@@ -52,10 +52,17 @@
     </properties>
 
 
-
-
     <dependencyManagement>
         <dependencies>
+
+            <!-- ================= spring ======================== -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring.boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
 
 
             <!-- ================= Mybatis ===================== -->
@@ -66,10 +73,9 @@
                 <version>${mybatis.plus.version}</version>
             </dependency>
 
-            <!-- 用来在项目里面进行mybatis实体类、DAO层代码的自动生成  -->
             <dependency>
                 <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-generator</artifactId>
+                <artifactId>mybatis-plus-core</artifactId>
                 <version>${mybatis.plus.version}</version>
             </dependency>
 
@@ -81,14 +87,13 @@
             </dependency>
 
 
+            <!-- ================= 数据库驱动 ==================== -->
             <dependency>
-                <!-- 引入Spring Boot 的依赖 -->
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring.boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>8.0.19</version>
             </dependency>
+
 
         </dependencies>
     </dependencyManagement>
@@ -121,6 +126,17 @@
             </plugins>
         </pluginManagement>
     </build>
+
+
+    <profiles>
+        <profile>
+            <id>develop</id>
+            <modules>
+                <module>generator</module>
+            </modules>
+        </profile>
+
+    </profiles>
 
     <distributionManagement>
         <!--  发布仓库源  -->
