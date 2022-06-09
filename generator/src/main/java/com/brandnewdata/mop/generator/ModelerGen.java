@@ -35,14 +35,16 @@ public class ModelerGen {
                 // 全局配置
                 .globalConfig((scanner, builder) -> builder
                         .author(scanner.apply("请输入作者名称？"))
-                        .outputDir(System.getProperty("user.dir") + '/' + OUTPUT)
+                        .outputDir(System.getProperty("user.dir") + "/" + OUTPUT)
                         .dateType(DateType.TIME_PACK)
+                        .fileOverride() // 覆盖已生成的文件
+                        .disableOpenDir() // 生成完成后不打开目录
                 )
 
                 // 模板配置
                 .templateConfig(builder -> builder
                         // 禁用controller, xml, service ,service_impl
-                        .disable(TemplateType.XML, TemplateType.CONTROLLER,  TemplateType.SERVICE, TemplateType.SERVICEIMPL)
+                        .disable(TemplateType.XML, TemplateType.CONTROLLER, TemplateType.SERVICE, TemplateType.SERVICEIMPL)
                 )
 
                 // 包配置
@@ -65,18 +67,15 @@ public class ModelerGen {
                         .enableLombok() // 加上lombok注解
                         .addTableFills(
                                 // 添加自动更新的标记
-                                new Column("created_by", FieldFill.INSERT),
-                                new Column("created_time", FieldFill.INSERT),
-                                new Column("last_updated_by", FieldFill.INSERT_UPDATE),
-                                new Column("last_updated_time", FieldFill.INSERT_UPDATE)
+                                new Column("create_by", FieldFill.INSERT),
+                                new Column("create_time", FieldFill.INSERT),
+                                new Column("update_by", FieldFill.INSERT_UPDATE),
+                                new Column("update_time", FieldFill.INSERT_UPDATE)
                         )
 
                         // mapper文件配置
                         .mapperBuilder()
                         .formatMapperFileName("%sDao")
-
-
-
                 )
 
                 .execute();
