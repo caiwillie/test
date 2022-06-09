@@ -29,10 +29,10 @@ public class MybatisPlusConfiguration {
     // private static final String LOCATION_PATTERN = "classpath*:com/shinemo/suc/core/mappers/DataDao.xml";
 
     @Bean("modelMainMapperScannerConfigurer")
-    public static MapperScannerConfigurer mapperScannerConfigurer() throws Exception {
+    public static MapperScannerConfigurer mapperScannerConfigurer() {
         MapperScannerConfigurer ret = new MapperScannerConfigurer();
         ret.setSqlSessionFactoryBeanName("coreMainSqlSessionFactoryBean");
-        ret.setBasePackage("com.shinemo.suc.core.dao.mybatis");
+        ret.setBasePackage("com.brandnewdata.mop.modeler.dao");
         return ret;
     }
 
@@ -40,7 +40,7 @@ public class MybatisPlusConfiguration {
     public static SqlSessionFactory sqlSessionFactoryBean(
             DataSource dataSource,
             ResourcePatternResolver resourcePatResolver,
-            @Value("${sm.schema}") String schema) throws Exception {
+            @Value("${brandnewdata.datasource.schema}") String schema) throws Exception {
         MybatisSqlSessionFactoryBean factory = new MybatisSqlSessionFactoryBean();
         factory.setDataSource(dataSource);
 

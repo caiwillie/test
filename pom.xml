@@ -23,6 +23,10 @@
         <spring.boot.version>2.7.0</spring.boot.version>
         <mybatis.plus.version>3.5.1</mybatis.plus.version>
         <alibaba.druid.version>1.2.8</alibaba.druid.version>
+        <lombok.version>1.18.24</lombok.version>
+        <hutool.version>5.8.2</hutool.version>
+
+        <mysql.jdbc.version>8.0.19</mysql.jdbc.version>
 
         <spring.framework.version>5.3.14</spring.framework.version>
         <spring.security.version>5.6.1</spring.security.version>
@@ -86,21 +90,48 @@
                 <version>${alibaba.druid.version}</version>
             </dependency>
 
-
             <!-- ================= 数据库驱动 ==================== -->
             <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
-                <version>8.0.19</version>
+                <version>${mysql.jdbc.version}</version>
             </dependency>
 
+            <!-- ================= 常用工具包 ==================== -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
 
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool.version}</version>
+            </dependency>
+
+            <!-- ================= zeebe ======================== -->
         </dependencies>
     </dependencyManagement>
 
 
-    <build>
+    <!-- ===================== 全局依赖：谨慎添加，只添加必要的工具包 ========================   -->
+    <dependencies>
 
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+        </dependency>
+
+    </dependencies>
+
+    <build>
         <plugins>
 
         </plugins>
@@ -126,6 +157,8 @@
             </plugins>
         </pluginManagement>
     </build>
+
+
 
 
     <profiles>
