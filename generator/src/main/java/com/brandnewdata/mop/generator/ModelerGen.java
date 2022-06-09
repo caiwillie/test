@@ -42,7 +42,7 @@ public class ModelerGen {
                 // 模板配置
                 .templateConfig(builder -> builder
                         // 禁用controller, xml, service ,service_impl
-                        .disable(TemplateType.XML, TemplateType.CONTROLLER, TemplateType.SERVICE, TemplateType.SERVICEIMPL)
+                        .disable(TemplateType.XML, TemplateType.CONTROLLER,  TemplateType.SERVICE, TemplateType.SERVICEIMPL)
                 )
 
                 // 包配置
@@ -71,8 +71,12 @@ public class ModelerGen {
                                 new Column("last_updated_time", FieldFill.INSERT_UPDATE)
                         )
 
+                        // mapper文件配置
                         .mapperBuilder()
                         .formatMapperFileName("%sDao")
+
+
+
                 )
 
                 .execute();
