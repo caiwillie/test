@@ -7,14 +7,138 @@
     <groupId>com.brandnewdata</groupId>
     <artifactId>microservice-orchestration-platform</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
     <modules>
         <module>modeler</module>
     </modules>
-    <packaging>pom</packaging>
+
 
     <properties>
+        <jdk.version>17</jdk.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+
+        <!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
+        <spring.boot.version>2.7.0</spring.boot.version>
+        <mybatis.plus.version>3.5.2</mybatis.plus.version>
+        <alibaba.druid.version>1.2.8</alibaba.druid.version>
+
+        <spring.framework.version>5.3.14</spring.framework.version>
+        <spring.security.version>5.6.1</spring.security.version>
+        <spring.amqp.version>2.4.1</spring.amqp.version>
+        <spring.kafka.version>2.8.1</spring.kafka.version>
+        <reactor-netty.version>1.0.14</reactor-netty.version>
+        <jackson.version>2.13.1</jackson.version>
+        <jakarta-jms.version>2.0.3</jakarta-jms.version>
+        <mule.version>3.8.0</mule.version>
+        <camel.version>2.25.0</camel.version>
+        <cxf.version>3.4.2</cxf.version>
+        <slf4j.version>1.7.32</slf4j.version>
+        <groovy.version>3.0.9</groovy.version>
+        <jib-maven-plugin.version>2.6.0</jib-maven-plugin.version>
+
+        <junit.version>4.13.2</junit.version>
+        <junit.jupiter.version>5.8.2</junit.jupiter.version>
+        <hikari.version>3.4.5</hikari.version>
+        <maven.deploy.plugin.version>2.8.2</maven.deploy.plugin.version>
+        <maven.resources.plugin.version>3.1.0</maven.resources.plugin.version>
+        <mockito.version>4.0.0</mockito.version>
+        <testcontainers.version>1.12.4</testcontainers.version>
+
+        <oracle.jdbc.version>12.2.0.1</oracle.jdbc.version>
+        <oracle.jdbc.artifact>ojdbc8</oracle.jdbc.artifact>
+
     </properties>
+
+
+
+
+    <dependencyManagement>
+        <dependencies>
+
+
+            <!-- ================= Mybatis ===================== -->
+            <!-- Mybatis-plus-extension 包含了所有集成 Spring 的扩展功能以及自身核心框架   -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-extension</artifactId>
+                <version>${mybatis.plus.version}</version>
+            </dependency>
+
+            <!-- 用来在项目里面进行mybatis实体类、DAO层代码的自动生成  -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-generator</artifactId>
+                <version>${mybatis.plus.version}</version>
+            </dependency>
+
+            <!-- ================= 连接池 ======================== -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>${alibaba.druid.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <!-- 引入Spring Boot 的依赖 -->
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring.boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+
+    <build>
+
+        <plugins>
+
+        </plugins>
+
+        <!-- ==================== 插件版本管理 ========================= -->
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${spring.boot.version}</version>
+                    <configuration>
+                        <mainClass>${start-class}</mainClass>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>repackage</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <distributionManagement>
+        <!--  发布仓库源  -->
+
+        <repository>
+            <id>brandnewdata-releases</id>
+            <name>BrandNewData Release Repository</name>
+            <url>>http://10.101.53.4:8081/artifactory/libs-release-local</url>
+        </repository>
+
+        <snapshotRepository>
+            <id>brandnewdata-snapshots</id>
+            <name>BrandNewData Snapshot Repository</name>
+            <url>http://10.101.53.4:8081/artifactory/libs-snapshot-local</url>
+        </snapshotRepository>
+
+    </distributionManagement>
+
+
 
 </project>
