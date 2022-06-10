@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.modeler.message;
+package com.brandnewdata.mop.poc.message;
 
 import lombok.Data;
 

@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.modeler.config;
+package com.brandnewdata.mop.poc.config;
 
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;

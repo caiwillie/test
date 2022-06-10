@@ -1,8 +1,8 @@
-package com.brandnewdata.mop.modeler.rest;
+package com.brandnewdata.mop.poc.rest;
 
-import com.brandnewdata.mop.modeler.common.service.result.PageVo;
-import com.brandnewdata.mop.modeler.common.service.result.Result;
-import com.brandnewdata.mop.modeler.pojo.vo.ModelVo;
+import com.brandnewdata.mop.poc.common.service.result.PageVo;
+import com.brandnewdata.mop.poc.common.service.result.Result;
+import com.brandnewdata.mop.poc.pojo.vo.ModelVo;
 import org.springframework.web.bind.annotation.*;
 
 /**

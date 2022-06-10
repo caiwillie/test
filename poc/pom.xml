@@ -13,7 +13,7 @@
 
     <properties>
         <dom4j.version>2.1.3</dom4j.version>
-        <start-class>com.brandnewdata.mop.modeler.PocApplication</start-class>
+        <start-class>com.brandnewdata.mop.poc.PocApplication</start-class>
     </properties>
 
     <dependencyManagement>

@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.modeler;
+package com.brandnewdata.mop.poc;
 
 import io.camunda.zeebe.spring.client.EnableZeebeClient;
 import org.springframework.boot.SpringApplication;

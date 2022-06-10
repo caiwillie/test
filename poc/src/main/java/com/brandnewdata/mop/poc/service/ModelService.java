@@ -1,14 +1,11 @@
-package com.brandnewdata.mop.modeler.service;
+package com.brandnewdata.mop.poc.service;
 
 
-import com.brandnewdata.mop.modeler.dao.DeModelDao;
-import com.brandnewdata.mop.modeler.pojo.entity.DeModelEntity;
+import com.brandnewdata.mop.poc.dao.DeModelDao;
+import com.brandnewdata.mop.poc.pojo.entity.DeModelEntity;
 import io.camunda.zeebe.client.ZeebeClient;
 import io.camunda.zeebe.client.api.response.DeploymentEvent;
 import io.camunda.zeebe.client.api.response.ProcessInstanceEvent;
-import io.camunda.zeebe.spring.client.lifecycle.ZeebeClientLifecycle;
-import io.camunda.zeebe.spring.client.properties.ZeebeClientConfigurationProperties;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 

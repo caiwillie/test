@@ -1,6 +1,6 @@
-package com.brandnewdata.mop.modeler.service;
+package com.brandnewdata.mop.poc.service;
 
-import com.brandnewdata.mop.modeler.dao.DeModelDao;
+import com.brandnewdata.mop.poc.dao.DeModelDao;
 import io.camunda.zeebe.client.ZeebeClient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

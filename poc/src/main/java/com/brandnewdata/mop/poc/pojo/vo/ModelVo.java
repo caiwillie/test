@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.modeler.pojo.vo;
+package com.brandnewdata.mop.poc.pojo.vo;
 
 import lombok.Data;
 

@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.modeler.config;
+package com.brandnewdata.mop.poc.config;
 
 import com.alibaba.druid.filter.stat.StatFilter;
 import com.alibaba.druid.pool.DruidDataSource;

@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.modeler.pojo.entity;
+package com.brandnewdata.mop.poc.pojo.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Getter;

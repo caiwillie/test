@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.modeler.common.service.result;
+package com.brandnewdata.mop.poc.common.service.result;
 
 /**
  * Web请求状态码
