@@ -1,19 +1,26 @@
 package com.brandnewdata.mop.modeler.message;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import io.camunda.zeebe.client.ZeebeClient;
 import io.camunda.zeebe.client.api.response.PublishMessageResponse;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The type Message resource.
  *
  * @author caiwillie
  */
-@RestController(value = "message")
+
+@Slf4j
+@RestController
 public class MessageResource {
 
     /**
@@ -23,21 +30,31 @@ public class MessageResource {
     private ZeebeClient zeebe;
 
     /**
-     * Sned.
-     *
-     * @param type           消息类型
-     * @param correlationKey 绑定键值
+     * 发送消息
      */
-    @GetMapping(value = "send")
-    public void sned(
-            @RequestParam String type,
-            @RequestParam String correlationKey
-    ) {
+    @PostMapping(value = "/message/send")
+    public void sned(@RequestBody MessageDTO message) {
+        String type = message.getType();
+        String correlationKey = message.getCorrelationKey();
+        String content = message.getContent();
+
+        log.info("接收到消息: type {}, correlationKey {}, content {}",
+                type, correlationKey, content);
+        Assert.notBlank(type, "消息类型不为空");
+
+        Map<String, Object> values = new HashMap<>();
+
+        // 解析参数
+        if(StrUtil.isNotBlank(content)) {
+            Map<String, Object> raw = JSONUtil.parseObj(content).getRaw();
+            if (raw != null) values.putAll(raw);
+        }
+
         zeebe.newPublishMessageCommand()
                 .messageName(type)
                 .correlationKey(correlationKey)
+                .variables(values)
                 .send()
                 .join();
-
     }
 }
