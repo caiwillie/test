@@ -2,16 +2,12 @@ package com.brandnewdata.mop.modeler.common.service.result;
 
 import lombok.Data;
 
-import java.io.Serializable;
-
 /**
  * 接口返回数据格式
  * @author caiwillie
  */
 @Data
-public class Result<T> implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class Result<T> {
 
 	/**
 	 * 成功标志

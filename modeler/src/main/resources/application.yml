@@ -17,3 +17,12 @@ brandnewdata:
     username: "root"
     password: "caiwillie"
     driver-class-name: "com.mysql.cj.jdbc.Driver"
+
+
+# https://github.com/camunda-community-hub/spring-zeebe/
+zeebe:
+  client:
+    broker:
+      gateway-address: "127.0.0.1:26500"
+    security:
+      plaintext: true

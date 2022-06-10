@@ -20,7 +20,12 @@
         <maven.compiler.target>17</maven.compiler.target>
 
         <!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
-        <spring.boot.version>2.7.0</spring.boot.version>
+        <!-- spring boot 和 spring colud 版本关系 https://docs.spring.io/spring-cloud/docs/current/reference/html/ -->
+        <spring.boot.version>2.6.8</spring.boot.version>
+        <spring.cloud.version>2021.0.3</spring.cloud.version>
+        <alibaba.nacos.spring.cloud.version>2021.1</alibaba.nacos.spring.cloud.version>
+
+
         <mybatis.plus.version>3.5.1</mybatis.plus.version>
         <alibaba.druid.version>1.2.8</alibaba.druid.version>
         <lombok.version>1.18.24</lombok.version>
@@ -68,6 +73,26 @@
                 <scope>import</scope>
             </dependency>
 
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring.cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- ================= nacos ======================== -->
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+                <version>${alibaba.nacos.spring.cloud.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+                <version>${alibaba.nacos.spring.cloud.version}</version>
+            </dependency>
 
             <!-- ================= Mybatis ===================== -->
             <!-- Mybatis-plus-extension 包含了所有集成 Spring 的扩展功能以及自身核心框架   -->

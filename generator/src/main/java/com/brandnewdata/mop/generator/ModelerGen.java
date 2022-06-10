@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.generator;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.generator.FastAutoGenerator;
 import com.baomidou.mybatisplus.generator.config.*;
@@ -29,12 +30,14 @@ public class ModelerGen {
 
     private static final String OUTPUT = "modeler/src/main/java";
 
+    private static final String AUTHOR = System.getenv("AUTHOR"); // 通过环境变量获取值
+
     public static void main(String[] args) {
 
         FastAutoGenerator.create(URL, USERNAME, PASSWORD)
                 // 全局配置
                 .globalConfig((scanner, builder) -> builder
-                        .author(scanner.apply("请输入作者名称？"))
+                        .author(StrUtil.isNotBlank(AUTHOR) ? AUTHOR : scanner.apply("请输入作者名称？"))
                         .outputDir(System.getProperty("user.dir") + "/" + OUTPUT)
                         .dateType(DateType.TIME_PACK)
                         .fileOverride() // 覆盖已生成的文件
@@ -65,6 +68,7 @@ public class ModelerGen {
                         .entityBuilder()
                         .formatFileName("%sEntity") // 修改名称后缀
                         .enableLombok() // 加上lombok注解
+                        .enableColumnConstant() // 加上字段名常量
                         .addTableFills(
                                 // 添加自动更新的标记
                                 new Column("create_by", FieldFill.INSERT),

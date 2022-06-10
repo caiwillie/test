@@ -1,14 +1,11 @@
 package com.brandnewdata.mop.modeler.pojo.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
-import java.time.LocalDateTime;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -40,5 +37,27 @@ public class DeModelEntity implements Serializable {
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
 
+    private String name;
+
+    private String modelKy;
+
+    private String editorJson;
+
+
+    public static final String ID = "id";
+
+    public static final String CREATE_BY = "create_by";
+
+    public static final String CREATE_TIME = "create_time";
+
+    public static final String UPDATE_BY = "update_by";
+
+    public static final String UPDATE_TIME = "update_time";
+
+    public static final String NAME = "name";
+
+    public static final String MODEL_KY = "model_ky";
+
+    public static final String EDITOR_JSON = "editor_json";
 
 }
