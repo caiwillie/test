@@ -1,0 +1,7 @@
+# https://github.com/camunda-community-hub/spring-zeebe/
+zeebe:
+  client:
+    broker:
+      gateway-address: "10.101.53.4:26500"
+    security:
+      plaintext: true

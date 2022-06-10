@@ -11,6 +11,7 @@
 
     <modules>
         <module>modeler</module>
+        <module>example</module>
     </modules>
 
 
@@ -23,15 +24,27 @@
         <!-- spring boot 和 spring colud 版本关系 https://docs.spring.io/spring-cloud/docs/current/reference/html/ -->
         <spring.boot.version>2.6.8</spring.boot.version>
         <spring.cloud.version>2021.0.3</spring.cloud.version>
+
+        <!-- nacos版本 -->
         <alibaba.nacos.spring.cloud.version>2021.1</alibaba.nacos.spring.cloud.version>
-
-
+        <!-- mybatis plus版本 -->
         <mybatis.plus.version>3.5.1</mybatis.plus.version>
+        <!-- alibaba druid版本 -->
         <alibaba.druid.version>1.2.8</alibaba.druid.version>
         <lombok.version>1.18.24</lombok.version>
         <hutool.version>5.8.2</hutool.version>
 
+        <!-- mysql jdbc 版本 -->
         <mysql.jdbc.version>8.0.19</mysql.jdbc.version>
+
+        <!-- zeebe 版本 -->
+        <spring.zeebe.version>8.0.5</spring.zeebe.version>
+        <!--  zeebe 使用的 protobuf 的版本问题 https://github.com/camunda-community-hub/micronaut-zeebe-client/issues/88-->
+        <google.protobuf.version>3.19.4</google.protobuf.version>
+
+
+
+
 
         <spring.framework.version>5.3.14</spring.framework.version>
         <spring.security.version>5.6.1</spring.security.version>
@@ -136,6 +149,19 @@
             </dependency>
 
             <!-- ================= zeebe ======================== -->
+
+            <dependency>
+                <groupId>io.camunda</groupId>
+                <artifactId>spring-zeebe-starter</artifactId>
+                <version>${spring.zeebe.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+                <version>${google.protobuf.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
