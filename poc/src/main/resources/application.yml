@@ -7,6 +7,9 @@ spring:
       max-file-size: 8MB
       max-request-size: 16MB
 
+# web容器相关配置
+server:
+  port: 14499
 
 # https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#data.sql.datasource
 # https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto.data-access.configure-custom-datasource

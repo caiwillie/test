@@ -8,9 +8,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @EnableZeebeClient
 
 @SpringBootApplication
-public class ModelerApplication {
+public class PocApplication {
 	public static void main(String[] args) {
-		SpringApplication.run(ModelerApplication.class, args);
+		SpringApplication.run(PocApplication.class, args);
 	}
 
 }

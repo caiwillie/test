@@ -12,7 +12,7 @@
     <artifactId>modeler</artifactId>
 
     <properties>
-        <start-class>com.brandnewdata.mop.modeler.ModelerApplication</start-class>
+        <start-class>com.brandnewdata.mop.modeler.PocApplication</start-class>
     </properties>
 
     <dependencies>
