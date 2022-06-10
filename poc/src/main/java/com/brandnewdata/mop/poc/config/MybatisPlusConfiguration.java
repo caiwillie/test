@@ -29,7 +29,7 @@ public class MybatisPlusConfiguration {
     public static MapperScannerConfigurer mapperScannerConfigurer() {
         MapperScannerConfigurer ret = new MapperScannerConfigurer();
         ret.setSqlSessionFactoryBeanName("coreMainSqlSessionFactoryBean");
-        ret.setBasePackage("com.brandnewdata.mop.modeler.dao");
+        ret.setBasePackage("com.brandnewdata.mop.poc.dao");
         return ret;
     }
 
