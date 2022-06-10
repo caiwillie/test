@@ -9,14 +9,25 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 
 /**
+ * The type Message resource.
+ *
  * @author caiwillie
  */
 @RestController(value = "message")
 public class MessageResource {
 
+    /**
+     * The Zeebe.
+     */
     @Resource
     private ZeebeClient zeebe;
 
+    /**
+     * Sned.
+     *
+     * @param type           消息类型
+     * @param correlationKey 绑定键值
+     */
     @GetMapping(value = "send")
     public void sned(
             @RequestParam String type,
