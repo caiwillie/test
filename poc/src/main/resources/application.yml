@@ -24,6 +24,6 @@ brandnewdata:
 zeebe:
   client:
     broker:
-      gateway-address: "10.101.53.4:26500"
+      gateway-address: "localhost:26500"
     security:
       plaintext: true
