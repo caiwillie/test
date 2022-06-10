@@ -3,6 +3,7 @@ package com.brandnewdata.mop.poc.message;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.brandnewdata.mop.poc.common.service.result.Result;
 import io.camunda.zeebe.client.ZeebeClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +32,7 @@ public class MessageResource {
      * 发送消息
      */
     @PostMapping(value = "/message/send")
-    public void sned(@RequestBody MessageDTO message) {
+    public Result sned(@RequestBody MessageDTO message) {
         String type = message.getType();
         String correlationKey = message.getCorrelationKey();
         String content = message.getContent();
@@ -48,11 +49,13 @@ public class MessageResource {
             if (raw != null) values.putAll(raw);
         }
 
-        zeebe.newPublishMessageCommand()
-                .messageName(type)
-                .correlationKey(correlationKey)
-                .variables(values)
-                .send()
-                .join();
+//        zeebe.newPublishMessageCommand()
+//                .messageName(type)
+//                .correlationKey(correlationKey)
+//                .variables(values)
+//                .send()
+//                .join();
+
+        return Result.success();
     }
 }
