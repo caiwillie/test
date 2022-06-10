@@ -10,8 +10,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>modeler</module>
         <module>example</module>
+        <module>poc</module>
     </modules>
 
 
