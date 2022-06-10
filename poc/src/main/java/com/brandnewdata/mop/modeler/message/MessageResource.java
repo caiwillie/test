@@ -33,10 +33,11 @@ public class MessageResource {
             @RequestParam String type,
             @RequestParam String correlationKey
     ) {
-        PublishMessageResponse response = zeebe.newPublishMessageCommand()
+        zeebe.newPublishMessageCommand()
                 .messageName(type)
                 .correlationKey(correlationKey)
                 .send()
                 .join();
+
     }
 }

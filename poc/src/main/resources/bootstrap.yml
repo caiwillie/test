@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: poc
+
+  # nacos 相关配置
+  cloud:
+    nacos:
+      config:
+        server-addr: 10.101.53.4:8848
+        namespace: "dev"
+        group: "default"
+        file-extension: yaml
+      discovery:
+        server-addr: 10.101.53.4:8848

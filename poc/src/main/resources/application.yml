@@ -1,22 +1,10 @@
 spring:
-  application:
-    name: mop-poc
-
   # servlet相关配置
   servlet:
     # 上传文件配置
     multipart:
       max-file-size: 8MB
       max-request-size: 16MB
-
-  # nacos 相关配置
-  cloud:
-    nacos:
-      config:
-        server-addr: 10.101.53.4:8848
-        namespace: ${CONFIG_NAMESPACE:dev}
-        group: ${CONFIG_GROUP:DEFAULT_GROUP}
-        file-extension: yaml
 
 # web容器相关配置
 server:
