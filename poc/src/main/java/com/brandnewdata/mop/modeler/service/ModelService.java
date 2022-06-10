@@ -9,6 +9,7 @@ import io.camunda.zeebe.client.api.response.ProcessInstanceEvent;
 import io.camunda.zeebe.spring.client.lifecycle.ZeebeClientLifecycle;
 import io.camunda.zeebe.spring.client.properties.ZeebeClientConfigurationProperties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -25,6 +26,10 @@ public class ModelService {
 
     @Resource
     private ZeebeClient zeebe;
+
+
+    @Value("${brandnewdata.datasource.url}")
+    private String url;
 
     @PostConstruct
     void post() {
