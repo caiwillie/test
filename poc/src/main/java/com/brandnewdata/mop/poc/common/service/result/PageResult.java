@@ -8,17 +8,17 @@ import java.util.List;
  * @author caiwillie
  */
 @Data
-public class PageVo<T> {
+public class PageResult<T> {
 
-    private int total;
+    private long total;
 
     private List<T> records;
 
-    public PageVo() {
+    public PageResult() {
 
     }
 
-    public PageVo(int total, List<T> records) {
+    public PageResult(long total, List<T> records) {
         this.total = total;
         this.records = records;
     }

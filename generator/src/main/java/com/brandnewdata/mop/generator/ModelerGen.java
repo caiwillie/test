@@ -16,19 +16,19 @@ import java.util.List;
  */
 public class ModelerGen {
 
-    private static final String IP = "localhost";
+    private static final String IP = "10.101.53.4";
 
     private static final String PORT = "3306";
 
-    private static final String DB_NAME = "test";
+    private static final String DB_NAME = "mop";
 
     private static final String URL = String.format("jdbc:mysql://%s:%s/%s?useUnicode=true&useSSL=false&characterEncoding=utf8", IP, PORT, DB_NAME);
 
     private static final String USERNAME = "root";
 
-    private static final String PASSWORD = "caiwillie";
+    private static final String PASSWORD = "Brand@123456";
 
-    private static final String OUTPUT = "modeler/src/main/java";
+    private static final String OUTPUT = "poc/src/main/java";
 
     private static final String AUTHOR = System.getenv("AUTHOR"); // 通过环境变量获取值
 
@@ -52,7 +52,7 @@ public class ModelerGen {
 
                 // 包配置
                 .packageConfig(builder -> builder
-                        .parent("com.brandnewdata.mop.modeler")
+                        .parent("com.brandnewdata.mop.poc")
                         // entity的包名称
                         .entity("pojo.entity")
                         // dao层的包名称

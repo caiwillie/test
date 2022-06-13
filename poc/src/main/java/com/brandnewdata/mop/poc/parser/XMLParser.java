@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.poc.parser;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FastStringWriter;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.StrUtil;
@@ -11,6 +12,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -77,24 +79,18 @@ public class XMLParser {
 
     public static void treeWalk(Element element) {
 
-        // 处理namespace
-        handleNamespace(element);
+        // 新建element，源列表可能会被修改
+        List<Element> elements = CollUtil.newArrayList(element.elements());
 
-        // 处理邮件连接器
         handleConnector(element);
 
-
         // 递归循环
-        for (int i = 0, size = element.nodeCount(); i < size; i++) {
-            Node node = element.node(i);
-
-            if (node instanceof Element) {
-
-                treeWalk((Element) node);
-            } else {
-                // do something…
-            }
+        for (Element e : elements) {
+            treeWalk(e);
         }
+
+        // 处理namespace
+        handleNamespace(element);
     }
 
     private static void handleNamespace(Element element) {
@@ -106,13 +102,18 @@ public class XMLParser {
     }
 
     private static void handleConnector(Element element) {
-        List<Attribute> attributes = element.attributes();
+        if(!StrUtil.equals(element.getName(), "serviceTask")) {
+            // 不是service task，直接跳过
+            return;
+        }
+
+        List<Element> elements = element.elements();
         String id = element.attributeValue("id");
 
         if(StrUtil.equals(id, "Activity_0fnu1xs")) {
             QName taskDefinition = DocumentHelper.createQName("taskDefinition", ZEEBE_NAMESPACE);
             Element e = DocumentHelper.createElement(taskDefinition);
-            List<Element> elements = element.elements();
+
             elements.add(0, e);
         }
 
