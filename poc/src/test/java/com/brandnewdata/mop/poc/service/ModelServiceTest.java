@@ -25,14 +25,6 @@ class ModelServiceTest {
     @InjectMocks
     private ModelService modelServiceUnderTest;
 
-    @Test
-    void testPost() {
-        // Setup
-        // Run the test
-        modelServiceUnderTest.post();
-
-        // Verify the results
-    }
 
     @Test
     void testAdd() {
@@ -44,13 +36,13 @@ class ModelServiceTest {
         entity.setUpdateBy("updateBy");
         entity.setUpdateTime(LocalDateTime.of(2020, 1, 1, 0, 0, 0));
         entity.setName("name");
-        entity.setModelKy("modelKy");
-        entity.setEditorJson("editorJson");
+        entity.setModelKey("modelKy");
+        entity.setEditorXml("editorJson");
 
         when(mockModelDao.insert(any(DeModelEntity.class))).thenReturn(0);
 
         // Run the test
-        modelServiceUnderTest.add(entity);
+
 
         // Verify the results
     }
