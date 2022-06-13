@@ -1,11 +1,14 @@
 package com.brandnewdata.mop.poc.pojo.entity;
 
-import com.baomidou.mybatisplus.annotation.*;
-import lombok.Getter;
-import lombok.Setter;
-
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * <p>
@@ -13,7 +16,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author caiwillie
- * @since 2022-06-09
+ * @since 2022-06-13
  */
 @Getter
 @Setter
@@ -39,9 +42,9 @@ public class DeModelEntity implements Serializable {
 
     private String name;
 
-    private String modelKy;
+    private String modelKey;
 
-    private String editorJson;
+    private String editorXml;
 
 
     public static final String ID = "id";
@@ -56,8 +59,8 @@ public class DeModelEntity implements Serializable {
 
     public static final String NAME = "name";
 
-    public static final String MODEL_KY = "model_ky";
+    public static final String MODEL_KEY = "model_key";
 
-    public static final String EDITOR_JSON = "editor_json";
+    public static final String EDITOR_XML = "editor_xml";
 
 }
