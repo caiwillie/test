@@ -25,8 +25,6 @@ public class ModelService {
     private ZeebeClient zeebe;
 
 
-    @Value("${brandnewdata.datasource.url}")
-    private String url;
 
     @PostConstruct
     void post() {

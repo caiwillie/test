@@ -1,6 +1,7 @@
 package com.brandnewdata.mop.poc.service;
 
 import com.brandnewdata.mop.poc.dao.DeModelDao;
+import com.brandnewdata.mop.poc.pojo.entity.DeModelEntity;
 import io.camunda.zeebe.client.ZeebeClient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,7 +9,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.Mockito.mock;
+import java.time.LocalDateTime;
+
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -16,54 +19,61 @@ class ModelServiceTest {
 
     @Mock
     private DeModelDao mockModelDao;
-
     @Mock
     private ZeebeClient mockZeebe;
 
     @InjectMocks
     private ModelService modelServiceUnderTest;
 
+    @Test
+    void testPost() {
+        // Setup
+        // Run the test
+        modelServiceUnderTest.post();
+
+        // Verify the results
+    }
 
     @Test
-    void testStart() {
-        try (ZeebeClient client = ZeebeClient.newClientBuilder()
-                .gatewayAddress("127.0.0.1:26500")
-                .usePlaintext()
-                .build()) {
-            // Setup
-            when(mockZeebe.newCreateInstanceCommand()).thenReturn(client.newCreateInstanceCommand());
+    void testAdd() {
+        // Setup
+        final DeModelEntity entity = new DeModelEntity();
+        entity.setId(0L);
+        entity.setCreateBy(LocalDateTime.of(2020, 1, 1, 0, 0, 0));
+        entity.setCreateTime("createTime");
+        entity.setUpdateBy("updateBy");
+        entity.setUpdateTime(LocalDateTime.of(2020, 1, 1, 0, 0, 0));
+        entity.setName("name");
+        entity.setModelKy("modelKy");
+        entity.setEditorJson("editorJson");
 
-            // Run the test
-            modelServiceUnderTest.start("camunda-cloud-quick-start-advanced");
+        when(mockModelDao.insert(any(DeModelEntity.class))).thenReturn(0);
 
-            // Verify the results
-        }
+        // Run the test
+        modelServiceUnderTest.add(entity);
+
+        // Verify the results
     }
 
     @Test
     void testDeploy() {
+        // Setup
+        when(mockZeebe.newDeployResourceCommand()).thenReturn(null);
 
+        // Run the test
+        modelServiceUnderTest.deploy("classPath");
 
-        try (ZeebeClient client = ZeebeClient.newClientBuilder()
-                .gatewayAddress("127.0.0.1:26500")
-                .usePlaintext()
-                .build()) {
-            // Setup
-            when(mockZeebe.newDeployResourceCommand()).thenReturn(client.newDeployResourceCommand());
+        // Verify the results
+    }
 
-            // Run the test
-            modelServiceUnderTest.deploy("gettingstarted_quickstart.bpmn");
+    @Test
+    void testStart() {
+        // Setup
+        when(mockZeebe.newCreateInstanceCommand()).thenReturn(null);
 
-            // Verify the results
-        }
+        // Run the test
+        modelServiceUnderTest.start("processId");
 
-
-
-
-
-
-
-
-
+        // Verify the results
     }
 }

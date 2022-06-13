@@ -11,4 +11,4 @@ spring:
         group: DEFAULT_GROUP
         file-extension: yaml
       discovery:
-        server-addr: 10.101.5.244:8848
+        server-addr: 10.101.53.4:8848
