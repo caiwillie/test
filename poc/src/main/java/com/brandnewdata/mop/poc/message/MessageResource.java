@@ -31,7 +31,6 @@ public class MessageResource {
     private static final ObjectMapper OM = new ObjectMapper();
     private static final MapType MAP_TYPE = OM.getTypeFactory().constructMapType(Map.class, String.class, Object.class);
 
-
     @Resource
     private ZeebeClient zeebe;
 
