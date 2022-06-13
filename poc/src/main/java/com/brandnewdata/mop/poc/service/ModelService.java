@@ -8,8 +8,6 @@ import com.brandnewdata.mop.poc.common.service.result.PageResult;
 import com.brandnewdata.mop.poc.dao.DeModelDao;
 import com.brandnewdata.mop.poc.pojo.entity.DeModelEntity;
 import io.camunda.zeebe.client.ZeebeClient;
-import io.camunda.zeebe.client.api.response.DeploymentEvent;
-import io.camunda.zeebe.client.api.response.ProcessInstanceEvent;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -60,26 +58,23 @@ public class ModelService {
         return ret;
     }
 
-    public void deploy(String classPath) {
-        DeploymentEvent deploymentEvent =
-                zeebe.newDeployResourceCommand()
-                        .addResourceFromClasspath(classPath)
-                        .send()
-                        .join();
-        return;
+    public void deploy(String modelKey) {
+        DeModelEntity entity = getOne(modelKey);
+        String editorXml = entity.getEditorXml();
+
+        zeebe.newDeployResourceCommand()
+                .addResourceStringUtf8(editorXml, modelKey + ".bpmn")
+                .send()
+                .join();
     }
 
-    public void start(String processId) {
+    public void start(String modelKey) {
         // camunda-cloud-quick-start-advanced
 
-        ProcessInstanceEvent processInstanceEvent =
-                zeebe
-                        .newCreateInstanceCommand()
-                        .bpmnProcessId(processId)
-                        .latestVersion()
-                        .send()
-                        .join();
-
-        return;
+        zeebe.newCreateInstanceCommand()
+                .bpmnProcessId(modelKey)
+                .latestVersion()
+                .send()
+                .join();
     }
 }
