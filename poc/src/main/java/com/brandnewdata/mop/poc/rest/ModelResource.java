@@ -42,7 +42,7 @@ public class ModelResource {
             @RequestParam Integer pageSize) {
         PageResult<DeModelEntity> page = modelService.page(pageNumber, pageSize);
         List<ModelVo> records = Optional.ofNullable(page.getRecords()).orElse(Collections.emptyList())
-                .stream().map(this::transformToVO).toList();
+                .stream().map(this::transformToVO).collect(Collectors.toList());
         PageResult<ModelVo> ret = new PageResult<>(page.getTotal(), records);
         return Result.success(ret);
     }
