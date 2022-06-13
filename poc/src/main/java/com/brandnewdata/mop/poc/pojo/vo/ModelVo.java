@@ -11,22 +11,22 @@ import lombok.Data;
 public class ModelVo {
 
     /**
-     * The Id.
+     * id
      */
     private Long id;
 
     /**
-     * The Name.
+     * 模型名称
      */
     private String name;
 
     /**
-     * The Model key.
+     * 模型标识
      */
     private String modelKey;
 
     /**
-     * The Editor xml.
+     * 模型定义
      */
     private String editorXML;
 }

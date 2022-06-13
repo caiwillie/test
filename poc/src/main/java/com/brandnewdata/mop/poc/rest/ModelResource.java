@@ -19,13 +19,24 @@ import java.util.stream.Collectors;
  *
  * @author caiwillie
  */
-@RestController(value = "/rest/model")
+@RestController
+@RequestMapping(value = "/rest/model")
 public class ModelResource {
 
+    /**
+     * The Model service.
+     */
     @Autowired
     private ModelService modelService;
 
-    @GetMapping(value = "/page")
+    /**
+     * 分页
+     *
+     * @param pageNumber 分页页码
+     * @param pageSize   分页大小
+     * @return the result
+     */
+    @GetMapping(value = "page")
     public Result<PageResult<ModelVo>> page(
             @RequestParam Integer pageNumber,
             @RequestParam Integer pageSize) {
@@ -36,6 +47,12 @@ public class ModelResource {
         return Result.success(ret);
     }
 
+    /**
+     * 保存（新增或者修改）
+     *
+     * @param vo the vo
+     * @return the result
+     */
     @PostMapping(value = "/save")
     public Result<ModelVo> save(@RequestBody ModelVo vo) {
         valid(vo);
@@ -46,6 +63,13 @@ public class ModelResource {
         return Result.success(vo);
     }
 
+
+    /**
+     * 详情
+     *
+     * @param modelKey the model key
+     * @return the result
+     */
     @GetMapping(value = "detail")
     public Result<ModelVo> detail(@RequestParam("modelKey") String modelKey) {
         Assert.notNull(modelKey, "模型标识不能为空");
@@ -55,16 +79,24 @@ public class ModelResource {
         return Result.success(vo);
     }
 
+    /**
+     * 部署
+     *
+     * @param modelVo the model vo
+     * @return the result
+     */
     @PostMapping(value = "/deploy")
     public Result<ModelVo> deploy(@RequestBody ModelVo modelVo) {
         return null;
     }
+
 
     private void valid(ModelVo modelVo) {
         Assert.notNull(modelVo.getModelKey(), "模型id不能为空");
         Assert.notNull(modelVo.getName(), "模型名称不能为空");
         Assert.notNull(modelVo.getEditorXML(), "模型定义不能为空");
     }
+
 
     private DeModelEntity transformToEntity(ModelVo modelVo) {
         DeModelEntity entity = new DeModelEntity();
@@ -74,6 +106,7 @@ public class ModelResource {
         entity.setEditorXml(modelVo.getEditorXML());
         return entity;
     }
+
 
     private ModelVo transformToVO(DeModelEntity entity) {
         ModelVo vo = new ModelVo();
