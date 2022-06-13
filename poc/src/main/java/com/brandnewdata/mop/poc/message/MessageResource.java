@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * The type Message resource.
@@ -63,7 +64,7 @@ public class MessageResource {
 
         zeebe.newPublishMessageCommand()
                 .messageName(type)
-                .correlationKey(correlationKey)
+                .correlationKey(Optional.ofNullable(correlationKey).orElse(StrUtil.EMPTY))
                 .variables(values)
                 .send()
                 .join();
