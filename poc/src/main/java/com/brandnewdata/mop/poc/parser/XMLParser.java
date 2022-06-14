@@ -110,7 +110,7 @@ public class XMLParser {
             throw new RuntimeException(e);
         }
     }
-
+    
     private void handleNamespace(Element element) {
         // 替换 namespace
         if (StrUtil.equals(element.getNamespacePrefix(), BPMNNamespace.BPMN2.getPrefix())) {

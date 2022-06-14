@@ -66,9 +66,10 @@ public class ModelService {
     public void deploy(String modelKey) {
         DeModelEntity entity = getOne(modelKey);
         String editorXml = entity.getEditorXml();
+        XMLDTO xmldto = new XMLParser().parse(editorXml);
 
         zeebe.newDeployResourceCommand()
-                .addResourceStringUtf8(editorXml, modelKey + ".bpmn")
+                .addResourceStringUtf8(xmldto.getZeebeXML(), modelKey + ".bpmn")
                 .send()
                 .join();
     }
