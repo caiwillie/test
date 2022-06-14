@@ -82,15 +82,30 @@ public class ModelResource {
     }
 
     /**
-     * 部署
+     * 部署流程
      *
      * @param modelVo the model vo
      * @return the result
      */
     @PostMapping(value = "/deploy")
     public Result<ModelVo> deploy(@RequestBody ModelVo modelVo) {
-        return null;
+        modelService.deploy(modelVo.getModelKey());
+        return Result.success();
     }
+
+    /**
+     * 启动流程
+     *
+     * @param modelVo the model vo
+     * @return the result
+     */
+    @PostMapping(value = "/start")
+    public Result<ModelVo> satrt(@RequestBody ModelVo modelVo) {
+        modelService.start(modelVo.getModelKey());
+        return Result.success();
+    }
+
+
 
 
     private void valid(ModelVo modelVo) {
