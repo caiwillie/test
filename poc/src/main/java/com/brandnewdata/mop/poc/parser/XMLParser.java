@@ -34,13 +34,17 @@ public class XMLParser {
     private static final Namespace ZEEBE_NAMESPACE =
             DocumentHelper.createNamespace(BPMNNamespace.ZEEBE.getPrefix(), BPMNNamespace.ZEEBE.getUri());
 
+    private static QName BPMN_TASK_QNAME = DocumentHelper.createQName("task", BPMN_NAMESPACE);
+
     private static QName BPMN_EXTENSION_ELEMENTS_QNAME = DocumentHelper.createQName("extensionElements", BPMN_NAMESPACE);
 
     private static QName BRANDNEWDATA_TASK_DEFINITION_QNAME = DocumentHelper.createQName("taskDefinition", BRANDNEWDATA_NAMESPACE);
     private static QName BRANDNEWDATA_INPUT_QNAME = DocumentHelper.createQName("input", BRANDNEWDATA_NAMESPACE);
 
     private static QName BRANDNEWDATA_OUTPUT_QNAME = DocumentHelper.createQName("output", BRANDNEWDATA_NAMESPACE);
-    private static QName IO_MAPPING_QNAME = DocumentHelper.createQName("ioMapping", ZEEBE_NAMESPACE);
+
+    private static QName BRANDNEWDATA_EXTENSION_QNAME = DocumentHelper.createQName("extension", BRANDNEWDATA_NAMESPACE);
+    private static QName ZEEBE_IO_MAPPING_QNAME = DocumentHelper.createQName("ioMapping", ZEEBE_NAMESPACE);
     private static QName ZEEBE_INPUT_QNAME = DocumentHelper.createQName("input", ZEEBE_NAMESPACE);
 
     public XMLDTO parse(String xml) {
@@ -139,19 +143,19 @@ public class XMLParser {
     }
 
     private void handleConnector(Element element) {
-        QName qName = element.getQName();
-        if(!(StrUtil.equals(BPMN_NAMESPACE.getPrefix(), qName.getNamespacePrefix())
-                && StrUtil.equals("serviceTask", qName.getName()))) {
-            // 不是 service task，直接跳过
+
+        if(!(StrUtil.equals(element.getQualifiedName(), BPMN_TASK_QNAME.getQualifiedName())
+            && StrUtil.isNotBlank(element.attributeValue(BRANDNEWDATA_EXTENSION_QNAME)))) {
+            // task 并且 brandnewdata:extension 不为空，计算为false, 就跳过
             return;
         }
+
+
 
         // 处理任务定义
         String type = handleTaskDefinition(element);
 
         handleInput(element, type);
-
-
 
 /*
 
@@ -206,7 +210,7 @@ public class XMLParser {
 
         List<Node> content = input.getParent().content();
 
-        Element ioMapping = DocumentHelper.createElement(IO_MAPPING_QNAME);
+        Element ioMapping = DocumentHelper.createElement(ZEEBE_IO_MAPPING_QNAME);
 
         content.add(ioMapping);
 
