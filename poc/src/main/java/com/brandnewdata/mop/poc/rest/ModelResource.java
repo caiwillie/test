@@ -60,9 +60,9 @@ public class ModelResource {
         valid(vo);
         DeModelEntity entity = transformToEntity(vo);
         modelService.save(entity);
-        // 回填id
-        vo.setId(entity.getId());
-        return Result.success(vo);
+        // 返回新增值
+        ModelVo ret = transformToVO(entity);
+        return Result.success(ret);
     }
 
 
