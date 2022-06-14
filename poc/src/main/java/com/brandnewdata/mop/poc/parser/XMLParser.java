@@ -66,10 +66,10 @@ public class XMLParser {
         String zeebeXML = serializa(document);
         ret.setZeebeXML(zeebeXML);
 
-        log.info("转换前的 xml 内容：\n" +
+        log.info("\n" +
+                "==============================转换前的 xml 内容============================\n" +
                 "{} \n" +
-                "=================================================================== \n" +
-                "转换后的 xml 内容：\n" +
+                "==============================转换后的 xml 内容============================\n" +
                 "{}", xml, zeebeXML);
         return ret;
     }
