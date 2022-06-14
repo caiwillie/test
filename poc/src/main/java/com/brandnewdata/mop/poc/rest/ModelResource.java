@@ -92,8 +92,6 @@ public class ModelResource {
 
 
     private void valid(ModelVo modelVo) {
-        Assert.notNull(modelVo.getModelKey(), "模型id不能为空");
-        Assert.notNull(modelVo.getName(), "模型名称不能为空");
         Assert.notNull(modelVo.getEditorXML(), "模型定义不能为空");
     }
 
@@ -101,8 +99,6 @@ public class ModelResource {
     private DeModelEntity transformToEntity(ModelVo modelVo) {
         DeModelEntity entity = new DeModelEntity();
         entity.setId(modelVo.getId());
-        entity.setName(modelVo.getName());
-        entity.setModelKey(modelVo.getModelKey());
         entity.setEditorXml(modelVo.getEditorXML());
         return entity;
     }

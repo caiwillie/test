@@ -106,7 +106,7 @@ public class XMLParser {
             // 不是service task，直接跳过
             return;
         }
-
+        
         List<Element> elements = element.elements();
         String id = element.attributeValue("id");
 
