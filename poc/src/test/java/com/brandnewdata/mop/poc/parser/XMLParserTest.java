@@ -8,7 +8,7 @@ class XMLParserTest {
 
     @Test
     void parse() {
-        XMLParser.parse();
+        new XMLParser().parse(null);
     }
 
 }
