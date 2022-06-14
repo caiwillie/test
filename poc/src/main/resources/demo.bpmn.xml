@@ -7,7 +7,7 @@
     </bpmn2:startEvent>
     <bpmn2:serviceTask id="Activity_0mnqdqs" name="sendemail" brandnewdata:extension="brandnewdata">
       <bpmn2:extensionElements>
-        <brandnewdata:taskDefinition type="com.brandnewdata:send_mail:v1" />
+        <brandnewdata:taskDefinition type="mail-service" />
         <brandnewdata:input receive="liuben@brandnewdata.com" content="helloworld" />
       </bpmn2:extensionElements>
       <bpmn2:incoming>Flow_1hbu9l0</bpmn2:incoming>

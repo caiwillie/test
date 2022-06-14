@@ -110,7 +110,7 @@ public class XMLParser {
             throw new RuntimeException(e);
         }
     }
-    
+
     private void handleNamespace(Element element) {
         // 替换 namespace
         if (StrUtil.equals(element.getNamespacePrefix(), BPMNNamespace.BPMN2.getPrefix())) {
@@ -212,9 +212,9 @@ public class XMLParser {
 
         List<Node> zeebeInputs = new ArrayList<>();
 
-        if(StrUtil.equals(type, "com.brandnewdata:send_mail:v1")) {
+        if(StrUtil.equals(type, "mail-service")) {
             zeebeInputs = handleSendMailInput(input);
-        } else if (StrUtil.equals(type, "com.brandnewdata:send_sms:v1")) {
+        } else if (StrUtil.equals(type, "sms-service")) {
             zeebeInputs = handleSendSMSInput(input);
         }
 
