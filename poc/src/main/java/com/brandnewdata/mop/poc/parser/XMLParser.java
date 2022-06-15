@@ -47,6 +47,8 @@ public class XMLParser {
     private static QName ZEEBE_IO_MAPPING_QNAME = DocumentHelper.createQName("ioMapping", ZEEBE_NAMESPACE);
     private static QName ZEEBE_INPUT_QNAME = DocumentHelper.createQName("input", ZEEBE_NAMESPACE);
 
+    private static QName ZEEBE_OUTPUT_QNAME = DocumentHelper.createQName("output", ZEEBE_NAMESPACE);
+
     public XMLDTO parse(String xml) {
         XMLDTO ret = new XMLDTO();
         Document document;
@@ -155,11 +157,13 @@ public class XMLParser {
         // 处理任务定义
         String type = handleTaskDefinition(element);
 
-        handleInput(element, type);
+        handleIOMapping(element, type);
+
+
 
 /*
 
-        XPath outputXPATH = DocumentHelper.createXPath(StrUtil.format("./{}/{}", extensionElementsQName, outputQName));
+
 
 
 
@@ -198,34 +202,54 @@ public class XMLParser {
         return type;
     }
 
-    private void handleInput(Element task, String type) {
+    private void handleIOMapping(Element task, String type) {
+
         XPath inputXPATH = DocumentHelper.createXPath(StrUtil.format("./{}/{}",
                 BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(), BRANDNEWDATA_INPUT_QNAME.getQualifiedName()));
-        Node $input = inputXPATH.selectSingleNode(task);
-        if(!($input instanceof Element)) {
+
+        XPath outputXPATH = DocumentHelper.createXPath(StrUtil.format("./{}/{}",
+                BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(), BRANDNEWDATA_OUTPUT_QNAME.getQualifiedName()));
+
+        List<Node> content = null;
+
+        Element input = null;
+        Element output = null;
+        if(inputXPATH.selectSingleNode(task) instanceof Element
+                || outputXPATH.selectSingleNode(task) instanceof Element) {
+            input = (Element) inputXPATH.selectSingleNode(task);
+            output = (Element) outputXPATH.selectSingleNode(task);
+            content = input == null ? input.content() : output.content();
+        } else {
+            // input 和 output 都不存在
             return;
         }
 
-        Element input = (Element) $input;
-
-        List<Node> content = input.getParent().content();
-
         Element ioMapping = DocumentHelper.createElement(ZEEBE_IO_MAPPING_QNAME);
+        List<Node> ioMappingContent = new ArrayList<>();
+        ioMapping.setContent(ioMappingContent);
 
         content.add(ioMapping);
 
         List<Node> zeebeInputs = new ArrayList<>();
+        List<Node> zeebeOutputs = new ArrayList<>();
 
+        // 处理每一个不同任务的出入参数
         if(StrUtil.equals(type, "mail-service")) {
             zeebeInputs = handleSendMailInput(input);
+            zeebeOutputs = handleSendMailOutput(output);
         } else if (StrUtil.equals(type, "sms-service")) {
             zeebeInputs = handleSendSMSInput(input);
         }
 
+        // 目前这版定义只有一个输入
         content.remove(input);
 
         if(CollUtil.isNotEmpty(zeebeInputs)) {
-            ioMapping.setContent(zeebeInputs);
+            ioMappingContent.addAll(zeebeInputs);
+        }
+
+        if(CollUtil.isNotEmpty(zeebeOutputs)) {
+            ioMappingContent.addAll(zeebeOutputs);
         }
 
     }
@@ -277,7 +301,15 @@ public class XMLParser {
         return elements;
     }
 
-    private void handleOutput(Element task) {
+    private List<Node> handleSendMailOutput(Element output) {
+        List<Node> outputs = new ArrayList<>();
+        Element output1 = DocumentHelper.createElement(ZEEBE_OUTPUT_QNAME);
+        output.addAttribute("target", "email_result");
+        output.addAttribute("source", "mail_result");
+
+        outputs.add(output);
+
+        return outputs;
 
     }
 
