@@ -19,6 +19,7 @@ public class MessageResourceTest {
                     .correlationKey("")
                     .send()
                     .join();
+
         }
 
 

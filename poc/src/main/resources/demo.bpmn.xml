@@ -5,14 +5,14 @@
       <bpmn2:outgoing>Flow_1hbu9l0</bpmn2:outgoing>
       <bpmn2:messageEventDefinition id="MessageEventDefinition_08e986j" />
     </bpmn2:startEvent>
-    <bpmn2:serviceTask id="Activity_0mnqdqs" name="sendemail" brandnewdata:extension="brandnewdata">
+    <bpmn2:task id="Activity_0mnqdqs" name="sendemail" brandnewdata:extension="brandnewdata">
       <bpmn2:extensionElements>
         <brandnewdata:taskDefinition type="mail-service" />
         <brandnewdata:input receive="liuben@brandnewdata.com" content="helloworld" />
       </bpmn2:extensionElements>
       <bpmn2:incoming>Flow_1hbu9l0</bpmn2:incoming>
       <bpmn2:outgoing>Flow_1ger8fr</bpmn2:outgoing>
-    </bpmn2:serviceTask>
+    </bpmn2:task>
     <bpmn2:sequenceFlow id="Flow_1hbu9l0" sourceRef="StartEvent_1" targetRef="Activity_0mnqdqs" />
     <bpmn2:exclusiveGateway id="Gateway_1seybmx">
       <bpmn2:incoming>Flow_1ger8fr</bpmn2:incoming>
@@ -27,14 +27,14 @@
     <bpmn2:sequenceFlow id="Flow_1e46ggn" name="condition=1" sourceRef="Gateway_1seybmx" targetRef="Event_1m8zjn9">
       <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">condition=1</bpmn2:conditionExpression>
     </bpmn2:sequenceFlow>
-    <bpmn2:serviceTask id="Activity_0p3hexz" name="sendmessage" brandnewdata:extension="brandnewdata">
+    <bpmn2:task id="Activity_0p3hexz" name="sendmessage" brandnewdata:extension="brandnewdata">
       <bpmn2:extensionElements>
         <brandnewdata:taskDefinition type="sendmessage" />
         <brandnewdata:input receive="15921686158" content="helloworld" />
       </bpmn2:extensionElements>
       <bpmn2:incoming>Flow_0bb2fq7</bpmn2:incoming>
       <bpmn2:outgoing>Flow_0e15haa</bpmn2:outgoing>
-    </bpmn2:serviceTask>
+    </bpmn2:task>
     <bpmn2:sequenceFlow id="Flow_0bb2fq7" name="condition=2" sourceRef="Gateway_1seybmx" targetRef="Activity_0p3hexz">
       <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">condition=2</bpmn2:conditionExpression>
     </bpmn2:sequenceFlow>

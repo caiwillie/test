@@ -157,18 +157,8 @@ public class XMLParser {
         // 处理任务定义
         String type = handleTaskDefinition(element);
 
+        // 处理出入参数映射
         handleIOMapping(element, type);
-
-
-
-/*
-
-
-
-
-
-        List<Node> outputs = outputXPATH.selectNodes(element);
-*/
 
         return;
     }
@@ -210,6 +200,7 @@ public class XMLParser {
         XPath outputXPATH = DocumentHelper.createXPath(StrUtil.format("./{}/{}",
                 BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(), BRANDNEWDATA_OUTPUT_QNAME.getQualifiedName()));
 
+        // 父级节点的容器树
         List<Node> content = null;
 
         Element input = null;
@@ -218,15 +209,14 @@ public class XMLParser {
                 || outputXPATH.selectSingleNode(task) instanceof Element) {
             input = (Element) inputXPATH.selectSingleNode(task);
             output = (Element) outputXPATH.selectSingleNode(task);
-            content = input == null ? input.content() : output.content();
+            content = input != null ? input.getParent().content() : output.getParent().content();
         } else {
             // input 和 output 都不存在
             return;
         }
 
         Element ioMapping = DocumentHelper.createElement(ZEEBE_IO_MAPPING_QNAME);
-        List<Node> ioMappingContent = new ArrayList<>();
-        ioMapping.setContent(ioMappingContent);
+
 
         content.add(ioMapping);
 
@@ -244,13 +234,14 @@ public class XMLParser {
         // 目前这版定义只有一个输入
         content.remove(input);
 
+        List<Node> ioMappingContent = new ArrayList<>();
         if(CollUtil.isNotEmpty(zeebeInputs)) {
             ioMappingContent.addAll(zeebeInputs);
         }
-
         if(CollUtil.isNotEmpty(zeebeOutputs)) {
             ioMappingContent.addAll(zeebeOutputs);
         }
+        ioMapping.setContent(ioMappingContent);
 
     }
 
@@ -304,10 +295,10 @@ public class XMLParser {
     private List<Node> handleSendMailOutput(Element output) {
         List<Node> outputs = new ArrayList<>();
         Element output1 = DocumentHelper.createElement(ZEEBE_OUTPUT_QNAME);
-        output.addAttribute("target", "email_result");
-        output.addAttribute("source", "mail_result");
+        output1.addAttribute("target", "email_result");
+        output1.addAttribute("source", "mail_result");
 
-        outputs.add(output);
+        outputs.add(output1);
 
         return outputs;
 
