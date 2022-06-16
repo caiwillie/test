@@ -34,7 +34,10 @@ public class XMLParser {
     private static final Namespace ZEEBE_NAMESPACE =
             DocumentHelper.createNamespace(BPMNNamespace.ZEEBE.getPrefix(), BPMNNamespace.ZEEBE.getUri());
 
+    private static QName BPMN_PROCESS_QNAME = DocumentHelper.createQName("process", BPMN_NAMESPACE);
     private static QName BPMN_TASK_QNAME = DocumentHelper.createQName("task", BPMN_NAMESPACE);
+
+    private static QName BPMN_SERVICE_TASK_QNAME = DocumentHelper.createQName("serviceTask", BPMN_NAMESPACE);
 
     private static QName BPMN_EXTENSION_ELEMENTS_QNAME = DocumentHelper.createQName("extensionElements", BPMN_NAMESPACE);
 
@@ -94,7 +97,7 @@ public class XMLParser {
         handleNamespace(element);
 
         // 处理 model key 与 名称
-        handleGeneralInfo(element);
+        handleRoot(element);
 
         // 处理连接器
         handleConnector(element);
@@ -125,14 +128,13 @@ public class XMLParser {
         }
     }
 
-    private void handleGeneralInfo(Element element) {
+    private void handleRoot(Element element) {
         if(modelKey != null || name != null) {
             return;
         }
         QName qName = element.getQName();
-        if(!(StrUtil.equals(BPMN_NAMESPACE.getPrefix(), qName.getNamespacePrefix())
-                && StrUtil.equals("process", qName.getName()))) {
-            // 不是 service task，直接跳过
+        if(!StrUtil.equals(element.getQualifiedName(), BPMN_PROCESS_QNAME.getQualifiedName())) {
+            // 不是 bpmn:process，直接跳过
             return;
         }
 
@@ -141,6 +143,8 @@ public class XMLParser {
 
         name = element.attributeValue("name");
         Assert.notBlank(name,"BPMN解析错误：模型名称不能为空");
+
+        element.attribute("isExecutable").setValue("true");
 
     }
 
@@ -152,7 +156,7 @@ public class XMLParser {
             return;
         }
 
-
+        element.setQName(BPMN_SERVICE_TASK_QNAME);
 
         // 处理任务定义
         String type = handleTaskDefinition(element);
@@ -296,7 +300,7 @@ public class XMLParser {
         List<Node> outputs = new ArrayList<>();
         Element output1 = DocumentHelper.createElement(ZEEBE_OUTPUT_QNAME);
         output1.addAttribute("target", "email_result");
-        output1.addAttribute("source", "mail_result");
+        output1.addAttribute("source", "= \"mail_result\"");
 
         outputs.add(output1);
 
