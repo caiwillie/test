@@ -3,8 +3,6 @@ package com.brandnewdata.mop.poc.rest;
 import cn.hutool.core.lang.Assert;
 import com.brandnewdata.mop.poc.common.service.result.PageResult;
 import com.brandnewdata.mop.poc.common.service.result.Result;
-import com.brandnewdata.mop.poc.parser.XMLDTO;
-import com.brandnewdata.mop.poc.parser.XMLParser;
 import com.brandnewdata.mop.poc.pojo.entity.DeModelEntity;
 import com.brandnewdata.mop.poc.pojo.vo.ModelVo;
 import com.brandnewdata.mop.poc.service.ModelService;
@@ -84,12 +82,14 @@ public class ModelResource {
     /**
      * 部署流程
      *
-     * @param modelVo the model vo
+     * @param vo the model vo
      * @return the result
      */
     @PostMapping(value = "/deploy")
-    public Result<ModelVo> deploy(@RequestBody ModelVo modelVo) {
-        modelService.deploy(modelVo.getModelKey());
+    public Result<ModelVo> deploy(@RequestBody ModelVo vo) {
+        // 先保存
+        save(vo);
+        modelService.deploy(vo.getModelKey());
         return Result.success();
     }
 
@@ -100,7 +100,7 @@ public class ModelResource {
      * @return the result
      */
     @PostMapping(value = "/start")
-    public Result<ModelVo> satrt(@RequestBody ModelVo modelVo) {
+    public Result<ModelVo> start(@RequestBody ModelVo modelVo) {
         modelService.start(modelVo.getModelKey());
         return Result.success();
     }
