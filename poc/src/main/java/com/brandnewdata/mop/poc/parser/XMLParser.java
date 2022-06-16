@@ -300,7 +300,7 @@ public class XMLParser {
         List<Node> outputs = new ArrayList<>();
         Element output1 = DocumentHelper.createElement(ZEEBE_OUTPUT_QNAME);
         output1.addAttribute("target", "email_result");
-        output1.addAttribute("source", "= \"mail_result\"");
+        output1.addAttribute("source", "= mail_result");
 
         outputs.add(output1);
 

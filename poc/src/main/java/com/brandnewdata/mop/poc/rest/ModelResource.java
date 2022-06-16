@@ -87,8 +87,11 @@ public class ModelResource {
      */
     @PostMapping(value = "/deploy")
     public Result<ModelVo> deploy(@RequestBody ModelVo vo) {
-        // 先保存
-        save(vo);
+        if(vo.getEditorXML() != null) {
+            // 不为空就先保存
+            save(vo);
+        }
+
         modelService.deploy(vo.getModelKey());
         return Result.success();
     }
