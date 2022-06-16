@@ -105,9 +105,6 @@ public class ModelResource {
         return Result.success();
     }
 
-
-
-
     private void valid(ModelVo modelVo) {
         Assert.notNull(modelVo.getEditorXML(), "模型定义不能为空");
     }
