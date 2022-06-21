@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.search.aggregations.Aggregations;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class AbstractReader {
@@ -19,7 +20,7 @@ public class AbstractReader {
       return ElasticsearchUtil.scroll(searchRequest, clazz, this.objectMapper, this.esClient);
    }
 
-   protected List scroll(SearchRequest searchRequest, Class clazz, Consumer aggsProcessor) throws IOException {
+   protected List scroll(SearchRequest searchRequest, Class clazz, Consumer<Aggregations> aggsProcessor) throws IOException {
       return ElasticsearchUtil.scroll(searchRequest, clazz, this.objectMapper, this.esClient, (Consumer)null, aggsProcessor);
    }
 

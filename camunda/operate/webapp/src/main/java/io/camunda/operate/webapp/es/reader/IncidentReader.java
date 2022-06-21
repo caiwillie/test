@@ -144,8 +144,8 @@ public class IncidentReader extends AbstractReader {
             processNames.put(inc.getProcessDefinitionKey(), this.processCache.getProcessNameOrBpmnProcessId(inc.getProcessDefinitionKey(), "Unknown process"));
          });
          Map operations = this.operationReader.getOperationsPerIncidentKey(processInstanceId);
-         Map incData = this.collectFlowNodeDataForPropagatedIncidents(incidents, processInstanceId, treePath);
-         incidentResponse.setFlowNodes((List)((Map)incData.values().stream().collect(Collectors.groupingBy(IncidentDataHolder::getFinalFlowNodeId, Collectors.counting()))).entrySet().stream().map((entry) -> {
+         Map<String, IncidentDataHolder> incData = this.collectFlowNodeDataForPropagatedIncidents(incidents, processInstanceId, treePath);
+         incidentResponse.setFlowNodes((List)(incData.values().stream().collect(Collectors.groupingBy(IncidentDataHolder::getFinalFlowNodeId, Collectors.counting()))).entrySet().stream().map((entry) -> {
             return new IncidentFlowNodeDto((String)entry.getKey(), ((Long)entry.getValue()).intValue());
          }).collect(Collectors.toList()));
          List incidentsDtos = IncidentDto.sortDefault(IncidentDto.createFrom((List)incidents, operations, (Map)processNames, (Map)incData));
@@ -159,14 +159,14 @@ public class IncidentReader extends AbstractReader {
       }
    }
 
-   public Map collectFlowNodeDataForPropagatedIncidents(List incidents, String processInstanceId, String currentTreePath) {
-      Set flowNodeInstanceIdsSet = new HashSet();
-      Map incDatas = new HashMap();
+   public Map<String, IncidentDataHolder> collectFlowNodeDataForPropagatedIncidents(List<IncidentEntity> incidents, String processInstanceId, String currentTreePath) {
+      Set<String> flowNodeInstanceIdsSet = new HashSet<>();
+      Map<String, IncidentDataHolder> incDatas = new HashMap<>();
 
       IncidentEntity inc;
       IncidentDataHolder incData;
-      for(Iterator var6 = incidents.iterator(); var6.hasNext(); incDatas.put(inc.getId(), incData)) {
-         inc = (IncidentEntity)var6.next();
+      for(Iterator<IncidentEntity> var6 = incidents.iterator(); var6.hasNext(); incDatas.put(inc.getId(), incData)) {
+         inc = var6.next();
          incData = (new IncidentDataHolder()).setIncidentId(inc.getId());
          if (!String.valueOf(inc.getProcessInstanceKey()).equals(processInstanceId)) {
             String callActivityInstanceId = TreePath.extractFlowNodeInstanceId(inc.getTreePath(), currentTreePath);
@@ -190,8 +190,8 @@ public class IncidentReader extends AbstractReader {
       return incDatas;
    }
 
-   private Map getFlowNodeIds(Set flowNodeInstanceIds) {
-      Map flowNodeIdsMap = new HashMap();
+   private Map<String, String> getFlowNodeIds(Set flowNodeInstanceIds) {
+      Map<String, String> flowNodeIdsMap = new HashMap<>();
       QueryBuilder q = QueryBuilders.termsQuery("id", flowNodeInstanceIds);
       SearchRequest request = ElasticsearchUtil.createSearchRequest(this.flowNodeInstanceTemplate, QueryType.ONLY_RUNTIME).source((new SearchSourceBuilder()).query(q).fetchSource(new String[]{"id", "flowNodeId"}, (String[])null));
 
