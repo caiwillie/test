@@ -13,10 +13,13 @@
     <packaging>pom</packaging>
     <modules>
         <module>operate-common</module>
+        <module>operate-els-schema</module>
     </modules>
 
     <properties>
+        <camunda.operate.version>8.0.2</camunda.operate.version>
         <spring.boot.version>2.6.8</spring.boot.version>
+        <elasticsearch.version>7.16.3</elasticsearch.version>
     </properties>
 
     <dependencyManagement>
@@ -76,8 +79,16 @@
             <dependency>
                 <groupId>org.elasticsearch.client</groupId>
                 <artifactId>elasticsearch-rest-high-level-client</artifactId>
-                <version>7.16.3</version>
+                <version>${elasticsearch.version}</version>
             </dependency>
+
+
+            <dependency>
+                <groupId>org.elasticsearch</groupId>
+                <artifactId>elasticsearch-x-content</artifactId>
+                <version>${elasticsearch.version}</version>
+            </dependency>
+
 
         </dependencies>
 
