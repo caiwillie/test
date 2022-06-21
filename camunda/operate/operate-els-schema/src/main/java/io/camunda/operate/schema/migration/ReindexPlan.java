@@ -65,8 +65,8 @@ public class ReindexPlan implements Plan {
    }
 
    public void executeOn(RetryElasticsearchClient retryElasticsearchClient) throws MigrationException {
-      ReindexRequest reindexRequest = ((ReindexRequest)(new ReindexRequest()).setSourceIndices(new String[]{this.srcIndex + "_*"}).setDestIndex(this.dstIndex + "_").setSlices(this.slices)).setSourceBatchSize(this.reindexBatchSize);
-      Optional pipelineName = this.createPipelineFromSteps(retryElasticsearchClient);
+      ReindexRequest reindexRequest = ((new ReindexRequest()).setSourceIndices(new String[]{this.srcIndex + "_*"}).setDestIndex(this.dstIndex + "_").setSlices(this.slices)).setSourceBatchSize(this.reindexBatchSize);
+      Optional<String> pipelineName = this.createPipelineFromSteps(retryElasticsearchClient);
       Objects.requireNonNull(reindexRequest);
       pipelineName.ifPresent(reindexRequest::setDestPipeline);
       if (this.script == null) {

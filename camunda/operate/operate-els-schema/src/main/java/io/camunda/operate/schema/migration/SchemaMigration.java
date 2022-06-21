@@ -43,7 +43,8 @@ public class SchemaMigration implements CommandLineRunner {
       SpringApplication.exit(ctx, new ExitCodeGenerator[0]);
    }
 
-   public static class ApplicationErrorListener implements ApplicationListener {
+   public static class ApplicationErrorListener implements ApplicationListener<ApplicationFailedEvent> {
+      @Override
       public void onApplicationEvent(ApplicationFailedEvent event) {
          if (event.getException() != null) {
             event.getApplicationContext().close();

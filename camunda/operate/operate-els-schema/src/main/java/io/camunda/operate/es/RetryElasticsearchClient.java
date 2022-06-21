@@ -7,13 +7,7 @@ import io.camunda.operate.util.CollectionUtil;
 import io.camunda.operate.util.RetryOperation;
 import java.io.IOException;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -276,7 +270,8 @@ public class RetryElasticsearchClient {
    }
 
    public void reindex(ReindexRequest reindexRequest, boolean checkDocumentCount) {
-      this.executeWithRetries("Reindex " + Arrays.asList(reindexRequest.getSearchRequest().indices()) + " -> " + reindexRequest.getDestination().index(), () -> {
+      this.executeWithRetries("Reindex " + Arrays.asList(reindexRequest.getSearchRequest().indices()) + " -> " + reindexRequest.getDestination().index(),
+              () -> {
          String srcIndices = reindexRequest.getSearchRequest().indices()[0];
          long srcCount = this.getNumberOfDocumentsFor(srcIndices);
          String dstIndex;
@@ -362,7 +357,7 @@ public class RetryElasticsearchClient {
       return (List)this.executeWithRetries("Search with scroll", () -> {
          return this.scroll(searchRequest, resultClass, objectMapper);
       }, (resultList) -> {
-         return (long)resultList.size() != totalHits;
+         return (long) (resultList).size() != totalHits;
       });
    }
 
@@ -399,20 +394,32 @@ public class RetryElasticsearchClient {
    }
 
    private Object executeWithRetries(RetryOperation.RetryConsumer retryConsumer) {
-      return this.executeWithRetries("", retryConsumer, (RetryOperation.RetryPredicate)null);
+      return this.executeWithRetries("", retryConsumer, null);
    }
 
    private Object executeWithRetries(String operationName, RetryOperation.RetryConsumer retryConsumer) {
-      return this.executeWithRetries(operationName, retryConsumer, (RetryOperation.RetryPredicate)null);
+      return this.executeWithRetries(operationName, retryConsumer, null);
    }
 
-   private Object executeWithRetries(String operationName, RetryOperation.RetryConsumer retryConsumer, RetryOperation.RetryPredicate retryPredicate) {
+   private <T> Object executeWithRetries(String operationName, RetryOperation.RetryConsumer<T> retryConsumer, RetryOperation.RetryPredicate<T> retryPredicate) {
       return this.executeWithGivenRetries(this.numberOfRetries, operationName, retryConsumer, retryPredicate);
    }
 
-   private Object executeWithGivenRetries(int retries, String operationName, RetryOperation.RetryConsumer retryConsumer, RetryOperation.RetryPredicate retryPredicate) {
+   private <T> T executeWithGivenRetries(int retries, String operationName, RetryOperation.RetryConsumer<T> retryConsumer, RetryOperation.RetryPredicate<T> retryPredicate) {
       try {
-         return RetryOperation.newBuilder().retryConsumer(retryConsumer).retryPredicate(retryPredicate).noOfRetry(retries).delayInterval(this.delayIntervalInSeconds, TimeUnit.SECONDS).retryOn(new Class[]{IOException.class, ElasticsearchException.class}).retryPredicate(retryPredicate).message(operationName).build().retry();
+
+         RetryOperation.OperationBuilder<T> objectOperationBuilder = RetryOperation.newBuilder();
+
+         return objectOperationBuilder
+                 .retryConsumer(retryConsumer)
+                 .retryPredicate(retryPredicate)
+                 .noOfRetry(retries)
+                 .delayInterval(this.delayIntervalInSeconds, TimeUnit.SECONDS)
+                 .retryOn(new Class[]{IOException.class, ElasticsearchException.class})
+                 .retryPredicate(retryPredicate)
+                 .message(operationName)
+                 .build()
+                 .retry();
       } catch (Exception var6) {
          throw new OperateRuntimeException("Couldn't execute operation " + operationName + " on elasticsearch for " + this.numberOfRetries + " attempts with " + this.delayIntervalInSeconds + " seconds waiting.", var6);
       }

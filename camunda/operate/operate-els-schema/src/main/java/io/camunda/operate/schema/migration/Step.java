@@ -19,17 +19,17 @@ public interface Step {
    String VERSION = "version";
    String ORDER = "order";
    String CONTENT = "content";
-   Comparator SEMANTICVERSION_COMPARATOR = new Comparator() {
+   Comparator SEMANTICVERSION_COMPARATOR = new Comparator<Step>() {
       public int compare(Step s1, Step s2) {
          return SemanticVersion.fromVersion(s1.getVersion()).compareTo(SemanticVersion.fromVersion(s2.getVersion()));
       }
    };
-   Comparator ORDER_COMPARATOR = new Comparator() {
+   Comparator ORDER_COMPARATOR = new Comparator<Step>() {
       public int compare(Step s1, Step s2) {
          return s1.getOrder().compareTo(s2.getOrder());
       }
    };
-   Comparator SEMANTICVERSION_ORDER_COMPARATOR = new Comparator() {
+   Comparator SEMANTICVERSION_ORDER_COMPARATOR = new Comparator<Step>() {
       public int compare(Step s1, Step s2) {
          int result = Step.SEMANTICVERSION_COMPARATOR.compare(s1, s2);
          if (result == 0) {

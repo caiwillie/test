@@ -54,18 +54,18 @@ public abstract class CollectionUtil {
       };
    }
 
-   public static List emptyListWhenNull(List aList) {
+   public static <T> List<T> emptyListWhenNull(List<T> aList) {
       return aList == null ? Collections.emptyList() : aList;
    }
 
-   public static List withoutNulls(Collection aCollection) {
+   public static <T> List<T> withoutNulls(Collection<T> aCollection) {
       return aCollection != null ? filter(aCollection, Objects::nonNull) : Collections.emptyList();
    }
 
-   public static Map addToMap(Map map, Object key, Object value) {
-      ((List)map.computeIfAbsent(key, (k) -> {
-         return new ArrayList();
-      })).add(value);
+   public static <K, V> Map<K, List<V>> addToMap(Map<K, List<V>> map, K key, V value) {
+      map.computeIfAbsent(key, (k) -> {
+         return new ArrayList<>();
+      }).add(value);
       return map;
    }
 
@@ -83,28 +83,28 @@ public abstract class CollectionUtil {
       }
    }
 
-   public static List map(Collection sourceList, Function mapper) {
+   public static <T, R> List<R> map(Collection<T> sourceList, Function<T, R> mapper) {
       return map(sourceList.stream(), mapper);
    }
 
-   public static List map(Object[] sourceArray, Function mapper) {
-      return map((Stream)Arrays.stream(sourceArray).parallel(), mapper);
+   public static <T, R> List<R> map(T[] sourceArray, Function<T, R> mapper) {
+      return map(Arrays.stream(sourceArray).parallel(), mapper);
    }
 
-   public static List map(Stream sequenceStream, Function mapper) {
-      return (List)sequenceStream.map(mapper).collect(Collectors.toList());
+   public static <T, R> List<R> map(Stream<T> sequenceStream, Function<T, R> mapper) {
+      return sequenceStream.map(mapper).collect(Collectors.toList());
    }
 
-   public static List filter(Collection collection, Predicate predicate) {
+   public static <T> List<T> filter(Collection<T> collection, Predicate<T> predicate) {
       return filter(collection.stream(), predicate);
    }
 
-   public static List filter(Stream filterStream, Predicate predicate) {
-      return (List)filterStream.filter(predicate).collect(Collectors.toList());
+   public static <T> List<T> filter(Stream<T> filterStream, Predicate<T> predicate) {
+      return filterStream.filter(predicate).collect(Collectors.toList());
    }
 
    public static List toSafeListOfStrings(Collection aCollection) {
-      return map((Collection)withoutNulls(aCollection), Object::toString);
+      return map(withoutNulls(aCollection), Object::toString);
    }
 
    public static String[] toSafeArrayOfStrings(Collection aCollection) {

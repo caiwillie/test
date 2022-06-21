@@ -46,6 +46,7 @@ import org.elasticsearch.index.reindex.ReindexRequest;
 import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.tasks.RawTaskStatus;
 import org.slf4j.Logger;
@@ -61,10 +62,10 @@ public abstract class ElasticsearchUtil {
    public static final int TOPHITS_AGG_SIZE = 100;
    public static final int UPDATE_RETRY_COUNT = 3;
    public static final String TASKS_INDEX_NAME = ".tasks";
-   public static final Function searchHitIdToLong = (hit) -> {
+   public static final Function<SearchHit, Long> searchHitIdToLong = (hit) -> {
       return Long.valueOf(hit.getId());
    };
-   public static final Function searchHitIdToString = SearchHit::getId;
+   public static final Function<SearchHit, String> searchHitIdToString = SearchHit::getId;
 
    public static long reindex(ReindexRequest reindexRequest, String sourceIndexName, RestHighLevelClient esClient) throws IOException {
       String taskId = esClient.submitReindexTask(reindexRequest, RequestOptions.DEFAULT).getTask();
@@ -356,11 +357,11 @@ public abstract class ElasticsearchUtil {
       return result;
    }
 
-   public static void scrollWith(SearchRequest searchRequest, RestHighLevelClient esClient, Consumer searchHitsProcessor) throws IOException {
-      scrollWith(searchRequest, esClient, searchHitsProcessor, (Consumer)null, (Consumer)null);
+   public static void scrollWith(SearchRequest searchRequest, RestHighLevelClient esClient, Consumer<SearchHits> searchHitsProcessor) throws IOException {
+      scrollWith(searchRequest, esClient, searchHitsProcessor, null, null);
    }
 
-   public static void scrollWith(SearchRequest searchRequest, RestHighLevelClient esClient, Consumer searchHitsProcessor, Consumer aggsProcessor, Consumer firstResponseConsumer) throws IOException {
+   public static void scrollWith(SearchRequest searchRequest, RestHighLevelClient esClient, Consumer<SearchHits> searchHitsProcessor, Consumer<Aggregations> aggsProcessor, Consumer<SearchHits> firstResponseConsumer) throws IOException {
       searchRequest.scroll(TimeValue.timeValueMillis(60000L));
       SearchResponse response = esClient.search(searchRequest, RequestOptions.DEFAULT);
       if (firstResponseConsumer != null) {
@@ -401,30 +402,30 @@ public abstract class ElasticsearchUtil {
 
    }
 
-   public static List scrollIdsToList(SearchRequest request, RestHighLevelClient esClient) throws IOException {
-      List result = new ArrayList();
-      Consumer collectIds = (hits) -> {
+   public static List<String> scrollIdsToList(SearchRequest request, RestHighLevelClient esClient) throws IOException {
+      List<String> result = new ArrayList<>();
+      Consumer<SearchHits> collectIds = (hits) -> {
          result.addAll(CollectionUtil.map(hits.getHits(), searchHitIdToString));
       };
-      scrollWith(request, esClient, collectIds, (Consumer)null, collectIds);
+      scrollWith(request, esClient, collectIds, null, collectIds);
       return result;
    }
 
-   public static List scrollKeysToList(SearchRequest request, RestHighLevelClient esClient) throws IOException {
-      List result = new ArrayList();
-      Consumer collectIds = (hits) -> {
+   public static List<Long> scrollKeysToList(SearchRequest request, RestHighLevelClient esClient) throws IOException {
+      List<Long> result = new ArrayList<>();
+      Consumer<SearchHits> collectIds = (hits) -> {
          result.addAll(CollectionUtil.map(hits.getHits(), searchHitIdToLong));
       };
-      scrollWith(request, esClient, collectIds, (Consumer)null, collectIds);
+      scrollWith(request, esClient, collectIds, null, collectIds);
       return result;
    }
 
    public static List scrollFieldToList(SearchRequest request, String fieldName, RestHighLevelClient esClient) throws IOException {
       List result = new ArrayList();
-      Function searchHitFieldToString = (searchHit) -> {
+      Function<SearchHit, Object> searchHitFieldToString = (searchHit) -> {
          return searchHit.getSourceAsMap().get(fieldName);
       };
-      Consumer collectFields = (hits) -> {
+      Consumer<SearchHits> collectFields = (hits) -> {
          result.addAll(CollectionUtil.map(hits.getHits(), searchHitFieldToString));
       };
       scrollWith(request, esClient, collectFields, (Consumer)null, collectFields);
@@ -433,7 +434,7 @@ public abstract class ElasticsearchUtil {
 
    public static Set scrollIdsToSet(SearchRequest request, RestHighLevelClient esClient) throws IOException {
       Set result = new HashSet();
-      Consumer collectIds = (hits) -> {
+      Consumer<SearchHits> collectIds = (hits) -> {
          result.addAll(CollectionUtil.map(hits.getHits(), searchHitIdToString));
       };
       scrollWith(request, esClient, collectIds, (Consumer)null, collectIds);
@@ -442,7 +443,7 @@ public abstract class ElasticsearchUtil {
 
    public static Set scrollKeysToSet(SearchRequest request, RestHighLevelClient esClient) throws IOException {
       Set result = new HashSet();
-      Consumer collectIds = (hits) -> {
+      Consumer<SearchHits> collectIds = (hits) -> {
          result.addAll(CollectionUtil.map(hits.getHits(), searchHitIdToLong));
       };
       scrollWith(request, esClient, collectIds, (Consumer)null, collectIds);
@@ -489,15 +490,15 @@ public abstract class ElasticsearchUtil {
       }
    }
 
-   public static Map getIndexNamesAsList(AbstractTemplateDescriptor template, Collection ids, RestHighLevelClient esClient) {
-      Map indexNames = new ConcurrentHashMap();
+   public static Map<String, List<String>> getIndexNamesAsList(AbstractTemplateDescriptor template, Collection ids, RestHighLevelClient esClient) {
+      Map<String, List<String>> indexNames = new ConcurrentHashMap<>();
       SearchRequest piRequest = createSearchRequest(template).source((new SearchSourceBuilder()).query(QueryBuilders.idsQuery().addIds((String[])ids.toArray((x$0) -> {
          return new String[x$0];
       }))).fetchSource(false));
 
       try {
          scrollWith(piRequest, esClient, (sh) -> {
-            ((Map)Arrays.stream(sh.getHits()).collect(Collectors.groupingBy(SearchHit::getId, Collectors.mapping(SearchHit::getIndex, Collectors.toList())))).forEach((key, value) -> {
+            (Arrays.stream(sh.getHits()).collect(Collectors.groupingBy(SearchHit::getId, Collectors.mapping(SearchHit::getIndex, Collectors.toList())))).forEach((key, value) -> {
                indexNames.merge(key, value, (v1, v2) -> {
                   v1.addAll(v2);
                   return v1;

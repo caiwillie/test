@@ -9,10 +9,6 @@ import io.camunda.operate.es.dao.response.SearchResponse;
 import io.camunda.operate.exceptions.OperateRuntimeException;
 import io.camunda.operate.schema.indices.IndexDescriptor;
 import io.camunda.operate.util.ElasticsearchUtil;
-import java.io.IOException;
-import java.lang.reflect.ParameterizedType;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
@@ -23,10 +19,16 @@ import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.bucket.terms.ParsedStringTerms;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.xcontent.XContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class GenericDAO {
    private static final Logger LOGGER = LoggerFactory.getLogger(GenericDAO.class);
@@ -99,7 +101,7 @@ public class GenericDAO {
                throw new OperateRuntimeException("Unexpected response for aggregations");
             } else {
                ParsedStringTerms terms = (ParsedStringTerms)group;
-               List buckets = terms.getBuckets();
+               List<? extends Terms.Bucket> buckets = terms.getBuckets();
                List values = (List)buckets.stream().map((it) -> {
                   return new AggregationResponse.AggregationValue(String.valueOf(it.getKey()), it.getDocCount());
                }).collect(Collectors.toList());

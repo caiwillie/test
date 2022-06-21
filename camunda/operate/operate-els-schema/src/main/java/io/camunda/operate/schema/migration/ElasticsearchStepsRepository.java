@@ -17,6 +17,7 @@ import java.util.Objects;
 import java.util.Optional;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.support.IndicesOptions;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
@@ -105,7 +106,7 @@ public class ElasticsearchStepsRepository implements StepsRepository {
       }
    }
 
-   protected List findBy(Optional query) {
+   protected List findBy(Optional<QueryBuilder> query) {
       SearchSourceBuilder searchSpec = (new SearchSourceBuilder()).sort("version.keyword", SortOrder.ASC);
       Objects.requireNonNull(searchSpec);
       query.ifPresent(searchSpec::query);

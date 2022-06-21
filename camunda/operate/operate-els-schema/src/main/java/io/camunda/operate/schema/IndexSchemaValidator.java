@@ -23,18 +23,18 @@ public class IndexSchemaValidator {
    private static final Logger logger = LoggerFactory.getLogger(IndexSchemaValidator.class);
    private static final Pattern VERSION_PATTERN = Pattern.compile(".*-(\\d+\\.\\d+\\.\\d+.*)_.*");
    @Autowired
-   Set indexDescriptors;
+   Set<IndexDescriptor> indexDescriptors;
    @Autowired
    OperateProperties operateProperties;
    @Autowired
    RetryElasticsearchClient retryElasticsearchClient;
 
-   private Set getAllIndexNamesForIndex(String index) {
+   private Set<String> getAllIndexNamesForIndex(String index) {
       String indexPattern = String.format("%s-%s*", this.getIndexPrefix(), index);
       logger.debug("Getting all indices for {}", indexPattern);
-      Set indexNames = this.retryElasticsearchClient.getIndexNames(indexPattern);
+      Set<String> indexNames = this.retryElasticsearchClient.getIndexNames(indexPattern);
       String patternWithVersion = String.format("%s-%s-\\d.*", this.getIndexPrefix(), index);
-      return (Set)indexNames.stream().filter((n) -> {
+      return indexNames.stream().filter((n) -> {
          return n.matches(patternWithVersion);
       }).collect(Collectors.toSet());
    }
@@ -43,38 +43,38 @@ public class IndexSchemaValidator {
       return this.operateProperties.getElasticsearch().getIndexPrefix();
    }
 
-   public Set newerVersionsForIndex(IndexDescriptor indexDescriptor) {
+   public Set<String> newerVersionsForIndex(IndexDescriptor indexDescriptor) {
       SemanticVersion currentVersion = SemanticVersion.fromVersion(indexDescriptor.getVersion());
-      Set versions = this.versionsForIndex(indexDescriptor);
-      return (Set)versions.stream().filter((version) -> {
+      Set<String> versions = this.versionsForIndex(indexDescriptor);
+      return versions.stream().filter((version) -> {
          return SemanticVersion.fromVersion(version).isNewerThan(currentVersion);
       }).collect(Collectors.toSet());
    }
 
-   public Set olderVersionsForIndex(IndexDescriptor indexDescriptor) {
+   public Set<String> olderVersionsForIndex(IndexDescriptor indexDescriptor) {
       SemanticVersion currentVersion = SemanticVersion.fromVersion(indexDescriptor.getVersion());
-      Set versions = this.versionsForIndex(indexDescriptor);
-      return (Set)versions.stream().filter((version) -> {
+      Set<String> versions = this.versionsForIndex(indexDescriptor);
+      return versions.stream().filter((version) -> {
          return currentVersion.isNewerThan(SemanticVersion.fromVersion(version));
       }).collect(Collectors.toSet());
    }
 
-   private Set versionsForIndex(IndexDescriptor indexDescriptor) {
-      Set allIndexNames = this.getAllIndexNamesForIndex(indexDescriptor.getIndexName());
-      return (Set)allIndexNames.stream().map(this::getVersionFromIndexName).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toSet());
+   private Set<String> versionsForIndex(IndexDescriptor indexDescriptor) {
+      Set<String> allIndexNames = this.getAllIndexNamesForIndex(indexDescriptor.getIndexName());
+      return allIndexNames.stream().map(this::getVersionFromIndexName).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toSet());
    }
 
-   private Optional getVersionFromIndexName(String indexName) {
+   private Optional<String> getVersionFromIndexName(String indexName) {
       Matcher matcher = VERSION_PATTERN.matcher(indexName);
       return matcher.matches() && matcher.groupCount() > 0 ? Optional.of(matcher.group(1)) : Optional.empty();
    }
 
    public void validate() {
       if (this.hasAnyOperateIndices()) {
-         Set errors = new HashSet();
+         Set<String> errors = new HashSet<>();
          this.indexDescriptors.forEach((indexDescriptor) -> {
-            Set oldVersions = this.olderVersionsForIndex(indexDescriptor);
-            Set newerVersions = this.newerVersionsForIndex(indexDescriptor);
+            Set<String> oldVersions = this.olderVersionsForIndex(indexDescriptor);
+            Set<String> newerVersions = this.newerVersionsForIndex(indexDescriptor);
             if (oldVersions.size() > 1) {
                errors.add(String.format("More than one older version for %s (%s) found: %s", indexDescriptor.getIndexName(), indexDescriptor.getVersion(), oldVersions));
             }

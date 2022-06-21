@@ -8,9 +8,9 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RetryOperation {
+public class RetryOperation<T> {
    private static final Logger logger = LoggerFactory.getLogger(RetryOperation.class);
-   private RetryConsumer retryConsumer;
+   private RetryConsumer<T> retryConsumer;
    private int noOfRetry;
    private int delayInterval;
    private TimeUnit timeUnit;
@@ -18,11 +18,17 @@ public class RetryOperation {
    private List<Class> exceptionList;
    private String message;
 
-   public static OperationBuilder newBuilder() {
+   public static <T> OperationBuilder<T> newBuilder() {
       return new OperationBuilder();
    }
 
-   private RetryOperation(RetryConsumer retryConsumer, int noOfRetry, int delayInterval, TimeUnit timeUnit, RetryPredicate retryPredicate, List exceptionList, String message) {
+   private RetryOperation(RetryConsumer<T> retryConsumer,
+                          int noOfRetry,
+                          int delayInterval,
+                          TimeUnit timeUnit,
+                          RetryPredicate retryPredicate,
+                          List exceptionList,
+                          String message) {
       this.retryConsumer = retryConsumer;
       this.noOfRetry = noOfRetry;
       this.delayInterval = delayInterval;
@@ -32,8 +38,8 @@ public class RetryOperation {
       this.message = message;
    }
 
-   public Object retry() throws Exception {
-      Object result = null;
+   public T retry() throws Exception {
+      T result = null;
       int retries = 0;
 
       while(retries < this.noOfRetry) {
@@ -92,8 +98,8 @@ public class RetryOperation {
       return retries;
    }
 
-   public static class OperationBuilder {
-      private RetryConsumer iRetryConsumer;
+   public static class OperationBuilder<T> {
+      private RetryConsumer<T> iRetryConsumer;
       private int iNoOfRetry;
       private int iDelayInterval;
       private TimeUnit iTimeUnit;
@@ -104,39 +110,39 @@ public class RetryOperation {
       private OperationBuilder() {
       }
 
-      public OperationBuilder retryConsumer(RetryConsumer retryConsumer) {
+      public OperationBuilder<T> retryConsumer(RetryConsumer<T> retryConsumer) {
          this.iRetryConsumer = retryConsumer;
          return this;
       }
 
-      public OperationBuilder noOfRetry(int noOfRetry) {
+      public OperationBuilder<T> noOfRetry(int noOfRetry) {
          this.iNoOfRetry = noOfRetry;
          return this;
       }
 
-      public OperationBuilder delayInterval(int delayInterval, TimeUnit timeUnit) {
+      public OperationBuilder<T> delayInterval(int delayInterval, TimeUnit timeUnit) {
          this.iDelayInterval = delayInterval;
          this.iTimeUnit = timeUnit;
          return this;
       }
 
-      public OperationBuilder retryPredicate(RetryPredicate retryPredicate) {
+      public OperationBuilder<T> retryPredicate(RetryPredicate<T> retryPredicate) {
          this.iRetryPredicate = retryPredicate;
          return this;
       }
 
       @SafeVarargs
-      public final OperationBuilder retryOn(Class... exceptionClasses) {
+      public final OperationBuilder<T> retryOn(Class... exceptionClasses) {
          this.exceptionClasses = exceptionClasses;
          return this;
       }
 
-      public OperationBuilder message(String message) {
+      public OperationBuilder<T> message(String message) {
          this.message = message;
          return this;
       }
 
-      public RetryOperation build() {
+      public RetryOperation<T> build() {
          if (Objects.isNull(this.iRetryConsumer)) {
             throw new RuntimeException("'#retryConsumer:RetryConsumer<T>' not set");
          } else {
@@ -152,11 +158,11 @@ public class RetryOperation {
       }
    }
 
-   public interface RetryPredicate {
-      boolean shouldRetry(Object var1);
+   public interface RetryPredicate<T> {
+      boolean shouldRetry(T var1);
    }
 
-   public interface RetryConsumer {
-      Object evaluate() throws Exception;
+   public interface RetryConsumer<T> {
+      T evaluate() throws Exception;
    }
 }

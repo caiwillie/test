@@ -66,7 +66,7 @@ public class ProcessorStep implements Step {
    }
 
    public int hashCode() {
-      int prime = true;
+      boolean prime = true;
       int result = 1;
       result = 31 * result + (this.content == null ? 0 : this.content.hashCode());
       result = 31 * result + (this.indexName == null ? 0 : this.indexName.hashCode());

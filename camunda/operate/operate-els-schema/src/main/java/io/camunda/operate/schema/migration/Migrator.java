@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
 public class Migrator {
    private static final Logger logger = LoggerFactory.getLogger(Migrator.class);
    @Autowired
-   private List indexDescriptors;
+   private List<IndexDescriptor> indexDescriptors;
    @Autowired
    private OperateProperties operateProperties;
    @Autowired
@@ -165,7 +165,7 @@ public class Migrator {
    protected Plan createPlanFor(String indexName, String srcVersion, String dstVersion, List steps) {
       SemanticVersion sourceVersion = SemanticVersion.fromVersion(srcVersion);
       SemanticVersion destinationVersion = SemanticVersion.fromVersion(dstVersion);
-      List sortByVersion = new ArrayList(steps);
+      List<Step> sortByVersion = new ArrayList(steps);
       sortByVersion.sort(Step.SEMANTICVERSION_ORDER_COMPARATOR);
       List onlyAffectedVersions = CollectionUtil.filter(sortByVersion, (s) -> {
          return SemanticVersion.fromVersion(s.getVersion()).isBetween(sourceVersion, destinationVersion);

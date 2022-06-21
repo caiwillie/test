@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.springframework.util.StringUtils;
 
-public final class SemanticVersion implements Comparable {
+public final class SemanticVersion implements Comparable<SemanticVersion> {
    private static Pattern splitPattern = Pattern.compile("\\.(?=\\d)");
    private final List versionParts;
    private final String displayText;
@@ -94,6 +94,7 @@ public final class SemanticVersion implements Comparable {
       return this.versionParts.size() == 1 ? "0" : ((Integer)this.versionParts.get(1)).toString();
    }
 
+   @Override
    public int compareTo(SemanticVersion o) {
       if (o == null) {
          return 1;
@@ -138,4 +139,5 @@ public final class SemanticVersion implements Comparable {
 
       return parts;
    }
+
 }
