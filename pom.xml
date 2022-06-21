@@ -12,13 +12,19 @@
     <modules>
         <module>example</module>
         <module>poc</module>
+        <module>camunda</module>
     </modules>
 
-
     <properties>
-        <jdk.version>17</jdk.version>
+
+        <!-- 编译设置, mvn 环境中的jdk版本需要高于设置的版本 -->
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+        <!-- 文件拷贝时的编码 -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <!-- 编译时的编码 -->
+        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
 
         <!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
         <!-- spring boot 和 spring colud 版本关系 https://docs.spring.io/spring-cloud/docs/current/reference/html/ -->
@@ -41,10 +47,6 @@
         <spring.zeebe.version>8.0.5</spring.zeebe.version>
         <!--  zeebe 使用的 protobuf 的版本问题 https://github.com/camunda-community-hub/micronaut-zeebe-client/issues/88-->
         <google.protobuf.version>3.19.4</google.protobuf.version>
-
-
-
-
 
         <spring.framework.version>5.3.14</spring.framework.version>
         <spring.security.version>5.6.1</spring.security.version>
