@@ -37,9 +37,9 @@ public class ElasticsearchSchemaManager {
    private static final String NUMBER_OF_REPLICAS = "index.number_of_replicas";
    private static final String ALIASES = "aliases";
    @Autowired
-   private List indexDescriptors;
+   private List<IndexDescriptor> indexDescriptors;
    @Autowired
-   private List templateDescriptors;
+   private List<TemplateDescriptor> templateDescriptors;
    @Autowired
    protected RetryElasticsearchClient retryElasticsearchClient;
    @Autowired

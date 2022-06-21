@@ -16,11 +16,6 @@
     <dependencies>
 
         <dependency>
-            <groupId>org.elasticsearch</groupId>
-            <artifactId>elasticsearch-x-content</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>com.brandnewdata</groupId>
             <artifactId>operate-common</artifactId>
             <version>${camunda.operate.version}</version>
