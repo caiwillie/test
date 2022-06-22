@@ -16,35 +16,49 @@
         <!--========================== CAMUNDA =======================-->
         <dependency>
             <groupId>io.camunda</groupId>
+            <artifactId>zeebe-client-java</artifactId>
+            <version>${camunda.operate.version}</version>
+        </dependency>
+        <!-- 下面这些camunda依赖包是手动上传到私服的，缺少一些pom源数据，不能在dependices manager中管理版本 -->
+        <dependency>
+            <groupId>io.camunda</groupId>
             <artifactId>operate-common</artifactId>
+            <version>${camunda.operate.version}</version>
         </dependency>
         <dependency>
             <groupId>io.camunda</groupId>
             <artifactId>operate-els-schema</artifactId>
+            <version>${camunda.operate.version}</version>
         </dependency>
         <dependency>
             <groupId>io.camunda</groupId>
             <artifactId>operate-data-generator</artifactId>
+            <version>${camunda.operate.version}</version>
         </dependency>
         <dependency>
             <groupId>io.camunda</groupId>
             <artifactId>operate-importer</artifactId>
+            <version>${camunda.operate.version}</version>
         </dependency>
         <dependency>
             <groupId>io.camunda</groupId>
             <artifactId>operate-importer-common</artifactId>
+            <version>${camunda.operate.version}</version>
         </dependency>
         <dependency>
             <groupId>io.camunda</groupId>
             <artifactId>operate-importer-8_0</artifactId>
+            <version>${camunda.operate.version}</version>
         </dependency>
         <dependency>
             <groupId>io.camunda</groupId>
             <artifactId>operate-importer-1_3</artifactId>
+            <version>${camunda.operate.version}</version>
         </dependency>
         <dependency>
             <groupId>io.camunda</groupId>
             <artifactId>operate-archiver</artifactId>
+            <version>${camunda.operate.version}</version>
         </dependency>
         <dependency>
             <groupId>io.camunda</groupId>
@@ -56,10 +70,7 @@
             <artifactId>identity-sdk</artifactId>
             <version>${camunda.operate.version}</version>
         </dependency>
-        <dependency>
-            <groupId>io.camunda</groupId>
-            <artifactId>zeebe-client-java</artifactId>
-        </dependency>
+
 
         <!--===================== SPRING =======================-->
         <dependency>
@@ -97,27 +108,13 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
-        <!--=================== LDAP =========================-->
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-ldap</artifactId>
-        </dependency>
-
-
 
         <!--=========================== ELASTICSEARCH ===============================-->
-
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-high-level-client</artifactId>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.glassfish/javax.json -->
-
-        <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>javax.json</artifactId>
-        </dependency>
 
         <!--======================= SWAGGER =========================-->
         <dependency>
@@ -139,6 +136,31 @@
             <artifactId>springdoc-openapi-ui</artifactId>
         </dependency>
 
+        <!--=============================== TEST ===============================-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!--=================== LDAP =========================-->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-ldap</artifactId>
+        </dependency>
+
+        <!--======================== OAuth2 token authorization ==========================-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+        </dependency>
+
+
         <!-- Micrometer Prometheus -->
         <dependency>
             <groupId>io.micrometer</groupId>
@@ -152,30 +174,14 @@
             <version>1.8.2</version>
         </dependency>
 
-        <!--=============================== TEST ===============================-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-
-        <!--======================== OAuth2 token authorization ==========================-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.json</artifactId>
         </dependency>
 
     </dependencies>

@@ -53,7 +53,6 @@ public class Application {
         System.setProperty("java.util.logging.manager", "org.apache.logging.log4j.jul.LogManager");
         System.setProperty("spring.config.location", "optional:classpath:/,optional:classpath:/config/,optional:file:./,optional:file:./config/");
         SpringApplication springApplication = new SpringApplication(new Class[]{Application.class});
-        springApplication.setLazyInitialization(true);
         springApplication.setAddCommandLineProperties(true);
         springApplication.addListeners(new ApplicationListener[]{new ApplicationErrorListener()});
         Application.setDefaultProperties(springApplication);

@@ -26,12 +26,20 @@
         <log4j.version>2.17.2</log4j.version>
         <micrometer.prometheus.version>1.8.4</micrometer.prometheus.version>
         <hibernate.validator.version>6.2.3.Final</hibernate.validator.version>
+        <oauth0.version>1.8.2</oauth0.version>
 
     </properties>
 
     <dependencyManagement>
 
         <dependencies>
+
+            <!-- ================= CAMUNDA ======================== -->
+            <dependency>
+                <groupId>io.camunda</groupId>
+                <artifactId>zeebe-client-java</artifactId>
+                <version>${camunda.operate.version}</version>
+            </dependency>
 
             <!-- ================= SPRING ======================== -->
             <dependency>
@@ -67,77 +75,52 @@
                 <version>${spring.boot.version}</version>
             </dependency>
 
-            <!-- ================= CAMUNDA ======================== -->
-            <dependency>
-                <groupId>io.camunda</groupId>
-                <artifactId>zeebe-client-java</artifactId>
-                <version>${camunda.operate.version}</version>
-            </dependency>
-
-            <!-- ================= LOG ======================== -->
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-core</artifactId>
-                <version>${log4j.version}</version>
-                <type>test-jar</type>
-                <scope>test</scope>
-            </dependency>
-
-            <!-- ELASTICSEARCH -->
+            <!--===================== ELASTICSEARCH =======================-->
             <dependency>
                 <groupId>org.elasticsearch</groupId>
                 <artifactId>elasticsearch-cli</artifactId>
                 <version>${elasticsearch.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.elasticsearch</groupId>
                 <artifactId>elasticsearch-core</artifactId>
                 <version>${elasticsearch.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.elasticsearch</groupId>
                 <artifactId>elasticsearch-geo</artifactId>
                 <version>${elasticsearch.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.elasticsearch</groupId>
                 <artifactId>elasticsearch-lz4</artifactId>
                 <version>${elasticsearch.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.elasticsearch</groupId>
                 <artifactId>elasticsearch-plugin-classloader</artifactId>
                 <version>${elasticsearch.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.elasticsearch</groupId>
                 <artifactId>elasticsearch-x-content</artifactId>
                 <version>${elasticsearch.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.elasticsearch</groupId>
                 <artifactId>elasticsearch-secure-sm</artifactId>
                 <version>${elasticsearch.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.elasticsearch</groupId>
                 <artifactId>elasticsearch</artifactId>
                 <version>${elasticsearch.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.elasticsearch.client</groupId>
                 <artifactId>elasticsearch-rest-client</artifactId>
                 <version>${elasticsearch.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.elasticsearch.client</groupId>
                 <artifactId>elasticsearch-rest-high-level-client</artifactId>
@@ -148,16 +131,6 @@
             <dependency>
                 <groupId>io.springfox</groupId>
                 <artifactId>springfox-boot-starter</artifactId>
-                <version>${springfox.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger2</artifactId>
-                <version>${springfox.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger-ui</artifactId>
                 <version>${springfox.version}</version>
             </dependency>
             <dependency>
@@ -174,14 +147,12 @@
                 <version>${spring.boot.version}</version>
                 <scope>test</scope>
             </dependency>
-
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-test</artifactId>
                 <version>${spring.security.version}</version>
                 <scope>test</scope>
             </dependency>
-
 
             <!--=================== LDAP =========================-->
             <dependency>
@@ -196,31 +167,6 @@
                 <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
                 <version>${spring.boot.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.springframework.security</groupId>
-                <artifactId>spring-security-oauth2-resource-server</artifactId>
-                <version>${spring.security.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.security</groupId>
-                <artifactId>spring-security-oauth2-jose</artifactId>
-                <version>${spring.security.version}</version>
-            </dependency>
-
-
-            <dependency>
-                <groupId>org.hibernate.validator</groupId>
-                <artifactId>hibernate-validator</artifactId>
-                <version>${hibernate.validator.version}</version>
-            </dependency>
-
-
-
-            <dependency>
-                <groupId>org.glassfish</groupId>
-                <artifactId>javax.json</artifactId>
-                <version>${javax.json.version}</version>
-            </dependency>
 
 
 
@@ -231,6 +177,24 @@
                 <version>${micrometer.prometheus.version}</version>
             </dependency>
 
+            <!-- OAuth0 -->
+            <dependency>
+                <groupId>com.auth0</groupId>
+                <artifactId>mvc-auth-commons</artifactId>
+                <version>${oauth0.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.hibernate.validator</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>${hibernate.validator.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.glassfish</groupId>
+                <artifactId>javax.json</artifactId>
+                <version>${javax.json.version}</version>
+            </dependency>
 
         </dependencies>
 
