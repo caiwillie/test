@@ -13,68 +13,55 @@
 
     <dependencies>
 
+        <!--========================== CAMUNDA =======================-->
         <dependency>
             <groupId>io.camunda</groupId>
             <artifactId>operate-common</artifactId>
-            <version>${camunda.operate.version}</version>
         </dependency>
-
         <dependency>
             <groupId>io.camunda</groupId>
             <artifactId>operate-els-schema</artifactId>
-            <version>${camunda.operate.version}</version>
         </dependency>
-
         <dependency>
             <groupId>io.camunda</groupId>
             <artifactId>operate-data-generator</artifactId>
-            <version>${camunda.operate.version}</version>
         </dependency>
-
         <dependency>
             <groupId>io.camunda</groupId>
             <artifactId>operate-importer</artifactId>
-            <version>${camunda.operate.version}</version>
         </dependency>
-
         <dependency>
             <groupId>io.camunda</groupId>
             <artifactId>operate-importer-common</artifactId>
-            <version>${camunda.operate.version}</version>
         </dependency>
-
         <dependency>
             <groupId>io.camunda</groupId>
             <artifactId>operate-importer-8_0</artifactId>
-            <version>${camunda.operate.version}</version>
         </dependency>
-
         <dependency>
             <groupId>io.camunda</groupId>
             <artifactId>operate-importer-1_3</artifactId>
-            <version>${camunda.operate.version}</version>
         </dependency>
-
         <dependency>
             <groupId>io.camunda</groupId>
             <artifactId>operate-archiver</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.camunda</groupId>
+            <artifactId>operate-webjar</artifactId>
             <version>${camunda.operate.version}</version>
         </dependency>
-
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <scope>test</scope>
+            <groupId>io.camunda</groupId>
+            <artifactId>identity-sdk</artifactId>
+            <version>${camunda.operate.version}</version>
         </dependency>
-
-        <!-- ZEEBE -->
         <dependency>
             <groupId>io.camunda</groupId>
             <artifactId>zeebe-client-java</artifactId>
         </dependency>
 
-        <!-- SPRING BOOT -->
-
+        <!--===================== SPRING =======================-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -89,47 +76,36 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.session</groupId>
             <artifactId>spring-session</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
-            <version>${spring.boot.version}</version>
         </dependency>
-
-        <!-- LDAP -->
         <dependency>
-            <groupId>org.springframework.ldap</groupId>
-            <artifactId>spring-ldap-core</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
+        <!--=================== LDAP =========================-->
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-ldap</artifactId>
-            <version>${spring.security.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-ui</artifactId>
-            <version>1.6.6</version>
-        </dependency>
 
-        <!-- ELASTICSEARCH -->
+
+        <!--=========================== ELASTICSEARCH ===============================-->
 
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
@@ -143,7 +119,7 @@
             <artifactId>javax.json</artifactId>
         </dependency>
 
-        <!-- SWAGGER -->
+        <!--======================= SWAGGER =========================-->
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-boot-starter</artifactId>
@@ -158,38 +134,15 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>${springfox.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>${springfox.version}</version>
-        </dependency>
-
-        <!-- WEBJAR -->
-
-        <dependency>
-            <groupId>io.camunda</groupId>
-            <artifactId>operate-webjar</artifactId>
-            <version>${camunda.operate.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.camunda</groupId>
-            <artifactId>identity-sdk</artifactId>
-            <version>${camunda.operate.version}</version>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
         </dependency>
 
         <!-- Micrometer Prometheus -->
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
-            <version>1.8.4</version>
         </dependency>
 
         <!-- OAuth0 -->
@@ -199,7 +152,7 @@
             <version>1.8.2</version>
         </dependency>
 
-        <!-- TEST -->
+        <!--=============================== TEST ===============================-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -209,41 +162,20 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
-            <version>${spring.security.version}</version>
             <scope>test</scope>
         </dependency>
 
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-            <version>${spring.boot.version}</version>
-        </dependency>
-
-        <!-- OAuth2 token authorization -->
+        <!--======================== OAuth2 token authorization ==========================-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
-            <version>${spring.boot.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-oauth2-resource-server</artifactId>
-            <version>${spring.security.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-oauth2-jose</artifactId>
-            <version>${spring.security.version}</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>6.2.3.Final</version>
         </dependency>
 
     </dependencies>
