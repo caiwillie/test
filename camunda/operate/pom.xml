@@ -12,9 +12,6 @@
     <artifactId>operate</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>operate-common</module>
-        <module>operate-els-schema</module>
-        <module>operate-data-generator</module>
         <module>operate-webapp</module>
     </modules>
 
