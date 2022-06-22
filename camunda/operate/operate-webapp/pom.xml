@@ -108,7 +108,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
-            <version>2.6.8</version>
+            <version>${spring.boot.version}</version>
         </dependency>
 
         <!-- LDAP -->
@@ -120,6 +120,7 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-ldap</artifactId>
+            <version>${spring.security.version}</version>
         </dependency>
 
         <dependency>
@@ -161,13 +162,13 @@
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
-            <version>3.0.0</version>
+            <version>${springfox.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger-ui</artifactId>
-            <version>3.0.0</version>
+            <version>${springfox.version}</version>
         </dependency>
 
         <!-- WEBJAR -->
@@ -208,7 +209,7 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
-            <version>5.6.5</version>
+            <version>${spring.security.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -216,28 +217,34 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
-            <version>2.6.8</version>
+            <version>${spring.boot.version}</version>
         </dependency>
 
         <!-- OAuth2 token authorization -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
-            <version>2.6.8</version>
+            <version>${spring.boot.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-oauth2-resource-server</artifactId>
-            <version>5.6.5</version>
+            <version>${spring.security.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-oauth2-jose</artifactId>
-            <version>5.6.5</version>
+            <version>${spring.security.version}</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>6.2.3.Final</version>
+        </dependency>
 
     </dependencies>
 
