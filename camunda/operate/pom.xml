@@ -15,7 +15,7 @@
         <module>operate-common</module>
         <module>operate-els-schema</module>
         <module>operate-data-generator</module>
-        <module>webapp</module>
+        <module>operate-webapp</module>
     </modules>
 
     <properties>
