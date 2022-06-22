@@ -1,3 +1,23 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.camunda.operate.entities.ProcessEntity
+ *  io.camunda.operate.webapp.es.reader.ProcessInstanceReader
+ *  io.camunda.operate.webapp.es.reader.ProcessReader
+ *  io.camunda.operate.webapp.rest.dto.DtoCreator
+ *  io.camunda.operate.webapp.rest.dto.ProcessDto
+ *  io.camunda.operate.webapp.rest.dto.ProcessGroupDto
+ *  io.swagger.annotations.Api
+ *  io.swagger.annotations.ApiOperation
+ *  io.swagger.annotations.SwaggerDefinition
+ *  io.swagger.annotations.Tag
+ *  org.springframework.beans.factory.annotation.Autowired
+ *  org.springframework.web.bind.annotation.GetMapping
+ *  org.springframework.web.bind.annotation.PathVariable
+ *  org.springframework.web.bind.annotation.RequestMapping
+ *  org.springframework.web.bind.annotation.RestController
+ */
 package io.camunda.operate.webapp.rest;
 
 import io.camunda.operate.entities.ProcessEntity;
@@ -18,47 +38,34 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Api(
-   tags = {"Processes"}
-)
-@SwaggerDefinition(
-   tags = {@Tag(
-   name = "Processes",
-   description = "Processes"
-)}
-)
+@Api(tags={"Processes"})
+@SwaggerDefinition(tags={@Tag(name="Processes", description="Processes")})
 @RestController
-@RequestMapping({"/api/processes"})
+@RequestMapping(value={"/api/processes"})
 public class ProcessRestService {
-   @Autowired
-   protected ProcessReader processReader;
-   @Autowired
-   protected ProcessInstanceReader processInstanceReader;
-   public static final String PROCESS_URL = "/api/processes";
+    @Autowired
+    protected ProcessReader processReader;
+    @Autowired
+    protected ProcessInstanceReader processInstanceReader;
+    public static final String PROCESS_URL = "/api/processes";
 
-   @ApiOperation("Get process BPMN XML")
-   @GetMapping(
-      path = {"/{id}/xml"}
-   )
-   public String getProcessDiagram(@PathVariable("id") String processId) {
-      return this.processReader.getDiagram(Long.valueOf(processId));
-   }
+    @ApiOperation(value="Get process BPMN XML")
+    @GetMapping(path={"/{id}/xml"})
+    public String getProcessDiagram(@PathVariable(value="id") String processId) {
+        return this.processReader.getDiagram(Long.valueOf(processId));
+    }
 
-   @ApiOperation("Get process by id")
-   @GetMapping(
-      path = {"/{id}"}
-   )
-   public ProcessDto getProcess(@PathVariable("id") String processId) {
-      ProcessEntity processEntity = this.processReader.getProcess(Long.valueOf(processId));
-      return (ProcessDto)DtoCreator.create((Object)processEntity, ProcessDto.class);
-   }
+    @ApiOperation(value="Get process by id")
+    @GetMapping(path={"/{id}"})
+    public ProcessDto getProcess(@PathVariable(value="id") String processId) {
+        ProcessEntity processEntity = this.processReader.getProcess(Long.valueOf(processId));
+        return (ProcessDto)DtoCreator.create(processEntity, ProcessDto.class);
+    }
 
-   @ApiOperation("List processes grouped by bpmnProcessId")
-   @GetMapping(
-      path = {"/grouped"}
-   )
-   public List getProcessesGrouped() {
-      Map processesGrouped = this.processReader.getProcessesGrouped();
-      return ProcessGroupDto.createFrom(processesGrouped);
-   }
+    @ApiOperation(value="List processes grouped by bpmnProcessId")
+    @GetMapping(path={"/grouped"})
+    public List<ProcessGroupDto> getProcessesGrouped() {
+        Map processesGrouped = this.processReader.getProcessesGrouped();
+        return ProcessGroupDto.createFrom((Map)processesGrouped);
+    }
 }

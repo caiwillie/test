@@ -1,13 +1,22 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.camunda.operate.webapp.api.v1.exceptions.APIException
+ */
 package io.camunda.operate.webapp.api.v1.exceptions;
 
-public class ServerException extends APIException {
-   public static final String TYPE = "API application error";
+import io.camunda.operate.webapp.api.v1.exceptions.APIException;
 
-   public ServerException(String message, Throwable cause) {
-      super(message, cause);
-   }
+public class ServerException
+extends APIException {
+    public static final String TYPE = "API application error";
 
-   public ServerException(String message) {
-      super(message);
-   }
+    public ServerException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public ServerException(String message) {
+        super(message);
+    }
 }

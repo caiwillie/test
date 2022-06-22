@@ -1,13 +1,22 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.camunda.operate.webapp.api.v1.exceptions.APIException
+ */
 package io.camunda.operate.webapp.api.v1.exceptions;
 
-public class ValidationException extends APIException {
-   public static final String TYPE = "Data invalid";
+import io.camunda.operate.webapp.api.v1.exceptions.APIException;
 
-   public ValidationException(String message) {
-      super(message);
-   }
+public class ValidationException
+extends APIException {
+    public static final String TYPE = "Data invalid";
 
-   public ValidationException(String message, Throwable cause) {
-      super(message, cause);
-   }
+    public ValidationException(String message) {
+        super(message);
+    }
+
+    public ValidationException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

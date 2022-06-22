@@ -1,3 +1,16 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  org.springframework.context.annotation.Bean
+ *  org.springframework.context.annotation.Configuration
+ *  org.springframework.context.annotation.Profile
+ *  springfox.documentation.builders.PathSelectors
+ *  springfox.documentation.builders.RequestHandlerSelectors
+ *  springfox.documentation.spi.DocumentationType
+ *  springfox.documentation.spring.web.plugins.Docket
+ *  springfox.documentation.swagger2.annotations.EnableSwagger2
+ */
 package io.camunda.operate.webapp.rest;
 
 import org.springframework.context.annotation.Bean;
@@ -9,12 +22,12 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-@Profile({"dev"})
+@Profile(value={"dev"})
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {
-   @Bean
-   public Docket api() {
-      return (new Docket(DocumentationType.SWAGGER_2)).select().apis(RequestHandlerSelectors.any()).paths(PathSelectors.any()).build();
-   }
+    @Bean
+    public Docket api() {
+        return new Docket(DocumentationType.SWAGGER_2).select().apis(RequestHandlerSelectors.any()).paths(PathSelectors.any()).build();
+    }
 }
