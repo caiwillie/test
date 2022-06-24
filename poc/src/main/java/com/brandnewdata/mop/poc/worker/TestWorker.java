@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.poc.worker;
 
+import cn.hutool.json.JSONUtil;
 import com.brandnewdata.mop.poc.common.service.result.ProcessConstants;
 import io.camunda.zeebe.spring.client.annotation.ZeebeVariablesAsType;
 import io.camunda.zeebe.spring.client.annotation.ZeebeWorker;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class TestWorker {
     @ZeebeWorker(type = ProcessConstants.TEST_WORKER, autoComplete = true)
-    public Outputs doWork(@ZeebeVariablesAsType Inputs variables) {
+    public String doWork(@ZeebeVariablesAsType Inputs variables) {
         // do whatever you need to do
         // but no need to call client.newCompleteCommand()...
 
@@ -22,7 +23,7 @@ public class TestWorker {
             outputs.setAttribution("JH");
         }
 
-        return outputs;
+        return JSONUtil.toJsonStr(outputs);
     }
 
     @Data
