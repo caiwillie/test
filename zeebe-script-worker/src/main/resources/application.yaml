@@ -4,10 +4,12 @@ zeebe:
       defaultName: script-worker
       defaultType: script
       threads: 3
-
-    job.timeout: 10000
-    broker.contactPoint: 127.0.0.1:26500
-    security.plaintext: true
+    broker:
+      gateway-address: "10.101.53.4:26500"
+    job:
+      timeout: 10000
+    security:
+      plaintext: true
 
 logging:
   level:

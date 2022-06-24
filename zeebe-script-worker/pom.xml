@@ -39,6 +39,7 @@
 
     <dependencyManagement>
         <dependencies>
+        <!--
 
             <dependency>
                 <groupId>io.camunda</groupId>
@@ -47,6 +48,7 @@
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
+        -->
 
             <dependency>
                 <groupId>org.jetbrains.kotlin</groupId>
@@ -56,6 +58,8 @@
                 <scope>import</scope>
             </dependency>
 
+            <!--
+
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
@@ -63,6 +67,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            -->
 
         </dependencies>
     </dependencyManagement>
@@ -73,7 +78,7 @@
         <dependency>
             <groupId>io.camunda</groupId>
             <artifactId>spring-zeebe-starter</artifactId>
-            <version>${version.zeebe.spring}</version>
+            <version>${spring.zeebe.version}</version>
         </dependency>
 
         <dependency>
@@ -81,10 +86,12 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
+        <!--
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+        -->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -45,7 +45,8 @@
         <mysql.jdbc.version>8.0.19</mysql.jdbc.version>
 
         <!-- zeebe 版本 -->
-        <spring.zeebe.version>8.0.5</spring.zeebe.version>
+        <zeebe.version>8.0.2</zeebe.version>
+        <spring.zeebe.version>8.0.2</spring.zeebe.version>
         <!--  zeebe 使用的 protobuf 的版本问题 https://github.com/camunda-community-hub/micronaut-zeebe-client/issues/88-->
         <google.protobuf.version>3.19.4</google.protobuf.version>
 
@@ -152,6 +153,14 @@
             </dependency>
 
             <!-- ================= zeebe ======================== -->
+
+            <dependency>
+                <groupId>io.camunda</groupId>
+                <artifactId>zeebe-bom</artifactId>
+                <version>${zeebe.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
 
             <dependency>
                 <groupId>io.camunda</groupId>
