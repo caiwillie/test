@@ -1,13 +1,10 @@
 package com.brandnewdata.mop.poc.worker;
 
-import cn.hutool.json.JSONUtil;
 import com.brandnewdata.mop.poc.common.service.result.ProcessConstants;
 import io.camunda.zeebe.spring.client.annotation.ZeebeVariablesAsType;
 import io.camunda.zeebe.spring.client.annotation.ZeebeWorker;
 import lombok.Data;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
 
 @Service
 public class TestWorker {
@@ -18,11 +15,15 @@ public class TestWorker {
 
         Outputs outputs = new Outputs();
 
+        Result result = new Result();
+
+        outputs.setResult(result);
+
         String phone = variables.getPhone();
         if(phone != null && phone.startsWith("182")) {
-            outputs.setAttribution("HZ");
+            result.setAttribution("HZ");
         } else {
-            outputs.setAttribution("JH");
+            result.setAttribution("JH");
         }
 
         return outputs;
@@ -35,11 +36,16 @@ public class TestWorker {
     }
 
     @Data
-    public static class Outputs {
+    public static class Result {
         // 归属地
         private String attribution;
 
-        private String jsonSerialization = "{\"english\":\"hello\",\"chinese\":\"你好\"}";
+    }
+
+    @Data
+    public static class Outputs {
+        // 归属地
+        private Result result;
 
     }
 }
