@@ -7,10 +7,12 @@ import io.camunda.zeebe.spring.client.annotation.ZeebeWorker;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 public class TestWorker {
     @ZeebeWorker(type = ProcessConstants.TEST_WORKER, autoComplete = true)
-    public String doWork(@ZeebeVariablesAsType Inputs variables) {
+    public Outputs doWork(@ZeebeVariablesAsType Inputs variables) {
         // do whatever you need to do
         // but no need to call client.newCompleteCommand()...
 
@@ -23,7 +25,7 @@ public class TestWorker {
             outputs.setAttribution("JH");
         }
 
-        return JSONUtil.toJsonStr(outputs);
+        return outputs;
     }
 
     @Data
@@ -36,5 +38,8 @@ public class TestWorker {
     public static class Outputs {
         // 归属地
         private String attribution;
+
+        private String jsonSerialization = "{\"english\":\"hello\",\"chinese\":\"你好\"}";
+
     }
 }

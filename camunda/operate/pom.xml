@@ -12,7 +12,7 @@
     <artifactId>operate</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>operate-webapp</module>
+<!--        <module>operate-webapp</module>-->
     </modules>
 
     <properties>
