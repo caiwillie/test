@@ -23,10 +23,13 @@ public class ScriptEvaluator {
 
   private final ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
 
-  private final Map<String, ZeebeScriptEvaluator> additionalEvaluators =
-      Map.of("mustache", new MustacheEvaluator());
+  private final Map<String, ZeebeScriptEvaluator> additionalEvaluators = new HashMap<>();
 
   private final Map<String, ScriptEngine> cachedScriptEngines = new HashMap<>();
+
+  {
+    additionalEvaluators.put("mustache", new MustacheEvaluator());
+  }
 
   public Object evaluate(String language, String script, Map<String, Object> variables) {
 
