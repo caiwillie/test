@@ -31,7 +31,7 @@ public class ScriptEvaluator {
   public Object evaluate(String language, String script, Map<String, Object> variables) {
 
     if (additionalEvaluators.containsKey(language)) {
-      final var scriptEvaluator = additionalEvaluators.get(language);
+      final ZeebeScriptEvaluator scriptEvaluator = additionalEvaluators.get(language);
       return scriptEvaluator.eval(script, variables);
     }
 
