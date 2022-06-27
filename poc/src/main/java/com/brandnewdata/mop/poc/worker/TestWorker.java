@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.poc.worker;
 
+import cn.hutool.json.JSONUtil;
 import com.brandnewdata.mop.poc.common.service.result.ProcessConstants;
 import io.camunda.zeebe.spring.client.annotation.ZeebeVariablesAsType;
 import io.camunda.zeebe.spring.client.annotation.ZeebeWorker;
@@ -17,14 +18,14 @@ public class TestWorker {
 
         Result result = new Result();
 
-        outputs.setResult(result);
-
         String phone = variables.getPhone();
         if(phone != null && phone.startsWith("182")) {
             result.setAttribution("HZ");
         } else {
             result.setAttribution("JH");
         }
+
+        outputs.setResult(JSONUtil.toJsonStr(result));
 
         return outputs;
     }
@@ -45,7 +46,7 @@ public class TestWorker {
     @Data
     public static class Outputs {
         // 归属地
-        private Result result;
+        private String result;
 
     }
 }
