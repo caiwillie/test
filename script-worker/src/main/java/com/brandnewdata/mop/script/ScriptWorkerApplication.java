@@ -21,9 +21,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @EnableZeebeClient
-public class ZeebeScriptWorkerApplication {
+public class ScriptWorkerApplication {
 
   public static void main(String[] args) {
-    SpringApplication.run(ZeebeScriptWorkerApplication.class, args);
+    SpringApplication.run(ScriptWorkerApplication.class, args);
   }
 }

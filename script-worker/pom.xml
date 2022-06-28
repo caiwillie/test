@@ -12,7 +12,7 @@
     <artifactId>script-worker</artifactId>
 
     <properties>
-        <start-class>com.brandnewdata.mop.script.ZeebeScriptWorkerApplication</start-class>
+        <start-class>com.brandnewdata.mop.script.ScriptWorkerApplication</start-class>
         <version.groovy>2.4.21</version.groovy>
         <version.feel>1.14.2</version.feel>
         <version.kotlin>1.7.0</version.kotlin>
