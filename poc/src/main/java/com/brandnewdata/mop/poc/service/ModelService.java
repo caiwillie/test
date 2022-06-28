@@ -8,6 +8,7 @@ import com.brandnewdata.mop.poc.common.service.result.PageResult;
 import com.brandnewdata.mop.poc.dao.DeModelDao;
 import com.brandnewdata.mop.poc.parser.XMLDTO;
 import com.brandnewdata.mop.poc.parser.XMLParser;
+import com.brandnewdata.mop.poc.parser.XMLParser2;
 import com.brandnewdata.mop.poc.pojo.entity.DeModelEntity;
 import io.camunda.zeebe.client.ZeebeClient;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ public class ModelService {
 
     public void save(DeModelEntity entity) {
         Long id = entity.getId();
-        XMLDTO xmlDTO = new XMLParser().parse(entity.getEditorXml());
+        XMLDTO xmlDTO = new XMLParser2().parse(entity.getEditorXml());
         entity.setName(xmlDTO.getName());
         entity.setModelKey(xmlDTO.getModelKey());
         if(id == null) {
