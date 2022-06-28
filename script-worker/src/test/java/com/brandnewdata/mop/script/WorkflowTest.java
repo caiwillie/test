@@ -12,6 +12,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,7 +27,7 @@ public class WorkflowTest {
 
   @BeforeAll
   public static void init() {
-    final var gatewayContactPoint = ZEEBE_CONTAINER.getExternalGatewayAddress();
+    final String gatewayContactPoint = ZEEBE_CONTAINER.getExternalGatewayAddress();
     System.setProperty("zeebe.client.broker.contactPoint", gatewayContactPoint);
 
     ZEEBE_CLIENT =
@@ -47,7 +48,7 @@ public class WorkflowTest {
                         .zeebeTaskHeader("script", "x + 1"))
             .done();
 
-    final var workflowInstanceResult =
+    final ProcessInstanceResult workflowInstanceResult =
         deployAndCreateInstance(workflow, Collections.singletonMap("x", 2));
 
     assertThat(workflowInstanceResult.getVariablesAsMap()).containsEntry("result", 3);
@@ -67,7 +68,7 @@ public class WorkflowTest {
                         .zeebeTaskHeader("script", "job.processInstanceKey"))
             .done();
 
-    final var workflowInstanceResult = deployAndCreateInstance(workflow, Collections.emptyMap());
+    final ProcessInstanceResult workflowInstanceResult = deployAndCreateInstance(workflow, Collections.emptyMap());
 
     assertThat(workflowInstanceResult.getVariablesAsMap())
         .containsEntry("result", workflowInstanceResult.getProcessInstanceKey());
@@ -101,7 +102,10 @@ public class WorkflowTest {
             .endEvent()
             .done();
 
-    final var workflowInstanceResult = deployAndCreateInstance(workflow, Map.of("key", "key-1"));
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("key", "key-1");
+    final ProcessInstanceResult workflowInstanceResult =
+            deployAndCreateInstance(workflow, variables);
 
     assertThat(workflowInstanceResult.getVariablesAsMap()).containsEntry("x", 1);
   }
