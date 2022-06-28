@@ -1,4 +1,4 @@
-package io.zeebe.script;
+package com.brandnewdata.mop.script;
 
 import java.util.Map;
 

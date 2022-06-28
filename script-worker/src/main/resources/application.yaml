@@ -13,6 +13,5 @@ zeebe:
 
 logging:
   level:
-    root: ERROR
-    io.zeebe: INFO
-    io.zeebe.script: DEBUG
+    root: INFO
+    com.brandnewdata.mop.script: DEBUG

@@ -13,7 +13,7 @@
         <module>example</module>
         <module>poc</module>
         <module>camunda</module>
-        <module>zeebe-script-worker</module>
+        <module>script-worker</module>
     </modules>
 
     <properties>

@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: script-worker
+
+  # nacos 相关配置
+  cloud:
+    nacos:
+      config:
+        server-addr: 10.101.53.4:8848
+        namespace: "dev"
+        group: DEFAULT_GROUP
+        file-extension: yaml
+      discovery:
+        server-addr: 10.101.53.4:8848
+        namespace: "dev"
+        group: DEFAULT_GROUP

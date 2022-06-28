@@ -1,4 +1,4 @@
-package io.zeebe.script;
+package com.brandnewdata.mop.script;
 
 import io.camunda.zeebe.client.ZeebeClient;
 import io.camunda.zeebe.client.api.response.ProcessInstanceResult;

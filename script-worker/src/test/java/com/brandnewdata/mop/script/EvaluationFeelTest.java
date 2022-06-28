@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.zeebe.script;
+package com.brandnewdata.mop.script;
 
 import org.junit.jupiter.api.Test;
 

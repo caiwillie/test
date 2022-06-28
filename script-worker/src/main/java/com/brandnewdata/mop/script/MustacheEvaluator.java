@@ -1,4 +1,4 @@
-package io.zeebe.script;
+package com.brandnewdata.mop.script;
 
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.Template;

@@ -9,29 +9,13 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>zeebe-script-worker</artifactId>
+    <artifactId>script-worker</artifactId>
 
     <properties>
-        <version.zeebe>8.0.3</version.zeebe>
-        <version.zeebe.spring>8.0.5</version.zeebe.spring>
-
+        <start-class>com.brandnewdata.mop.script.ZeebeScriptWorkerApplication</start-class>
         <version.groovy>2.4.21</version.groovy>
         <version.feel>1.14.2</version.feel>
         <version.kotlin>1.7.0</version.kotlin>
-
-        <version.spring.boot>2.7.0</version.spring.boot>
-        <version.java>11</version.java>
-        <java.version>${version.java}</java.version>
-
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
-
-        <!-- release parent settings -->
-        <nexus.snapshot.repository>https://artifacts.camunda.com/artifactory/zeebe-io-snapshots/
-        </nexus.snapshot.repository>
-        <nexus.release.repository>https://artifacts.camunda.com/artifactory/zeebe-io/
-        </nexus.release.repository>
-
         <plugin.version.javadoc>3.1.1</plugin.version.javadoc>
         <!-- disable jdk8 javadoc checks on release build -->
         <additionalparam>-Xdoclint:none</additionalparam>
@@ -39,16 +23,6 @@
 
     <dependencyManagement>
         <dependencies>
-        <!--
-
-            <dependency>
-                <groupId>io.camunda</groupId>
-                <artifactId>zeebe-bom</artifactId>
-                <version>${version.zeebe}</version>
-                <scope>import</scope>
-                <type>pom</type>
-            </dependency>
-        -->
 
             <dependency>
                 <groupId>org.jetbrains.kotlin</groupId>
@@ -58,16 +32,6 @@
                 <scope>import</scope>
             </dependency>
 
-            <!--
-
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${version.spring.boot}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            -->
 
         </dependencies>
     </dependencyManagement>
@@ -78,20 +42,12 @@
         <dependency>
             <groupId>io.camunda</groupId>
             <artifactId>spring-zeebe-starter</artifactId>
-            <version>${spring.zeebe.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
-
-        <!--
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        -->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -152,7 +108,33 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- nacos -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+
+        <!-- nacos service name为空的问题 https://github.com/alibaba/nacos/issues/5448 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bootstrap</artifactId>
+        </dependency>
+
     </dependencies>
 
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
