@@ -1,6 +1,8 @@
 package com.brandnewdata.mop.poc.api;
 
+import com.brandnewdata.mop.poc.common.service.result.Result;
 import lombok.Data;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -11,7 +13,8 @@ import java.util.List;
  *
  * @author caiwillie
  */
-public interface ModelAPI {
+@FeignClient(name = "poc", contextId = "modelApi")
+public interface ModelApi {
 
     /**
      * 流程资源实体
@@ -44,6 +47,6 @@ public interface ModelAPI {
      * @param bpmnList the bpmn list
      */
     @RequestMapping("/deploy")
-    void deploy(@RequestBody List<BPMNResource> bpmnList);
+    Result deploy(@RequestBody List<BPMNResource> bpmnList);
 
 }

@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.brandnewdata.mop.poc.common.service.result.PageResult;
 import com.brandnewdata.mop.poc.dao.DeModelDao;
 import com.brandnewdata.mop.poc.parser.XMLDTO;
-import com.brandnewdata.mop.poc.parser.XMLParser;
 import com.brandnewdata.mop.poc.parser.XMLParser2;
 import com.brandnewdata.mop.poc.pojo.entity.DeModelEntity;
 import io.camunda.zeebe.client.ZeebeClient;
@@ -64,10 +63,10 @@ public class ModelService {
         return ret;
     }
 
-    public void deploy(String modelKey) {
+    public void deploy(String modelKey, String name, String editorXMl) {
         DeModelEntity entity = getOne(modelKey);
         String editorXml = entity.getEditorXml();
-        XMLDTO xmldto = new XMLParser().parse(editorXml);
+        XMLDTO xmldto = new XMLParser2(modelKey, name).parse(editorXml);
 
         zeebe.newDeployResourceCommand()
                 .addResourceStringUtf8(xmldto.getZeebeXML(), modelKey + ".bpmn")

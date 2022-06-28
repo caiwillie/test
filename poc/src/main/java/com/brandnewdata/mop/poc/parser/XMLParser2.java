@@ -208,7 +208,7 @@ public class XMLParser2 {
                 Element input = (Element) node;
                 String target = input.attributeValue("target");
                 target = "inputs." + target;
-                ((Element) node).addAttribute("target", target);
+                input.addAttribute("target", target);
             }
         }
 

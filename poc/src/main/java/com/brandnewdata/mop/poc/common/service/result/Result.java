@@ -1,12 +1,14 @@
 package com.brandnewdata.mop.poc.common.service.result;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * 接口返回数据格式
  * @author caiwillie
  */
 @Data
+@Accessors(chain = true)
 public class Result<T> {
 
 	/**

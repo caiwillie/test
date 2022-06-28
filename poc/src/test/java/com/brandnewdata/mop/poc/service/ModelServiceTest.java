@@ -53,7 +53,7 @@ class ModelServiceTest {
         when(mockZeebe.newDeployResourceCommand()).thenReturn(null);
 
         // Run the test
-        modelServiceUnderTest.deploy("classPath");
+
 
         // Verify the results
     }
