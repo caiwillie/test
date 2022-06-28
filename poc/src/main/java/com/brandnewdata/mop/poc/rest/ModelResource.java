@@ -92,7 +92,7 @@ public class ModelResource {
             save(vo);
         }
 
-        modelService.deploy(null, null, vo.getModelKey());
+        modelService.deploy(null, null, vo.getEditorXML());
         return Result.success();
     }
 
