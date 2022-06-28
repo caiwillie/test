@@ -113,9 +113,6 @@ public class XMLParser2 {
     }
 
     private void handleRoot(Element element) {
-        if(modelKey != null || name != null) {
-            return;
-        }
         QName qName = element.getQName();
         if(!StrUtil.equals(element.getQualifiedName(), BPMN_PROCESS_QNAME.getQualifiedName())) {
             // 不是 bpmn:process，直接跳过
@@ -138,7 +135,7 @@ public class XMLParser2 {
             element.addAttribute("name", name);
         }
 
-
+        // isExecutable="false"
         element.addAttribute("isExecutable", "true");
 
     }

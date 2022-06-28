@@ -2,6 +2,7 @@ package com.brandnewdata.mop.poc.service;
 
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.brandnewdata.mop.poc.common.service.result.PageResult;
@@ -66,8 +67,10 @@ public class ModelService {
     public void deploy(String modelKey, String name, String editorXMl) {
         XMLDTO xmldto = new XMLParser2(modelKey, name).parse(editorXMl);
 
+        // fileName中替换.
+        String fileName = StrUtil.replace(modelKey, ".", "_") + ".bpmn";
         zeebe.newDeployResourceCommand()
-                .addResourceStringUtf8(xmldto.getZeebeXML(), modelKey + ".bpmn")
+                .addResourceStringUtf8(xmldto.getZeebeXML(), fileName)
                 .send()
                 .join();
     }
