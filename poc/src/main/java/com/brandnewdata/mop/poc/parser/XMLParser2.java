@@ -153,6 +153,9 @@ public class XMLParser2 {
         // 处理任务定义
         String type = handleTaskDefinition(element);
 
+        // 处理call activity
+        handleCallActivity(element, type);
+
         // 处理出入参数映射
         handleIOMapping(element, type);
 
@@ -178,7 +181,41 @@ public class XMLParser2 {
         return type;
     }
 
+    private void handleCallActivity(Element task, String type) {
+        if(type.startsWith("com.brandnewdata")) {
+            // 是com.brandnewdata就不当作call activity处理
+            return;
+        }
+
+        // 修改Qname
+        task.setQName(BPMN_CALL_ACTIVITY_TASK_QNAME);
+
+        XPath taskDefinitionXPATH = DocumentHelper.createXPath(StrUtil.format("./{}/{}",
+                BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
+                ZEEBE_TASK_DEFINITION_QNAME.getQualifiedName()));
+
+        // 获取taskDefinition的index
+        Node node = taskDefinitionXPATH.selectSingleNode(task);
+        ((Element) node).attributeValue("type");
+
+        List<Node> parent = node.getParent().content();
+
+        int index = parent.indexOf(node);
+
+        // 创建 call element，并设置 processId = type
+        Element callElement = DocumentHelper.createElement(ZEEBE_CALLED_ELEMENT_QNAME);
+        callElement.addAttribute("processId", type);
+        callElement.addAttribute("propagateAllChildVariables", "false");
+
+        parent.set(index, callElement);
+
+    }
+
     private void handleIOMapping(Element task, String type) {
+        if(!type.startsWith("com.brandnewdata")) {
+            return;
+        }
+
 
         XPath ioMappingXPATH = DocumentHelper.createXPath(StrUtil.format("./{}/{}",
                 BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
@@ -189,26 +226,22 @@ public class XMLParser2 {
                 ZEEBE_IO_MAPPING_QNAME.getQualifiedName(),
                 ZEEBE_INPUT_QNAME.getQualifiedName()));
 
-
-
-        XPath outputXPATH = DocumentHelper.createXPath(StrUtil.format("./{}/{}/{}",
-                BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
-                ZEEBE_IO_MAPPING_QNAME.getQualifiedName(),
-                ZEEBE_OUTPUT_QNAME.getQualifiedName()));
-
         Element ioMapping = (Element) ioMappingXPATH.selectSingleNode(task);
 
-        List<Node> nodes = inputXPATH.selectNodes(task);
+        if(StrUtil.containsAny(type, "http", "datasource")) {
+            // 只有当 http 和 dataaSource 时才能够处理inputs
+            List<Node> nodes = inputXPATH.selectNodes(task);
 
-        if(CollUtil.isNotEmpty(nodes)) {
-            for (Node node : nodes) {
-                if(!(node instanceof Element)) {
-                    throw new IllegalArgumentException(StrUtil.format("服务任务 {} 下入参配置有误", task.getName()));
+            if(CollUtil.isNotEmpty(nodes)) {
+                for (Node node : nodes) {
+                    if(!(node instanceof Element)) {
+                        throw new IllegalArgumentException(StrUtil.format("服务任务 {} 下入参配置有误", task.getName()));
+                    }
+                    Element input = (Element) node;
+                    String target = input.attributeValue("target");
+                    target = "inputs." + target;
+                    input.addAttribute("target", target);
                 }
-                Element input = (Element) node;
-                String target = input.attributeValue("target");
-                target = "inputs." + target;
-                input.addAttribute("target", target);
             }
         }
 
@@ -224,7 +257,6 @@ public class XMLParser2 {
 
 
     }
-
     private List<Node> handleHttpProperties(Element task, String type) {
         List<Node> ret = new ArrayList<>();
         /*

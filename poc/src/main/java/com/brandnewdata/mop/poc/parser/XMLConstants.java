@@ -21,6 +21,8 @@ public interface XMLConstants {
 
     static QName BPMN_SERVICE_TASK_QNAME = DocumentHelper.createQName("serviceTask", BPMN_NAMESPACE);
 
+    static QName BPMN_CALL_ACTIVITY_TASK_QNAME = DocumentHelper.createQName("callActivity", BPMN_NAMESPACE);
+
     static QName BPMN_EXTENSION_ELEMENTS_QNAME = DocumentHelper.createQName("extensionElements", BPMN_NAMESPACE);
 
     static QName BRANDNEWDATA_TASK_DEFINITION_QNAME = DocumentHelper.createQName("taskDefinition", BRANDNEWDATA_NAMESPACE);
@@ -32,6 +34,8 @@ public interface XMLConstants {
     static QName BRANDNEWDATA_EXTENSION_QNAME = DocumentHelper.createQName("extension", BRANDNEWDATA_NAMESPACE);
 
     static QName ZEEBE_TASK_DEFINITION_QNAME = DocumentHelper.createQName("taskDefinition", ZEEBE_NAMESPACE);
+
+    static QName ZEEBE_CALLED_ELEMENT_QNAME = DocumentHelper.createQName("calledElement", ZEEBE_NAMESPACE);
 
     static QName ZEEBE_IO_MAPPING_QNAME = DocumentHelper.createQName("ioMapping", ZEEBE_NAMESPACE);
 
