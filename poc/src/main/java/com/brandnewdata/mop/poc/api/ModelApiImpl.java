@@ -17,7 +17,7 @@ public class ModelApiImpl implements ModelApi{
     @Override
     public Result deploy(List<BPMNResource> bpmnList) {
         if(CollUtil.isEmpty(bpmnList)) {
-            return Result.success();
+            return Result.error().setMessage("流程资源列表为空");
         }
 
         for (BPMNResource bpmnResource : bpmnList) {

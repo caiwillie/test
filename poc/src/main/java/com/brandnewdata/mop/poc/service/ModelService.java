@@ -65,18 +65,18 @@ public class ModelService {
     }
 
     public void deploy(String modelKey, String name, String editorXMl) {
+        modelKey = ServiceUtil.convertModelKey(modelKey);
         XMLDTO xmldto = new XMLParser2(modelKey, name).parse(editorXMl);
 
-        // fileName中替换.
-        String fileName = StrUtil.replace(modelKey, ".", "_") + ".bpmn";
         zeebe.newDeployResourceCommand()
-                .addResourceStringUtf8(xmldto.getZeebeXML(), fileName)
+                .addResourceStringUtf8(xmldto.getZeebeXML(), modelKey + ".bpmn")
                 .send()
                 .join();
     }
 
     public void start(String modelKey) {
         // camunda-cloud-quick-start-advanced
+        modelKey = ServiceUtil.convertModelKey(modelKey);
 
         zeebe.newCreateInstanceCommand()
                 .bpmnProcessId(modelKey)
@@ -84,4 +84,5 @@ public class ModelService {
                 .send()
                 .join();
     }
+
 }

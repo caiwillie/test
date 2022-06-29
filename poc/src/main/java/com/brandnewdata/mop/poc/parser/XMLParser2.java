@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FastStringWriter;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
+import com.brandnewdata.mop.poc.service.ServiceUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.dom4j.*;
 import org.dom4j.io.OutputFormat;
@@ -201,7 +202,8 @@ public class XMLParser2 {
 
         // 创建 call element，并设置 processId = type
         Element callElement = DocumentHelper.createElement(ZEEBE_CALLED_ELEMENT_QNAME);
-        callElement.addAttribute("processId", type);
+        String processId = ServiceUtil.convertModelKey(type);
+        callElement.addAttribute("processId", processId);
         callElement.addAttribute("propagateAllChildVariables", "false");
 
         parent.set(index, callElement);

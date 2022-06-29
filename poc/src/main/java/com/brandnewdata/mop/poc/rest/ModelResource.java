@@ -91,6 +91,10 @@ public class ModelResource {
         if(editorXML != null) {
             // 不为空就先保存
             save(vo);
+        } else {
+            // 为空就查询
+            DeModelEntity entity = modelService.getOne(vo.getModelKey());
+            editorXML = entity.getEditorXml();
         }
 
         modelService.deploy(null, null, editorXML);
