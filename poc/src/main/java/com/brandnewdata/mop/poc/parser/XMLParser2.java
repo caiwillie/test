@@ -227,7 +227,7 @@ public class XMLParser2 {
 
         Element ioMapping = (Element) ioMappingXPATH.selectSingleNode(task);
 
-        if(StrUtil.containsAny(type, "http", "datasource")) {
+        if(StrUtil.containsAny(type, "http", "database")) {
             // 只有当 http 和 dataaSource 时才能够处理inputs
             List<Node> nodes = inputXPATH.selectNodes(task);
 
@@ -281,13 +281,13 @@ public class XMLParser2 {
 
         Element properties1 = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
         properties1.addAttribute("target", "properties.databaseType");
-        properties1.addAttribute("source", "= &#34;mysql&#34;");
+        properties1.addAttribute("source", "= \"mysql\"");
         ret.add(properties1);
 
 
         Element properties2 = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
         properties2.addAttribute("target", "properties.host");
-        properties2.addAttribute("source", "= &#34;10.101.53.4&#34;");
+        properties2.addAttribute("source", "= \"10.101.53.4\"");
         ret.add(properties2);
 
 
@@ -298,17 +298,17 @@ public class XMLParser2 {
 
         Element properties4 = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
         properties4.addAttribute("target", "properties.databaseName");
-        properties4.addAttribute("source", "= &#34;brand_connector&#34;");
+        properties4.addAttribute("source", "= \"brand_connector\"");
         ret.add(properties4);
 
         Element properties5 = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
         properties5.addAttribute("target", "properties.username");
-        properties5.addAttribute("source", "= &#34;root&#34;");
+        properties5.addAttribute("source", "= \"root\"");
         ret.add(properties5);
 
         Element properties6 = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
         properties6.addAttribute("target", "properties.password");
-        properties6.addAttribute("source", "= &#34;Brand@123456&#34;");
+        properties6.addAttribute("source", "= \"Brand@123456\"");
         ret.add(properties6);
 
         return ret;
