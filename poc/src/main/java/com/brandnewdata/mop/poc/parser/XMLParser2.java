@@ -279,17 +279,18 @@ public class XMLParser2 {
           <zeebe:input source="= &#34;Brand@123456&#34;" target="properties.password" />
         * */
 
+        /*
+        * dom4j框架会负责转义，直接输入字面量就行
+        * */
         Element properties1 = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
         properties1.addAttribute("target", "properties.databaseType");
         properties1.addAttribute("source", "= \"mysql\"");
         ret.add(properties1);
 
-
         Element properties2 = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
         properties2.addAttribute("target", "properties.host");
         properties2.addAttribute("source", "= \"10.101.53.4\"");
         ret.add(properties2);
-
 
         Element properties3 = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
         properties3.addAttribute("target", "properties.port");
