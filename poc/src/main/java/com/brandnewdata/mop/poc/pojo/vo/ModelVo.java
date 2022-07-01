@@ -29,4 +29,14 @@ public class ModelVo {
      * 模型定义
      */
     private String editorXML;
+
+    /**
+     * 创建时间
+     */
+    private String createTime;
+
+    /**
+     * 更新时间
+     */
+    private String updateTime;
 }

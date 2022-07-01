@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.poc.rest;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
 import com.brandnewdata.mop.poc.common.service.result.PageResult;
 import com.brandnewdata.mop.poc.common.service.result.Result;
@@ -9,6 +10,7 @@ import com.brandnewdata.mop.poc.service.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -132,6 +134,11 @@ public class ModelResource {
         vo.setName(entity.getName());
         vo.setModelKey(entity.getModelKey());
         vo.setEditorXML(entity.getEditorXml());
+        LocalDateTime updateTime = entity.getUpdateTime();
+        if(updateTime != null) {
+            vo.setCreateTime(DateUtil.formatLocalDateTime(updateTime));
+            vo.setUpdateTime(DateUtil.formatLocalDateTime(updateTime));
+        }
         return vo;
     }
 
