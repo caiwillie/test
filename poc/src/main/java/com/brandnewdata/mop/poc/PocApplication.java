@@ -11,7 +11,7 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 @EnableZeebeClient // 开启zeebe https://github.com/camunda-community-hub/spring-zeebe/
 @RefreshScope // 开启配置中心自动刷新 https://nacos.io/zh-cn/docs/quick-start-spring-cloud.html
 @EnableDiscoveryClient // 开启注册发现 https://nacos.io/zh-cn/docs/quick-start-spring-cloud.html
-@EnableCorsConfig
+//@EnableCorsConfig
 public class PocApplication {
 
 	public static void main(String[] args) {
