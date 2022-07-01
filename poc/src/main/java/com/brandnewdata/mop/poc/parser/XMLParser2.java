@@ -227,20 +227,17 @@ public class XMLParser2 {
 
         Element ioMapping = (Element) ioMappingXPATH.selectSingleNode(task);
 
-        if(StrUtil.containsAny(type, "http", "database")) {
-            // 只有当 http 和 dataaSource 时才能够处理inputs
-            List<Node> nodes = inputXPATH.selectNodes(task);
+        List<Node> nodes = inputXPATH.selectNodes(task);
 
-            if(CollUtil.isNotEmpty(nodes)) {
-                for (Node node : nodes) {
-                    if(!(node instanceof Element)) {
-                        throw new IllegalArgumentException(StrUtil.format("服务任务 {} 下入参配置有误", task.getName()));
-                    }
-                    Element input = (Element) node;
-                    String target = input.attributeValue("target");
-                    target = "inputs." + target;
-                    input.addAttribute("target", target);
+        if(CollUtil.isNotEmpty(nodes)) {
+            for (Node node : nodes) {
+                if(!(node instanceof Element)) {
+                    throw new IllegalArgumentException(StrUtil.format("服务任务 {} 下入参配置有误", task.getName()));
                 }
+                Element input = (Element) node;
+                String target = input.attributeValue("target");
+                target = "inputs." + target;
+                input.addAttribute("target", target);
             }
         }
 
