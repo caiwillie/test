@@ -87,7 +87,7 @@ public class ModelResource {
      * @param vo the model vo
      * @return the result
      */
-    @PostMapping(value = "/deploy")
+    @RequestMapping(value = "/deploy")
     public Result<ModelVo> deploy(@RequestBody ModelVo vo) {
         String editorXML = vo.getEditorXML();
         if(editorXML != null) {
