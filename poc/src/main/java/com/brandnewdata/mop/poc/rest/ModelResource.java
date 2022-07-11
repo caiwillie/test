@@ -2,8 +2,8 @@ package com.brandnewdata.mop.poc.rest;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
+import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.common.service.result.PageResult;
-import com.brandnewdata.mop.poc.common.service.result.Result;
 import com.brandnewdata.mop.poc.pojo.entity.DeModelEntity;
 import com.brandnewdata.mop.poc.pojo.vo.ModelVo;
 import com.brandnewdata.mop.poc.service.ModelService;
@@ -46,7 +46,7 @@ public class ModelResource {
         List<ModelVo> records = Optional.ofNullable(page.getRecords()).orElse(Collections.emptyList())
                 .stream().map(this::transformToVO).collect(Collectors.toList());
         PageResult<ModelVo> ret = new PageResult<>(page.getTotal(), records);
-        return Result.success(ret);
+        return Result.OK(ret);
     }
 
     /**
@@ -62,7 +62,7 @@ public class ModelResource {
         modelService.save(entity);
         // 返回新增值
         ModelVo ret = transformToVO(entity);
-        return Result.success(ret);
+        return Result.OK(ret);
     }
 
 
@@ -78,7 +78,7 @@ public class ModelResource {
         DeModelEntity entity = modelService.getOne(modelKey);
         Assert.notNull(entity, "模型不存在");
         ModelVo vo = transformToVO(entity);
-        return Result.success(vo);
+        return Result.OK();
     }
 
     /**
@@ -100,7 +100,7 @@ public class ModelResource {
         }
 
         modelService.deploy(null, null, editorXML);
-        return Result.success();
+        return Result.OK();
     }
 
     /**
@@ -112,7 +112,7 @@ public class ModelResource {
     @PostMapping(value = "/start")
     public Result<ModelVo> start(@RequestBody ModelVo modelVo) {
         modelService.start(modelVo.getModelKey());
-        return Result.success();
+        return Result.OK();
     }
 
     private void valid(ModelVo modelVo) {
