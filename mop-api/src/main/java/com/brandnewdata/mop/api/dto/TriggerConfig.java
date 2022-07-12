@@ -1,6 +1,5 @@
 package com.brandnewdata.mop.api.dto;
 
-import com.brandnewdata.mop.api.dto.RequestParamConfig;
 import lombok.Data;
 
 import java.util.List;
@@ -9,9 +8,9 @@ import java.util.List;
 public class TriggerConfig {
 
     /**
-     * 连接器id
+     * 触发器名称
      */
-    private String id;
+    private String triggerName;
 
     /**
      * 监听配置
