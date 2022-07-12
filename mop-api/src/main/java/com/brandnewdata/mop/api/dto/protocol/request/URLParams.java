@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.api.dto.protocol;
+package com.brandnewdata.mop.api.dto.protocol.request;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -2,6 +2,7 @@ package com.brandnewdata.mop.poc.message;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
+import com.brandnewdata.common.webresult.Result;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.MapType;
@@ -36,7 +37,7 @@ public class MessageResource {
      * 发送消息
      */
     @PostMapping(value = "/message/send")
-    public Result sned(@RequestBody MessageDTO message) {
+    public Result send(@RequestBody MessageDTO message) {
 
         String type = message.getType();
         String correlationKey = message.getCorrelationKey();
@@ -66,6 +67,6 @@ public class MessageResource {
                 .send()
                 .join();
 
-        return Result.success();
+        return Result.OK();
     }
 }
