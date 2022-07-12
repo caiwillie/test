@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
 
 @FeignClient(name = "poc", contextId = "modelApi")
+@RequestMapping("/api/model")
 public interface ModelApi {
 
     /**
