@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.api.dto;
 
+import com.brandnewdata.mop.api.dto.RequestParamConfig;
 import lombok.Data;
 
 import java.util.List;
