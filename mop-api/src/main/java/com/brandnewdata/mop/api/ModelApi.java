@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
 
 @FeignClient(name = "poc", contextId = "modelApi")
-@RequestMapping("/api/model")
+// @RequestMapping("/api/model")
 public interface ModelApi {
 
     /**
@@ -18,13 +18,13 @@ public interface ModelApi {
      *
      * @param bpmnList the bpmn list
      */
-    @RequestMapping("/deploy")
+    @RequestMapping("/api/model/deploy")
     Result deploy(@RequestBody List<BPMNResource> bpmnList);
 
     /**
      * 通过消息触发流程
      */
-    @RequestMapping("/startByMessages")
+    @RequestMapping("/api/model/startByMessages")
     Result startByMessages(@RequestBody List<StartMessage> messages);
 
 }

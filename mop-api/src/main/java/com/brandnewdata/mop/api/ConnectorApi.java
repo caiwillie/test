@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
 
 @FeignClient(name = "poc", contextId = "connectorApi")
-@RequestMapping("/api/connector")
+// @RequestMapping("/api/connector")
 public interface ConnectorApi {
 
     /**
@@ -17,7 +17,7 @@ public interface ConnectorApi {
      * @param connectorId 连接器主键id
      * @return the request param config
      */
-    @RequestMapping("/getRequestParamConfig")
+    @RequestMapping("/api/connector/getRequestParamConfig")
     Result<List<TriggerConfig>> getRequestParamConfig(Long connectorId);
 
 }
