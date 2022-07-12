@@ -17,6 +17,7 @@ public interface ConnectorApi {
      * @param connectorId 连接器主键id
      * @return the request param config
      */
+    @RequestMapping("/getRequestParamConfig")
     Result<List<TriggerConfig>> getRequestParamConfig(Long connectorId);
 
 }

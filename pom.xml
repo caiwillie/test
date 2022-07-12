@@ -75,6 +75,8 @@
         <oracle.jdbc.version>12.2.0.1</oracle.jdbc.version>
         <oracle.jdbc.artifact>ojdbc8</oracle.jdbc.artifact>
 
+        <plugin.java.source.version>3.2.1</plugin.java.source.version>
+
     </properties>
 
 
@@ -195,10 +197,6 @@
     </dependencies>
 
     <build>
-        <plugins>
-
-        </plugins>
-
         <!-- ==================== 插件版本管理 ========================= -->
         <pluginManagement>
             <plugins>
@@ -221,9 +219,9 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
+                    <version>${plugin.java.source.version}</version>
                     <executions>
                         <execution>
-                            <id>attach-sources</id>
                             <goals>
                                 <goal>jar</goal>
                             </goals>
