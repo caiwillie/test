@@ -11,9 +11,11 @@ import com.brandnewdata.mop.poc.parser.XMLDTO;
 import com.brandnewdata.mop.poc.parser.XMLParser2;
 import com.brandnewdata.mop.poc.pojo.entity.DeModelEntity;
 import io.camunda.zeebe.client.ZeebeClient;
+import io.camunda.zeebe.client.api.response.DeploymentEvent;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 
 /**
  * @author caiwillie
@@ -68,7 +70,7 @@ public class ModelService {
         modelKey = ServiceUtil.convertModelKey(modelKey);
         XMLDTO xmldto = new XMLParser2(modelKey, name).parse(editorXMl);
 
-        zeebe.newDeployResourceCommand()
+        DeploymentEvent join = zeebe.newDeployResourceCommand()
                 .addResourceStringUtf8(xmldto.getZeebeXML(), modelKey + ".bpmn")
                 .send()
                 .join();
@@ -77,6 +79,8 @@ public class ModelService {
     public void start(String modelKey) {
         // camunda-cloud-quick-start-advanced
         modelKey = ServiceUtil.convertModelKey(modelKey);
+
+
 
         zeebe.newCreateInstanceCommand()
                 .bpmnProcessId(modelKey)

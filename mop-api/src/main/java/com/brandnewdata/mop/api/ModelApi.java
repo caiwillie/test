@@ -1,7 +1,8 @@
 package com.brandnewdata.mop.api;
 
 import com.brandnewdata.common.webresult.Result;
-import lombok.Data;
+import com.brandnewdata.mop.api.dto.BPMNResource;
+import com.brandnewdata.mop.api.dto.StartMessage;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

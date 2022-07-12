@@ -2,9 +2,9 @@ package com.brandnewdata.mop.poc.api;
 
 import cn.hutool.core.collection.CollUtil;
 import com.brandnewdata.common.webresult.Result;
-import com.brandnewdata.mop.api.BPMNResource;
+import com.brandnewdata.mop.api.dto.BPMNResource;
 import com.brandnewdata.mop.api.ModelApi;
-import com.brandnewdata.mop.api.StartMessage;
+import com.brandnewdata.mop.api.dto.StartMessage;
 import com.brandnewdata.mop.poc.service.ModelService;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,9 +23,9 @@ public class ModelApiImpl implements ModelApi {
             return Result.error("流程资源列表为空");
         }
 
-        for (BPMNResource bpmnResource : bpmnList) {
+        for (BPMNResource bpmnResourceDTO : bpmnList) {
             try {
-                modelService.deploy(bpmnResource.getModelKey(), bpmnResource.getName(), bpmnResource.getEditorXML());
+                modelService.deploy(bpmnResourceDTO.getModelKey(), bpmnResourceDTO.getName(), bpmnResourceDTO.getEditorXML());
             } catch (Exception e) {
                 return Result.error(e.getMessage());
             }

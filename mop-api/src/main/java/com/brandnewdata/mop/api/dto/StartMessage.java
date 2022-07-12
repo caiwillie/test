@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.api;
+package com.brandnewdata.mop.api.dto;
 
 import lombok.Data;
 
@@ -18,10 +18,10 @@ public class StartMessage {
     /**
      * 流程 modelKey
      */
-    private String modelKey;
+    private String processId;
 
     /**
      * 消息内容
      */
-    private Map<String, Object> content;
+    private String content;
 }
