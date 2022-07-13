@@ -6,6 +6,6 @@ public class ConnectorResource {
 
     private List<BPMNResource> triggers;
 
-    private List<BPMNResource> connector;
+    private List<BPMNResource> operates;
 
 }
