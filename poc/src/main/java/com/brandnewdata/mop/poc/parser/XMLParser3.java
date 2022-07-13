@@ -27,7 +27,7 @@ import static com.brandnewdata.mop.poc.parser.XMLConstants.*;
 import static com.brandnewdata.mop.poc.parser.XMLConstants.ZEEBE_INPUT_QNAME;
 
 @Slf4j
-public class XMLParserImpl implements XMLParseStep1, XMLParseStep1.XMLParseStep2, XMLParseStep1.XMLParseStep3 {
+public class XMLParser3 implements XMLParseStep1, XMLParseStep1.XMLParseStep2, XMLParseStep1.XMLParseStep3 {
 
     private String modelKey;
 
@@ -37,12 +37,12 @@ public class XMLParserImpl implements XMLParseStep1, XMLParseStep1.XMLParseStep2
 
     private Document document;
 
-    public XMLParserImpl(String modelKey, String name) {
+    public XMLParser3(String modelKey, String name) {
         this.modelKey = modelKey;
         this.name = name;
     }
 
-    public XMLParserImpl() {
+    public XMLParser3() {
     }
 
     @Override
@@ -68,15 +68,27 @@ public class XMLParserImpl implements XMLParseStep1, XMLParseStep1.XMLParseStep2
     }
 
     @Override
-    public XMLParseStep3 replaceGeneralTrigger(int version) {
+    public XMLParseStep3 replaceGeneralTrigger() {
         Element root = document.getRootElement();
 
-        XPath startEvent = DocumentHelper.createXPath(StrUtil.format("{}/{}/{}",
-                BPMN_DEFINITIONS_QNAME.getQualifiedName(),
+        // 从 bpmn:process 开始计算
+        XPath startEventXPATH = DocumentHelper.createXPath(StrUtil.format("{}/{}",
                 BPMN_PROCESS_QNAME.getQualifiedName(),
                 BPMN_START_EVENT_QNAME.getQualifiedName()));
 
-        return null;
+        Element startEvent = (Element) startEventXPATH.selectSingleNode(root);
+
+        Iterator<Element> iterator = startEvent.elementIterator();
+
+        while(iterator.hasNext()) {
+            // 删除outgoing以外的其他元素
+            Element element = iterator.next();
+            if(!StrUtil.equals(element.getQualifiedName(), BPMN_OUTGOING_QNAME.getQualifiedName())) {
+                iterator.remove();
+            }
+        }
+
+        return this;
     }
 
     @Override

@@ -15,7 +15,10 @@ public class XMLParser3Test {
     @Test
     void parse() {
         String content = ResourceUtil.readStr("v3.bpmn.xml", StandardCharsets.UTF_8);
-
+        XMLDTO xmldto = new XMLParser3()
+                .parse(content)
+                .replaceGeneralTrigger()
+                .build();
         /*
         ObjectMapper objectMapper = new ObjectMapper();
 

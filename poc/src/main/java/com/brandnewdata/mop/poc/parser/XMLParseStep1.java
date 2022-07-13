@@ -8,7 +8,7 @@ public interface XMLParseStep1 {
 
     interface XMLParseStep2 {
 
-        XMLParseStep1.XMLParseStep3 replaceGeneralTrigger(int version);
+        XMLParseStep1.XMLParseStep3 replaceGeneralTrigger();
 
         XMLParseStep1.XMLParseStep3 replaceCustomTrigger();
 
