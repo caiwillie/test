@@ -1,7 +1,10 @@
 package com.brandnewdata.mop.api.dto;
 
+import lombok.Data;
+
 import java.util.List;
 
+@Data
 public class ConnectorResource {
 
     /**

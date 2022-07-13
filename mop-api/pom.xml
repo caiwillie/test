@@ -6,6 +6,7 @@
         <groupId>com.brandnewdata</groupId>
         <artifactId>parent</artifactId>
         <version>1.0-SNAPSHOT</version>
+        <!-- https://blog.csdn.net/sinat_15561283/article/details/88384075 -->
         <relativePath/>
     </parent>
     <modelVersion>4.0.0</modelVersion>

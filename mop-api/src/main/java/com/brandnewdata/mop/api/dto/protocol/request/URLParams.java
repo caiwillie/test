@@ -1,8 +1,11 @@
 package com.brandnewdata.mop.api.dto.protocol.request;
 
+import lombok.Data;
+
 import java.util.HashMap;
 import java.util.Map;
 
+@Data
 public class URLParams {
     /**
      * path参数
