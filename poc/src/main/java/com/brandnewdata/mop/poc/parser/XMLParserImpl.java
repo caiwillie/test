@@ -18,32 +18,36 @@ import org.dom4j.io.XMLWriter;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import static com.brandnewdata.mop.poc.parser.XMLConstants.*;
+import static com.brandnewdata.mop.poc.parser.XMLConstants.ZEEBE_INPUT_QNAME;
 
-/**
- * @author caiwillie
- */
 @Slf4j
-public class XMLParser3 {
+public class XMLParserImpl implements XMLParseStep1, XMLParseStep1.XMLParseStep2, XMLParseStep1.XMLParseStep3 {
 
     private String modelKey;
 
     private String name;
 
-    public XMLParser3(String modelKey, String name) {
+    private String xml;
+
+    private Document document;
+
+    public XMLParserImpl(String modelKey, String name) {
         this.modelKey = modelKey;
         this.name = name;
     }
 
-    public XMLParser3() {
-
+    public XMLParserImpl() {
     }
 
-    public XMLDTO parse(String xml) {
-        XMLDTO ret = new XMLDTO();
-        Document document;
+    @Override
+    public XMLParseStep2 parse(String xml) {
+        this.xml = xml;
         try (StringReader stringReader = new StringReader(xml)) {
             SAXReader reader = new SAXReader();
             document = reader.read(stringReader);
@@ -58,6 +62,31 @@ public class XMLParser3 {
 
         // 从根节点开始遍历
         walkTree(root);
+
+
+        return this;
+    }
+
+    @Override
+    public XMLParseStep3 replaceGeneralTrigger(int version) {
+        Element root = document.getRootElement();
+
+        XPath startEvent = DocumentHelper.createXPath(StrUtil.format("{}/{}/{}",
+                BPMN_DEFINITIONS_QNAME.getQualifiedName(),
+                BPMN_PROCESS_QNAME.getQualifiedName(),
+                BPMN_START_EVENT_QNAME.getQualifiedName()));
+
+        return null;
+    }
+
+    @Override
+    public XMLParseStep3 replaceCustomTrigger() {
+        return null;
+    }
+
+    @Override
+    public XMLDTO build() {
+        XMLDTO ret = new XMLDTO();
         ret.setName(name);
         ret.setModelKey(modelKey);
 
@@ -69,6 +98,7 @@ public class XMLParser3 {
                 "{} \n" +
                 "==============================转换后的 xml 内容============================\n" +
                 "{}", xml, zeebeXML);
+
         return ret;
     }
 
@@ -151,8 +181,6 @@ public class XMLParser3 {
             // task 并且 brandnewdata:extension 不为空，计算为false, 就跳过
             return;
         }
-
-
 
         // 处理任务定义
         String type = handleTaskDefinition(element);
@@ -438,8 +466,8 @@ public class XMLParser3 {
         * */
 
         /*
-        * dom4j框架会负责转义，直接输入字面量就行
-        * */
+         * dom4j框架会负责转义，直接输入字面量就行
+         * */
         Element properties1 = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
         properties1.addAttribute("target", "properties.databaseType");
         properties1.addAttribute("source", "= \"mysql\"");
@@ -472,5 +500,6 @@ public class XMLParser3 {
 
         return ret;
     }
+
 
 }

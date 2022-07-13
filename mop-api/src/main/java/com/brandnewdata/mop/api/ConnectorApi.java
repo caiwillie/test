@@ -14,10 +14,10 @@ public interface ConnectorApi {
     /**
      * 获取连接器的监听配置
      *
-     * @param connectorId 连接器主键id
+     * @param configs 触发器配置列表
      * @return the request param config
      */
     @RequestMapping("/api/connector/getRequestParamConfig")
-    Result<List<TriggerConfig>> getRequestParamConfig(Long connectorId);
+    Result<List<TriggerConfig>> getRequestParamConfig(List<TriggerConfig> configs);
 
 }

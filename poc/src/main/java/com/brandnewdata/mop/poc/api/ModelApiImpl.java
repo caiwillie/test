@@ -18,7 +18,6 @@ public class ModelApiImpl implements ModelApi {
     @Resource
     private ModelService modelService;
 
-
     @Override
     public Result deployConnector(ConnectorResource bpmnList) {
         return null;

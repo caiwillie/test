@@ -15,7 +15,10 @@ public interface XMLConstants {
     static final Namespace ZEEBE_NAMESPACE =
             DocumentHelper.createNamespace(BPMNNamespace.ZEEBE.getPrefix(), BPMNNamespace.ZEEBE.getUri());
 
+    static QName BPMN_DEFINITIONS_QNAME = DocumentHelper.createQName("definitions", BPMN_NAMESPACE);
     static QName BPMN_PROCESS_QNAME = DocumentHelper.createQName("process", BPMN_NAMESPACE);
+
+    static QName BPMN_START_EVENT_QNAME = DocumentHelper.createQName("startEvent", BPMN_NAMESPACE);
 
     static QName BPMN_TASK_QNAME = DocumentHelper.createQName("task", BPMN_NAMESPACE);
 

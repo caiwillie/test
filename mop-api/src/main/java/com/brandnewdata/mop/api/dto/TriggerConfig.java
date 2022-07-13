@@ -13,6 +13,11 @@ public class TriggerConfig {
     private String triggerName;
 
     /**
+     * 触发器xml
+     */
+    private String editorXML;
+
+    /**
      * 监听配置
      */
     private List<RequestParamConfig> requestParamConfigs;
