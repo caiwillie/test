@@ -27,8 +27,10 @@ public interface XMLConstants {
 
     static QName BRANDNEWDATA_TASK_DEFINITION_QNAME = DocumentHelper.createQName("taskDefinition", BRANDNEWDATA_NAMESPACE);
 
+    static QName BRANDNEWDATA_INPUT_MAPPING_QNAME = DocumentHelper.createQName("inputMapping", BRANDNEWDATA_NAMESPACE);
     static QName BRANDNEWDATA_INPUT_QNAME = DocumentHelper.createQName("input", BRANDNEWDATA_NAMESPACE);
 
+    static QName BRANDNEWDATA_OUTPUT_MAPPING_QNAME = DocumentHelper.createQName("outputMapping", BRANDNEWDATA_NAMESPACE);
     static QName BRANDNEWDATA_OUTPUT_QNAME = DocumentHelper.createQName("output", BRANDNEWDATA_NAMESPACE);
 
     static QName BRANDNEWDATA_EXTENSION_QNAME = DocumentHelper.createQName("extension", BRANDNEWDATA_NAMESPACE);

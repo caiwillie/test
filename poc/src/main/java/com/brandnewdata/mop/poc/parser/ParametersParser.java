@@ -3,9 +3,11 @@ package com.brandnewdata.mop.poc.parser;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.JsonSerializable;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.util.RawValue;
 import org.dom4j.Element;
 
 import java.util.List;
@@ -57,14 +59,14 @@ public class ParametersParser {
     }
 
 
-    private JsonNode parse(Element root) {
+    public ObjectNode parse(Element root) {
         return parseStruct(root);
     }
 
 
 
-    private JsonNode parseEach(Element root) {
-        JsonNode ret = null;
+    private Object parseEach(Element root) {
+        Object ret = null;
         String type = root.attributeValue(typeAttribute);
         if(StrUtil.equals(type, Constants.TYPE_STRUCT)) {
             ret = parseStruct(root);
@@ -76,47 +78,53 @@ public class ParametersParser {
 
         } else {
             String value = root.attributeValue(valueAttribute);
-            ret = OM.convertValue(value, JsonNode.class);
+            if(StrUtil.isNotBlank(value)) {
+                ret = new RawValue(value);
+            }
         }
 
         return ret;
     }
 
-    private JsonNode parseStruct(Element root) {
+    private ObjectNode parseStruct(Element root) {
         ObjectNode ret = OM.createObjectNode();
-        List<Element> elements = root.elements();
-        if(CollUtil.isEmpty(elements)) {
-            return ret;
+        if(root == null ) {
+            return null;
         }
 
+        boolean isEmpty = true;
+        List<Element> elements = root.elements();
         for (int i = 0; i < elements.size(); i++) {
             Element element = elements.get(i);
             if(!StrUtil.equals(element.getQualifiedName(), qName)) {
                 // 如果 qName 没匹配上，就直接跳过
                 continue;
             }
-            String name = root.attributeValue(nameAttribute);
-            JsonNode value = parseEach(element);
-            ret.set(name, value);
+            String name = element.attributeValue(nameAttribute);
+            Object value = parseEach(element);
+            if(value != null) {
+                if(isEmpty) isEmpty = false;
+                ret.putPOJO(name, value);
+            }
         }
         return ret;
     }
 
-    private JsonNode parseList(Element root) {
+    private ArrayNode parseList(Element root) {
         ArrayNode ret = OM.createArrayNode();
-        List<Element> elements = root.elements();
-        if(CollUtil.isEmpty(elements)) {
-            return ret;
+        if(root == null) {
+            return null;
         }
 
+        List<Element> elements = root.elements();
         for (int i = 0; i < elements.size(); i++) {
             Element element = elements.get(i);
             if(!StrUtil.equals(element.getQualifiedName(), qName)) {
                 // 如果 qName 没匹配上，就直接跳过
                 continue;
             }
-            JsonNode value = parseEach(element);
-            ret.add(value);
+            Object value = parseEach(element);
+            ret.addPOJO(value);
         }
 
         return ret;
