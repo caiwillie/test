@@ -225,6 +225,8 @@ public class XMLParser2 {
                 ZEEBE_IO_MAPPING_QNAME.getQualifiedName(),
                 ZEEBE_INPUT_QNAME.getQualifiedName()));
 
+
+
         Element ioMapping = (Element) ioMappingXPATH.selectSingleNode(task);
 
         List<Node> nodes = inputXPATH.selectNodes(task);
