@@ -78,7 +78,7 @@ public class ModelResource {
         DeModelEntity entity = modelService.getOne(modelKey);
         Assert.notNull(entity, "模型不存在");
         ModelVo vo = transformToVO(entity);
-        return Result.OK();
+        return Result.OK(vo);
     }
 
     /**

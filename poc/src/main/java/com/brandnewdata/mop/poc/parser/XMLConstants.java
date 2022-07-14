@@ -23,11 +23,16 @@ public interface XMLConstants {
 
     QName BPMN_SERVICE_TASK_QNAME = DocumentHelper.createQName("serviceTask", BPMN_NAMESPACE);
 
-    QName BPMN_CALL_ACTIVITY_TASK_QNAME = DocumentHelper.createQName("callActivity", BPMN_NAMESPACE);
+    QName BPMN_CALL_ACTIVITY_QNAME = DocumentHelper.createQName("callActivity", BPMN_NAMESPACE);
 
     QName BPMN_EXTENSION_ELEMENTS_QNAME = DocumentHelper.createQName("extensionElements", BPMN_NAMESPACE);
 
     QName BPMN_OUTGOING_QNAME = DocumentHelper.createQName("outgoing", BPMN_NAMESPACE);
+
+    QName BPMN_INCOMING_QNAME = DocumentHelper.createQName("incoming", BPMN_NAMESPACE);
+
+    QName BPMN_SEQUENCE_FLOW_QNAME = DocumentHelper.createQName("sequenceFlow", BPMN_NAMESPACE);
+
     QName BRANDNEWDATA_TASK_DEFINITION_QNAME = DocumentHelper.createQName("taskDefinition", BRANDNEWDATA_NAMESPACE);
 
     QName BRANDNEWDATA_INPUT_QNAME = DocumentHelper.createQName("input", BRANDNEWDATA_NAMESPACE);
@@ -40,6 +45,8 @@ public interface XMLConstants {
 
     QName ZEEBE_TASK_DEFINITION_QNAME = DocumentHelper.createQName("taskDefinition", ZEEBE_NAMESPACE);
 
+    QName ZEEBE_CALLED_ACTIVITY_QNAME = DocumentHelper.createQName("callActivity", ZEEBE_NAMESPACE);
+
     QName ZEEBE_CALLED_ELEMENT_QNAME = DocumentHelper.createQName("calledElement", ZEEBE_NAMESPACE);
 
     QName ZEEBE_IO_MAPPING_QNAME = DocumentHelper.createQName("ioMapping", ZEEBE_NAMESPACE);
@@ -47,6 +54,34 @@ public interface XMLConstants {
     QName ZEEBE_INPUT_QNAME = DocumentHelper.createQName("input", ZEEBE_NAMESPACE);
 
     QName ZEEBE_OUTPUT_QNAME = DocumentHelper.createQName("output", ZEEBE_NAMESPACE);
+
+    String ID_ATTR = "id";
+
+    String NAME_ATTR = "name";
+
+    String VALUE_ATTR = "value";
+
+    String LABEL_ATTR = "label";
+
+    String DATA_TYPE_ATTR = "dataType";
+
+    String TYPE_ATTR = "type";
+
+    String SOURCE_ATTR = "source";
+
+    String TARGET_ATTR = "target";
+
+    String IS_EXECUTABLE_ATTR = "isExecutable";
+
+    String PROCESS_ID_ATTR = "processId";
+
+    String PROPAGATE_ALL_CHILD_VARIABLES_ATTR = "propagateAllChildVariables";
+
+    String SOURCE_REF_ATTR = "sourceRef";
+
+    String TARGET_REF_ATTR = "targetRef";
+
+
 
 
 }

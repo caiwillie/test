@@ -3,6 +3,7 @@ package com.brandnewdata.mop.poc.parser;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FastStringWriter;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.mop.poc.service.ServiceUtil;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,10 +19,7 @@ import org.dom4j.io.XMLWriter;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.brandnewdata.mop.poc.parser.XMLConstants.*;
 import static com.brandnewdata.mop.poc.parser.XMLConstants.ZEEBE_INPUT_QNAME;
@@ -38,7 +36,7 @@ public class XMLParser3 implements XMLParseStep1, XMLParseStep1.XMLParseStep2, X
     private Document document;
 
     public XMLParser3(String modelKey, String name) {
-        this.modelKey = modelKey;
+        this.modelKey = ServiceUtil.convertModelKey(modelKey);
         this.name = name;
     }
 
@@ -63,20 +61,12 @@ public class XMLParser3 implements XMLParseStep1, XMLParseStep1.XMLParseStep2, X
         // 从根节点开始遍历
         walkTree(root);
 
-
         return this;
     }
 
     @Override
     public XMLParseStep3 replaceGeneralTrigger() {
-        Element root = document.getRootElement();
-
-        // 从 bpmn:process 开始计算
-        XPath startEventXPATH = DocumentHelper.createXPath(StrUtil.format("{}/{}",
-                BPMN_PROCESS_QNAME.getQualifiedName(),
-                BPMN_START_EVENT_QNAME.getQualifiedName()));
-
-        Element startEvent = (Element) startEventXPATH.selectSingleNode(root);
+        Element startEvent = getRootStartEvent();
 
         Iterator<Element> iterator = startEvent.elementIterator();
 
@@ -93,7 +83,108 @@ public class XMLParser3 implements XMLParseStep1, XMLParseStep1.XMLParseStep2, X
 
     @Override
     public XMLParseStep3 replaceCustomTrigger() {
-        return null;
+        Element startEvent = getRootStartEvent();
+        Element root = startEvent.getParent();
+
+        Element callActivity = createCallActivity(root, startEvent);
+
+        createSequenceFlow(root, startEvent, callActivity);
+
+        return this;
+    }
+
+    private Element createCallActivity(Element root, Element startEvent) {
+        List<Node> outgoingList = startEvent.selectNodes(BPMN_OUTGOING_QNAME.getQualifiedName());
+        List<Node> sequenceFlows = root.selectNodes(BPMN_SEQUENCE_FLOW_QNAME.getQualifiedName());
+
+        Element taskDefinition = getBPMNTaskDefinition(startEvent);
+        Element zeebeIOMapping = getZeebeIOMapping(startEvent);
+        String triggerFullId = ServiceUtil.convertModelKey(taskDefinition.attributeValue(TYPE_ATTR));
+
+        Element callActivity = DocumentHelper.createElement(BPMN_CALL_ACTIVITY_QNAME);
+        String callActivityId = StrUtil.format("Activity_{}", RandomUtil.randomString(9));
+        callActivity.addAttribute(ID_ATTR, callActivityId);
+        callActivity.addAttribute(NAME_ATTR, "执行自定义触发器");
+        callActivity.setParent(root);
+        root.content().add(0, callActivity);
+
+        Element extensionElements = DocumentHelper.createElement(BPMN_EXTENSION_ELEMENTS_QNAME);
+        extensionElements.setParent(callActivity);
+        callActivity.content().add(extensionElements);
+
+        Element callElement = DocumentHelper.createElement(ZEEBE_CALLED_ELEMENT_QNAME);
+        callElement.addAttribute(PROCESS_ID_ATTR, triggerFullId);
+        callElement.addAttribute(PROPAGATE_ALL_CHILD_VARIABLES_ATTR, Constants.TYPE_BOOLEAN_FALSE);
+        callElement.setParent(extensionElements);
+        extensionElements.content().add(callElement);
+
+        // 放入zeebeIOMapping
+        zeebeIOMapping.getParent().remove(zeebeIOMapping);
+        zeebeIOMapping.setParent(extensionElements);
+        extensionElements.content().add(zeebeIOMapping);
+
+        // 放入outgoing
+        Set<String> outgoingNameSet = new HashSet<>();
+        for (int i = 0; i < outgoingList.size(); i++) {
+            Element outgoing = (Element) outgoingList.get(i);
+            outgoing.getParent().remove(outgoing);
+            outgoing.setParent(callActivity);
+            callActivity.content().add(outgoing);
+            outgoingNameSet.add(outgoing.getText());
+        }
+
+        // 修改 sequence flow 的 source ref
+        for (int i = 0; i < sequenceFlows.size(); i++) {
+            Element sequenceFlow = (Element) sequenceFlows.get(i);
+            if(outgoingNameSet.contains(sequenceFlow.attributeValue(ID_ATTR))) {
+                // 修改 sequence flow 的 SOURCE_REF
+                sequenceFlow.attribute(SOURCE_REF_ATTR).setValue(callActivityId);
+            }
+        }
+
+        return callActivity;
+    }
+
+    private Element createSequenceFlow(Element root, Element source, Element target) {
+        String sourceRef = source.attributeValue(ID_ATTR);
+        String targetRef = target.attributeValue(ID_ATTR);
+
+        Element sequenceFlow = DocumentHelper.createElement(BPMN_SEQUENCE_FLOW_QNAME);
+        sequenceFlow.addAttribute(SOURCE_REF_ATTR, sourceRef);
+        sequenceFlow.addAttribute(TARGET_REF_ATTR, targetRef);
+        String sequenceFlowId = StrUtil.format("FLOW_{}", RandomUtil.randomString(9));
+        sequenceFlow.addAttribute(ID_ATTR, sequenceFlowId);
+        sequenceFlow.setParent(root);
+        root.content().add(0, sequenceFlow);
+
+        Element outgoing = DocumentHelper.createElement(BPMN_OUTGOING_QNAME);
+        outgoing.addText(sequenceFlowId);
+        outgoing.setParent(source);
+        source.content().add(outgoing);
+
+        Element incoming = DocumentHelper.createElement(BPMN_INCOMING_QNAME);
+        incoming.addText(sequenceFlowId);
+        incoming.setParent(target);
+        target.content().add(incoming);
+
+        return incoming;
+    }
+
+    private Element getRootStartEvent() {
+        Element root = document.getRootElement();
+
+        // 从 bpmn:process 开始计算
+        XPath startEventXPATH = DocumentHelper.createXPath(StrUtil.format("./{}/{}",
+                BPMN_PROCESS_QNAME.getQualifiedName(),
+                BPMN_START_EVENT_QNAME.getQualifiedName()));
+
+        Element startEvent = (Element) startEventXPATH.selectSingleNode(root);
+
+        if(startEvent == null) {
+            throw new IllegalArgumentException("没有定义触发器");
+        }
+
+        return startEvent;
     }
 
     @Override
@@ -124,11 +215,20 @@ public class XMLParser3 implements XMLParseStep1, XMLParseStep1.XMLParseStep2, X
             }
         }
 
-        // 处理namespace
-        handleNamespace(element);
+        // 处理 bpmn2 namespace
+        replaceBPMN2Namespace(element);
 
         // 处理 model key 与 名称
-        handleRoot(element);
+        handleBPMNProcess(element);
+
+        // 处理 brandnewdata:taskDefinition
+        replaceBNDTaskDefinition(element);
+
+        // 处理 brandnewdata:inputMapping
+        replaceBNDInputMapping(element);
+
+        // 处理 brandnewdata:outputMapping
+        replaceBNDOutputMapping(element);
 
         // 处理连接器
         handleConnector(element);
@@ -151,7 +251,7 @@ public class XMLParser3 implements XMLParseStep1, XMLParseStep1.XMLParseStep2, X
         }
     }
 
-    private void handleNamespace(Element element) {
+    private void replaceBPMN2Namespace(Element element) {
         // 替换 namespace
         if (StrUtil.equals(element.getNamespacePrefix(), BPMNNamespace.BPMN2.getPrefix())) {
             // 会逐级向上查找namespace
@@ -159,199 +259,131 @@ public class XMLParser3 implements XMLParseStep1, XMLParseStep1.XMLParseStep2, X
         }
     }
 
-    private void handleRoot(Element element) {
-        QName qName = element.getQName();
+    private void handleBPMNProcess(Element element) {
+        // 只处理 bpmn:process，直接跳过
         if(!StrUtil.equals(element.getQualifiedName(), BPMN_PROCESS_QNAME.getQualifiedName())) {
-            // 不是 bpmn:process，直接跳过
             return;
         }
 
-
         if(modelKey == null) {
-            modelKey = element.attributeValue("id");
-            Assert.notBlank(modelKey, "BPMN解析错误：模型标识不能为空");
+            modelKey = element.attributeValue(ID_ATTR);
+            Assert.notEmpty(modelKey, "BPMN解析错误：模型标识不能为空");
         } else {
-            // 修改
-            element.addAttribute("id", modelKey);
+            element.addAttribute(ID_ATTR, modelKey);
         }
 
         if(name == null) {
-            name = element.attributeValue("name");
+            name = element.attributeValue(NAME_ATTR);
             Assert.notBlank(name,"BPMN解析错误：模型名称不能为空");
         } else {
-            element.addAttribute("name", name);
+            element.addAttribute(NAME_ATTR, name);
         }
 
         // isExecutable="false"
-        element.addAttribute("isExecutable", "true");
+        element.addAttribute(IS_EXECUTABLE_ATTR, Constants.TYPE_BOOLEAN_TRUE);
 
     }
 
-    private void handleConnector(Element element) {
+    private void replaceBNDTaskDefinition(Element element) {
+        // 替换 brandnewdata:taskDefinition to zeebe:taskDefinition
+        if (StrUtil.equals(element.getQualifiedName(), BRANDNEWDATA_TASK_DEFINITION_QNAME.getQualifiedName())) {
+            // 会逐级向上查找namespace
+            Element parent = element.getParent();
 
-        if(!StrUtil.equals(element.getQualifiedName(), BPMN_SERVICE_TASK_QNAME.getQualifiedName())) {
-            // task 并且 brandnewdata:extension 不为空，计算为false, 就跳过
+            Element zeebeTaskDefinition = DocumentHelper.createElement(ZEEBE_TASK_DEFINITION_QNAME);
+            zeebeTaskDefinition.addAttribute(TYPE_ATTR, element.attributeValue(TYPE_ATTR));
+            zeebeTaskDefinition.setParent(parent);
+            List<Node> content = parent.content();
+            content.set(content.indexOf(element), zeebeTaskDefinition);
+        }
+    }
+
+    private void replaceBNDInputMapping(Element element) {
+        if(!StrUtil.equalsAny(element.getQualifiedName(),
+                BPMN_START_EVENT_QNAME.getQualifiedName(),
+                BPMN_SERVICE_TASK_QNAME.getQualifiedName())) {
             return;
         }
-
-        // 处理任务定义
-        String type = handleTaskDefinition(element);
-
-        // 处理call activity
-        handleCallActivity(element, type);
-
-        // 处理入参数映射
-        handleInputMapping(element, type);
-
-        // 处理出参映射
-        handleOutputMapping(element, type);
-
-        return;
-    }
-
-    private String handleTaskDefinition(Element task) {
-
-        XPath taskDefinitionXPATH = DocumentHelper.createXPath(StrUtil.format("./{}/{}",
-                BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(), BRANDNEWDATA_TASK_DEFINITION_QNAME.getQualifiedName()));
-
-        Node node = taskDefinitionXPATH.selectSingleNode(task);
-
-        if(!(node instanceof Element)) {
-            throw new IllegalArgumentException(StrUtil.format("服务任务 {} 下未定义任务类型", task.getName()));
-        }
-
-        Element taskDefinition = (Element) node;
-
-        String type = taskDefinition.attributeValue("type");
-        Assert.notBlank(type, "服务任务 {} 下未定义任务类型", task.getName());
-
-        // 转换并且解析成zeebe
-        Element taskDefinitionNew = DocumentHelper.createElement(ZEEBE_TASK_DEFINITION_QNAME);
-
-        taskDefinitionNew.addAttribute("type", type);
-
-        Element parent = taskDefinition.getParent();
-
-        int index = parent.indexOf(taskDefinition);
-        parent.content().set(index, taskDefinitionNew);
-        return type;
-    }
-
-    private void handleCallActivity(Element task, String type) {
-        if(type.startsWith("com.brandnewdata")) {
-            // 是com.brandnewdata就不当作call activity处理
-            return;
-        }
-
-        // 修改Qname
-        task.setQName(BPMN_CALL_ACTIVITY_TASK_QNAME);
-
-        XPath taskDefinitionXPATH = DocumentHelper.createXPath(StrUtil.format("./{}/{}",
-                BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
-                ZEEBE_TASK_DEFINITION_QNAME.getQualifiedName()));
-
-        // 获取taskDefinition的index
-        Node node = taskDefinitionXPATH.selectSingleNode(task);
-
-        Element parent = node.getParent();;
-
-        // 创建 call element，并设置 processId = type
-        Element callElement = DocumentHelper.createElement(ZEEBE_CALLED_ELEMENT_QNAME);
-        String processId = ServiceUtil.convertModelKey(type);
-        callElement.addAttribute("processId", processId);
-        callElement.addAttribute("propagateAllChildVariables", "false");
-        callElement.setParent(parent);
-
-        List<Node> content = parent.content();
-        int index = content.indexOf(node);
-
-        content.set(index, callElement);
-
-    }
-
-    private void handleInputMapping(Element task, String type) {
-
-        XPath extensionElementsXPATH = DocumentHelper.createXPath(StrUtil.format("./{}",
-                BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName()));
-
-        XPath ioMappingXPATH = DocumentHelper.createXPath(StrUtil.format("./{}/{}",
-                BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
-                ZEEBE_IO_MAPPING_QNAME.getQualifiedName()));
 
         XPath inputMappingXPATH = DocumentHelper.createXPath(StrUtil.format("./{}/{}",
                 BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
                 BRANDNEWDATA_INPUT_MAPPING_QNAME.getQualifiedName()));
 
-        Element extensionElements = (Element) extensionElementsXPATH.selectSingleNode(task);
+        Element inputMapping = (Element) inputMappingXPATH.selectSingleNode(element);
 
-        Element ioMapping = (Element) ioMappingXPATH.selectSingleNode(task);
+        // brandnewdata:inputMapping 不存在，就直接返回
+        if(inputMapping == null) return;
 
-        if(ioMapping == null) {
-            ioMapping = DocumentHelper.createElement(ZEEBE_IO_MAPPING_QNAME);
-            ioMapping.setParent(extensionElements);
-            extensionElements.content().add(ioMapping);
-        }
+        Element zeebeIOMapping = getZeebeIOMapping(element);
 
-        Element inputMapping = (Element) inputMappingXPATH.selectSingleNode(task);
-
-        ParametersParser parametersParser = new ParametersParser("brandnewdata:input", "name",
-                "value", "label",
-                "type", "dataType");
+        ParametersParser parametersParser = new ParametersParser(BRANDNEWDATA_INPUT_QNAME.getQualifiedName(),
+                NAME_ATTR, VALUE_ATTR, LABEL_ATTR, TYPE_ATTR, DATA_TYPE_ATTR);
 
         ObjectNode parameters = parametersParser.parse(inputMapping);
 
         Iterator<Map.Entry<String, JsonNode>> iterator = parameters.fields();
         while(iterator.hasNext()) {
             Map.Entry<String, JsonNode> entry = iterator.next();
-            String target = entry.getKey();
+            String target = StrUtil.format("{}.{}", Constants.INPUTS, entry.getKey());
             // 加上 = 号代表表达式
-            String source =  "=" + entry.getValue();
-            if(!type.startsWith("com.brandnewdata")) {
-                // 通用连接器的参数需要加上input
-                target = "inputs." + target;
-                Element element = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
-                element.addAttribute("target", target);
-                element.addAttribute("source", source);
-                element.setParent(ioMapping);
-                // 新增 zeebe:input
-                ioMapping.content().add(element);
-            }
+            String source = StrUtil.format("{} {}", Constants.EQUALS, entry.getValue());
+            Element input = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
+            input.addAttribute(TARGET_ATTR, target);
+            input.addAttribute(SOURCE_ATTR, source);
+            input.setParent(zeebeIOMapping);
+            // 新增 zeebe:input
+            zeebeIOMapping.content().add(input);
         }
 
         // 移除inputMapping
-        extensionElements.remove(inputMapping);
-
-        List<Node> properties = null;
-
-        /*
-        if(type.startsWith("com.brandnewdata:database")) {
-            properties =  handleDatabaseProperties(task, type);
-        }
-
-        if(CollUtil.isNotEmpty(properties)) {
-            inputMapping.content().addAll(properties);
-        }
-        */
-
-
+        inputMapping.getParent().remove(inputMapping);
     }
 
+    private void replaceBNDOutputMapping(Element element) {
+        if(!StrUtil.equalsAny(element.getQualifiedName(),
+                BPMN_START_EVENT_QNAME.getQualifiedName(),
+                BPMN_SERVICE_TASK_QNAME.getQualifiedName())) {
+            return;
+        }
 
-    private void handleOutputMapping(Element task, String type) {
-        XPath extensionElementsXPATH = DocumentHelper.createXPath(StrUtil.format("./{}",
-                BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName()));
-
-        XPath ioMappingXPATH = DocumentHelper.createXPath(StrUtil.format("./{}/{}",
-                BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
-                ZEEBE_IO_MAPPING_QNAME.getQualifiedName()));
-
-        XPath outputMappingXPATH = DocumentHelper.createXPath(StrUtil.format("./{}/{}",
+        XPath inputMappingXPATH = DocumentHelper.createXPath(StrUtil.format("./{}/{}",
                 BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
                 BRANDNEWDATA_OUTPUT_MAPPING_QNAME.getQualifiedName()));
 
-        Element extensionElements = (Element) extensionElementsXPATH.selectSingleNode(task);
+        Element outputMapping = (Element) inputMappingXPATH.selectSingleNode(element);
 
-        Element ioMapping = (Element) ioMappingXPATH.selectSingleNode(task);
+        // brandnewdata:outMapping 不存在，就直接返回
+        if(outputMapping == null) return;
+
+        Element zeebeIOMapping = getZeebeIOMapping(element);
+
+
+        ParametersParser parametersParser = new ParametersParser(BRANDNEWDATA_OUTPUT_QNAME.getQualifiedName(),
+                NAME_ATTR, VALUE_ATTR, LABEL_ATTR, TYPE_ATTR, DATA_TYPE_ATTR);
+
+        ObjectNode parameters = parametersParser.parse(outputMapping);
+
+        List<IOMap> ioMaps = parseObjectIOMapList(parameters, null);
+
+        for (IOMap ioMap : ioMaps) {
+            Element output = DocumentHelper.createElement(ZEEBE_OUTPUT_QNAME);
+            output.addAttribute(TARGET_ATTR, ioMap.getTarget());
+            output.addAttribute(SOURCE_ATTR, ioMap.getSource());
+            output.setParent(zeebeIOMapping);
+            // 新增 zeebe:output
+            zeebeIOMapping.content().add(output);
+        }
+
+        outputMapping.getParent().remove(outputMapping);
+    }
+
+    private Element getZeebeIOMapping(Element element) {
+        XPath extensionElementsXPATH = DocumentHelper.createXPath(StrUtil.format("./{}",
+                BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName()));
+
+        Element extensionElements = (Element) extensionElementsXPATH.selectSingleNode(element);
+
+        Element ioMapping = (Element) extensionElements.selectSingleNode(ZEEBE_IO_MAPPING_QNAME.getQualifiedName());
 
         if(ioMapping == null) {
             ioMapping = DocumentHelper.createElement(ZEEBE_IO_MAPPING_QNAME);
@@ -359,26 +391,84 @@ public class XMLParser3 implements XMLParseStep1, XMLParseStep1.XMLParseStep2, X
             extensionElements.content().add(ioMapping);
         }
 
-        Element outputMapping = (Element) outputMappingXPATH.selectSingleNode(task);
+        return ioMapping;
+    }
 
-        ParametersParser parametersParser = new ParametersParser("brandnewdata:output", "name",
-                "value", "label",
-                "type", "dataType");
+    private Element getBPMNTaskDefinition(Element element) {
+        XPath path = DocumentHelper.createXPath(StrUtil.format("./{}/{}",
+                BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
+                ZEEBE_TASK_DEFINITION_QNAME.getQualifiedName()));
 
-        ObjectNode parameters = parametersParser.parse(outputMapping);
-
-        List<IOMap> ioMaps = parseObjectIOMapList(parameters, null);
-
-        for (IOMap ioMap : ioMaps) {
-            Element element = DocumentHelper.createElement(ZEEBE_OUTPUT_QNAME);
-            element.addAttribute("target", ioMap.getTarget());
-            element.addAttribute("source", ioMap.getSource());
-            element.setParent(ioMapping);
-            // 新增 zeebe:output
-            ioMapping.content().add(element);
+        Element taskDefinition = (Element) path.selectSingleNode(element);
+        if(taskDefinition == null) {
+            throw new IllegalArgumentException(StrUtil.format("元素 {} 下未定义 taskDefinition",
+                    element.attributeValue(ID_ATTR)));
         }
 
-        extensionElements.remove(outputMapping);
+        if(taskDefinition.attributeValue(TYPE_ATTR) == null) {
+            throw new IllegalArgumentException(StrUtil.format("元素 {} 下未定义 taskDefinition.type",
+                    element.attributeValue(ID_ATTR)));
+        }
+
+        return taskDefinition;
+    }
+
+    private void handleConnector(Element element) {
+
+        // 不是 bpmn:serviceTask 跳过
+        if(!StrUtil.equals(element.getQualifiedName(), BPMN_SERVICE_TASK_QNAME.getQualifiedName())) return;
+
+        Element taskDefinition = getBPMNTaskDefinition(element);
+
+        // 处理call activity
+        handleCallActivity(element, taskDefinition);
+
+        // 处理入参数映射
+        // handleGeneralConnectorInputs(element, taskDefinition);
+    }
+
+    private void handleCallActivity(Element task, Element taskDefinition) {
+        // 除了 com.brandnewdata 开头外的所有其他serviceTask都当作 call activity 处理
+        String type = taskDefinition.attributeValue(TYPE_ATTR);
+        if(type.startsWith(Constants.DOMAIN_BND)) return;
+
+        // 修改 bpmn:serviceTask to bpmn:callActivityTask
+        task.setQName(BPMN_CALL_ACTIVITY_QNAME);
+
+        Element parent = taskDefinition.getParent();;
+
+        // 创建 callElement，并设置 processId = type
+        Element callElement = DocumentHelper.createElement(ZEEBE_CALLED_ELEMENT_QNAME);
+        String processId = ServiceUtil.convertModelKey(type);
+        callElement.addAttribute(PROCESS_ID_ATTR, processId);
+        callElement.addAttribute(PROPAGATE_ALL_CHILD_VARIABLES_ATTR, Constants.TYPE_BOOLEAN_FALSE);
+        callElement.setParent(parent);
+        List<Node> content = parent.content();
+        content.set(content.indexOf(taskDefinition), callElement);
+    }
+
+
+
+    private void handleGeneralConnectorInputs(Element task, Element taskDefinition) {
+        XPath inputXPATH = DocumentHelper.createXPath(StrUtil.format("./{}/{}/{}",
+                BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
+                ZEEBE_IO_MAPPING_QNAME.getQualifiedName(),
+                ZEEBE_INPUT_QNAME.getQualifiedName()));
+
+        // 如果不是 通用连接器 那就不处理
+        if(!StrUtil.startWith(taskDefinition.attributeValue(TYPE_ATTR), Constants.DOMAIN_BND)) return;
+
+        List<Node> inputs = inputXPATH.selectNodes(task);
+
+        if(CollUtil.isEmpty(inputs)) return;
+
+        for (int i = 0; i < inputs.size(); i++) {
+            Element input = (Element) inputs.get(i);
+            // 通用连接器 target 前面加上 inputs
+            Attribute attribute = input.attribute(TARGET_ATTR);
+            attribute.setValue(Constants.INPUTS + "." + attribute.getValue());
+        }
+
     }
 
     private List<IOMap> parseEachIOMapList(JsonNode jsonNode, String parent) {
@@ -448,70 +538,5 @@ public class XMLParser3 implements XMLParseStep1, XMLParseStep1.XMLParseStep2, X
         ret = new IOMap("=" + parent, parameter.rawValue().toString());
         return ret;
     }
-
-
-    private void handleCustomIOMapping(Element task, String type) {
-
-    }
-
-    private List<Node> handleHttpProperties(Element task, String type) {
-        List<Node> ret = new ArrayList<>();
-        /*
-        Element properties1 = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
-        properties1.addAttribute("target", "properties.baseUrl");
-        properties1.addAttribute("source", "= &#34;https://api04.aliyun.venuscn.com&#34;");
-        ret.add(properties1);
-        */
-
-        return ret;
-    }
-
-    private List<Node> handleDatabaseProperties(Element task, String type) {
-        List<Node> ret = new ArrayList<>();
-        /*
-          <zeebe:input source="= &#34;mysql&#34;" target="properties.databaseType" />
-          <zeebe:input source="= &#34;10.101.53.4&#34;" target="properties.host" />
-          <zeebe:input source="= 3306" target="properties.port" />
-          <zeebe:input source="= &#34;brand_connector&#34;" target="properties.databaseName" />
-          <zeebe:input source="= &#34;root&#34;" target="properties.username" />
-          <zeebe:input source="= &#34;Brand@123456&#34;" target="properties.password" />
-        * */
-
-        /*
-         * dom4j框架会负责转义，直接输入字面量就行
-         * */
-        Element properties1 = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
-        properties1.addAttribute("target", "properties.databaseType");
-        properties1.addAttribute("source", "= \"mysql\"");
-        ret.add(properties1);
-
-        Element properties2 = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
-        properties2.addAttribute("target", "properties.host");
-        properties2.addAttribute("source", "= \"10.101.53.4\"");
-        ret.add(properties2);
-
-        Element properties3 = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
-        properties3.addAttribute("target", "properties.port");
-        properties3.addAttribute("source", "= 3306");
-        ret.add(properties3);
-
-        Element properties4 = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
-        properties4.addAttribute("target", "properties.databaseName");
-        properties4.addAttribute("source", "= \"brand_connector\"");
-        ret.add(properties4);
-
-        Element properties5 = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
-        properties5.addAttribute("target", "properties.username");
-        properties5.addAttribute("source", "= \"root\"");
-        ret.add(properties5);
-
-        Element properties6 = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
-        properties6.addAttribute("target", "properties.password");
-        properties6.addAttribute("source", "= \"Brand@123456\"");
-        ret.add(properties6);
-
-        return ret;
-    }
-
 
 }

@@ -80,8 +80,6 @@ public class ModelService {
         // camunda-cloud-quick-start-advanced
         modelKey = ServiceUtil.convertModelKey(modelKey);
 
-
-
         zeebe.newCreateInstanceCommand()
                 .bpmnProcessId(modelKey)
                 .latestVersion()

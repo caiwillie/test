@@ -186,7 +186,7 @@ public class XMLParser2 {
         }
 
         // 修改Qname
-        task.setQName(BPMN_CALL_ACTIVITY_TASK_QNAME);
+        task.setQName(BPMN_CALL_ACTIVITY_QNAME);
 
         XPath taskDefinitionXPATH = DocumentHelper.createXPath(StrUtil.format("./{}/{}",
                 BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),

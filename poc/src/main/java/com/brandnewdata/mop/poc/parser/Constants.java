@@ -25,4 +25,14 @@ public interface Constants {
     String TYPE_LIST = "list";
 
     String TYPE_ENUM = "enum";
+
+    String TYPE_BOOLEAN_TRUE = "true";
+
+    String TYPE_BOOLEAN_FALSE = "false";
+
+    String DOMAIN_BND = "com.brandnewdata";
+
+    String INPUTS = "inputs";
+
+    String EQUALS = "=";
 }
