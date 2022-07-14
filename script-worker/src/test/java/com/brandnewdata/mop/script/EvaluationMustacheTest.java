@@ -24,51 +24,51 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class EvaluationMustacheTest {
 
-  private final ScriptEvaluator scriptEvaluator = new ScriptEvaluator();
+    private final ScriptEvaluator scriptEvaluator = new ScriptEvaluator();
 
-  @Test
-  public void shouldReplaceStringVariables() {
-/*
-    final Object result =
-        scriptEvaluator.evaluate("mustache", "{{x}} and {{y}}", Map.of("x", "a", "y", "b"));
+    @Test
+    public void shouldReplaceStringVariables() {
 
-    assertThat(result).isEqualTo("a and b");*/
-  }
+        final Object result =
+                scriptEvaluator.evaluate("mustache", "{{x}} and {{y}}", Map.of("x", "a", "y", "b"));
 
-  @Test
-  public void shouldReplaceNumericVariables() {
+        assertThat(result).isEqualTo("a and b");
+    }
 
-    final Object result =
-        scriptEvaluator.evaluate("mustache", "{{x}} and {{y}}", Map.of("x", "1", "y", "2"));
+    @Test
+    public void shouldReplaceNumericVariables() {
 
-    assertThat(result).isEqualTo("1 and 2");
-  }
+        final Object result =
+                scriptEvaluator.evaluate("mustache", "{{x}} and {{y}}", Map.of("x", "1", "y", "2"));
 
-  @Test
-  public void shouldReplaceListVariables() {
+        assertThat(result).isEqualTo("1 and 2");
+    }
 
-    final Object result =
-        scriptEvaluator.evaluate("mustache", "{{x}}", Map.of("x", List.of(1, 2, 3)));
+    @Test
+    public void shouldReplaceListVariables() {
 
-    assertThat(result).isEqualTo("[1, 2, 3]");
-  }
+        final Object result =
+                scriptEvaluator.evaluate("mustache", "{{x}}", Map.of("x", List.of(1, 2, 3)));
 
-  @Test
-  public void shouldReplaceObjectVariables() {
+        assertThat(result).isEqualTo("[1, 2, 3]");
+    }
 
-    final Object result =
-        scriptEvaluator.evaluate("mustache", "{{x.y}}", Map.of("x", Map.of("y", 1)));
+    @Test
+    public void shouldReplaceObjectVariables() {
 
-    assertThat(result).isEqualTo("1");
-  }
+        final Object result =
+                scriptEvaluator.evaluate("mustache", "{{x.y}}", Map.of("x", Map.of("y", 1)));
 
-  @Test
-  public void shouldIterateOverListVariable() {
+        assertThat(result).isEqualTo("1");
+    }
 
-    final Object result =
-            scriptEvaluator.evaluate("mustache", "{{#x}}i:{{.}} {{/x}}", Map.of("x", List.of(1, 2, 3)));
+    @Test
+    public void shouldIterateOverListVariable() {
 
-    assertThat(result).isEqualTo("i:1 i:2 i:3 ");
-  }
+        final Object result =
+                scriptEvaluator.evaluate("mustache", "{{#x}}i:{{.}} {{/x}}", Map.of("x", List.of(1, 2, 3)));
+
+        assertThat(result).isEqualTo("i:1 i:2 i:3 ");
+    }
 
 }

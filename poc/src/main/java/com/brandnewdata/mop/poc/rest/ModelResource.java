@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -111,7 +112,7 @@ public class ModelResource {
      */
     @PostMapping(value = "/start")
     public Result<ModelVo> start(@RequestBody ModelVo modelVo) {
-        modelService.start(modelVo.getModelKey(), null);
+        modelService.start(modelVo.getModelKey(), new HashMap<>());
         return Result.OK();
     }
 

@@ -33,6 +33,10 @@ public interface XMLConstants {
 
     QName BPMN_SEQUENCE_FLOW_QNAME = DocumentHelper.createQName("sequenceFlow", BPMN_NAMESPACE);
 
+    QName BPMN_MESSAGE_QNAME = DocumentHelper.createQName("message", BPMN_NAMESPACE);
+
+    QName BPMN_MESSAGE_EVENT_DEFINITION_QNAME = DocumentHelper.createQName("messageEventDefinition", BPMN_NAMESPACE);
+
     QName BRANDNEWDATA_TASK_DEFINITION_QNAME = DocumentHelper.createQName("taskDefinition", BRANDNEWDATA_NAMESPACE);
 
     QName BRANDNEWDATA_INPUT_QNAME = DocumentHelper.createQName("input", BRANDNEWDATA_NAMESPACE);
@@ -82,6 +86,8 @@ public interface XMLConstants {
     String SOURCE_REF_ATTR = "sourceRef";
 
     String TARGET_REF_ATTR = "targetRef";
+
+    String MESSAGE_REF_ATTR = "messageRef";
 
 
 

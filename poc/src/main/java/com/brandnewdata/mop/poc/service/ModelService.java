@@ -2,11 +2,13 @@ package com.brandnewdata.mop.poc.service;
 
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.brandnewdata.connector.api.IConnectorCommonTriggerProcessConfFeign;
 import com.brandnewdata.mop.poc.common.service.result.PageResult;
 import com.brandnewdata.mop.poc.dao.DeModelDao;
+import com.brandnewdata.mop.poc.message.MessageDTO;
 import com.brandnewdata.mop.poc.parser.XMLDTO;
 import com.brandnewdata.mop.poc.parser.XMLParser3;
 import com.brandnewdata.mop.poc.pojo.entity.DeModelEntity;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author caiwillie
@@ -103,6 +106,15 @@ public class ModelService {
         zeebe.newCreateInstanceCommand()
                 .bpmnProcessId(ServiceUtil.convertModelKey(processId))
                 .latestVersion()
+                .variables(values)
+                .send()
+                .join();
+    }
+
+    public void sendMessage(String message, Map<String, Object> values) {
+        zeebe.newPublishMessageCommand()
+                .messageName(message)
+                .correlationKey(StrUtil.EMPTY)
                 .variables(values)
                 .send()
                 .join();

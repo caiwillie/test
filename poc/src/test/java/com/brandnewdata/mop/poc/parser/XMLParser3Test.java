@@ -9,12 +9,14 @@ import com.fasterxml.jackson.databind.JsonSerializable;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
+import io.camunda.zeebe.client.ZeebeClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 
 @SpringBootTest
 public class XMLParser3Test {
@@ -56,6 +58,19 @@ public class XMLParser3Test {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+
+    @Test
+    void start() {
+        modelService.start("Process_0298f5ac-b918-44ba-838c-b88b52c5ba5f", new HashMap<>());
+        return;
+    }
+
+    @Test
+    void sendMessage() {
+        modelService.sendMessage("Process_0298f5ac-b918-44ba-838c-b88b52c5ba5f", new HashMap<>());
+        return;
     }
 
 }

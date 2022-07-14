@@ -71,7 +71,7 @@ public class XMLParser3 implements XMLParseStep1, XMLParseStep1.XMLParseStep2, X
 
     @Override
     public XMLParseStep3 replaceGeneralTrigger() {
-        Element startEvent = getRootStartEvent();
+        Element startEvent = getProcessStartEvent();
 
         Iterator<Element> iterator = startEvent.elementIterator();
 
@@ -88,24 +88,30 @@ public class XMLParser3 implements XMLParseStep1, XMLParseStep1.XMLParseStep2, X
 
     @Override
     public XMLParseStep3 replaceCustomTrigger() {
-        Element startEvent = getRootStartEvent();
-        Element root = startEvent.getParent();
+        Element startEvent = getProcessStartEvent();
+        Element process = startEvent.getParent();
 
-        Element callActivity = createCallActivity(root, startEvent);
+        // 创建 call activity
+        Element callActivity = createCallActivity(process, startEvent);
 
-        createSequenceFlow(root, startEvent, callActivity);
+        // 创建线
+        createSequenceFlow(process, startEvent, callActivity);
+
+        // 创建 message
+        Element message = createMessage(process.getParent());
+
+        // 添加 message definition
+        createMessageEventDefinition(startEvent, message);
 
         // 处理 request mapping
         handleRequestMapping(startEvent);
 
-
-
         return this;
     }
 
-    private Element createCallActivity(Element root, Element startEvent) {
+    private Element createCallActivity(Element process, Element startEvent) {
         List<Node> outgoingList = startEvent.selectNodes(BPMN_OUTGOING_QNAME.getQualifiedName());
-        List<Node> sequenceFlows = root.selectNodes(BPMN_SEQUENCE_FLOW_QNAME.getQualifiedName());
+        List<Node> sequenceFlows = process.selectNodes(BPMN_SEQUENCE_FLOW_QNAME.getQualifiedName());
 
         Element taskDefinition = getBPMNTaskDefinition(startEvent);
         Element zeebeIOMapping = getZeebeIOMapping(startEvent);
@@ -117,8 +123,8 @@ public class XMLParser3 implements XMLParseStep1, XMLParseStep1.XMLParseStep2, X
         String callActivityId = StrUtil.format("Activity_{}", RandomUtil.randomString(9));
         callActivity.addAttribute(ID_ATTR, callActivityId);
         callActivity.addAttribute(NAME_ATTR, "执行自定义触发器");
-        callActivity.setParent(root);
-        root.content().add(callActivity);
+        callActivity.setParent(process);
+        process.content().add(callActivity);
 
         Element extensionElements = DocumentHelper.createElement(BPMN_EXTENSION_ELEMENTS_QNAME);
         extensionElements.setParent(callActivity);
@@ -162,17 +168,17 @@ public class XMLParser3 implements XMLParseStep1, XMLParseStep1.XMLParseStep2, X
         return callActivity;
     }
 
-    private Element createSequenceFlow(Element root, Element source, Element target) {
+    private Element createSequenceFlow(Element process, Element source, Element target) {
         String sourceRef = source.attributeValue(ID_ATTR);
         String targetRef = target.attributeValue(ID_ATTR);
 
         Element sequenceFlow = DocumentHelper.createElement(BPMN_SEQUENCE_FLOW_QNAME);
-        String sequenceFlowId = StrUtil.format("FLOW_{}", RandomUtil.randomString(9));
+        String sequenceFlowId = StrUtil.format("Flow_{}", RandomUtil.randomString(9));
         sequenceFlow.addAttribute(ID_ATTR, sequenceFlowId);
         sequenceFlow.addAttribute(SOURCE_REF_ATTR, sourceRef);
         sequenceFlow.addAttribute(TARGET_REF_ATTR, targetRef);
-        sequenceFlow.setParent(root);
-        root.content().add(sequenceFlow);
+        sequenceFlow.setParent(process);
+        process.content().add(sequenceFlow);
 
         Element outgoing = DocumentHelper.createElement(BPMN_OUTGOING_QNAME);
         outgoing.addText(sequenceFlowId);
@@ -182,12 +188,35 @@ public class XMLParser3 implements XMLParseStep1, XMLParseStep1.XMLParseStep2, X
         Element incoming = DocumentHelper.createElement(BPMN_INCOMING_QNAME);
         incoming.addText(sequenceFlowId);
         incoming.setParent(target);
-        target.content().add(incoming);
+        // incoming 必须在 incoming前面
+
+        Node firstOutput = target.selectSingleNode(BPMN_OUTGOING_QNAME.getQualifiedName());
+
+        target.content().add(target.indexOf(firstOutput), incoming);
 
         return incoming;
     }
 
-    private Element getRootStartEvent() {
+    private Element createMessage(Element root) {
+        Element message = DocumentHelper.createElement(BPMN_MESSAGE_QNAME);
+        message.addAttribute(ID_ATTR, StrUtil.format("Message_{}", RandomUtil.randomString(9)));
+        message.addAttribute(NAME_ATTR, modelKey);
+        message.setParent(root);
+        Node processNode = root.selectSingleNode(BPMN_PROCESS_QNAME.getQualifiedName());
+        root.content().add(root.indexOf(processNode) + 1, message);
+        return message;
+    }
+
+    private Element createMessageEventDefinition(Element startEvent, Element message) {
+        Element messageEventDefinition = DocumentHelper.createElement(BPMN_MESSAGE_EVENT_DEFINITION_QNAME);
+        messageEventDefinition.addAttribute(ID_ATTR, StrUtil.format("MessageEventDefinition_{}", RandomUtil.randomString(9)));
+        messageEventDefinition.addAttribute(MESSAGE_REF_ATTR, message.attributeValue(ID_ATTR));
+        messageEventDefinition.setParent(startEvent);
+        startEvent.content().add(messageEventDefinition);
+        return messageEventDefinition;
+    }
+
+    private Element getProcessStartEvent() {
         Element root = document.getRootElement();
 
         // 从 bpmn:process 开始计算
