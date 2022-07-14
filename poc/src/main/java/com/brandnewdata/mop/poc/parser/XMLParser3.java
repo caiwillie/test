@@ -33,6 +33,11 @@ public class XMLParser3 implements XMLParseStep1, XMLParseStep1.XMLParseStep2, X
 
     private String xml;
 
+    private String triggerFullId;
+
+    private String protocol;
+    private ObjectNode requestParamConfigs;
+
     private Document document;
 
     public XMLParser3(String modelKey, String name) {
@@ -90,6 +95,11 @@ public class XMLParser3 implements XMLParseStep1, XMLParseStep1.XMLParseStep2, X
 
         createSequenceFlow(root, startEvent, callActivity);
 
+        // 处理 request mapping
+        handleRequestMapping(startEvent);
+
+
+
         return this;
     }
 
@@ -99,21 +109,23 @@ public class XMLParser3 implements XMLParseStep1, XMLParseStep1.XMLParseStep2, X
 
         Element taskDefinition = getBPMNTaskDefinition(startEvent);
         Element zeebeIOMapping = getZeebeIOMapping(startEvent);
-        String triggerFullId = ServiceUtil.convertModelKey(taskDefinition.attributeValue(TYPE_ATTR));
+
+        triggerFullId = taskDefinition.attributeValue(TYPE_ATTR);
+        taskDefinition.getParent().remove(taskDefinition);
 
         Element callActivity = DocumentHelper.createElement(BPMN_CALL_ACTIVITY_QNAME);
         String callActivityId = StrUtil.format("Activity_{}", RandomUtil.randomString(9));
         callActivity.addAttribute(ID_ATTR, callActivityId);
         callActivity.addAttribute(NAME_ATTR, "执行自定义触发器");
         callActivity.setParent(root);
-        root.content().add(0, callActivity);
+        root.content().add(callActivity);
 
         Element extensionElements = DocumentHelper.createElement(BPMN_EXTENSION_ELEMENTS_QNAME);
         extensionElements.setParent(callActivity);
         callActivity.content().add(extensionElements);
 
         Element callElement = DocumentHelper.createElement(ZEEBE_CALLED_ELEMENT_QNAME);
-        callElement.addAttribute(PROCESS_ID_ATTR, triggerFullId);
+        callElement.addAttribute(PROCESS_ID_ATTR, ServiceUtil.convertModelKey(triggerFullId));
         callElement.addAttribute(PROPAGATE_ALL_CHILD_VARIABLES_ATTR, Constants.TYPE_BOOLEAN_FALSE);
         callElement.setParent(extensionElements);
         extensionElements.content().add(callElement);
@@ -142,6 +154,11 @@ public class XMLParser3 implements XMLParseStep1, XMLParseStep1.XMLParseStep2, X
             }
         }
 
+        Node startExtensionElements = startEvent.selectSingleNode(BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName());
+        if(startExtensionElements != null) {
+            startExtensionElements.getParent().remove(startExtensionElements);
+        }
+
         return callActivity;
     }
 
@@ -150,12 +167,12 @@ public class XMLParser3 implements XMLParseStep1, XMLParseStep1.XMLParseStep2, X
         String targetRef = target.attributeValue(ID_ATTR);
 
         Element sequenceFlow = DocumentHelper.createElement(BPMN_SEQUENCE_FLOW_QNAME);
-        sequenceFlow.addAttribute(SOURCE_REF_ATTR, sourceRef);
-        sequenceFlow.addAttribute(TARGET_REF_ATTR, targetRef);
         String sequenceFlowId = StrUtil.format("FLOW_{}", RandomUtil.randomString(9));
         sequenceFlow.addAttribute(ID_ATTR, sequenceFlowId);
+        sequenceFlow.addAttribute(SOURCE_REF_ATTR, sourceRef);
+        sequenceFlow.addAttribute(TARGET_REF_ATTR, targetRef);
         sequenceFlow.setParent(root);
-        root.content().add(0, sequenceFlow);
+        root.content().add(sequenceFlow);
 
         Element outgoing = DocumentHelper.createElement(BPMN_OUTGOING_QNAME);
         outgoing.addText(sequenceFlowId);
@@ -187,11 +204,31 @@ public class XMLParser3 implements XMLParseStep1, XMLParseStep1.XMLParseStep2, X
         return startEvent;
     }
 
+    private void handleRequestMapping(Element startEvent) {
+        XPath requestMappingXPATH = DocumentHelper.createXPath(StrUtil.format("./{}/{}",
+                BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
+                BRANDNEWDATA_REQUEST_MAPPING_QNAME.getQualifiedName()));
+
+        Element requestMapping = (Element) requestMappingXPATH.selectSingleNode(startEvent);
+
+        // brandnewdata:requestMapping 不存在，就直接返回
+        if(requestMapping == null) return;
+
+        ParametersParser parametersParser = new ParametersParser(BRANDNEWDATA_REQUEST_QNAME.getQualifiedName(),
+                NAME_ATTR, VALUE_ATTR, LABEL_ATTR, TYPE_ATTR, DATA_TYPE_ATTR);
+
+        requestParamConfigs = parametersParser.parse(requestMapping);
+
+        requestMapping.getParent().remove(requestMapping);
+    }
+
     @Override
     public XMLDTO build() {
         XMLDTO ret = new XMLDTO();
         ret.setName(name);
         ret.setModelKey(modelKey);
+        ret.setRequestParamConfigs(requestParamConfigs);
+        ret.setTriggerFullId(triggerFullId);
 
         String zeebeXML = serializa(document);
         ret.setZeebeXML(zeebeXML);

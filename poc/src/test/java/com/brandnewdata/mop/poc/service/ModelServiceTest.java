@@ -63,9 +63,6 @@ class ModelServiceTest {
         // Setup
         when(mockZeebe.newCreateInstanceCommand()).thenReturn(null);
 
-        // Run the test
-        modelServiceUnderTest.start("processId");
-
         // Verify the results
     }
 }

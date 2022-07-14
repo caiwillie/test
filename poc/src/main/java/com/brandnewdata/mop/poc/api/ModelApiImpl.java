@@ -51,6 +51,12 @@ public class ModelApiImpl implements ModelApi {
 
     @Override
     public Result startByConnectorMessages(List<StartMessage> messages) {
+        if(CollUtil.isEmpty(messages)) {
+            return Result.OK();
+        }
+
+        StartMessage startMessage = messages.get(0);
+
         return null;
     }
 }

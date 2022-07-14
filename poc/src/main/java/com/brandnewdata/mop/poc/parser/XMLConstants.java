@@ -41,11 +41,13 @@ public interface XMLConstants {
     QName BRANDNEWDATA_OUTPUT_MAPPING_QNAME = DocumentHelper.createQName("outputMapping", BRANDNEWDATA_NAMESPACE);
     QName BRANDNEWDATA_OUTPUT_QNAME = DocumentHelper.createQName("output", BRANDNEWDATA_NAMESPACE);
 
+    QName BRANDNEWDATA_REQUEST_MAPPING_QNAME = DocumentHelper.createQName("requestMapping", BRANDNEWDATA_NAMESPACE);
+
+    QName BRANDNEWDATA_REQUEST_QNAME = DocumentHelper.createQName("request", BRANDNEWDATA_NAMESPACE);
+
     QName BRANDNEWDATA_EXTENSION_QNAME = DocumentHelper.createQName("extension", BRANDNEWDATA_NAMESPACE);
 
     QName ZEEBE_TASK_DEFINITION_QNAME = DocumentHelper.createQName("taskDefinition", ZEEBE_NAMESPACE);
-
-    QName ZEEBE_CALLED_ACTIVITY_QNAME = DocumentHelper.createQName("callActivity", ZEEBE_NAMESPACE);
 
     QName ZEEBE_CALLED_ELEMENT_QNAME = DocumentHelper.createQName("calledElement", ZEEBE_NAMESPACE);
 

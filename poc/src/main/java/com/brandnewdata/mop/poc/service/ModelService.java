@@ -2,20 +2,20 @@ package com.brandnewdata.mop.poc.service;
 
 
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.brandnewdata.connector.api.IConnectorCommonTriggerProcessConfFeign;
 import com.brandnewdata.mop.poc.common.service.result.PageResult;
 import com.brandnewdata.mop.poc.dao.DeModelDao;
 import com.brandnewdata.mop.poc.parser.XMLDTO;
-import com.brandnewdata.mop.poc.parser.XMLParser2;
+import com.brandnewdata.mop.poc.parser.XMLParser3;
 import com.brandnewdata.mop.poc.pojo.entity.DeModelEntity;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.camunda.zeebe.client.ZeebeClient;
-import io.camunda.zeebe.client.api.response.DeploymentEvent;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author caiwillie
@@ -29,10 +29,17 @@ public class ModelService {
     @Resource
     private ZeebeClient zeebe;
 
+    @Resource
+    private IConnectorCommonTriggerProcessConfFeign triggerProcessConfClient;
+
+    private static final ObjectMapper OM = new ObjectMapper();
+
 
     public void save(DeModelEntity entity) {
         Long id = entity.getId();
-        XMLDTO xmlDTO = new XMLParser2().parse(entity.getEditorXml());
+        XMLDTO xmlDTO = new XMLParser3()
+                .parse(entity.getEditorXml())
+                .replaceCustomTrigger().build();
         entity.setName(xmlDTO.getName());
         entity.setModelKey(xmlDTO.getModelKey());
         if(id == null) {
@@ -67,22 +74,36 @@ public class ModelService {
     }
 
     public void deploy(String modelKey, String name, String editorXMl) {
-        modelKey = ServiceUtil.convertModelKey(modelKey);
-        XMLDTO xmldto = new XMLParser2(modelKey, name).parse(editorXMl);
+        XMLDTO xmldto = new XMLParser3(modelKey, name)
+                .parse(editorXMl).replaceCustomTrigger().build();
 
-        DeploymentEvent join = zeebe.newDeployResourceCommand()
-                .addResourceStringUtf8(xmldto.getZeebeXML(), modelKey + ".bpmn")
+        IConnectorCommonTriggerProcessConfFeign.ConnectorCommonTriggerProcessConfParamDTO triggerProcessConfig =
+                new IConnectorCommonTriggerProcessConfFeign.ConnectorCommonTriggerProcessConfParamDTO();
+
+        zeebe.newDeployResourceCommand()
+                .addResourceStringUtf8(xmldto.getZeebeXML(), xmldto.getModelKey() + ".bpmn")
                 .send()
                 .join();
+
+        try {
+            triggerProcessConfig.setProcessId(xmldto.getModelKey());
+            triggerProcessConfig.setProtocol("HTTP");
+            triggerProcessConfig.setConfig(OM.writeValueAsString(xmldto.getRequestParamConfigs()));
+            triggerProcessConfig.setTriggerFullId(xmldto.getTriggerFullId());
+            triggerProcessConfClient.save(triggerProcessConfig);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return;
     }
 
-    public void start(String modelKey) {
-        // camunda-cloud-quick-start-advanced
-        modelKey = ServiceUtil.convertModelKey(modelKey);
+    public void start(String processId, Map<String, Object> values) {
 
         zeebe.newCreateInstanceCommand()
-                .bpmnProcessId(modelKey)
+                .bpmnProcessId(ServiceUtil.convertModelKey(processId))
                 .latestVersion()
+                .variables(values)
                 .send()
                 .join();
     }

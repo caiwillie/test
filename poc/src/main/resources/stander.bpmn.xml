@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0k3bnp1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.0.0">
+    <bpmn:process id="Process_0yn5ewr" isExecutable="true">
+        <bpmn:startEvent id="StartEvent_1">
+            <bpmn:outgoing>Flow_0jfq028</bpmn:outgoing>
+        </bpmn:startEvent>
+        <bpmn:sequenceFlow id="Flow_0jfq028" sourceRef="StartEvent_1" targetRef="Activity_0xdgwmg" />
+        <bpmn:callActivity id="Activity_0xdgwmg" name="执行自定义触发器">
+            <bpmn:extensionElements>
+                <zeebe:calledElement processId="com_developer__test-connector4_test-trigger1__1_0_0" propagateAllChildVariables="false" />
+                <zeebe:ioMapping>
+                    <zeebe:input source="= xxx" target="inputs.access_key" />
+                </zeebe:ioMapping>
+            </bpmn:extensionElements>
+            <bpmn:incoming>Flow_0jfq028</bpmn:incoming>
+            <bpmn:outgoing>Flow_1p0fzjq</bpmn:outgoing>
+        </bpmn:callActivity>
+        <bpmn:sequenceFlow id="Flow_1p0fzjq" sourceRef="Activity_0xdgwmg" targetRef="Activity_1wjffte" />
+        <bpmn:scriptTask id="Activity_1wjffte" name="测试脚本">
+            <bpmn:extensionElements>
+                <zeebe:taskDefinition type="script" />
+                <zeebe:taskHeaders>
+                    <zeebe:header key="script" value="&#34;a&#34; + &#34;b&#39;" />
+                    <zeebe:header key="language" value="groovy" />
+                </zeebe:taskHeaders>
+            </bpmn:extensionElements>
+            <bpmn:incoming>Flow_1p0fzjq</bpmn:incoming>
+            <bpmn:outgoing>Flow_01polck</bpmn:outgoing>
+        </bpmn:scriptTask>
+        <bpmn:endEvent id="Event_1dlpa7s">
+            <bpmn:incoming>Flow_01polck</bpmn:incoming>
+        </bpmn:endEvent>
+        <bpmn:sequenceFlow id="Flow_01polck" sourceRef="Activity_1wjffte" targetRef="Event_1dlpa7s" />
+    </bpmn:process>
+</bpmn:definitions>

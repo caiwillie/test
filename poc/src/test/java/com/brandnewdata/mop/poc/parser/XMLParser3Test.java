@@ -51,7 +51,7 @@ public class XMLParser3Test {
                     .parse(xml)
                     .replaceGeneralTrigger()
                     .build();
-            modelService.start(xmldto.getModelKey());
+
             return;
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

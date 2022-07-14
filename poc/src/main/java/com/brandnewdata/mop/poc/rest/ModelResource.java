@@ -111,7 +111,7 @@ public class ModelResource {
      */
     @PostMapping(value = "/start")
     public Result<ModelVo> start(@RequestBody ModelVo modelVo) {
-        modelService.start(modelVo.getModelKey());
+        modelService.start(modelVo.getModelKey(), null);
         return Result.OK();
     }
 

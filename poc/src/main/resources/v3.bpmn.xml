@@ -1,74 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn2:definitions
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL"
-        xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-        xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-        xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-        xmlns:brandnewdata="https://www.brandnewdata.com/schema/1.0" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">\n
-    <bpmn2:process id="Process_66ef0a36-7fbd-4049-9bfb-5dc58831c6f3" name="sad" isExecutable="false">\n
-        <bpmn2:startEvent id="StartEvent_1" name="HttpListener&#10;http触发器" brandnewdata:modelerIcon="https://baida-private.oss-cn-hangzhou.aliyuncs.com/1657006590055http通用连接器.svg" brandnewdata:modelerId="1544223454033076225" brandnewdata:modelerType="3">\n
-            <bpmn2:extensionElements>\n
-                <brandnewdata:taskDefinition type="com.brandnewdata:http-listener.httpListener:1.0.0" />\n
-                <brandnewdata:requestMapping label="监听配置">\n
-                    <brandnewdata:request type="string" name="listenerPath" label="监听路径" value="/a/b/c" />\n
-                </brandnewdata:requestMapping>\n
-            </bpmn2:extensionElements>\n
-            <bpmn2:outgoing>Flow_007cg3s</bpmn2:outgoing>\n
-        </bpmn2:startEvent>\n
-        <bpmn2:serviceTask id="Activity_0ck8sho" name="global&#10;用户测试" brandnewdata:modelerIcon="https://baida-private.oss-cn-hangzhou.aliyuncs.com/1656902682817http通用连接器.svg" brandnewdata:modelerId="1543785542103588865" brandnewdata:modelerType="2">\n
-            <bpmn2:extensionElements>\n
-                <brandnewdata:taskDefinition type="com.developer:global_caihua.usrTest:1.0.0" />\n
-                <brandnewdata:inputMapping label="入参配置">\n
-                    <brandnewdata:input type="struct" name="usr" label="用户基本信息" dataType="string">\n
-                        <brandnewdata:input type="string" name="name" label="姓名" value="dsad" />\n
-                        <brandnewdata:input type="string" name="age" label="年龄" value="sad" />\n
-                        <brandnewdata:input type="string" name="gender" label="性别" value="sad" />\n
-                        <brandnewdata:input type="list" name="friends" label="朋友圈" dataType="string" />\n
-                        <brandnewdata:input type="dict" name="hobby" label="爱好" dataType="string" />\n
-                        <brandnewdata:input type="enum" name="education" label="学历" dataType="string" source="[{&#34;enumName&#34;:&#34;syou&#34;,&#34;enumValue&#34;:&#34;1&#34;},{&#34;enumName&#34;:&#34;gongg&#34;,&#34;enumValue&#34;:&#34;2&#34;}]" />\n          </brandnewdata:input>\n
-                </brandnewdata:inputMapping>\n
-                <brandnewdata:outputMapping label="出参配置">\n
-                    <brandnewdata:output type="struct" name="usr" label="用户基本信息" dataType="string">\n
-                        <brandnewdata:output type="string" name="name" label="姓名" value="" />\n
-                        <brandnewdata:output type="string" name="age" label="年龄" value="" />\n
-                        <brandnewdata:output type="string" name="gender" label="性别" value="" />\n
-                        <brandnewdata:output type="list" name="friends" label="朋友圈" dataType="string" />\n
-                        <brandnewdata:output type="dict" name="hobby" label="爱好" dataType="string" />\n
-                        <brandnewdata:output type="enum" name="education" label="学历" dataType="string" source="[{&#34;enumName&#34;:&#34;syou&#34;,&#34;enumValue&#34;:&#34;1&#34;},{&#34;enumName&#34;:&#34;gongg&#34;,&#34;enumValue&#34;:&#34;2&#34;}]" />\n          </brandnewdata:output>\n
-                </brandnewdata:outputMapping>\n
-            </bpmn2:extensionElements>\n
-            <bpmn2:incoming>Flow_007cg3s</bpmn2:incoming>\n
-            <bpmn2:outgoing>Flow_02dlqp1</bpmn2:outgoing>\n
-        </bpmn2:serviceTask>\n
-        <bpmn2:sequenceFlow id="Flow_007cg3s" sourceRef="StartEvent_1" targetRef="Activity_0ck8sho" />\n
-        <bpmn2:endEvent id="Event_1x1zjcq">\n
-            <bpmn2:incoming>Flow_02dlqp1</bpmn2:incoming>\n
-        </bpmn2:endEvent>\n
-        <bpmn2:sequenceFlow id="Flow_02dlqp1" sourceRef="Activity_0ck8sho" targetRef="Event_1x1zjcq" />\n
-    </bpmn2:process>\n
-    <bpmndi:BPMNDiagram id="BPMNDiagram_1">\n
-        <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_66ef0a36-7fbd-4049-9bfb-5dc58831c6f3">\n
-            <bpmndi:BPMNEdge id="Flow_007cg3s_di" bpmnElement="Flow_007cg3s">\n
-                <di:waypoint x="448" y="258" />\n
-                <di:waypoint x="500" y="258" />\n
-            </bpmndi:BPMNEdge>\n
-            <bpmndi:BPMNEdge id="Flow_02dlqp1_di" bpmnElement="Flow_02dlqp1">\n
-                <di:waypoint x="600" y="258" />\n
-                <di:waypoint x="652" y="258" />\n
-            </bpmndi:BPMNEdge>\n
-            <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">\n
-                <dc:Bounds x="412" y="240" width="36" height="36" />\n
-                <bpmndi:BPMNLabel>\n
-                    <dc:Bounds x="400" y="283" width="60" height="27" />\n
-                </bpmndi:BPMNLabel>\n
-            </bpmndi:BPMNShape>\n
-            <bpmndi:BPMNShape id="Activity_0ck8sho_di" bpmnElement="Activity_0ck8sho">\n
-                <dc:Bounds x="500" y="218" width="100" height="80" />\n
-            </bpmndi:BPMNShape>\n
-            <bpmndi:BPMNShape id="Event_1x1zjcq_di" bpmnElement="Event_1x1zjcq">\n
-                <dc:Bounds x="652" y="240" width="36" height="36" />\n
-            </bpmndi:BPMNShape>\n
-        </bpmndi:BPMNPlane>\n
-    </bpmndi:BPMNDiagram>\n
-</bpmn2:definitions>\n
+
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:brandnewdata="https://www.brandnewdata.com/schema/1.0" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+    <bpmn:process id="Process_0298f5ac-b918-44ba-838c-b88b52c5ba5f" name="测试自定义触发器6" isExecutable="true">
+        <bpmn:startEvent id="StartEvent_1" name="测试连接器4测试触发器">
+            <bpmn:outgoing>FLOW_i3hqcfda8</bpmn:outgoing>
+        </bpmn:startEvent>
+        <bpmn:sequenceFlow id="FLOW_i3hqcfda8" sourceRef="StartEvent_1" targetRef="Activity_pq5r85fjs"/>
+        <bpmn:callActivity id="Activity_pq5r85fjs" name="执行自定义触发器">
+            <bpmn:extensionElements>
+                <zeebe:calledElement processId="com_developer__test-connector4_test-trigger1__1_0_0" propagateAllChildVariables="false"/>
+                <zeebe:ioMapping>
+                    <zeebe:input target="inputs.access_key" source="= xxx"/>
+                </zeebe:ioMapping>
+            </bpmn:extensionElements>
+            <bpmn:incoming>FLOW_i3hqcfda8</bpmn:incoming>
+            <bpmn:outgoing>Flow_1a2reun</bpmn:outgoing>
+        </bpmn:callActivity>
+
+        <bpmn:sequenceFlow id="Flow_1a2reun" sourceRef="Activity_pq5r85fjs" targetRef="Activity_113k6fh"/>
+        <bpmn:scriptTask id="Activity_113k6fh" name="处理">
+            <bpmn:extensionElements>
+                <zeebe:taskHeaders>
+                    <zeebe:header key="script" value="&quot;a&quot; + &quot;c&quot;"/>
+                    <zeebe:header key="language" value="groovy"/>
+                </zeebe:taskHeaders>
+                <zeebe:taskDefinition type="script"/>
+            </bpmn:extensionElements>
+            <bpmn:incoming>Flow_1a2reun</bpmn:incoming>
+            <bpmn:outgoing>Flow_1e79p18</bpmn:outgoing>
+        </bpmn:scriptTask>
+        <bpmn:endEvent id="Event_1q8e0fs">
+            <bpmn:incoming>Flow_1e79p18</bpmn:incoming>
+        </bpmn:endEvent>
+        <bpmn:sequenceFlow id="Flow_1e79p18" sourceRef="Activity_113k6fh" targetRef="Event_1q8e0fs"/>
+    </bpmn:process>
+</bpmn:definitions>
