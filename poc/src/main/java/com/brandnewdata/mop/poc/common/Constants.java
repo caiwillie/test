@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.parser;
+package com.brandnewdata.mop.poc.common;
 
 public interface Constants {
 
@@ -35,4 +35,6 @@ public interface Constants {
     String INPUTS = "inputs";
 
     String EQUALS = "=";
+
+    String PROTOCOL_HTTP = "HTTP";
 }

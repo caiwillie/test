@@ -2,18 +2,22 @@ package com.brandnewdata.mop.poc.api;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.api.dto.BPMNResource;
 import com.brandnewdata.mop.api.ModelApi;
 import com.brandnewdata.mop.api.dto.ConnectorResource;
 import com.brandnewdata.mop.api.dto.StartMessage;
+import com.brandnewdata.mop.poc.common.Constants;
 import com.brandnewdata.mop.poc.parser.XMLDTO;
 import com.brandnewdata.mop.poc.parser.XMLParser3;
 import com.brandnewdata.mop.poc.service.ModelService;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class ModelApiImpl implements ModelApi {
@@ -57,6 +61,21 @@ public class ModelApiImpl implements ModelApi {
 
         StartMessage startMessage = messages.get(0);
 
-        return null;
+        String processId = startMessage.getProcessId();
+        String protocol = startMessage.getProtocol();
+        String content = startMessage.getContent();
+        Map<String, Object> variables = getVariables(protocol, content);
+
+        modelService.sendMessage(processId, variables);
+
+        return Result.ok();
+    }
+
+    private Map<String, Object> getVariables(String protocol, String content) {
+        Map<String, Object> ret = new HashMap<>();
+        if(StrUtil.equalsAny(protocol, Constants.PROTOCOL_HTTP)) {
+
+        }
+        return ret;
     }
 }
