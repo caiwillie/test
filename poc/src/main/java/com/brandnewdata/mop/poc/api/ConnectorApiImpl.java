@@ -34,4 +34,5 @@ public class ConnectorApiImpl implements ConnectorApi {
             return Result.error(e.getMessage());
         }
     }
+
 }
