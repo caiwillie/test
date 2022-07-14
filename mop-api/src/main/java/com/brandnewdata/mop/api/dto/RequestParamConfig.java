@@ -14,15 +14,15 @@ public class RequestParamConfig {
     /**
      * 配置名称
      */
-    private String name;
+    private String paramName;
 
     /**
      * 配置显示名称
      */
-    private String label;
+    private String paramShowName;
 
     /**
      * 配置值
      */
-    private String value;
+    private String paramType;
 }
