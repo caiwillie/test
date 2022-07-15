@@ -8,7 +8,6 @@ import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.connector.api.IConnectorConfFeign;
 import com.brandnewdata.mop.poc.common.Constants;
 import com.brandnewdata.mop.poc.service.ServiceUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -27,7 +26,6 @@ import java.io.StringReader;
 import java.util.*;
 
 import static com.brandnewdata.mop.poc.parser.XMLConstants.*;
-import static com.brandnewdata.mop.poc.parser.XMLConstants.ZEEBE_INPUT_QNAME;
 
 @Slf4j
 public class XMLParser3 implements XMLParseStep1,

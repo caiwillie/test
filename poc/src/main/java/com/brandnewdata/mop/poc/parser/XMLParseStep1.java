@@ -1,7 +1,6 @@
 package com.brandnewdata.mop.poc.parser;
 
 import com.brandnewdata.connector.api.IConnectorConfFeign;
-import io.camunda.zeebe.client.api.command.CreateProcessInstanceCommandStep1;
 
 public interface XMLParseStep1 {
 

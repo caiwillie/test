@@ -1,7 +1,7 @@
 package com.brandnewdata.mop.poc.dao;
 
-import com.brandnewdata.mop.poc.pojo.entity.DeModelEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.brandnewdata.mop.poc.pojo.entity.DeModelEntity;
 
 /**
  * <p>

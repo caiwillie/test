@@ -9,7 +9,6 @@ import com.brandnewdata.connector.api.IConnectorCommonTriggerProcessConfFeign;
 import com.brandnewdata.connector.api.IConnectorConfFeign;
 import com.brandnewdata.mop.poc.common.service.result.PageResult;
 import com.brandnewdata.mop.poc.dao.DeModelDao;
-import com.brandnewdata.mop.poc.message.MessageDTO;
 import com.brandnewdata.mop.poc.parser.XMLDTO;
 import com.brandnewdata.mop.poc.parser.XMLParser3;
 import com.brandnewdata.mop.poc.pojo.entity.DeModelEntity;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author caiwillie

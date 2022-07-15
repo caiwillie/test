@@ -1,6 +1,5 @@
 package com.brandnewdata.mop.poc.parser;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Data;
 

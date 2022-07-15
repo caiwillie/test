@@ -1,6 +1,5 @@
 package com.brandnewdata.mop.poc;
 
-import com.brandnewdata.common.annotation.EnableCorsConfig;
 import com.brandnewdata.common.annotation.EnableGlobalExceptionHandler;
 import com.brandnewdata.common.annotation.EnableRequestInterceptorComponent;
 import com.brandnewdata.connector.api.IConnectorCommonTriggerProcessConfFeign;
