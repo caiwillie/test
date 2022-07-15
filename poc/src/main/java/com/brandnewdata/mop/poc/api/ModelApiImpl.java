@@ -64,7 +64,7 @@ public class ModelApiImpl implements ModelApi {
                     String modelKey = operate.getModelKey();
                     String name = operate.getName();
                     String xml = operate.getEditorXML();
-                    modelService.deploy(modelKey, name, xml, Constants.TRIGGER_TYPE_GENERAL);
+                    modelService.deploy(modelKey, name, xml, Constants.TRIGGER_TYPE_NONE);
                 }
             }
 
