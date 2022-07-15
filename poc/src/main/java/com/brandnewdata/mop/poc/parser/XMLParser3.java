@@ -155,13 +155,14 @@ public class XMLParser3 implements XMLParseStep1,
                 Element input = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
                 input.addAttribute(TARGET_ATTR, Constants.PROPERTIES);
                 input.addAttribute(SOURCE_ATTR, StrUtil.format("{} {}", Constants.EQUALS, configs));
+                input.setParent(zeebeIOMapping);
                 zeebeIOMapping.content().add(input);
             }
 
             taskDefinition.remove(attribute);
         }
 
-        return null;
+        return this;
     }
 
     @Override
