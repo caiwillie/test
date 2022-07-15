@@ -89,7 +89,6 @@ public interface XMLConstants {
 
     String MESSAGE_REF_ATTR = "messageRef";
 
-
-
+    String CONFIG_ID_ATTR = "configId";
 
 }

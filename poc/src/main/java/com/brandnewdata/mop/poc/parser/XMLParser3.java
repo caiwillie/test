@@ -5,12 +5,16 @@ import cn.hutool.core.io.FastStringWriter;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import com.brandnewdata.connector.api.IConnectorConfFeign;
 import com.brandnewdata.mop.poc.common.Constants;
 import com.brandnewdata.mop.poc.service.ServiceUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.POJONode;
+import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.databind.util.RawValue;
 import lombok.extern.slf4j.Slf4j;
 import org.dom4j.*;
@@ -26,7 +30,14 @@ import static com.brandnewdata.mop.poc.parser.XMLConstants.*;
 import static com.brandnewdata.mop.poc.parser.XMLConstants.ZEEBE_INPUT_QNAME;
 
 @Slf4j
-public class XMLParser3 implements XMLParseStep1, XMLParseStep1.XMLParseStep2, XMLParseStep1.XMLParseStep3 {
+public class XMLParser3 implements XMLParseStep1,
+        XMLParseStep1.XMLParseStep2,
+        XMLParseStep1.XMLParseStep3,
+        XMLParseStep1.XMLParseStep4 {
+
+    private ObjectMapper om = ServiceUtil.OM;
+
+    private MapType mapType = ServiceUtil.MAP_TYPE;
 
     private String modelKey;
 
@@ -107,8 +118,72 @@ public class XMLParser3 implements XMLParseStep1, XMLParseStep1.XMLParseStep2, X
         // 处理 request mapping
         handleRequestMapping(startEvent);
 
+        // 移除 bpmn:extensionElements
+        Node startExtensionElements = startEvent.selectSingleNode(BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName());
+        if(startExtensionElements != null) {
+            startExtensionElements.getParent().remove(startExtensionElements);
+        }
+
         return this;
     }
+
+    @Override
+    public XMLParseStep4 replaceProperties(IConnectorConfFeign client) {
+        Element root = document.getRootElement();
+        Element process = (Element) root.selectSingleNode(BPMN_PROCESS_QNAME.getQualifiedName());
+
+        XPath zeebeTaskDefinitionXPATH = DocumentHelper.createXPath(
+                StrUtil.format("//{}[@{}]", ZEEBE_TASK_DEFINITION_QNAME.getQualifiedName(), CONFIG_ID_ATTR));
+
+        List<Node> taskDefinitionList = zeebeTaskDefinitionXPATH.selectNodes(process);
+
+        if(CollUtil.isEmpty(taskDefinitionList)) {
+            return this;
+        }
+
+        for (int i = 0; i < taskDefinitionList.size(); i++) {
+            Element taskDefinition = (Element) taskDefinitionList.get(i);
+            Attribute attribute = taskDefinition.attribute(CONFIG_ID_ATTR);
+            String configId = attribute.getValue();
+            Element zeebeIOMapping = getZeebeIOMapping(taskDefinition.getParent().getParent());
+            IConnectorConfFeign.ConnectorConfDTO configInfo = client.getConfigInfo(Long.parseLong(configId));
+
+            String configs = configInfo.getConfigs();
+
+            if(StrUtil.isNotBlank(configs)) {
+                // 将查询到的config，添加到 properties 中
+                Element input = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
+                input.addAttribute(TARGET_ATTR, Constants.PROPERTIES);
+                input.addAttribute(SOURCE_ATTR, StrUtil.format("{} {}", Constants.EQUALS, configs));
+                zeebeIOMapping.content().add(input);
+            }
+
+            taskDefinition.remove(attribute);
+        }
+
+        return null;
+    }
+
+    @Override
+    public XMLDTO build() {
+        XMLDTO ret = new XMLDTO();
+        ret.setName(name);
+        ret.setModelKey(modelKey);
+        ret.setRequestParamConfigs(requestParamConfigs);
+        ret.setTriggerFullId(triggerFullId);
+
+        String zeebeXML = serializa(document);
+        ret.setZeebeXML(zeebeXML);
+
+        log.info("\n" +
+                "==============================转换前的 xml 内容============================\n" +
+                "{} \n" +
+                "==============================转换后的 xml 内容============================\n" +
+                "{}", xml, zeebeXML);
+
+        return ret;
+    }
+
 
     private Element createCallActivity(Element process, Element startEvent) {
         List<Node> outgoingList = startEvent.selectNodes(BPMN_OUTGOING_QNAME.getQualifiedName());
@@ -159,11 +234,6 @@ public class XMLParser3 implements XMLParseStep1, XMLParseStep1.XMLParseStep2, X
                 // 修改 sequence flow 的 SOURCE_REF
                 sequenceFlow.attribute(SOURCE_REF_ATTR).setValue(callActivityId);
             }
-        }
-
-        Node startExtensionElements = startEvent.selectSingleNode(BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName());
-        if(startExtensionElements != null) {
-            startExtensionElements.getParent().remove(startExtensionElements);
         }
 
         return callActivity;
@@ -252,25 +322,6 @@ public class XMLParser3 implements XMLParseStep1, XMLParseStep1.XMLParseStep2, X
         requestMapping.getParent().remove(requestMapping);
     }
 
-    @Override
-    public XMLDTO build() {
-        XMLDTO ret = new XMLDTO();
-        ret.setName(name);
-        ret.setModelKey(modelKey);
-        ret.setRequestParamConfigs(requestParamConfigs);
-        ret.setTriggerFullId(triggerFullId);
-
-        String zeebeXML = serializa(document);
-        ret.setZeebeXML(zeebeXML);
-
-        log.info("\n" +
-                "==============================转换前的 xml 内容============================\n" +
-                "{} \n" +
-                "==============================转换后的 xml 内容============================\n" +
-                "{}", xml, zeebeXML);
-
-        return ret;
-    }
 
     private void walkTree(Element element) {
         List<Element> elements = element.elements();
@@ -359,6 +410,7 @@ public class XMLParser3 implements XMLParseStep1, XMLParseStep1.XMLParseStep2, X
 
             Element zeebeTaskDefinition = DocumentHelper.createElement(ZEEBE_TASK_DEFINITION_QNAME);
             zeebeTaskDefinition.addAttribute(TYPE_ATTR, element.attributeValue(TYPE_ATTR));
+            zeebeTaskDefinition.addAttribute(CONFIG_ID_ATTR, element.attributeValue(CONFIG_ID_ATTR));
             zeebeTaskDefinition.setParent(parent);
             List<Node> content = parent.content();
             content.set(content.indexOf(element), zeebeTaskDefinition);

@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.brandnewdata.connector.api.IConnectorCommonTriggerProcessConfFeign;
+import com.brandnewdata.connector.api.IConnectorConfFeign;
 import com.brandnewdata.mop.poc.common.service.result.PageResult;
 import com.brandnewdata.mop.poc.dao.DeModelDao;
 import com.brandnewdata.mop.poc.message.MessageDTO;
@@ -35,6 +36,9 @@ public class ModelService {
 
     @Resource
     private IConnectorCommonTriggerProcessConfFeign triggerProcessConfClient;
+
+    @Resource
+    private IConnectorConfFeign confClient;
 
     private static final ObjectMapper OM = new ObjectMapper();
 
@@ -79,7 +83,7 @@ public class ModelService {
 
     public void deploy(String modelKey, String name, String editorXMl) {
         XMLDTO xmldto = new XMLParser3(modelKey, name)
-                .parse(editorXMl).replaceCustomTrigger().build();
+                .parse(editorXMl).replaceCustomTrigger().replaceProperties(confClient).build();
 
         IConnectorCommonTriggerProcessConfFeign.ConnectorCommonTriggerProcessConfParamDTO triggerProcessConfig =
                 new IConnectorCommonTriggerProcessConfFeign.ConnectorCommonTriggerProcessConfParamDTO();

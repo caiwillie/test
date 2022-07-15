@@ -34,6 +34,8 @@ public interface Constants {
 
     String INPUTS = "inputs";
 
+    String PROPERTIES = "properties";
+
     String EQUALS = "=";
 
     String PROTOCOL_HTTP = "HTTP";

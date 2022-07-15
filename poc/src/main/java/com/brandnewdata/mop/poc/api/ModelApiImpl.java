@@ -76,32 +76,28 @@ public class ModelApiImpl implements ModelApi {
             Map<String, Object> requestVariables = getRequestVariables(protocol, content);
             Map<String, Object> result = modelService.startWithResult(processId, requestVariables);
             String response = getResponseVariables(protocol, result);
-            return Result.ok(response);
+            return Result.OK(response);
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
     }
 
     private Map<String, Object> getRequestVariables(String protocol, String content) throws JsonProcessingException {
-        Map<String, Object> ret = null;
+        Map<String, Object> ret = new HashMap<>();
 
+        Object request = null;
         if(StrUtil.equalsAny(protocol, Constants.PROTOCOL_HTTP)) {
-            HttpRequest httpRequest = om.readValue(content, HttpRequest.class);
-            ret = om.convertValue(httpRequest, mapType);
+            request = om.readValue(content, HttpRequest.class);
         }
-
-        if(ret == null) {
-            return new HashMap<>();
-        } else {
-            return ret;
-        }
+        ret.put("request", request);
+        return ret;
     }
 
 
     private String getResponseVariables(String protocol, Map<String, Object> result) throws JsonProcessingException {
         HttpResponse response = new HttpResponse();
         response.setHeaders(new HashMap<>());
-        response.setBody("");
+        response.setBody("success");
         return om.writeValueAsString(response);
     }
 }
