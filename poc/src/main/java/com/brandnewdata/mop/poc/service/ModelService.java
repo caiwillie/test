@@ -7,9 +7,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.brandnewdata.connector.api.IConnectorCommonTriggerProcessConfFeign;
 import com.brandnewdata.connector.api.IConnectorConfFeign;
+import com.brandnewdata.mop.poc.common.Constants;
 import com.brandnewdata.mop.poc.common.service.result.PageResult;
 import com.brandnewdata.mop.poc.dao.DeModelDao;
 import com.brandnewdata.mop.poc.parser.XMLDTO;
+import com.brandnewdata.mop.poc.parser.XMLParseStep1;
 import com.brandnewdata.mop.poc.parser.XMLParser3;
 import com.brandnewdata.mop.poc.pojo.entity.DeModelEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -79,9 +81,22 @@ public class ModelService {
         return ret;
     }
 
-    public void deploy(String modelKey, String name, String editorXMl) {
-        XMLDTO xmldto = new XMLParser3(modelKey, name)
-                .parse(editorXMl).replaceCustomTrigger().replaceProperties(confClient).build();
+    public void deploy(String modelKey, String name, String editorXMl, int triggerType) {
+
+
+        XMLDTO xmldto = null;
+
+        XMLParseStep1.XMLParseStep2 step2 = new XMLParser3(modelKey, name)
+                .parse(editorXMl);
+        if(triggerType == Constants.TRIGGER_TYPE_NONE) {
+            xmldto = step2.replaceProperties(confClient).build();
+        } else if (triggerType == Constants.TRIGGER_TYPE_GENERAL) {
+            xmldto = step2.replaceGeneralTrigger().replaceProperties(confClient).build();
+        } else if (triggerType == Constants.TRIGGER_TYPE_CUSTOM) {
+            step2.replaceCustomTrigger().replaceProperties(confClient).build();
+        } else {
+            throw new IllegalArgumentException("触发器类型不支持");
+        }
 
         IConnectorCommonTriggerProcessConfFeign.ConnectorCommonTriggerProcessConfParamDTO triggerProcessConfig =
                 new IConnectorCommonTriggerProcessConfFeign.ConnectorCommonTriggerProcessConfParamDTO();

@@ -1,6 +1,7 @@
 package com.brandnewdata.mop.poc.parser;
 
 import cn.hutool.core.io.resource.ResourceUtil;
+import com.brandnewdata.mop.poc.common.Constants;
 import com.brandnewdata.mop.poc.service.ModelService;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -35,7 +36,7 @@ public class XMLParser3Test {
                     .parse(xml)
                     .replaceGeneralTrigger()
                     .build();
-            modelService.deploy(xmldto.getModelKey(), xmldto.getName(), xmldto.getZeebeXML());
+            modelService.deploy(xmldto.getModelKey(), xmldto.getName(), xmldto.getZeebeXML(), Constants.TRIGGER_TYPE_NONE);
             return;
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

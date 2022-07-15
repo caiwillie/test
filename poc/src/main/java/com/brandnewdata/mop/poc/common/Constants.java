@@ -39,4 +39,11 @@ public interface Constants {
     String EQUALS = "=";
 
     String PROTOCOL_HTTP = "HTTP";
+
+    int TRIGGER_TYPE_NONE = 0;
+
+    int TRIGGER_TYPE_GENERAL = 1;
+
+    int TRIGGER_TYPE_CUSTOM = 2;
+
 }

@@ -18,6 +18,7 @@ import com.brandnewdata.mop.poc.service.ServiceUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.MapType;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 public class ModelApiImpl implements ModelApi {
 
@@ -47,17 +49,28 @@ public class ModelApiImpl implements ModelApi {
             Assert.isTrue(CollUtil.isNotEmpty(operates) || CollUtil.isNotEmpty(triggers),
                     "操作和触发器为空");
 
-            for (BPMNResource trigger : triggers) {
-                String modelKey = trigger.getModelKey();
-                String name = trigger.getName();
-                XMLDTO xmlDto = new XMLParser3(modelKey, name).parse(trigger.getEditorXML())
-                        .replaceGeneralTrigger()
-                        .build();
-                modelService.deploy(xmlDto.getModelKey(), xmlDto.getName(), xmlDto.getZeebeXML());
+
+            if(CollUtil.isNotEmpty(triggers)) {
+                for (BPMNResource trigger : triggers) {
+                    String modelKey = trigger.getModelKey();
+                    String name = trigger.getName();
+                    String xml = trigger.getEditorXML();
+                    modelService.deploy(modelKey, name, xml, Constants.TRIGGER_TYPE_GENERAL);
+                }
+            }
+
+            if(CollUtil.isNotEmpty(operates)) {
+                for (BPMNResource operate : operates) {
+                    String modelKey = operate.getModelKey();
+                    String name = operate.getName();
+                    String xml = operate.getEditorXML();
+                    modelService.deploy(modelKey, name, xml, Constants.TRIGGER_TYPE_GENERAL);
+                }
             }
 
             return Result.OK();
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return Result.error(e.getMessage());
         }
     }

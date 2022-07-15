@@ -12,6 +12,8 @@ public interface XMLParseStep1 {
 
         XMLParseStep1.XMLParseStep3 replaceCustomTrigger();
 
+        XMLParseStep1.XMLParseStep4 replaceProperties(IConnectorConfFeign client);
+
         XMLDTO build();
     }
 

@@ -3,6 +3,7 @@ package com.brandnewdata.mop.poc.rest;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
 import com.brandnewdata.common.webresult.Result;
+import com.brandnewdata.mop.poc.common.Constants;
 import com.brandnewdata.mop.poc.common.service.result.PageResult;
 import com.brandnewdata.mop.poc.pojo.entity.DeModelEntity;
 import com.brandnewdata.mop.poc.pojo.vo.ModelVo;
@@ -100,7 +101,7 @@ public class ModelResource {
             editorXML = entity.getEditorXml();
         }
 
-        modelService.deploy(null, null, editorXML);
+        modelService.deploy(null, null, editorXML, Constants.TRIGGER_TYPE_CUSTOM);
         return Result.OK();
     }
 
