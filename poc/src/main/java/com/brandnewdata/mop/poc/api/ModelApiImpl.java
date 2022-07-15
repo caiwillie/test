@@ -8,10 +8,16 @@ import com.brandnewdata.mop.api.dto.BPMNResource;
 import com.brandnewdata.mop.api.ModelApi;
 import com.brandnewdata.mop.api.dto.ConnectorResource;
 import com.brandnewdata.mop.api.dto.StartMessage;
+import com.brandnewdata.mop.api.dto.protocol.request.HttpRequest;
+import com.brandnewdata.mop.api.dto.protocol.response.HttpResponse;
 import com.brandnewdata.mop.poc.common.Constants;
 import com.brandnewdata.mop.poc.parser.XMLDTO;
 import com.brandnewdata.mop.poc.parser.XMLParser3;
 import com.brandnewdata.mop.poc.service.ModelService;
+import com.brandnewdata.mop.poc.service.ServiceUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.MapType;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -21,6 +27,9 @@ import java.util.Map;
 
 @RestController
 public class ModelApiImpl implements ModelApi {
+
+    private ObjectMapper om = ServiceUtil.OM;
+    private MapType mapType = ServiceUtil.MAP_TYPE;
 
     @Resource
     private ModelService modelService;
@@ -59,23 +68,40 @@ public class ModelApiImpl implements ModelApi {
             return Result.OK();
         }
 
-        StartMessage startMessage = messages.get(0);
-
-        String processId = startMessage.getProcessId();
-        String protocol = startMessage.getProtocol();
-        String content = startMessage.getContent();
-        Map<String, Object> variables = getVariables(protocol, content);
-
-        modelService.sendMessage(processId, variables);
-
-        return Result.ok();
+        try {
+            StartMessage startMessage = messages.get(0);
+            String processId = startMessage.getProcessId();
+            String protocol = startMessage.getProtocol();
+            String content = startMessage.getContent();
+            Map<String, Object> requestVariables = getRequestVariables(protocol, content);
+            Map<String, Object> result = modelService.startWithResult(processId, requestVariables);
+            String response = getResponseVariables(protocol, result);
+            return Result.ok(response);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
     }
 
-    private Map<String, Object> getVariables(String protocol, String content) {
-        Map<String, Object> ret = new HashMap<>();
-        if(StrUtil.equalsAny(protocol, Constants.PROTOCOL_HTTP)) {
+    private Map<String, Object> getRequestVariables(String protocol, String content) throws JsonProcessingException {
+        Map<String, Object> ret = null;
 
+        if(StrUtil.equalsAny(protocol, Constants.PROTOCOL_HTTP)) {
+            HttpRequest httpRequest = om.readValue(content, HttpRequest.class);
+            ret = om.convertValue(httpRequest, mapType);
         }
-        return ret;
+
+        if(ret == null) {
+            return new HashMap<>();
+        } else {
+            return ret;
+        }
+    }
+
+
+    private String getResponseVariables(String protocol, Map<String, Object> result) throws JsonProcessingException {
+        HttpResponse response = new HttpResponse();
+        response.setHeaders(new HashMap<>());
+        response.setBody("");
+        return om.writeValueAsString(response);
     }
 }

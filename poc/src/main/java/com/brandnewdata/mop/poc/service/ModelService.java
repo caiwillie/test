@@ -14,6 +14,7 @@ import com.brandnewdata.mop.poc.parser.XMLParser3;
 import com.brandnewdata.mop.poc.pojo.entity.DeModelEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.camunda.zeebe.client.ZeebeClient;
+import io.camunda.zeebe.client.api.response.ProcessInstanceResult;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -109,6 +110,18 @@ public class ModelService {
                 .variables(values)
                 .send()
                 .join();
+    }
+
+    public Map<String, Object> startWithResult(String processId, Map<String, Object> values) {
+        ProcessInstanceResult result = zeebe.newCreateInstanceCommand()
+                .bpmnProcessId(ServiceUtil.convertModelKey(processId))
+                .latestVersion()
+                .variables(values)
+                .withResult()
+                .send()
+                .join();
+
+        return result.getVariablesAsMap();
     }
 
     public void sendMessage(String message, Map<String, Object> values) {

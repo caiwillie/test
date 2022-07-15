@@ -99,10 +99,10 @@ public class XMLParser3 implements XMLParseStep1, XMLParseStep1.XMLParseStep2, X
         createSequenceFlow(process, startEvent, callActivity);
 
         // 创建 message
-        Element message = createMessage(process.getParent());
+        // Element message = createMessage(process.getParent());
 
         // 添加 message definition
-        createMessageEventDefinition(startEvent, message);
+        // createMessageEventDefinition(startEvent, message);
 
         // 处理 request mapping
         handleRequestMapping(startEvent);
