@@ -93,7 +93,8 @@ public class ModelApiImpl implements ModelApi {
             String response = getResponseVariables(protocol, result);
             return Result.OK(response);
         } catch (Exception e) {
-            return Result.error(e.getMessage());
+            String response = getExceptionResponse(e);
+            return Result.error(response);
         }
     }
 
@@ -114,5 +115,16 @@ public class ModelApiImpl implements ModelApi {
         response.setHeaders(new HashMap<>());
         response.setBody("success");
         return om.writeValueAsString(response);
+    }
+
+    private String getExceptionResponse(Exception e) {
+        HttpResponse response = new HttpResponse();
+        response.setHeaders(new HashMap<>());
+        response.setBody(e.getMessage());
+        try {
+            return om.writeValueAsString(response);
+        } catch (JsonProcessingException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }

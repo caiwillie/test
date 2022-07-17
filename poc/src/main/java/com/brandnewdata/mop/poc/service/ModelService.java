@@ -51,7 +51,7 @@ public class ModelService {
                 .replaceCustomTrigger().build();
 
         // 通过 modelKey 查询 id
-        Long id = Optional.of(getOne(xmlDTO.getModelKey()))
+        Long id = Optional.ofNullable(getOne(xmlDTO.getModelKey()))
                 .map(DeModelEntity::getId).orElse(null);
         entity.setName(xmlDTO.getName());
         entity.setModelKey(xmlDTO.getModelKey());
@@ -113,14 +113,19 @@ public class ModelService {
                 .join();
 
         if(triggerType == Constants.TRIGGER_TYPE_CUSTOM) {
+            Integer success = null;
             try {
                 triggerProcessConfig.setProcessId(xmldto.getModelKey());
                 triggerProcessConfig.setProtocol("HTTP");
                 triggerProcessConfig.setConfig(OM.writeValueAsString(xmldto.getRequestParamConfigs()));
                 triggerProcessConfig.setTriggerFullId(xmldto.getTriggerFullId());
-                Integer success = triggerProcessConfClient.save(triggerProcessConfig);
+                success = triggerProcessConfClient.save(triggerProcessConfig);
             } catch (Exception e) {
                 throw new RuntimeException(e);
+            }
+
+            if(success == null || success != 1) {
+                throw new IllegalArgumentException("shenme");
             }
         }
 
