@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.connector.api.IConnectorCommonTriggerProcessConfFeign;
 import com.brandnewdata.connector.api.IConnectorConfFeign;
 import com.brandnewdata.mop.poc.common.Constants;
@@ -106,17 +107,18 @@ public class ModelService {
                 .send()
                 .join();
 
-        try {
-            triggerProcessConfig.setProcessId(xmldto.getModelKey());
-            triggerProcessConfig.setProtocol("HTTP");
-            triggerProcessConfig.setConfig(OM.writeValueAsString(xmldto.getRequestParamConfigs()));
-            triggerProcessConfig.setTriggerFullId(xmldto.getTriggerFullId());
-            triggerProcessConfClient.save(triggerProcessConfig);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        if(triggerType == Constants.TRIGGER_TYPE_CUSTOM) {
+            try {
+                triggerProcessConfig.setProcessId(xmldto.getModelKey());
+                triggerProcessConfig.setProtocol("HTTP");
+                triggerProcessConfig.setConfig(OM.writeValueAsString(xmldto.getRequestParamConfigs()));
+                triggerProcessConfig.setTriggerFullId(xmldto.getTriggerFullId());
+                Integer success = triggerProcessConfClient.save(triggerProcessConfig);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
 
-        return;
     }
 
     public void start(String processId, Map<String, Object> values) {
