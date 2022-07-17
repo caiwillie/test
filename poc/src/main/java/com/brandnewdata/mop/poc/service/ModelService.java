@@ -94,7 +94,7 @@ public class ModelService {
         } else if (triggerType == Constants.TRIGGER_TYPE_GENERAL) {
             xmldto = step2.replaceGeneralTrigger().replaceProperties(confClient).build();
         } else if (triggerType == Constants.TRIGGER_TYPE_CUSTOM) {
-            step2.replaceCustomTrigger().replaceProperties(confClient).build();
+            xmldto = step2.replaceCustomTrigger().replaceProperties(confClient).build();
         } else {
             throw new IllegalArgumentException("触发器类型不支持");
         }

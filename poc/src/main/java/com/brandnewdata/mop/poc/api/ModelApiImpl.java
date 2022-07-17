@@ -55,6 +55,7 @@ public class ModelApiImpl implements ModelApi {
                     String modelKey = trigger.getModelKey();
                     String name = trigger.getName();
                     String xml = trigger.getEditorXML();
+                    name = StrUtil.format("【触发器】{}", name);
                     modelService.deploy(modelKey, name, xml, Constants.TRIGGER_TYPE_GENERAL);
                 }
             }
@@ -64,6 +65,7 @@ public class ModelApiImpl implements ModelApi {
                     String modelKey = operate.getModelKey();
                     String name = operate.getName();
                     String xml = operate.getEditorXML();
+                    name = StrUtil.format("【操作】{}", name);
                     modelService.deploy(modelKey, name, xml, Constants.TRIGGER_TYPE_NONE);
                 }
             }
