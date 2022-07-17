@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author caiwillie
@@ -45,15 +46,19 @@ public class ModelService {
 
 
     public void save(DeModelEntity entity) {
-        Long id = entity.getId();
         XMLDTO xmlDTO = new XMLParser3()
                 .parse(entity.getEditorXml())
                 .replaceCustomTrigger().build();
+
+        // 通过 modelKey 查询 id
+        Long id = Optional.of(getOne(xmlDTO.getModelKey()))
+                .map(DeModelEntity::getId).orElse(null);
         entity.setName(xmlDTO.getName());
         entity.setModelKey(xmlDTO.getModelKey());
         if(id == null) {
             modelDao.insert(entity);
         } else {
+            entity.setId(id);
             modelDao.updateById(entity);
         }
         return;
