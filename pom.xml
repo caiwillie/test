@@ -12,7 +12,7 @@
     <modules>
         <module>example</module>
         <module>poc</module>
-        <module>camunda</module>
+<!--        <module>camunda</module>-->
         <module>script-worker</module>
         <module>mop-api</module>
     </modules>
