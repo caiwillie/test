@@ -4,14 +4,19 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
-import com.brandnewdata.mop.poc.dao.BusinessSceneDao;
+import com.brandnewdata.mop.poc.group.dao.BusinessSceneDao;
+import com.brandnewdata.mop.poc.group.dao.BusinessSceneProcessDao;
 import com.brandnewdata.mop.poc.group.dto.BusinessScene;
 import com.brandnewdata.mop.poc.group.entity.BusinessSceneEntity;
+import com.brandnewdata.mop.poc.group.entity.BusinessSceneProcessEntity;
+import com.brandnewdata.mop.poc.modeler.dto.ProcessDefinition;
+import com.brandnewdata.mop.poc.modeler.service.IProcessDefinitionService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author caiwillie
@@ -21,6 +26,12 @@ public class BusinessSceneService implements IBusinessSceneService {
 
     @Resource
     private BusinessSceneDao businessSceneDao;
+
+    @Resource
+    private BusinessSceneProcessDao businessSceneProcessDao;
+
+    @Resource
+    private IProcessDefinitionService processDefinitionService;
 
     @Override
     public Page<BusinessScene> page(int pageNumber, int pageSize) {
@@ -41,11 +52,28 @@ public class BusinessSceneService implements IBusinessSceneService {
 
     @Override
     public BusinessScene detail(Long id) {
-        BusinessScene ret = null;
         BusinessSceneEntity entity = businessSceneDao.selectById(id);
-        if(entity != null) {
-            ret = toDto(entity);
+        if(entity == null) {
+            return null;
         }
+        BusinessScene ret = toDto(entity);
+
+        QueryWrapper<BusinessSceneProcessEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(BusinessSceneProcessEntity.BUSINESS_SCENE_ID, id);
+        List<BusinessSceneProcessEntity> sceneProcessEntities = businessSceneProcessDao.selectList(queryWrapper);
+
+        List<ProcessDefinition> processDefinitions = new ArrayList<>();
+        ret.setProcessDefinitions(processDefinitions);
+
+        if(CollUtil.isEmpty(sceneProcessEntities)) {
+            return ret;
+        }
+
+        List<String> processIds = sceneProcessEntities.stream().map(BusinessSceneProcessEntity::getProcessId).collect(Collectors.toList());
+
+        // 确保不会产生 null
+        processDefinitions.addAll(processDefinitionService.list(processIds));
+
         return ret;
     }
 
