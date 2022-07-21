@@ -18,11 +18,27 @@ public class ConnectorApiImpl implements ConnectorApi {
     public Result<List<TriggerConfig>> getRequestParamConfig(List<TriggerConfig> configs) {
         try {
             List<RequestParamConfig> requestParams = new ArrayList<>();
+
+            RequestParamConfig requestParam = new RequestParamConfig();
+            requestParams.add(requestParam);
+            requestParam.setParamName("type");
+            requestParam.setParamShowName("定时类型");
+            requestParam.setParamType("string");
+
+            RequestParamConfig requestParam2 = new RequestParamConfig();
+            requestParams.add(requestParam2);
+            requestParam2.setParamName("content");
+            requestParam2.setParamShowName("配置内容");
+            requestParam2.setParamType("string");
+
+
+            /*
             RequestParamConfig requestParam = new RequestParamConfig();
             requestParams.add(requestParam);
             requestParam.setParamName("listenPath");
             requestParam.setParamShowName("监听路径");
             requestParam.setParamType("string");
+            */
 
             Assert.isTrue(CollUtil.isNotEmpty(configs), "触发器不能为空");
             for (int i = 0; i < configs.size(); i++) {

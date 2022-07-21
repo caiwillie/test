@@ -11,8 +11,6 @@ import com.brandnewdata.mop.api.dto.StartMessage;
 import com.brandnewdata.mop.api.dto.protocol.request.HttpRequest;
 import com.brandnewdata.mop.api.dto.protocol.response.HttpResponse;
 import com.brandnewdata.mop.poc.common.Constants;
-import com.brandnewdata.mop.poc.parser.XMLDTO;
-import com.brandnewdata.mop.poc.parser.XMLParser3;
 import com.brandnewdata.mop.poc.service.ModelService;
 import com.brandnewdata.mop.poc.service.ServiceUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;

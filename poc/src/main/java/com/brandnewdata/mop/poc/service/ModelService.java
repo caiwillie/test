@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.brandnewdata.common.constant.TriggerProtocolConstant;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.connector.api.IConnectorCommonTriggerProcessConfFeign;
 import com.brandnewdata.connector.api.IConnectorConfFeign;
@@ -116,7 +117,8 @@ public class ModelService {
             Integer success = null;
             try {
                 triggerProcessConfig.setProcessId(xmldto.getModelKey());
-                triggerProcessConfig.setProtocol("HTTP");
+                triggerProcessConfig.setProcessName(xmldto.getName());
+                triggerProcessConfig.setProtocol(TriggerProtocolConstant.SCHEDULED);
                 triggerProcessConfig.setConfig(OM.writeValueAsString(xmldto.getRequestParamConfigs()));
                 triggerProcessConfig.setTriggerFullId(xmldto.getTriggerFullId());
                 success = triggerProcessConfClient.save(triggerProcessConfig);
