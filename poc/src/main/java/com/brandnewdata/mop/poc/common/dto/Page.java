@@ -18,6 +18,7 @@ public class Page<T> {
 
     }
 
+
     public Page(long total, List<T> records) {
         this.total = total;
         this.records = records;

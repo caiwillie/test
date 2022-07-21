@@ -1,9 +1,11 @@
 package com.brandnewdata.mop.poc.group.rest;
 
+import cn.hutool.core.lang.Assert;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.group.dto.BusinessScene;
 import com.brandnewdata.mop.poc.group.service.IBusinessSceneService;
+import org.apache.http.util.Asserts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -46,6 +48,7 @@ public class BusinessSceneRest {
     public Result<BusinessScene> page(
             @RequestParam Long id) {
         BusinessScene businessScene = service.detail(id);
+        Assert.notNull(businessScene, "场景 id 不存在");
         return Result.OK(businessScene);
     }
 
