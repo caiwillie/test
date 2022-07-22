@@ -9,6 +9,7 @@ import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.group.dao.BusinessSceneDao;
 import com.brandnewdata.mop.poc.group.dao.BusinessSceneProcessDao;
 import com.brandnewdata.mop.poc.group.dto.BusinessScene;
+import com.brandnewdata.mop.poc.group.dto.BusinessSceneProcessDefinition;
 import com.brandnewdata.mop.poc.group.entity.BusinessSceneEntity;
 import com.brandnewdata.mop.poc.group.entity.BusinessSceneProcessEntity;
 import com.brandnewdata.mop.poc.modeler.dto.ProcessDefinition;
@@ -18,6 +19,8 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -45,7 +48,7 @@ public class BusinessSceneService implements IBusinessSceneService {
         List<BusinessScene> dtos = new ArrayList<>();
         if(CollUtil.isNotEmpty(entities)) {
             for (BusinessSceneEntity entity : entities) {
-                BusinessScene dto = toDto(entity);
+                BusinessScene dto = toDTO(entity);
                 dtos.add(dto);
             }
         }
@@ -59,23 +62,35 @@ public class BusinessSceneService implements IBusinessSceneService {
         if(entity == null) {
             return null;
         }
-        BusinessScene ret = toDto(entity);
+        BusinessScene ret = toDTO(entity);
 
         QueryWrapper<BusinessSceneProcessEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(BusinessSceneProcessEntity.BUSINESS_SCENE_ID, id);
-        List<BusinessSceneProcessEntity> sceneProcessEntities = businessSceneProcessDao.selectList(queryWrapper);
+        List<BusinessSceneProcessEntity> businessSceneProcessEntities = businessSceneProcessDao.selectList(queryWrapper);
 
-        List<ProcessDefinition> processDefinitions = new ArrayList<>();
-        ret.setProcessDefinitions(processDefinitions);
+        // 场景流程关联
+        List<BusinessSceneProcessDefinition> businessSceneProcessDefinitions = new ArrayList<>();
+        ret.setProcessDefinitions(businessSceneProcessDefinitions);
 
-        if(CollUtil.isEmpty(sceneProcessEntities)) {
+        if(CollUtil.isEmpty(businessSceneProcessEntities)) {
             return ret;
         }
 
-        List<String> processIds = sceneProcessEntities.stream().map(BusinessSceneProcessEntity::getProcessId).collect(Collectors.toList());
+        List<String> processIds = businessSceneProcessEntities.stream().map(BusinessSceneProcessEntity::getProcessId).collect(Collectors.toList());
 
-        // 确保不会产生 null
-        processDefinitions.addAll(processDefinitionService.list(processIds));
+        List<ProcessDefinition> processDefinitions = processDefinitionService.list(processIds);
+
+        // get 流程定义 map
+        Map<String, ProcessDefinition> processDefinitionMap = processDefinitions.stream()
+                .collect(Collectors.toMap(ProcessDefinition::getProcessId, Function.identity()));
+
+        for (BusinessSceneProcessEntity businessSceneProcessEntity : businessSceneProcessEntities) {
+            String processId = businessSceneProcessEntity.getProcessId();
+            ProcessDefinition processDefinition = processDefinitionMap.get(processId);
+            Assert.notNull(processDefinition, ErrorMessage.STALE_DATA_NOT_EXIST("流程定义", processId));
+            BusinessSceneProcessDefinition businessSceneProcessDefinition = toDTO(businessSceneProcessEntity, processDefinition);
+            businessSceneProcessDefinitions.add(businessSceneProcessDefinition);
+        }
 
         return ret;
     }
@@ -90,21 +105,38 @@ public class BusinessSceneService implements IBusinessSceneService {
         } else {
             businessSceneDao.updateById(entity);
         }
-        return toDto(entity);
+        return toDTO(entity);
     }
 
     @Override
-    public ProcessDefinition saveProcessDefinition(Long businessScene, ProcessDefinition processDefinition) {
-
-        return null;
+    public BusinessSceneProcessDefinition saveBusinessSceneProcessDefinition(BusinessSceneProcessDefinition businessSceneProcessDefinition) {
+        ProcessDefinition processDefinition = processDefinitionService.save(toDTO(businessSceneProcessDefinition));
+        BusinessSceneProcessEntity businessSceneProcessEntity = toEntity(businessSceneProcessDefinition);
+        if(businessSceneProcessEntity.getId() == null) {
+            // 不存在则新增
+            businessSceneProcessEntity.setProcessId(processDefinition.getProcessId());
+            businessSceneProcessDao.insert(businessSceneProcessEntity);
+        }
+        return toDTO(businessSceneProcessEntity, processDefinition);
     }
 
-    public BusinessScene toDto(BusinessSceneEntity entity) {
+    public BusinessScene toDTO(BusinessSceneEntity entity) {
         BusinessScene dto = new BusinessScene();
         dto.setId(entity.getId());
         dto.setName(entity.getName());
         dto.setCreateTime(LocalDateTimeUtil.formatNormal(entity.getCreateTime()));
         dto.setUpdateTime(LocalDateTimeUtil.formatNormal(entity.getUpdateTime()));
+        return dto;
+    }
+
+    public BusinessSceneProcessDefinition toDTO(BusinessSceneProcessEntity businessSceneProcessEntity,
+                                                ProcessDefinition processDefinition) {
+        BusinessSceneProcessDefinition dto = new BusinessSceneProcessDefinition();
+        dto.setId(businessSceneProcessEntity.getId());
+        dto.setBusinessSceneId(businessSceneProcessEntity.getBusinessSceneId());
+        dto.setProcessId(businessSceneProcessEntity.getProcessId());
+        dto.setName(processDefinition.getName());
+        dto.setXml(processDefinition.getXml());
         return dto;
     }
 
@@ -114,4 +146,21 @@ public class BusinessSceneService implements IBusinessSceneService {
         entity.setName(businessScene.getName());
         return entity;
     }
+
+    public BusinessSceneProcessEntity toEntity(BusinessSceneProcessDefinition businessSceneProcessDefinition) {
+        BusinessSceneProcessEntity entity = new BusinessSceneProcessEntity();
+        entity.setId(businessSceneProcessDefinition.getId());
+        entity.setBusinessSceneId(businessSceneProcessDefinition.getBusinessSceneId());
+        return entity;
+    }
+
+    public ProcessDefinition toDTO(BusinessSceneProcessDefinition businessSceneProcessDefinition) {
+        ProcessDefinition dto = new ProcessDefinition();
+        dto.setProcessId(businessSceneProcessDefinition.getProcessId());
+        dto.setName(businessSceneProcessDefinition.getName());
+        dto.setXml(businessSceneProcessDefinition.getXml());
+        return dto;
+    }
+
+
 }

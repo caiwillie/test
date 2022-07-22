@@ -32,5 +32,5 @@ public class BusinessScene {
     /**
      * 流程定义列表
      */
-    private List<ProcessDefinition> processDefinitions;
+    private List<BusinessSceneProcessDefinition> processDefinitions;
 }

@@ -37,7 +37,7 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
     }
 
     @Override
-    public ProcessDefinition save(String processId, String name, String xml) {
+    public ProcessDefinition save(ProcessDefinition processDefinition) {
 
         return null;
     }

@@ -14,5 +14,5 @@ public interface IProcessDefinitionService {
     List<ProcessDefinition> list(List<String> ids);
 
 
-    ProcessDefinition save(String processId, String name, String xml);
+    ProcessDefinition save(ProcessDefinition processDefinition);
 }

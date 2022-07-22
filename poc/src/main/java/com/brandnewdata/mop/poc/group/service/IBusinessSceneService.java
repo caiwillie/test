@@ -2,6 +2,7 @@ package com.brandnewdata.mop.poc.group.service;
 
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.group.dto.BusinessScene;
+import com.brandnewdata.mop.poc.group.dto.BusinessSceneProcessDefinition;
 import com.brandnewdata.mop.poc.modeler.dto.ProcessDefinition;
 
 /**
@@ -15,6 +16,6 @@ public interface IBusinessSceneService {
 
     BusinessScene save(BusinessScene businessScene);
 
-    ProcessDefinition saveProcessDefinition(Long businessScene, ProcessDefinition processDefinition);
+    BusinessSceneProcessDefinition saveBusinessSceneProcessDefinition(BusinessSceneProcessDefinition businessSceneProcessDefinition);
 
 }

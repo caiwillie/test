@@ -13,7 +13,7 @@ import lombok.Setter;
  * </p>
  *
  * @author caiwillie
- * @since 2022-07-21
+ * @since 2022-07-22
  */
 @Getter
 @Setter
@@ -25,7 +25,7 @@ public class BusinessSceneProcessEntity implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    private Integer businessSceneId;
+    private Long businessSceneId;
 
     private String processId;
 
