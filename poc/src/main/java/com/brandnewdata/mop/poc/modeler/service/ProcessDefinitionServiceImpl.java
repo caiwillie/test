@@ -36,6 +36,12 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
         return ret;
     }
 
+    @Override
+    public ProcessDefinition save(String processId, String name, String xml) {
+
+        return null;
+    }
+
 
     private ProcessDefinition toDto(ProcessDefinitionEntity entity) {
         ProcessDefinition dto = new ProcessDefinition();

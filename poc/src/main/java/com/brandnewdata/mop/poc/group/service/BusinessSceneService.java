@@ -2,8 +2,10 @@ package com.brandnewdata.mop.poc.group.service;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
+import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.group.dao.BusinessSceneDao;
 import com.brandnewdata.mop.poc.group.dao.BusinessSceneProcessDao;
 import com.brandnewdata.mop.poc.group.dto.BusinessScene;
@@ -52,6 +54,7 @@ public class BusinessSceneService implements IBusinessSceneService {
 
     @Override
     public BusinessScene detail(Long id) {
+        Assert.notNull(id, ErrorMessage.NOT_NULL("场景 id"));
         BusinessSceneEntity entity = businessSceneDao.selectById(id);
         if(entity == null) {
             return null;
@@ -77,6 +80,24 @@ public class BusinessSceneService implements IBusinessSceneService {
         return ret;
     }
 
+    @Override
+    public BusinessScene save(BusinessScene businessScene) {
+        Assert.notNull(businessScene.getName(), ErrorMessage.NOT_NULL("场景名称"));
+        BusinessSceneEntity entity = toEntity(businessScene);
+        Long id = entity.getId();
+        if(id == null) {
+            businessSceneDao.insert(entity);
+        } else {
+            businessSceneDao.updateById(entity);
+        }
+        return toDto(entity);
+    }
+
+    @Override
+    public ProcessDefinition saveProcessDefinition(Long businessScene, ProcessDefinition processDefinition) {
+
+        return null;
+    }
 
     public BusinessScene toDto(BusinessSceneEntity entity) {
         BusinessScene dto = new BusinessScene();
@@ -85,5 +106,12 @@ public class BusinessSceneService implements IBusinessSceneService {
         dto.setCreateTime(LocalDateTimeUtil.formatNormal(entity.getCreateTime()));
         dto.setUpdateTime(LocalDateTimeUtil.formatNormal(entity.getUpdateTime()));
         return dto;
+    }
+
+    public BusinessSceneEntity toEntity(BusinessScene businessScene) {
+        BusinessSceneEntity entity = new BusinessSceneEntity();
+        entity.setId(businessScene.getId());
+        entity.setName(businessScene.getName());
+        return entity;
     }
 }
