@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:brandnewdata="https://www.brandnewdata.com/schema/1.0" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+    <bpmn2:process id="Process_2875dfe6-b543-4d98-bdba-87b1f8c4d993" name="测试自定义流程" isExecutable="false">
+        <bpmn2:scriptTask id="Activity_16apwwi" name="处理表单数据">
+            <bpmn2:extensionElements>
+                <zeebe:taskDefinition type="script" />
+                <zeebe:taskHeaders>
+                    <zeebe:header key="language" value="groovy" />
+                    <zeebe:header key="script" value="import groovy.json.JsonSlurper;  def body = job.getVariablesAsMap().get(&#34;body&#34;); def json = new JsonSlurper(); def root = json.parseText(body); def city = root[&#34;q4&#34;].split(&#34;-&#34;)[1];  def userMap = [:];  def user = [:]; user[&#34;name&#34;] = root[&#34;q1&#34;]; user[&#34;phone&#34;] = root[&#34;q2&#34;]; user[&#34;idCard&#34;] = root[&#34;q3&#34;]; userMap.put(&#34;0&#34;, user);   for (e in root) {     def key = e.getAt(&#34;key&#34;);     def value = e.getAt(&#34;value&#34;);      if (key.startsWith(&#34;q5&#34;)) {         def split = key.split(&#34;_&#34;);         if(userMap.containsKey(split[1])) {             user = userMap.get(split[1])         } else {             user = [:];             userMap.put(split[1], user);         };         if(split[2] == &#34;1&#34;) user[&#34;name&#34;] = value;         else if (split[2] == &#34;2&#34;) user[&#34;phone&#34;] = value;         else if (split[2] == &#34;3&#34; ) user[&#34;idCard&#34;] = value;     }; };  def result = [:];  result[&#34;userMap&#34;] = userMap; result[&#34;count&#34;] = userMap.size(); result[&#34;city&#34;] = city;  def risk = &#34;低风险&#34;; if(city.contains(&#34;上海&#34;)) {     risk = &#34;中高风险&#34;; };  result[&#34;risk&#34;] = risk;  return result;" />
+                </zeebe:taskHeaders>
+                <zeebe:ioMapping>
+                    <zeebe:input source="= request.body" target="body" />
+                    <zeebe:output source="= result.userMap" target="userMap" />
+                    <zeebe:output source="= result.count" target="count" />
+                    <zeebe:output source="= result.city" target="city" />
+                    <zeebe:output source="= result.risk" target="risk" />
+                </zeebe:ioMapping>
+            </bpmn2:extensionElements>
+            <bpmn2:incoming>Flow_0xpfxd1</bpmn2:incoming>
+            <bpmn2:outgoing>Flow_0c1ijdh</bpmn2:outgoing>
+        </bpmn2:scriptTask>
+        <bpmn2:exclusiveGateway id="Gateway_0hji0da" name="判断人数？">
+            <bpmn2:incoming>Flow_0enpfv9</bpmn2:incoming>
+            <bpmn2:incoming>Flow_1pcc7k7</bpmn2:incoming>
+            <bpmn2:outgoing>Flow_050g236</bpmn2:outgoing>
+            <bpmn2:outgoing>Flow_1qz8li7</bpmn2:outgoing>
+        </bpmn2:exclusiveGateway>
+        <bpmn2:endEvent id="Event_1ssylys">
+            <bpmn2:incoming>Flow_050g236</bpmn2:incoming>
+            <bpmn2:incoming>Flow_1r92flt</bpmn2:incoming>
+        </bpmn2:endEvent>
+        <bpmn2:sequenceFlow id="Flow_050g236" name="count &#60;= 0" sourceRef="Gateway_0hji0da" targetRef="Event_1ssylys">
+            <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">= count &lt;= 0</bpmn2:conditionExpression>
+        </bpmn2:sequenceFlow>
+        <bpmn2:exclusiveGateway id="Gateway_0awvrcr" name="判断来自区域">
+            <bpmn2:incoming>Flow_0c1ijdh</bpmn2:incoming>
+            <bpmn2:outgoing>Flow_0enpfv9</bpmn2:outgoing>
+            <bpmn2:outgoing>Flow_1iuj8e8</bpmn2:outgoing>
+        </bpmn2:exclusiveGateway>
+        <bpmn2:sequenceFlow id="Flow_0c1ijdh" sourceRef="Activity_16apwwi" targetRef="Gateway_0awvrcr" />
+        <bpmn2:exclusiveGateway id="Gateway_1ch8wwc" name="判断人数？">
+            <bpmn2:incoming>Flow_1utndy5</bpmn2:incoming>
+            <bpmn2:incoming>Flow_0mslkyy</bpmn2:incoming>
+            <bpmn2:incoming>Flow_1v485qf</bpmn2:incoming>
+            <bpmn2:outgoing>Flow_1r92flt</bpmn2:outgoing>
+            <bpmn2:outgoing>Flow_1xxjp7p</bpmn2:outgoing>
+        </bpmn2:exclusiveGateway>
+        <bpmn2:sequenceFlow id="Flow_0enpfv9" name="中高风险" sourceRef="Gateway_0awvrcr" targetRef="Gateway_0hji0da">
+            <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">= risk != "低风险"</bpmn2:conditionExpression>
+        </bpmn2:sequenceFlow>
+        <bpmn2:sequenceFlow id="Flow_1r92flt" name="coung &#60;= 0" sourceRef="Gateway_1ch8wwc" targetRef="Event_1ssylys">
+            <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">= count &lt;= 0</bpmn2:conditionExpression>
+        </bpmn2:sequenceFlow>
+        <bpmn2:sequenceFlow id="Flow_1iuj8e8" name="低风险" sourceRef="Gateway_0awvrcr" targetRef="Activity_1n1cckq">
+            <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">= risk = "低风险"</bpmn2:conditionExpression>
+        </bpmn2:sequenceFlow>
+        <bpmn2:sequenceFlow id="Flow_1utndy5" sourceRef="Activity_1n1cckq" targetRef="Gateway_1ch8wwc" />
+        <bpmn2:sequenceFlow id="Flow_0mslkyy" sourceRef="Activity_0ofrrnf" targetRef="Gateway_1ch8wwc" />
+        <bpmn2:scriptTask id="Activity_1n1cckq" name="获取低风险区域短信模板">
+            <bpmn2:extensionElements>
+                <zeebe:taskDefinition type="script" />
+                <zeebe:taskHeaders>
+                    <zeebe:header key="language" value="groovy" />
+                    <zeebe:header key="script" value="&#34;&#34;" />
+                </zeebe:taskHeaders>
+                <zeebe:ioMapping>
+                    <zeebe:output source="= &#34;欢迎来到金华，请及时做好核酸监测&#34;" target="sms_template" />
+                </zeebe:ioMapping>
+            </bpmn2:extensionElements>
+            <bpmn2:incoming>Flow_1iuj8e8</bpmn2:incoming>
+            <bpmn2:outgoing>Flow_1utndy5</bpmn2:outgoing>
+        </bpmn2:scriptTask>
+        <bpmn2:scriptTask id="Activity_0ofrrnf" name="获取中高风险区域短信模板">
+            <bpmn2:extensionElements>
+                <zeebe:taskDefinition type="script" />
+                <zeebe:taskHeaders>
+                    <zeebe:header key="language" value="groovy" />
+                    <zeebe:header key="script" value="def userMap = job.getVariablesAsMap().get(&#34;userMap&#34;);  def result = [:]; result[&#34;count&#34;] = userMap.size(); return result;" />
+                </zeebe:taskHeaders>
+                <zeebe:ioMapping>
+                    <zeebe:output source="= &#34;欢迎来到金华，请按规定在居住点隔离&#34;" target="sms_template" />
+                    <zeebe:output source="= result.count" target="count" />
+                </zeebe:ioMapping>
+            </bpmn2:extensionElements>
+            <bpmn2:incoming>Flow_101uv2i</bpmn2:incoming>
+            <bpmn2:outgoing>Flow_0mslkyy</bpmn2:outgoing>
+        </bpmn2:scriptTask>
+        <bpmn2:sequenceFlow id="Flow_1xxjp7p" name="count &#62; 0" sourceRef="Gateway_1ch8wwc" targetRef="Activity_0lbf5iv">
+            <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">= count &gt; 0</bpmn2:conditionExpression>
+        </bpmn2:sequenceFlow>
+        <bpmn2:scriptTask id="Activity_0lbf5iv" name="【预处理】姓名手机号">
+            <bpmn2:extensionElements>
+                <zeebe:taskDefinition type="script" />
+                <zeebe:taskHeaders>
+                    <zeebe:header key="language" value="groovy" />
+                    <zeebe:header key="script" value="def userMap = job.getVariablesAsMap().get(&#34;userMap&#34;); def count = job.getVariablesAsMap().get(&#34;count&#34;);  def index = userMap.size() - count; def user = userMap[&#34;${index}&#34;]; return user;" />
+                </zeebe:taskHeaders>
+                <zeebe:ioMapping>
+                    <zeebe:output source="= result.phone" target="phone" />
+                    <zeebe:output source="= count - 1" target="count" />
+                </zeebe:ioMapping>
+            </bpmn2:extensionElements>
+            <bpmn2:incoming>Flow_1xxjp7p</bpmn2:incoming>
+            <bpmn2:outgoing>Flow_0om8udw</bpmn2:outgoing>
+        </bpmn2:scriptTask>
+        <bpmn2:serviceTask id="Activity_0tt7bpy" name="移动短信平台&#10;发送短信" brandnewdata:modelerIcon="https://baida-private.oss-cn-hangzhou.aliyuncs.com/1656406231314移动短信平台.svg" brandnewdata:modelerGroup="com.brandnewdata" brandnewdata:modelerUid="sms-service" brandnewdata:modelerId="1536178649598399220" brandnewdata:modelerType="1">
+            <bpmn2:extensionElements>
+                <brandnewdata:taskDefinition type="com.brandnewdata:sms-service.send-sms:1.0.1" configId="1547455968386101249" />
+                <brandnewdata:inputMapping label="入参配置">
+                    <brandnewdata:input type="string" name="phone" label="手机号" value="phone" />
+                    <brandnewdata:input type="string" name="name" label="姓名" value="sms_template" />
+                </brandnewdata:inputMapping>
+                <brandnewdata:outputMapping label="出参配置">
+                    <brandnewdata:output type="bool" name="sms_result" label="发送结果" value="" />
+                </brandnewdata:outputMapping>
+            </bpmn2:extensionElements>
+            <bpmn2:incoming>Flow_0om8udw</bpmn2:incoming>
+            <bpmn2:outgoing>Flow_1v485qf</bpmn2:outgoing>
+        </bpmn2:serviceTask>
+        <bpmn2:sequenceFlow id="Flow_0om8udw" sourceRef="Activity_0lbf5iv" targetRef="Activity_0tt7bpy" />
+        <bpmn2:sequenceFlow id="Flow_1v485qf" sourceRef="Activity_0tt7bpy" targetRef="Gateway_1ch8wwc" />
+        <bpmn2:sequenceFlow id="Flow_1qz8li7" name="count &#62; 0" sourceRef="Gateway_0hji0da" targetRef="Activity_1vqk6me">
+            <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">= count &gt; 0</bpmn2:conditionExpression>
+        </bpmn2:sequenceFlow>
+        <bpmn2:scriptTask id="Activity_1vqk6me" name="【预处理】es数据">
+            <bpmn2:extensionElements>
+                <zeebe:taskDefinition type="script" />
+                <zeebe:taskHeaders>
+                    <zeebe:header key="language" value="groovy" />
+                    <zeebe:header key="script" value="import groovy.json.JsonOutput;  def userMap = job.getVariablesAsMap().get(&#34;userMap&#34;); def count = job.getVariablesAsMap().get(&#34;count&#34;);  def index = userMap.size() - count; def user = userMap[&#34;${index}&#34;]; return JsonOutput.toJson(user);" />
+                </zeebe:taskHeaders>
+                <zeebe:ioMapping>
+                    <zeebe:output source="= result" target="es_data" />
+                    <zeebe:output source="= count - 1" target="count" />
+                </zeebe:ioMapping>
+            </bpmn2:extensionElements>
+            <bpmn2:incoming>Flow_1qz8li7</bpmn2:incoming>
+            <bpmn2:outgoing>Flow_16c2zis</bpmn2:outgoing>
+        </bpmn2:scriptTask>
+        <bpmn2:serviceTask id="Activity_1aki112" name="elasticsearch&#10;新增" brandnewdata:modelerIcon="https://baida-private.oss-cn-hangzhou.aliyuncs.com/1657771736101database通用连接器.svg" brandnewdata:modelerGroup="com.brandnewdata" brandnewdata:modelerUid="elasticsearch" brandnewdata:modelerId="1547432913144262657" brandnewdata:modelerType="3">
+            <bpmn2:extensionElements>
+                <brandnewdata:taskDefinition type="com.brandnewdata:elasticsearch.executeInsert:1.0.0" configId="1547824434958266369" />
+                <brandnewdata:inputMapping label="入参配置">
+                    <brandnewdata:input type="string" name="indexName" label="索引名称" value="&#34;high_risk&#34;" />
+                    <brandnewdata:input type="string" name="documentContent" label="文档内容" value="es_data" />
+                </brandnewdata:inputMapping>
+                <brandnewdata:outputMapping label="出参配置">
+                    <brandnewdata:output type="bool" name="result" label="结果" value="" />
+                </brandnewdata:outputMapping>
+            </bpmn2:extensionElements>
+            <bpmn2:incoming>Flow_16c2zis</bpmn2:incoming>
+            <bpmn2:outgoing>Flow_0jy8j7j</bpmn2:outgoing>
+        </bpmn2:serviceTask>
+        <bpmn2:sequenceFlow id="Flow_16c2zis" sourceRef="Activity_1vqk6me" targetRef="Activity_1aki112" />
+        <bpmn2:exclusiveGateway id="Gateway_0cqqutq">
+            <bpmn2:incoming>Flow_0jy8j7j</bpmn2:incoming>
+            <bpmn2:outgoing>Flow_101uv2i</bpmn2:outgoing>
+            <bpmn2:outgoing>Flow_1pcc7k7</bpmn2:outgoing>
+        </bpmn2:exclusiveGateway>
+        <bpmn2:sequenceFlow id="Flow_0jy8j7j" name="count = 0" sourceRef="Activity_1aki112" targetRef="Gateway_0cqqutq" />
+        <bpmn2:sequenceFlow id="Flow_101uv2i" sourceRef="Gateway_0cqqutq" targetRef="Activity_0ofrrnf">
+            <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">= count = 0</bpmn2:conditionExpression>
+        </bpmn2:sequenceFlow>
+        <bpmn2:sequenceFlow id="Flow_1pcc7k7" name="count &#62; 0" sourceRef="Gateway_0cqqutq" targetRef="Gateway_0hji0da">
+            <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">= count &gt; 0</bpmn2:conditionExpression>
+        </bpmn2:sequenceFlow>
+        <bpmn2:startEvent id="Event_04gdlah" name="问卷星&#10;提交问卷回调" brandnewdata:modelerIcon="https://baida-private.oss-cn-hangzhou.aliyuncs.com/1657865476812icon.svg" brandnewdata:modelerGroup="com.developer" brandnewdata:modelerUid="wjx" brandnewdata:modelerId="1547824641265274882" brandnewdata:modelerType="2">
+            <bpmn2:extensionElements>
+                <brandnewdata:taskDefinition type="com.developer:wjx.commit-callback:1.0.0" />
+                <brandnewdata:requestMapping label="监听配置">
+                    <brandnewdata:request type="string" name="listenPath" label="监听路径" value="&#34;/testhaha&#34;" />
+                </brandnewdata:requestMapping>
+                <brandnewdata:inputMapping label="入参配置">
+                    <brandnewdata:input type="string" name="access_key" label="密钥" value="&#34;d25749c8-65f8-4cbe-bcac-6d03dd219786&#34;" />
+                </brandnewdata:inputMapping>
+                <brandnewdata:requestMapping label="监听配置">
+                    <brandnewdata:request type="string" name="listenPath" label="监听路径" value="" />
+                </brandnewdata:requestMapping>
+            </bpmn2:extensionElements>
+            <bpmn2:outgoing>Flow_0xpfxd1</bpmn2:outgoing>
+        </bpmn2:startEvent>
+        <bpmn2:sequenceFlow id="Flow_0xpfxd1" sourceRef="Event_04gdlah" targetRef="Activity_16apwwi" />
+    </bpmn2:process>
+    <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+        <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_2875dfe6-b543-4d98-bdba-87b1f8c4d993">
+            <bpmndi:BPMNEdge id="Flow_0xpfxd1_di" bpmnElement="Flow_0xpfxd1">
+                <di:waypoint x="88" y="261" />
+                <di:waypoint x="160" y="261" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_1pcc7k7_di" bpmnElement="Flow_1pcc7k7">
+                <di:waypoint x="755" y="70" />
+                <di:waypoint x="490" y="70" />
+                <di:waypoint x="490" y="135" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="600" y="52" width="46" height="14" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_101uv2i_di" bpmnElement="Flow_101uv2i">
+                <di:waypoint x="805" y="70" />
+                <di:waypoint x="880" y="70" />
+                <di:waypoint x="880" y="310" />
+                <di:waypoint x="670" y="310" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_0jy8j7j_di" bpmnElement="Flow_0jy8j7j">
+                <di:waypoint x="780" y="120" />
+                <di:waypoint x="780" y="95" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="807" y="53" width="46" height="14" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_16c2zis_di" bpmnElement="Flow_16c2zis">
+                <di:waypoint x="670" y="160" />
+                <di:waypoint x="730" y="160" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_1qz8li7_di" bpmnElement="Flow_1qz8li7">
+                <di:waypoint x="515" y="160" />
+                <di:waypoint x="570" y="160" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="512" y="173" width="46" height="14" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_1v485qf_di" bpmnElement="Flow_1v485qf">
+                <di:waypoint x="780" y="460" />
+                <di:waypoint x="780" y="500" />
+                <di:waypoint x="490" y="500" />
+                <di:waypoint x="490" y="445" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_0om8udw_di" bpmnElement="Flow_0om8udw">
+                <di:waypoint x="670" y="420" />
+                <di:waypoint x="730" y="420" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_1xxjp7p_di" bpmnElement="Flow_1xxjp7p">
+                <di:waypoint x="515" y="420" />
+                <di:waypoint x="570" y="420" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="512" y="423" width="46" height="14" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_0mslkyy_di" bpmnElement="Flow_0mslkyy">
+                <di:waypoint x="620" y="350" />
+                <di:waypoint x="540" y="370" />
+                <di:waypoint x="503" y="408" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_1utndy5_di" bpmnElement="Flow_1utndy5">
+                <di:waypoint x="350" y="400" />
+                <di:waypoint x="350" y="420" />
+                <di:waypoint x="465" y="420" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_1iuj8e8_di" bpmnElement="Flow_1iuj8e8">
+                <di:waypoint x="350" y="286" />
+                <di:waypoint x="350" y="320" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="303" y="293" width="33" height="14" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_1r92flt_di" bpmnElement="Flow_1r92flt">
+                <di:waypoint x="490" y="395" />
+                <di:waypoint x="490" y="298" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="492" y="333" width="56" height="14" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_0enpfv9_di" bpmnElement="Flow_0enpfv9">
+                <di:waypoint x="350" y="236" />
+                <di:waypoint x="350" y="160" />
+                <di:waypoint x="465" y="160" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="297" y="213" width="45" height="14" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_0c1ijdh_di" bpmnElement="Flow_0c1ijdh">
+                <di:waypoint x="260" y="261" />
+                <di:waypoint x="325" y="261" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_050g236_di" bpmnElement="Flow_050g236">
+                <di:waypoint x="490" y="185" />
+                <di:waypoint x="490" y="262" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="494" y="213" width="52" height="14" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNShape id="Activity_185shkh_di" bpmnElement="Activity_16apwwi">
+                <dc:Bounds x="160" y="221" width="100" height="80" />
+                <bpmndi:BPMNLabel />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Gateway_0hji0da_di" bpmnElement="Gateway_0hji0da" isMarkerVisible="true">
+                <dc:Bounds x="465" y="135" width="50" height="50" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="420" y="182" width="55" height="14" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Event_1ssylys_di" bpmnElement="Event_1ssylys">
+                <dc:Bounds x="472" y="262" width="36" height="36" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Gateway_0awvrcr_di" bpmnElement="Gateway_0awvrcr" isMarkerVisible="true">
+                <dc:Bounds x="325" y="236" width="50" height="50" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="385" y="254" width="67" height="14" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Gateway_1ch8wwc_di" bpmnElement="Gateway_1ch8wwc" isMarkerVisible="true">
+                <dc:Bounds x="465" y="395" width="50" height="50" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="432" y="443" width="55" height="14" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Activity_1s62elm_di" bpmnElement="Activity_1n1cckq">
+                <dc:Bounds x="300" y="320" width="100" height="80" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Activity_0di6mvo_di" bpmnElement="Activity_0ofrrnf">
+                <dc:Bounds x="570" y="270" width="100" height="80" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Activity_0ipp3r3_di" bpmnElement="Activity_0lbf5iv">
+                <dc:Bounds x="570" y="380" width="100" height="80" />
+                <bpmndi:BPMNLabel />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Activity_0tt7bpy_di" bpmnElement="Activity_0tt7bpy">
+                <dc:Bounds x="730" y="380" width="100" height="80" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Activity_0yzbddc_di" bpmnElement="Activity_1vqk6me">
+                <dc:Bounds x="570" y="120" width="100" height="80" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Activity_1aki112_di" bpmnElement="Activity_1aki112">
+                <dc:Bounds x="730" y="120" width="100" height="80" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Gateway_0cqqutq_di" bpmnElement="Gateway_0cqqutq" isMarkerVisible="true">
+                <dc:Bounds x="755" y="45" width="50" height="50" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Event_04gdlah_di" bpmnElement="Event_04gdlah">
+                <dc:Bounds x="52" y="243" width="36" height="36" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="37" y="286" width="66" height="27" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</bpmn2:definitions>
