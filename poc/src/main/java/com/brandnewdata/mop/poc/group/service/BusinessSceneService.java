@@ -109,7 +109,7 @@ public class BusinessSceneService implements IBusinessSceneService {
     }
 
     @Override
-    public BusinessSceneProcessDefinition saveBusinessSceneProcessDefinition(BusinessSceneProcessDefinition businessSceneProcessDefinition) {
+    public BusinessSceneProcessDefinition saveProcessDefinition(BusinessSceneProcessDefinition businessSceneProcessDefinition) {
         ProcessDefinition processDefinition = processDefinitionService.save(toDTO(businessSceneProcessDefinition));
         BusinessSceneProcessEntity businessSceneProcessEntity = toEntity(businessSceneProcessDefinition);
         if(businessSceneProcessEntity.getId() == null) {

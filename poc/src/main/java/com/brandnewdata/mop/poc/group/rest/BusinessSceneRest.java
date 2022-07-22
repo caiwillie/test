@@ -4,12 +4,10 @@ import cn.hutool.core.lang.Assert;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.group.dto.BusinessScene;
+import com.brandnewdata.mop.poc.group.dto.BusinessSceneProcessDefinition;
 import com.brandnewdata.mop.poc.group.service.IBusinessSceneService;
-import org.apache.http.util.Asserts;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 业务场景集成相关的接口
@@ -45,11 +43,36 @@ public class BusinessSceneRest {
      * @return the result
      */
     @GetMapping(value = "/rest/businessScene/detail")
-    public Result<BusinessScene> page(
+    public Result<BusinessScene> detail(
             @RequestParam Long id) {
         BusinessScene businessScene = service.detail(id);
         Assert.notNull(businessScene, "场景 id 不存在");
         return Result.OK(businessScene);
+    }
+
+
+    /**
+     * 保存业务场景
+     *
+     * @param businessScene the business scene
+     * @return the result
+     */
+    @PostMapping(value = "/rest/businessScene/save")
+    public Result<BusinessScene> save(@RequestBody BusinessScene businessScene) {
+        businessScene = service.save(businessScene);
+        return Result.OK(businessScene);
+    }
+
+    /**
+     * 保存业务场景下的流程
+     *
+     * @param businessSceneProcessDefinition the business scene process definition
+     * @return the result
+     */
+    @PostMapping(value = "/rest/businessScene/saveProcessDefinition")
+    public Result<BusinessSceneProcessDefinition> saveProcessDefinition(@RequestBody BusinessSceneProcessDefinition businessSceneProcessDefinition) {
+        businessSceneProcessDefinition = service.saveProcessDefinition(businessSceneProcessDefinition);
+        return Result.OK(businessSceneProcessDefinition);
     }
 
 }
