@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FastStringWriter;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
+import com.brandnewdata.common.constant.TriggerProtocolConstant;
 import com.brandnewdata.connector.api.IConnectorConfFeign;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.modeler.dto.ProcessDefinition;
@@ -44,12 +45,22 @@ public class ProcessDefinitionParser implements
 
     private String documentStr;
 
+    private String protocol;
+
+    private TriggerOrOperate trigger;
+
+    private ObjectNode requestParams;
+
     private static final ParameterParser INPUT_PARSER = new ParameterParser(
             BRANDNEWDATA_INPUT_QNAME.getQualifiedName(),
             NAME_ATTRIBUTE, VALUE_ATTRIBUTE, LABEL_ATTRIBUTE, TYPE_ATTRIBUTE, DATA_TYPE_ATTRIBUTE);
 
     private static final ParameterParser OUTPUT_PARSER = new ParameterParser(
             BRANDNEWDATA_OUTPUT_QNAME.getQualifiedName(),
+            NAME_ATTRIBUTE, VALUE_ATTRIBUTE, LABEL_ATTRIBUTE, TYPE_ATTRIBUTE, DATA_TYPE_ATTRIBUTE);
+
+    private static final ParameterParser REQUEST_PARSER = new ParameterParser(
+            BRANDNEWDATA_REQUEST_QNAME.getQualifiedName(),
             NAME_ATTRIBUTE, VALUE_ATTRIBUTE, LABEL_ATTRIBUTE, TYPE_ATTRIBUTE, DATA_TYPE_ATTRIBUTE);
 
     private static final IOMapParser IO_MAP_PARSER = new IOMapParser();
@@ -226,7 +237,7 @@ public class ProcessDefinitionParser implements
         Element parent = outputMapping.getParent();
         // 获取 zeebe:ioMapping
         Element ioMapping = getIoMapping(parent);
-        ObjectNode parameters = INPUT_PARSER.parse(outputMapping);
+        ObjectNode parameters = OUTPUT_PARSER.parse(outputMapping);
 
         List<IOMap> ioMapList = IO_MAP_PARSER.parse(parameters);
         for (IOMap ioMap : ioMapList) {
@@ -388,6 +399,8 @@ public class ProcessDefinitionParser implements
         Element oldE = (Element) nodes.get(0).getParent().getParent();
         replaceNoneStartEvent(oldE);
 
+        requestParams = getRequestParams(oldE);
+
         return this;
     }
 
@@ -422,12 +435,24 @@ public class ProcessDefinitionParser implements
         content.set(content.indexOf(startEvent), newE);
     }
 
-
-    private void replaceSceneGeneralStartEvent(Element startEvent, TriggerOrOperate triggerOrOperate) {
-
+    private ObjectNode getRequestParams(Element startEvent) {
+        XPath path = DocumentHelper.createXPath(StrUtil.join(StringPool.SLASH,
+                BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
+                BRANDNEWDATA_REQUEST_MAPPING_QNAME.getQualifiedName()));
+        Element oldE = (Element) path.selectSingleNode(startEvent);
+        // 缺少监听配置
+        Assert.notNull(oldE, ErrorMessage.NOT_NULL("监听配置"));
+        return REQUEST_PARSER.parse(oldE);
     }
 
-    private void replaceSceneCustomeStartEvent(Element startEvent, TriggerOrOperate triggerOrOperate) {
+    private void replaceSceneGeneralStartEvent(Element startEvent) {
+        // 获取监听参数
+        requestParams = getRequestParams(startEvent);
+        String connectorId = trigger.getConnectorId();
+        protocol = TriggerProtocolConstant.getProtocolByConnectorId(connectorId);
+    }
+
+    private void replaceSceneCustomStartEvent(Element startEvent) {
 
     }
 
@@ -445,13 +470,13 @@ public class ProcessDefinitionParser implements
 
         String type = oldE.attributeValue(TYPE_ATTRIBUTE);
 
-        TriggerOrOperate triggerOrOperate = getTriggerOrOperate(type);
+        trigger = getTriggerOrOperate(type);
 
         Element startEvent = oldE.getParent().getParent();
 
-        if(StrUtil.equals(triggerOrOperate.getGroupId(), BRANDNEWDATA_DOMAIN)) {
+        if(StrUtil.equals(trigger.getGroupId(), BRANDNEWDATA_DOMAIN)) {
             // 通用触发器
-
+            replaceSceneGeneralStartEvent(startEvent);
         } else {
             // 自定义触发器
 
@@ -472,7 +497,7 @@ public class ProcessDefinitionParser implements
     }
 
     @Override
-    public ProcessDefinitionParseStep2 replaceProperties(IConnectorConfFeign client) {
+    public ProcessDefinitionParseStep2 replaceProperties(ConnectorManager manager) {
         XPath path = DocumentHelper.createXPath(StrUtil.join(StringPool.SLASH,
                 StringPool.SLASH,
                 BPMN_SERVICE_TASK_QNAME.getQualifiedName(),
@@ -491,12 +516,11 @@ public class ProcessDefinitionParser implements
             if(StrUtil.isBlank(configId)) {
                 continue;
             }
-            IConnectorConfFeign.ConnectorConfDTO configInfo = client.getConfigInfo(Long.parseLong(configId));
-            String configs = configInfo.getConfigs();
-            if(StrUtil.isNotBlank(configs)) {
+            String properties = manager.getProperties(configId);
+            if(StrUtil.isNotBlank(properties)) {
                 Element newE = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
                 newE.addAttribute(TARGET_ATTRIBUTE, PROPERTIES_PREFIX);
-                newE.addAttribute(SOURCE_ATTRIBUTE, StrUtil.format("{} {}", StringPool.EQUALS, configs));
+                newE.addAttribute(SOURCE_ATTRIBUTE, StrUtil.format("{} {}", StringPool.EQUALS, properties));
                 newE.setParent(ioMapping);
                 ioMapping.content().add(newE);
             }

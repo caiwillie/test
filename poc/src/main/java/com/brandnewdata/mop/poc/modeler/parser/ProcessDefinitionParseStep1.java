@@ -8,5 +8,5 @@ public interface ProcessDefinitionParseStep1 {
 
     ProcessDefinitionParseStep2 replaceStep1();
 
-    ProcessDefinitionParseStep2 replaceProperties(IConnectorConfFeign client);
+    ProcessDefinitionParseStep2 replaceProperties(ConnectorManager manager);
 }
