@@ -56,7 +56,7 @@ public class BusinessSceneService implements IBusinessSceneService {
     }
 
     @Override
-    public BusinessScene detail(Long id) {
+    public BusinessScene getOne(Long id) {
         Assert.notNull(id, ErrorMessage.NOT_NULL("场景 id"));
         BusinessSceneEntity entity = businessSceneDao.selectById(id);
         if(entity == null) {

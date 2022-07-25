@@ -2,16 +2,9 @@ package com.brandnewdata.mop.poc.modeler.parser;
 
 import cn.hutool.core.io.resource.ResourceUtil;
 import com.brandnewdata.mop.poc.modeler.dto.ProcessDefinition;
-import io.camunda.zeebe.client.ZeebeClient;
-import org.dom4j.Document;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import static org.mockito.Mockito.*;
 
 class ProcessDefinitionParserTest {
 
@@ -28,6 +21,7 @@ class ProcessDefinitionParserTest {
         processDefinition.setName(null);
         processDefinition.setXml(xml);
         ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(processDefinition);
+        step1.build();
         // Assertions.assertEquals(null, result);
     }
 }

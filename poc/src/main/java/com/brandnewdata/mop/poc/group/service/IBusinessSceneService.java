@@ -11,7 +11,7 @@ public interface IBusinessSceneService {
 
     Page<BusinessScene> page(int pageNumber, int pageSize);
 
-    BusinessScene detail(Long id);
+    BusinessScene getOne(Long id);
 
     BusinessScene save(BusinessScene businessScene);
 

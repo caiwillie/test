@@ -45,7 +45,7 @@ public class BusinessSceneRest {
     @GetMapping(value = "/rest/businessScene/detail")
     public Result<BusinessScene> detail(
             @RequestParam Long id) {
-        BusinessScene businessScene = service.detail(id);
+        BusinessScene businessScene = service.getOne(id);
         Assert.notNull(businessScene, "场景 id 不存在");
         return Result.OK(businessScene);
     }

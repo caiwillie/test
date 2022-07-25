@@ -1,7 +1,9 @@
 package com.brandnewdata.mop.poc.modeler.service;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.modeler.dao.ProcessDefinitionDao;
 import com.brandnewdata.mop.poc.modeler.dto.ProcessDefinition;
 import com.brandnewdata.mop.poc.modeler.entity.ProcessDefinitionEntity;
@@ -27,7 +29,7 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
             List<ProcessDefinitionEntity> entities = processDefinitionDao.selectList(queryWrapper);
             if(CollUtil.isNotEmpty(entities)) {
                 for (ProcessDefinitionEntity entity : entities) {
-                    ProcessDefinition dto = toDto(entity);
+                    ProcessDefinition dto = toDTO(entity);
                     ret.add(dto);
                 }
             }
@@ -38,12 +40,42 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
 
     @Override
     public ProcessDefinition save(ProcessDefinition processDefinition) {
+        String processId = processDefinition.getProcessId();
+        String name = processDefinition.getName();
+        String xml = processDefinition.getXml();
 
-        return null;
+        // dto to entity 逻辑特殊，不提取公共
+        ProcessDefinitionEntity entity = new ProcessDefinitionEntity();
+        entity.setId(processId);
+        entity.setName(name);
+        entity.setXml(xml);
+
+        if(getOne(processId) != null) {
+             processDefinitionDao.updateById(entity);
+        } else {
+            processDefinitionDao.insert(entity);
+        }
+
+        return processDefinition;
+    }
+
+    @Override
+    public ProcessDefinition getOne(String processId) {
+        Assert.notNull(processId, ErrorMessage.NOT_NULL("流程 id"));
+
+        QueryWrapper<ProcessDefinitionEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(ProcessDefinitionEntity.ID, processId);
+        ProcessDefinitionEntity entity = processDefinitionDao.selectOne(queryWrapper);
+
+        if(entity == null) {
+            return null;
+        } else {
+            return toDTO(entity);
+        }
     }
 
 
-    private ProcessDefinition toDto(ProcessDefinitionEntity entity) {
+    private ProcessDefinition toDTO(ProcessDefinitionEntity entity) {
         ProcessDefinition dto = new ProcessDefinition();
         dto.setProcessId(entity.getId());
         dto.setName(entity.getName());

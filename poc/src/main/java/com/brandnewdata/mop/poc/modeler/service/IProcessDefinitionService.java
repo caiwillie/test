@@ -15,4 +15,6 @@ public interface IProcessDefinitionService {
 
 
     ProcessDefinition save(ProcessDefinition processDefinition);
+
+    ProcessDefinition getOne(String processId);
 }
