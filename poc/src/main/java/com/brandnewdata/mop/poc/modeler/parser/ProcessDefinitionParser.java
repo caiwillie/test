@@ -5,7 +5,6 @@ import cn.hutool.core.io.FastStringWriter;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.common.constant.TriggerProtocolConstant;
-import com.brandnewdata.connector.api.IConnectorConfFeign;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.modeler.dto.ProcessDefinition;
 import com.brandnewdata.mop.poc.modeler.dto.TriggerOrOperate;
@@ -197,6 +196,7 @@ public class ProcessDefinitionParser implements
     }
 
     private void replaceBrandnewdataInputMapping(Element inputMapping) {
+        if(inputMapping == null) return;
         Element parent = inputMapping.getParent();
         // 获取 zeebe:ioMapping
         Element ioMapping = getIoMapping(parent);
@@ -234,6 +234,7 @@ public class ProcessDefinitionParser implements
     }
 
     private void replaceBrandnewdataOutputMapping(Element outputMapping) {
+        if(outputMapping == null) return;
         Element parent = outputMapping.getParent();
         // 获取 zeebe:ioMapping
         Element ioMapping = getIoMapping(parent);
@@ -352,7 +353,6 @@ public class ProcessDefinitionParser implements
         return ioMapping;
     }
 
-
     private void logXML() {
         documentStr = serialize(document);
         String TEMPLATE =
@@ -372,6 +372,77 @@ public class ProcessDefinitionParser implements
             root.remove(namespace);
         }
     }
+
+    /**
+     * 替换成空启动事件
+     */
+    private void replaceNoneStartEvent(Element startEvent) {
+        Element parent = startEvent.getParent();
+
+        // 空启动事件
+        Element newE = DocumentHelper.createElement(BPMN_START_EVENT_QNAME);
+        newE.addAttribute(ID_ATTRIBUTE, startEvent.attributeValue(ID_ATTRIBUTE));
+        newE.addAttribute(NAME_ATTRIBUTE, startEvent.attributeValue(NAME_ATTRIBUTE));
+        newE.setParent(parent);
+
+        List<Node> content = parent.content();
+        content.set(content.indexOf(startEvent), newE);
+    }
+
+    private ObjectNode getRequestParams(Element startEvent) {
+        XPath path = DocumentHelper.createXPath(StrUtil.join(StringPool.SLASH,
+                BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
+                BRANDNEWDATA_REQUEST_MAPPING_QNAME.getQualifiedName()));
+        Element oldE = (Element) path.selectSingleNode(startEvent);
+        // 缺少监听配置
+        Assert.notNull(oldE, ErrorMessage.NOT_NULL("监听配置"));
+        return REQUEST_PARSER.parse(oldE);
+    }
+
+    private void replaceSceneGeneralStartEvent(Element startEvent) {
+        // 获取监听参数
+        requestParams = getRequestParams(startEvent);
+        String connectorId = trigger.getConnectorId();
+        protocol = TriggerProtocolConstant.getProtocolByConnectorId(connectorId);
+    }
+
+    private void replaceSceneCustomStartEvent(Element startEvent, ConnectorManager manager) {
+        String xml = manager.getTriggerXML(trigger);
+
+        // 解析自定义触发器内的通用触发器
+        ProcessDefinition _processDefintion = new ProcessDefinition();
+        _processDefintion.setProcessId(trigger.getFullId());
+        _processDefintion.setXml(xml);
+        TriggerProcessDefinition triggerProcessDefinition = ProcessDefinitionParser.newInstance(_processDefintion)
+                .replaceStep1().replaceTriggerStartEvent().buildTriggerProcessDefinition();
+
+        // 替换成真实协议
+        protocol = triggerProcessDefinition.getProtocol();
+        requestParams = triggerProcessDefinition.getRequestParams();
+
+        Element inputMapping = (Element) startEvent.selectSingleNode(StrUtil.join(StringPool.SLASH,
+                BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
+                BRANDNEWDATA_INPUT_MAPPING_QNAME.getQualifiedName()));
+        replaceBrandnewdataInputMapping(inputMapping);
+
+        Element outputMapping = (Element) startEvent.selectSingleNode(StrUtil.join(StringPool.SLASH,
+                BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
+                BRANDNEWDATA_OUTPUT_MAPPING_QNAME.getQualifiedName()));
+        replaceBrandnewdataInputMapping(outputMapping);
+
+        Element ioMapping = null;
+        if(inputMapping != null || outputMapping != null) {
+            // 二者取其一
+            Element parent = inputMapping != null ? inputMapping.getParent() : outputMapping.getParent();
+            ioMapping = getIoMapping(parent);
+        }
+
+    }
+
+    private Element createCallActivity() {
+        return null;
+    }
+
 
     @Override
     public ProcessDefinition buildProcessDefinition() {
@@ -419,45 +490,9 @@ public class ProcessDefinitionParser implements
     }
 
 
-    /**
-     * 替换成空启动事件
-     */
-    private void replaceNoneStartEvent(Element startEvent) {
-        Element parent = startEvent.getParent();
-
-        // 空启动事件
-        Element newE = DocumentHelper.createElement(BPMN_START_EVENT_QNAME);
-        newE.addAttribute(ID_ATTRIBUTE, startEvent.attributeValue(ID_ATTRIBUTE));
-        newE.addAttribute(NAME_ATTRIBUTE, startEvent.attributeValue(NAME_ATTRIBUTE));
-        newE.setParent(parent);
-
-        List<Node> content = parent.content();
-        content.set(content.indexOf(startEvent), newE);
-    }
-
-    private ObjectNode getRequestParams(Element startEvent) {
-        XPath path = DocumentHelper.createXPath(StrUtil.join(StringPool.SLASH,
-                BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
-                BRANDNEWDATA_REQUEST_MAPPING_QNAME.getQualifiedName()));
-        Element oldE = (Element) path.selectSingleNode(startEvent);
-        // 缺少监听配置
-        Assert.notNull(oldE, ErrorMessage.NOT_NULL("监听配置"));
-        return REQUEST_PARSER.parse(oldE);
-    }
-
-    private void replaceSceneGeneralStartEvent(Element startEvent) {
-        // 获取监听参数
-        requestParams = getRequestParams(startEvent);
-        String connectorId = trigger.getConnectorId();
-        protocol = TriggerProtocolConstant.getProtocolByConnectorId(connectorId);
-    }
-
-    private void replaceSceneCustomStartEvent(Element startEvent) {
-
-    }
 
     @Override
-    public ProcessDefinitionParseStep3 replaceSceneStartEvent() {
+    public ProcessDefinitionParseStep3 replaceSceneStartEvent(ConnectorManager manager) {
         XPath path = DocumentHelper.createXPath(StrUtil.join(StringPool.SLASH,
                 StringPool.SLASH,
                 BPMN_START_EVENT_QNAME.getQualifiedName(),
@@ -479,8 +514,7 @@ public class ProcessDefinitionParser implements
             replaceSceneGeneralStartEvent(startEvent);
         } else {
             // 自定义触发器
-
-
+            replaceSceneCustomStartEvent(startEvent, manager);
         }
 
         return this;
@@ -532,6 +566,17 @@ public class ProcessDefinitionParser implements
 
     @Override
     public TriggerProcessDefinition buildTriggerProcessDefinition() {
-        return null;
+        // 移除无用信息
+        removeUnusedNamespace();
+        // 打xml日志
+        logXML();
+        TriggerProcessDefinition ret = new TriggerProcessDefinition();
+        ret.setProcessId(processId);
+        ret.setName(name);
+        ret.setXml(documentStr);
+        ret.setProtocol(protocol);
+        ret.setTrigger(trigger);
+        ret.setRequestParams(requestParams);
+        return ret;
     }
 }
