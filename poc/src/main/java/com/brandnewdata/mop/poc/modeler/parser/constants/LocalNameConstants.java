@@ -30,13 +30,9 @@ public interface LocalNameConstants {
 
     String INPUT_LOCALNAME = "input";
 
-    String INPUTS_LOCALNAME = "inputs";
-
     String OUTPUT_LOCALNAME = "output";
 
     String REQUEST_LOCALNAME = "request";
-
-    String PROPERTIES_LOCALNAME = "properties";
 
     String INPUT_MAPPING_LOCALNAME = "inputMapping";
 

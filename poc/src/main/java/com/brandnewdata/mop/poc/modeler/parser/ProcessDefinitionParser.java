@@ -7,6 +7,7 @@ import com.brandnewdata.connector.api.IConnectorConfFeign;
 import com.brandnewdata.mop.poc.modeler.dto.ProcessDefinition;
 import com.brandnewdata.mop.poc.modeler.parser.constants.StringPool;
 import com.brandnewdata.mop.poc.parser.IOMap;
+import com.brandnewdata.mop.poc.service.ServiceUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.brandnewdata.mop.poc.modeler.parser.constants.AttributeConstants.*;
-import static com.brandnewdata.mop.poc.modeler.parser.constants.LocalNameConstants.INPUTS_LOCALNAME;
-import static com.brandnewdata.mop.poc.modeler.parser.constants.LocalNameConstants.PROPERTIES_LOCALNAME;
+import static com.brandnewdata.mop.poc.modeler.parser.constants.BusinessConstants.*;
 import static com.brandnewdata.mop.poc.modeler.parser.constants.NamespaceConstants.BPMN2_NAMESPACE;
 import static com.brandnewdata.mop.poc.modeler.parser.constants.NamespaceConstants.BPMN_NAMESPACE;
 import static com.brandnewdata.mop.poc.modeler.parser.constants.QNameConstants.*;
@@ -184,7 +184,7 @@ public class ProcessDefinitionParser implements
             Iterator<Map.Entry<String, JsonNode>> iterator = parameters.fields();
             while(iterator.hasNext()) {
                 Map.Entry<String, JsonNode> entry = iterator.next();
-                String target = StrUtil.format("{}.{}", INPUTS_LOCALNAME, entry.getKey());
+                String target = StrUtil.format("{}.{}", INPUTS_PREFIX, entry.getKey());
                 String source = StrUtil.format("{} {}", StringPool.EQUALS, entry.getValue());
                 Element newE = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
                 newE.addAttribute(TARGET_ATTRIBUTE, target);
@@ -225,6 +225,46 @@ public class ProcessDefinitionParser implements
             parent.remove(oldE);
         }
 
+    }
+
+    /**
+     * 将自定义连接器替换成 bpmn:callActivity
+     */
+    private void replaceCustomServiceTask() {
+        XPath path = DocumentHelper.createXPath(StrUtil.join(StringPool.SLASH,
+                StringPool.SLASH,
+                BPMN_SERVICE_TASK_QNAME.getQualifiedName(),
+                BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
+                ZEEBE_TASK_DEFINITION_QNAME.getQualifiedName()));
+
+        List<Node> nodes = path.selectNodes(document);
+        if(CollUtil.isEmpty(nodes)) {
+            return;
+        }
+
+        for (Node node : nodes) {
+            Element oldE = (Element) node;
+            String type = oldE.attributeValue(TYPE_ATTRIBUTE);
+            if(type.startsWith(BRANDNEWDATA_DOMAIN)) {
+               continue;
+            }
+
+            Element extensionElements = oldE.getParent();
+            Element serviceTask = extensionElements.getParent();
+
+            // 将 bpmn:serviceTask 替换成 bpmn:callActivity
+            serviceTask.setQName(BPMN_CALL_ACTIVITY_QNAME);
+
+            Element newE = DocumentHelper.createElement(ZEEBE_CALLED_ELEMENT_QNAME);
+            String processId = ServiceUtil.convertModelKey(type);
+            newE.addAttribute(PROCESS_ID_ATTRIBUTE, processId);
+            newE.addAttribute(PROPAGATE_ALL_CHILD_VARIABLES_ATTRIBUTE, StringPool.FALSE);
+            newE.setParent(extensionElements);
+
+            // 替换成 calledElement
+            List<Node> content = extensionElements.content();
+            content.set(content.indexOf(oldE), newE);
+        }
     }
 
     private void clearServiceTask() {
@@ -277,10 +317,11 @@ public class ProcessDefinitionParser implements
 
     @Override
     public ProcessDefinitionParseStep2 replaceStep1() {
+        clearServiceTask();
         replaceServiceTask();
         replaceServiceTaskInputMapping();
         replaceServiceTaskOutputMapping();
-        clearServiceTask();
+        replaceCustomServiceTask();
         return this;
     }
 
@@ -308,7 +349,7 @@ public class ProcessDefinitionParser implements
             String configs = configInfo.getConfigs();
             if(StrUtil.isNotBlank(configs)) {
                 Element newE = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
-                newE.addAttribute(TARGET_ATTRIBUTE, PROPERTIES_LOCALNAME);
+                newE.addAttribute(TARGET_ATTRIBUTE, PROPERTIES_PREFIX);
                 newE.addAttribute(SOURCE_ATTRIBUTE, StrUtil.format("{} {}", StringPool.EQUALS, configs));
                 newE.setParent(ioMapping);
                 ioMapping.content().add(newE);

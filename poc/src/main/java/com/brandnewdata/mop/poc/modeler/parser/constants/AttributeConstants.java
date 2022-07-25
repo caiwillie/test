@@ -20,5 +20,11 @@ public interface AttributeConstants {
 
     String CONFIG_ID_ATTRIBUTE = "configId";
 
+    String PROCESS_ID_ATTRIBUTE = "processId";
+
+    String PROPAGATE_ALL_CHILD_VARIABLES_ATTRIBUTE = "propagateAllChildVariables";
+
+    String IS_EXECUTABLE_ATTRIBUTE = "isExecutable";
+
 
 }
