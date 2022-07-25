@@ -41,8 +41,6 @@ public class ProcessDefinitionParser implements ProcessDefinitionParseStep1 {
     private void convertZeebe2Namespace() {
         XPath path = DocumentHelper.createXPath("*");
         Element element = document.getRootElement();
-
-
     }
 
 }
