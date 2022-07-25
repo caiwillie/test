@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class TriggerProcessDefinition extends ProcessDefinition {
 
-    private String triggerFullId;
+    private TriggerOrOperate trigger;
 
     private String protocol;
 

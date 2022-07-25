@@ -9,5 +9,5 @@ public interface ProcessDefinitionParseStep2 {
 
     ProcessDefinitionParseStep3 replaceConnectorStartEvent();
 
-    ProcessDefinitionParseStep3 replaceCustomStartEvent();
+    ProcessDefinitionParseStep3 replaceSceneStartEvent();
 }

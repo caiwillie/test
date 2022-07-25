@@ -7,6 +7,7 @@ import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.connector.api.IConnectorConfFeign;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.modeler.dto.ProcessDefinition;
+import com.brandnewdata.mop.poc.modeler.dto.TriggerOrOperate;
 import com.brandnewdata.mop.poc.modeler.dto.TriggerProcessDefinition;
 import com.brandnewdata.mop.poc.modeler.parser.constants.StringPool;
 import com.brandnewdata.mop.poc.parser.IOMap;
@@ -180,25 +181,29 @@ public class ProcessDefinitionParser implements
         }
         for (Node node : nodes) {
             Element oldE = (Element) node;
-            Element parent = oldE.getParent();
-            // 获取 zeebe:ioMapping
-            Element ioMapping = getIoMapping(parent);
-            ObjectNode parameters = INPUT_PARSER.parse(oldE);
-
-            Iterator<Map.Entry<String, JsonNode>> iterator = parameters.fields();
-            while(iterator.hasNext()) {
-                Map.Entry<String, JsonNode> entry = iterator.next();
-                String target = StrUtil.format("{}.{}", INPUTS_PREFIX, entry.getKey());
-                String source = StrUtil.format("{} {}", StringPool.EQUALS, entry.getValue());
-                Element newE = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
-                newE.addAttribute(TARGET_ATTRIBUTE, target);
-                newE.addAttribute(SOURCE_ATTRIBUTE, source);
-                newE.setParent(ioMapping);
-                ioMapping.content().add(newE);
-            }
-            // 移除 brandnewdata:inputMapping
-            parent.remove(oldE);
+            replaceBrandnewdataInputMapping(oldE);
         }
+    }
+
+    private void replaceBrandnewdataInputMapping(Element inputMapping) {
+        Element parent = inputMapping.getParent();
+        // 获取 zeebe:ioMapping
+        Element ioMapping = getIoMapping(parent);
+        ObjectNode parameters = INPUT_PARSER.parse(inputMapping);
+
+        Iterator<Map.Entry<String, JsonNode>> iterator = parameters.fields();
+        while(iterator.hasNext()) {
+            Map.Entry<String, JsonNode> entry = iterator.next();
+            String target = StrUtil.format("{}.{}", INPUTS_PREFIX, entry.getKey());
+            String source = StrUtil.format("{} {}", StringPool.EQUALS, entry.getValue());
+            Element newE = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
+            newE.addAttribute(TARGET_ATTRIBUTE, target);
+            newE.addAttribute(SOURCE_ATTRIBUTE, source);
+            newE.setParent(ioMapping);
+            ioMapping.content().add(newE);
+        }
+        // 移除 brandnewdata:inputMapping
+        parent.remove(inputMapping);
     }
 
     private void replaceServiceTaskOutputMapping() {
@@ -213,22 +218,25 @@ public class ProcessDefinitionParser implements
         }
         for (Node node : nodes) {
             Element oldE = (Element) node;
-            Element parent = oldE.getParent();
-            // 获取 zeebe:ioMapping
-            Element ioMapping = getIoMapping(parent);
-            ObjectNode parameters = INPUT_PARSER.parse(oldE);
-
-            List<IOMap> ioMapList = IO_MAP_PARSER.parse(parameters);
-            for (IOMap ioMap : ioMapList) {
-                Element newE = DocumentHelper.createElement(ZEEBE_OUTPUT_QNAME);
-                newE.addAttribute(TARGET_ATTRIBUTE, ioMap.getTarget());
-                newE.addAttribute(SOURCE_ATTRIBUTE, ioMap.getSource());
-                newE.setParent(ioMapping);
-                ioMapping.content().add(newE);
-            }
-            parent.remove(oldE);
+            replaceBrandnewdataOutputMapping(oldE);
         }
+    }
 
+    private void replaceBrandnewdataOutputMapping(Element outputMapping) {
+        Element parent = outputMapping.getParent();
+        // 获取 zeebe:ioMapping
+        Element ioMapping = getIoMapping(parent);
+        ObjectNode parameters = INPUT_PARSER.parse(outputMapping);
+
+        List<IOMap> ioMapList = IO_MAP_PARSER.parse(parameters);
+        for (IOMap ioMap : ioMapList) {
+            Element newE = DocumentHelper.createElement(ZEEBE_OUTPUT_QNAME);
+            newE.addAttribute(TARGET_ATTRIBUTE, ioMap.getTarget());
+            newE.addAttribute(SOURCE_ATTRIBUTE, ioMap.getSource());
+            newE.setParent(ioMapping);
+            ioMapping.content().add(newE);
+        }
+        parent.remove(outputMapping);
     }
 
     /**
@@ -249,7 +257,10 @@ public class ProcessDefinitionParser implements
         for (Node node : nodes) {
             Element oldE = (Element) node;
             String type = oldE.attributeValue(TYPE_ATTRIBUTE);
-            if(type.startsWith(BRANDNEWDATA_DOMAIN)) {
+            TriggerOrOperate triggerOrOperate = getTriggerOrOperate(type);
+
+            if(StrUtil.equalsAny(triggerOrOperate.getGroupId(), BRANDNEWDATA_DOMAIN)) {
+                // 通用连接器直接跳过
                continue;
             }
 
@@ -292,6 +303,31 @@ public class ProcessDefinitionParser implements
                 }
             }
         }
+    }
+
+    private TriggerOrOperate getTriggerOrOperate(String type) {
+        String[] arr = type.split(":");
+        Assert.isTrue(arr.length == 3, ErrorMessage.CHECK_ERROR("触发器或者连接器类型错误", type));
+        String groupId = arr[0];
+        Assert.notEmpty(groupId, ErrorMessage.NOT_NULL("开发者"));
+        String version = arr[2];
+        Assert.notEmpty(version, ErrorMessage.NOT_NULL("连接器版本"));
+
+        // 解析 连接器id.操作或触发器id
+        arr = arr[1].split(".");
+        Assert.isTrue(arr.length == 2, ErrorMessage.CHECK_ERROR("触发器或者连接器类型错误", type));
+        String connectorId = arr[0];
+        Assert.notEmpty(connectorId, ErrorMessage.NOT_NULL("连接器 id"));
+        String triggerOrOperateId = arr[1];
+        Assert.notEmpty(triggerOrOperateId, ErrorMessage.NOT_NULL("触发器 id"));
+
+        TriggerOrOperate ret = new TriggerOrOperate();
+        ret.setGroupId(groupId);
+        ret.setConnectorId(connectorId);
+        ret.setTriggerOrOperateId(triggerOrOperateId);
+        ret.setVersion(version);
+
+        return ret;
     }
 
     private Element getIoMapping(Element parent) {
@@ -347,7 +383,7 @@ public class ProcessDefinitionParser implements
                 BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
                 BRANDNEWDATA_TASK_DEFINITION_QNAME.getQualifiedName()));
         List<Node> nodes = path.selectNodes(document);
-        Assert.isTrue(CollUtil.size(nodes) == 1, ErrorMessage.CHECK_ERROR("有且只能有一个通用触发触发器"));
+        Assert.isTrue(CollUtil.size(nodes) == 1, ErrorMessage.CHECK_ERROR("有且只能有一个触发器", null));
 
         Element oldE = (Element) nodes.get(0).getParent().getParent();
         replaceNoneStartEvent(oldE);
@@ -361,7 +397,7 @@ public class ProcessDefinitionParser implements
                 StringPool.SLASH,
                 BPMN_START_EVENT_QNAME.getQualifiedName()));
         List<Node> nodes = path.selectNodes(document);
-        Assert.isTrue(CollUtil.size(nodes) == 1, ErrorMessage.CHECK_ERROR("有且只能有一个触发器"));
+        Assert.isTrue(CollUtil.size(nodes) == 1, ErrorMessage.CHECK_ERROR("有且只能有一个触发器", null));
 
         Element oldE = (Element) nodes.get(0);
         replaceNoneStartEvent(oldE);
@@ -386,9 +422,43 @@ public class ProcessDefinitionParser implements
         content.set(content.indexOf(startEvent), newE);
     }
 
+
+    private void replaceSceneGeneralStartEvent(Element startEvent, TriggerOrOperate triggerOrOperate) {
+
+    }
+
+    private void replaceSceneCustomeStartEvent(Element startEvent, TriggerOrOperate triggerOrOperate) {
+
+    }
+
     @Override
-    public ProcessDefinitionParseStep3 replaceCustomStartEvent() {
-        return null;
+    public ProcessDefinitionParseStep3 replaceSceneStartEvent() {
+        XPath path = DocumentHelper.createXPath(StrUtil.join(StringPool.SLASH,
+                StringPool.SLASH,
+                BPMN_START_EVENT_QNAME.getQualifiedName(),
+                BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
+                BRANDNEWDATA_TASK_DEFINITION_QNAME.getQualifiedName()));
+        List<Node> nodes = path.selectNodes(document);
+        Assert.isTrue(CollUtil.size(nodes) == 1, ErrorMessage.CHECK_ERROR("有且只能有一个触发器", null));
+
+        Element oldE = (Element) nodes.get(0);
+
+        String type = oldE.attributeValue(TYPE_ATTRIBUTE);
+
+        TriggerOrOperate triggerOrOperate = getTriggerOrOperate(type);
+
+        Element startEvent = oldE.getParent().getParent();
+
+        if(StrUtil.equals(triggerOrOperate.getGroupId(), BRANDNEWDATA_DOMAIN)) {
+            // 通用触发器
+
+        } else {
+            // 自定义触发器
+
+
+        }
+
+        return this;
     }
 
     @Override
