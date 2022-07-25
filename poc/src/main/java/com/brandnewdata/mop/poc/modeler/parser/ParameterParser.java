@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.parser;
+package com.brandnewdata.mop.poc.modeler.parser;
 
 import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.mop.poc.common.Constants;
@@ -10,8 +10,7 @@ import org.dom4j.Element;
 
 import java.util.List;
 
-public class ParametersParser {
-
+public class ParameterParser {
     /**
      * string
      * int
@@ -32,17 +31,17 @@ public class ParametersParser {
 
     public String qName;
 
-    private String nameAttribute;
+    private final String nameAttribute;
 
-    private String valueAttribute;
+    private final String valueAttribute;
 
-    private String labelAttribute;
+    private final String labelAttribute;
 
-    private String typeAttribute;
+    private final String typeAttribute;
 
-    private String innerTypeAttribute;
+    private final String innerTypeAttribute;
 
-    public ParametersParser(String qName,
+    public ParameterParser(String qName,
                             String nameAttribute,
                             String valueAttribute,
                             String labelAttribute,
@@ -75,6 +74,7 @@ public class ParametersParser {
         } else {
             String value = root.attributeValue(valueAttribute);
             if(StrUtil.isNotBlank(value)) {
+                // 基础类型直接放入的是 rawValue
                 ret = new RawValue(value);
             }
         }
@@ -88,18 +88,15 @@ public class ParametersParser {
             return null;
         }
 
-        boolean isEmpty = true;
         List<Element> elements = root.elements();
-        for (int i = 0; i < elements.size(); i++) {
-            Element element = elements.get(i);
-            if(!StrUtil.equals(element.getQualifiedName(), qName)) {
+        for (Element element : elements) {
+            if (!StrUtil.equals(element.getQualifiedName(), qName)) {
                 // 如果 qName 没匹配上，就直接跳过
                 continue;
             }
             String name = element.attributeValue(nameAttribute);
             Object value = parseEach(element);
-            if(value != null) {
-                if(isEmpty) isEmpty = false;
+            if (value != null) {
                 ret.putPOJO(name, value);
             }
         }
@@ -113,9 +110,8 @@ public class ParametersParser {
         }
 
         List<Element> elements = root.elements();
-        for (int i = 0; i < elements.size(); i++) {
-            Element element = elements.get(i);
-            if(!StrUtil.equals(element.getQualifiedName(), qName)) {
+        for (Element element : elements) {
+            if (!StrUtil.equals(element.getQualifiedName(), qName)) {
                 // 如果 qName 没匹配上，就直接跳过
                 continue;
             }
@@ -125,5 +121,4 @@ public class ParametersParser {
 
         return ret;
     }
-
 }

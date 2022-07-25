@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.poc.modeler.parser.constants;
 
+import cn.hutool.core.util.StrUtil;
 import org.dom4j.DocumentHelper;
 import org.dom4j.QName;
 
@@ -8,8 +9,10 @@ import static com.brandnewdata.mop.poc.modeler.parser.constants.NamespaceConstan
 
 public interface QNameConstants {
 
-    // bpmn 相关的 qname
+    // bpmn2
+    String BPMN2_ALL_QNAME = StrUtil.format("{}:*", BPMN2_NAMESPACE);
 
+    // bpmn
     QName BPMN_DEFINITIONS_QNAME = DocumentHelper.createQName(DEFINITIONS_LOCALNAME, BPMN_NAMESPACE);
 
     QName BPMN_PROCESS_QNAME = DocumentHelper.createQName(PROCESS_LOCALNAME, BPMN_NAMESPACE);
@@ -34,7 +37,7 @@ public interface QNameConstants {
 
     QName BPMN_MESSAGE_EVENT_DEFINITION_QNAME = DocumentHelper.createQName(MESSAGE_EVENT_DEFINITION_LOCALNAME, BPMN_NAMESPACE);
 
-    // Brandnewdata 相关的 qname
+    // brandnewdata
 
     QName BRANDNEWDATA_TASK_DEFINITION_QNAME = DocumentHelper.createQName(TASK_DEFINITION_LOCALNAME, BRANDNEWDATA_NAMESPACE);
 
@@ -50,7 +53,7 @@ public interface QNameConstants {
 
     QName BRANDNEWDATA_REQUEST_QNAME = DocumentHelper.createQName(REQUEST_LOCALNAME, BRANDNEWDATA_NAMESPACE);
 
-    // zeebe 相关的 qname
+    // zeebe
 
     QName ZEEBE_TASK_DEFINITION_QNAME = DocumentHelper.createQName(TASK_DEFINITION_LOCALNAME, ZEEBE_NAMESPACE);
 

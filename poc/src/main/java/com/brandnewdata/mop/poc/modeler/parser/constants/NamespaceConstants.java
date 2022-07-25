@@ -6,6 +6,8 @@ import org.dom4j.Namespace;
 
 public interface NamespaceConstants {
 
+    String BPMN2_NAMESPACE = "bpmn2";
+
     Namespace BPMN_NAMESPACE = DocumentHelper.createNamespace("bpmn",
             "http://www.omg.org/spec/BPMN/20100524/MODEL");
 
