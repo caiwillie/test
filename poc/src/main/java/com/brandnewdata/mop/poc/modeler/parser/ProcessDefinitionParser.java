@@ -3,6 +3,7 @@ package com.brandnewdata.mop.poc.modeler.parser;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FastStringWriter;
 import cn.hutool.core.util.StrUtil;
+import com.brandnewdata.connector.api.IConnectorConfFeign;
 import com.brandnewdata.mop.poc.modeler.dto.ProcessDefinition;
 import com.brandnewdata.mop.poc.modeler.parser.constants.StringPool;
 import com.brandnewdata.mop.poc.parser.IOMap;
@@ -22,6 +23,7 @@ import java.util.Map;
 
 import static com.brandnewdata.mop.poc.modeler.parser.constants.AttributeConstants.*;
 import static com.brandnewdata.mop.poc.modeler.parser.constants.LocalNameConstants.INPUTS_LOCALNAME;
+import static com.brandnewdata.mop.poc.modeler.parser.constants.LocalNameConstants.PROPERTIES_LOCALNAME;
 import static com.brandnewdata.mop.poc.modeler.parser.constants.NamespaceConstants.BPMN2_NAMESPACE;
 import static com.brandnewdata.mop.poc.modeler.parser.constants.NamespaceConstants.BPMN_NAMESPACE;
 import static com.brandnewdata.mop.poc.modeler.parser.constants.QNameConstants.*;
@@ -162,7 +164,7 @@ public class ProcessDefinitionParser implements
         }
     }
 
-    private void replaceInputMapping() {
+    private void replaceServiceTaskInputMapping() {
         XPath path = DocumentHelper.createXPath(StrUtil.join(StringPool.SLASH,
                 StringPool.SLASH,
                 BPMN_SERVICE_TASK_QNAME.getQualifiedName(),
@@ -195,7 +197,7 @@ public class ProcessDefinitionParser implements
         }
     }
 
-    private void replaceOutputMapping() {
+    private void replaceServiceTaskOutputMapping() {
         XPath path = DocumentHelper.createXPath(StrUtil.join(StringPool.SLASH,
                 StringPool.SLASH,
                 BPMN_SERVICE_TASK_QNAME.getQualifiedName(),
@@ -225,6 +227,29 @@ public class ProcessDefinitionParser implements
 
     }
 
+    private void clearServiceTask() {
+        XPath path = DocumentHelper.createXPath(StrUtil.join(StringPool.SLASH,
+                StringPool.SLASH,
+                BPMN_SERVICE_TASK_QNAME.getQualifiedName()));
+
+        List<Node> nodes = path.selectNodes(document);
+        if(CollUtil.isEmpty(nodes)) {
+            return;
+        }
+
+        for (Node node : nodes) {
+            Element oldE = (Element) node;
+            Iterator<Attribute> iterator = oldE.attributeIterator();
+            // 删除 id, name 之外的其他属性
+            while(iterator.hasNext()) {
+                Attribute attribute = iterator.next();
+                if(!StrUtil.equalsAny(attribute.getName(), ID_ATTRIBUTE, NAME_ATTRIBUTE)) {
+                    iterator.remove();
+                }
+            }
+        }
+    }
+
     private Element getIoMapping(Element parent) {
         Element ioMapping = (Element) parent.selectSingleNode(ZEEBE_IO_MAPPING_QNAME.getQualifiedName());
 
@@ -251,9 +276,46 @@ public class ProcessDefinitionParser implements
     }
 
     @Override
-    public ProcessDefinitionParseStep2 parseStep1() {
+    public ProcessDefinitionParseStep2 replaceStep1() {
         replaceServiceTask();
-        replaceInputMapping();
+        replaceServiceTaskInputMapping();
+        replaceServiceTaskOutputMapping();
+        clearServiceTask();
+        return this;
+    }
+
+    @Override
+    public ProcessDefinitionParseStep2 replaceProperties(IConnectorConfFeign client) {
+        XPath path = DocumentHelper.createXPath(StrUtil.join(StringPool.SLASH,
+                StringPool.SLASH,
+                BPMN_SERVICE_TASK_QNAME.getQualifiedName(),
+                BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
+                BRANDNEWDATA_TASK_DEFINITION_QNAME.getQualifiedName()));
+        List<Node> nodes = path.selectNodes(document);
+        if(CollUtil.isEmpty(nodes)) {
+            return this;
+        }
+
+        for (Node node : nodes) {
+            Element oldE = (Element) node;
+            Element parent = oldE.getParent();
+            Element ioMapping = getIoMapping(parent);
+            String configId = oldE.attributeValue(CONFIG_ID_ATTRIBUTE);
+            if(StrUtil.isBlank(configId)) {
+                continue;
+            }
+            IConnectorConfFeign.ConnectorConfDTO configInfo = client.getConfigInfo(Long.parseLong(configId));
+            String configs = configInfo.getConfigs();
+            if(StrUtil.isNotBlank(configs)) {
+                Element newE = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
+                newE.addAttribute(TARGET_ATTRIBUTE, PROPERTIES_LOCALNAME);
+                newE.addAttribute(SOURCE_ATTRIBUTE, StrUtil.format("{} {}", StringPool.EQUALS, configs));
+                newE.setParent(ioMapping);
+                ioMapping.content().add(newE);
+            }
+        }
+
+        // 这里不需要删除 brandnewdata:taskDefinition
         return this;
     }
 }

@@ -36,6 +36,8 @@ public interface LocalNameConstants {
 
     String REQUEST_LOCALNAME = "request";
 
+    String PROPERTIES_LOCALNAME = "properties";
+
     String INPUT_MAPPING_LOCALNAME = "inputMapping";
 
     String OUTPUT_MAPPING_LOCALNAME = "outputMapping";

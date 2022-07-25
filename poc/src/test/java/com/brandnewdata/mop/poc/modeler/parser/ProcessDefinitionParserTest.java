@@ -33,7 +33,7 @@ class ProcessDefinitionParserTest {
         processDefinition.setName(null);
         processDefinition.setXml(xml);
         ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(processDefinition);
-        ProcessDefinitionParseStep2 step2 = step1.parseStep1();
+        ProcessDefinitionParseStep2 step2 = step1.replaceStep1();
         step2.build();
     }
 }

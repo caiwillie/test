@@ -18,5 +18,7 @@ public interface AttributeConstants {
 
     String TARGET_ATTRIBUTE = "target";
 
+    String CONFIG_ID_ATTRIBUTE = "configId";
+
 
 }
