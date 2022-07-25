@@ -4,5 +4,4 @@ import com.brandnewdata.mop.poc.modeler.dto.ProcessDefinition;
 
 public interface FinalStep {
 
-    ProcessDefinition build();
 }

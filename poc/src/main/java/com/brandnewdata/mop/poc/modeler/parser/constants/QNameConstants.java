@@ -10,7 +10,7 @@ import static com.brandnewdata.mop.poc.modeler.parser.constants.NamespaceConstan
 public interface QNameConstants {
 
     // bpmn2
-    String BPMN2_ALL_QNAME = StrUtil.format("{}:*", BPMN2_NAMESPACE);
+    String BPMN2_ALL_QNAME = StrUtil.format("{}:*", BPMN2_NAMESPACE_PRIFIX);
 
     // bpmn
     QName BPMN_DEFINITIONS_QNAME = DocumentHelper.createQName(DEFINITIONS_LOCALNAME, BPMN_NAMESPACE);

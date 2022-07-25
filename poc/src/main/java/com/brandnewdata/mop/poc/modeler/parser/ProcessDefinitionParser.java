@@ -2,9 +2,12 @@ package com.brandnewdata.mop.poc.modeler.parser;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FastStringWriter;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.connector.api.IConnectorConfFeign;
+import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.modeler.dto.ProcessDefinition;
+import com.brandnewdata.mop.poc.modeler.dto.TriggerProcessDefinition;
 import com.brandnewdata.mop.poc.modeler.parser.constants.StringPool;
 import com.brandnewdata.mop.poc.parser.IOMap;
 import com.brandnewdata.mop.poc.service.ServiceUtil;
@@ -24,13 +27,12 @@ import java.util.Map;
 
 import static com.brandnewdata.mop.poc.modeler.parser.constants.AttributeConstants.*;
 import static com.brandnewdata.mop.poc.modeler.parser.constants.BusinessConstants.*;
-import static com.brandnewdata.mop.poc.modeler.parser.constants.NamespaceConstants.BPMN2_NAMESPACE;
-import static com.brandnewdata.mop.poc.modeler.parser.constants.NamespaceConstants.BPMN_NAMESPACE;
+import static com.brandnewdata.mop.poc.modeler.parser.constants.NamespaceConstants.*;
 import static com.brandnewdata.mop.poc.modeler.parser.constants.QNameConstants.*;
 
 @Slf4j
 public class ProcessDefinitionParser implements
-        ProcessDefinitionParseStep1, ProcessDefinitionParseStep2 {
+        ProcessDefinitionParseStep1, ProcessDefinitionParseStep2, ProcessDefinitionParseStep3 {
     private String oldDocument;
 
     private String processId;
@@ -38,6 +40,8 @@ public class ProcessDefinitionParser implements
     private String name;
 
     private Document document;
+
+    private String documentStr;
 
     private static final ParameterParser INPUT_PARSER = new ParameterParser(
             BRANDNEWDATA_INPUT_QNAME.getQualifiedName(),
@@ -97,7 +101,7 @@ public class ProcessDefinitionParser implements
         }
         Element root = document.getRootElement();
         root.add(BPMN_NAMESPACE);
-        Namespace bpmn2 = root.getNamespaceForPrefix(BPMN2_NAMESPACE);
+        Namespace bpmn2 = root.getNamespaceForPrefix(BPMN2_NAMESPACE_PRIFIX);
         if(bpmn2 != null) {
             root.remove(bpmn2);
         }
@@ -301,18 +305,90 @@ public class ProcessDefinitionParser implements
         return ioMapping;
     }
 
-    @Override
-    public ProcessDefinition build() {
-        String current = serialize(document);
+
+    private void logXML() {
+        documentStr = serialize(document);
         String TEMPLATE =
                 "\n======================= 转换前 xml =======================\n {}" +
                         "\n======================= 转换后 xml =======================\n {}";
-        log.info(StrUtil.format(TEMPLATE, oldDocument, current));
+        log.info(StrUtil.format(TEMPLATE, oldDocument, documentStr));
+    }
+
+    private void removeUnusedNamespace() {
+        Element root = document.getRootElement();
+        List<Namespace> namespaces = root.declaredNamespaces();
+        for (Namespace namespace : namespaces) {
+            if(StrUtil.equalsAny(namespace.getPrefix(), DI_NAMESPACE_PRIFIX, DC_NAMESPACE_PRIFIX,
+                    BPMNDI_NAMESPACE_PRIFIX, ZEEBE_NAMESPACE.getPrefix(), BPMN_NAMESPACE.getPrefix())) {
+                continue;
+            }
+            root.remove(namespace);
+        }
+    }
+
+    @Override
+    public ProcessDefinition buildProcessDefinition() {
+        // 移除无用信息
+        removeUnusedNamespace();
+        // 打xml日志
+        logXML();
         ProcessDefinition ret = new ProcessDefinition();
         ret.setProcessId(processId);
         ret.setName(name);
-        ret.setXml(current);
+        ret.setXml(documentStr);
         return ret;
+    }
+
+    @Override
+    public ProcessDefinitionParseStep3 replaceTriggerStartEvent() {
+        XPath path = DocumentHelper.createXPath(StrUtil.join(StringPool.SLASH,
+                StringPool.SLASH,
+                BPMN_START_EVENT_QNAME.getQualifiedName(),
+                BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
+                BRANDNEWDATA_TASK_DEFINITION_QNAME.getQualifiedName()));
+        List<Node> nodes = path.selectNodes(document);
+        Assert.isTrue(CollUtil.size(nodes) == 1, ErrorMessage.CHECK_ERROR("有且只能有一个通用触发触发器"));
+
+        Element oldE = (Element) nodes.get(0).getParent().getParent();
+        replaceNoneStartEvent(oldE);
+
+        return this;
+    }
+
+    @Override
+    public ProcessDefinitionParseStep3 replaceConnectorStartEvent() {
+        XPath path = DocumentHelper.createXPath(StrUtil.join(StringPool.SLASH,
+                StringPool.SLASH,
+                BPMN_START_EVENT_QNAME.getQualifiedName()));
+        List<Node> nodes = path.selectNodes(document);
+        Assert.isTrue(CollUtil.size(nodes) == 1, ErrorMessage.CHECK_ERROR("有且只能有一个触发器"));
+
+        Element oldE = (Element) nodes.get(0);
+        replaceNoneStartEvent(oldE);
+
+        return this;
+    }
+
+
+    /**
+     * 替换成空启动事件
+     */
+    private void replaceNoneStartEvent(Element startEvent) {
+        Element parent = startEvent.getParent();
+
+        // 空启动事件
+        Element newE = DocumentHelper.createElement(BPMN_START_EVENT_QNAME);
+        newE.addAttribute(ID_ATTRIBUTE, startEvent.attributeValue(ID_ATTRIBUTE));
+        newE.addAttribute(NAME_ATTRIBUTE, startEvent.attributeValue(NAME_ATTRIBUTE));
+        newE.setParent(parent);
+
+        List<Node> content = parent.content();
+        content.set(content.indexOf(startEvent), newE);
+    }
+
+    @Override
+    public ProcessDefinitionParseStep3 replaceCustomStartEvent() {
+        return null;
     }
 
     @Override
@@ -358,5 +434,10 @@ public class ProcessDefinitionParser implements
 
         // 这里不需要删除 brandnewdata:taskDefinition
         return this;
+    }
+
+    @Override
+    public TriggerProcessDefinition buildTriggerProcessDefinition() {
+        return null;
     }
 }

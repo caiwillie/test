@@ -1,4 +1,13 @@
 package com.brandnewdata.mop.poc.modeler.parser;
 
-public interface ProcessDefinitionParseStep2 extends FinalStep{
+import com.brandnewdata.mop.poc.modeler.dto.ProcessDefinition;
+
+public interface ProcessDefinitionParseStep2 {
+
+    ProcessDefinition buildProcessDefinition();
+    ProcessDefinitionParseStep3 replaceTriggerStartEvent();
+
+    ProcessDefinitionParseStep3 replaceConnectorStartEvent();
+
+    ProcessDefinitionParseStep3 replaceCustomStartEvent();
 }

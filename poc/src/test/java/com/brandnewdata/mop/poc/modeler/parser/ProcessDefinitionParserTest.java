@@ -21,7 +21,7 @@ class ProcessDefinitionParserTest {
         processDefinition.setName(null);
         processDefinition.setXml(xml);
         ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(processDefinition);
-        step1.build();
+        step1.buildProcessDefinition();
         // Assertions.assertEquals(null, result);
     }
 
@@ -34,7 +34,7 @@ class ProcessDefinitionParserTest {
         processDefinition.setXml(xml);
         ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(processDefinition);
         ProcessDefinitionParseStep2 step2 = step1.replaceStep1();
-        step2.build();
+        step2.buildProcessDefinition();
     }
 }
 
