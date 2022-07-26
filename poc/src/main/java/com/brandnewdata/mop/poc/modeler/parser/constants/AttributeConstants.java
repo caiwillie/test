@@ -26,5 +26,14 @@ public interface AttributeConstants {
 
     String IS_EXECUTABLE_ATTRIBUTE = "isExecutable";
 
+    String SOURCE_REF_ATTRIBUTE = "sourceRef";
+
+    String TARGET_REF_ATTRIBUTE = "targetRef";
+
+    String MESSAGE_REF_ATTRIBUTE = "messageRef";
+
+    String BPMN_ELEMENT = "bpmnElement";
+
+
 
 }

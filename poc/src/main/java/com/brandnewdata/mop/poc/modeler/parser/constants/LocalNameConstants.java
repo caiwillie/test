@@ -44,5 +44,7 @@ public interface LocalNameConstants {
 
     String CALLED_ELEMENT_LOCALNAME = "calledElement";
 
+    String BPMN_SHAPE_LOCALNAME = "BPMNShape";
+
 
 }

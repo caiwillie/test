@@ -13,17 +13,36 @@ public class ElementCreator {
 
     private static String ACTIVITY_TEMPLATE = "Activity_{}";
 
-    public static Element createBpmnSequenceFlow() {
+    private static String EVENT_TEMPLATE = "Event_{}";
+
+    public static Element createBpSequenceFlow() {
         Element e = DocumentHelper.createElement(QNameConstants.BPMN_SEQUENCE_FLOW_QNAME);
-        e.addAttribute(AttributeConstants.ID_ATTRIBUTE, generateId(FLOW_TEMPLATE));
+        e.addAttribute(AttributeConstants.ID_ATTRIBUTE, generateFlowId());
         return e;
     }
 
-
-    public static Element createCallActivity() {
+    public static Element createBpCallActivity() {
         Element e = DocumentHelper.createElement(QNameConstants.BPMN_CALL_ACTIVITY_QNAME);
-        e.addAttribute(AttributeConstants.ID_ATTRIBUTE, generateId(ACTIVITY_TEMPLATE));
+        e.addAttribute(AttributeConstants.ID_ATTRIBUTE, generateActivityId());
         return e;
+    }
+
+    public static Element createBpStartEvent() {
+        Element e = DocumentHelper.createElement(QNameConstants.BPMN_START_EVENT_QNAME);
+        e.addAttribute(AttributeConstants.ID_ATTRIBUTE, generateEventId());
+        return e;
+    }
+
+    public static String generateFlowId() {
+        return generateId(FLOW_TEMPLATE);
+    }
+
+    public static String generateActivityId() {
+        return generateId(ACTIVITY_TEMPLATE);
+    }
+
+    public static String generateEventId() {
+        return generateId(EVENT_TEMPLATE);
     }
 
     private static String randomString() {
@@ -33,5 +52,6 @@ public class ElementCreator {
     private static String generateId(String template) {
         return StrUtil.format(template, randomString());
     }
+
 
 }

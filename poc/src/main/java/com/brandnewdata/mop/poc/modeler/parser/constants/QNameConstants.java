@@ -37,8 +37,11 @@ public interface QNameConstants {
 
     QName BPMN_MESSAGE_EVENT_DEFINITION_QNAME = DocumentHelper.createQName(MESSAGE_EVENT_DEFINITION_LOCALNAME, BPMN_NAMESPACE);
 
-    // brandnewdata
 
+    // bpmndi
+    QName BPMNDI_BPMN_SHAPE_QNAME = DocumentHelper.createQName(BPMN_SHAPE_LOCALNAME, BPMNDI_NAMESPACE);
+
+    // brandnewdata
     QName BRANDNEWDATA_TASK_DEFINITION_QNAME = DocumentHelper.createQName(TASK_DEFINITION_LOCALNAME, BRANDNEWDATA_NAMESPACE);
 
     QName BRANDNEWDATA_INPUT_QNAME = DocumentHelper.createQName(INPUT_LOCALNAME, BRANDNEWDATA_NAMESPACE);

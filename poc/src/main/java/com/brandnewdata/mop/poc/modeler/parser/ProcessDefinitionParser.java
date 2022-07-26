@@ -6,6 +6,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.common.constant.TriggerProtocolConstant;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
+import com.brandnewdata.mop.poc.modeler.dto.BndStartEvent;
 import com.brandnewdata.mop.poc.modeler.dto.ProcessDefinition;
 import com.brandnewdata.mop.poc.modeler.dto.TriggerOrOperate;
 import com.brandnewdata.mop.poc.modeler.dto.TriggerProcessDefinition;
@@ -169,14 +170,19 @@ public class ProcessDefinitionParser implements
         for (Node node : nodes) {
             // 替换 brandnewdata:taskDefinition
             Element oldE = (Element) node;
-            Element parent = oldE.getParent();
-            List<Node> content = parent.content();
-            int index = content.indexOf(oldE);
-            Element newE = DocumentHelper.createElement(ZEEBE_TASK_DEFINITION_QNAME);
-            newE.addAttribute(TYPE_ATTRIBUTE, oldE.attributeValue(TYPE_ATTRIBUTE));
-            newE.setParent(parent);
-            content.set(index, newE);
+            replaceBndTaskDefinitionToZbTaskDefinition(oldE);
         }
+    }
+
+    private Element replaceBndTaskDefinitionToZbTaskDefinition(Element taskDefinition) {
+        Element parent = taskDefinition.getParent();
+        List<Node> content = parent.content();
+        Element newE = DocumentHelper.createElement(ZEEBE_TASK_DEFINITION_QNAME);
+        newE.addAttribute(TYPE_ATTRIBUTE, taskDefinition.attributeValue(TYPE_ATTRIBUTE));
+        newE.setParent(parent);
+        // 将 brandnewdata:taskDefinition替换成 zeebe:taskDefinition
+        content.set(content.indexOf(taskDefinition), newE);
+        return newE;
     }
 
     private void replaceServiceTaskInputMapping() {
@@ -191,15 +197,15 @@ public class ProcessDefinitionParser implements
         }
         for (Node node : nodes) {
             Element oldE = (Element) node;
-            replaceBrandnewdataInputMapping(oldE);
+            replaceBndInputMappingToZbIoMapping(oldE);
         }
     }
 
-    private void replaceBrandnewdataInputMapping(Element inputMapping) {
-        if(inputMapping == null) return;
+    private ObjectNode replaceBndInputMappingToZbIoMapping(Element inputMapping) {
+        if(inputMapping == null) return null;
         Element parent = inputMapping.getParent();
         // 获取 zeebe:ioMapping
-        Element ioMapping = getIoMapping(parent);
+        Element ioMapping = getZbIoMapping(parent);
         ObjectNode parameters = INPUT_PARSER.parse(inputMapping);
 
         Iterator<Map.Entry<String, JsonNode>> iterator = parameters.fields();
@@ -215,6 +221,7 @@ public class ProcessDefinitionParser implements
         }
         // 移除 brandnewdata:inputMapping
         parent.remove(inputMapping);
+        return parameters;
     }
 
     private void replaceServiceTaskOutputMapping() {
@@ -229,15 +236,15 @@ public class ProcessDefinitionParser implements
         }
         for (Node node : nodes) {
             Element oldE = (Element) node;
-            replaceBrandnewdataOutputMapping(oldE);
+            replaceBndOutputMappingToZbIoMapping(oldE);
         }
     }
 
-    private void replaceBrandnewdataOutputMapping(Element outputMapping) {
-        if(outputMapping == null) return;
+    private ObjectNode replaceBndOutputMappingToZbIoMapping(Element outputMapping) {
+        if(outputMapping == null) return null;
         Element parent = outputMapping.getParent();
         // 获取 zeebe:ioMapping
-        Element ioMapping = getIoMapping(parent);
+        Element ioMapping = getZbIoMapping(parent);
         ObjectNode parameters = OUTPUT_PARSER.parse(outputMapping);
 
         List<IOMap> ioMapList = IO_MAP_PARSER.parse(parameters);
@@ -249,6 +256,7 @@ public class ProcessDefinitionParser implements
             ioMapping.content().add(newE);
         }
         parent.remove(outputMapping);
+        return parameters;
     }
 
     /**
@@ -276,22 +284,29 @@ public class ProcessDefinitionParser implements
                continue;
             }
 
-            Element extensionElements = oldE.getParent();
-            Element serviceTask = extensionElements.getParent();
+            Element serviceTask = oldE.getParent().getParent();
 
             // 将 bpmn:serviceTask 替换成 bpmn:callActivity
             serviceTask.setQName(BPMN_CALL_ACTIVITY_QNAME);
 
-            Element newE = DocumentHelper.createElement(ZEEBE_CALLED_ELEMENT_QNAME);
-            String processId = ServiceUtil.convertModelKey(type);
-            newE.addAttribute(PROCESS_ID_ATTRIBUTE, processId);
-            newE.addAttribute(PROPAGATE_ALL_CHILD_VARIABLES_ATTRIBUTE, StringPool.FALSE);
-            newE.setParent(extensionElements);
-
-            // 替换成 calledElement
-            List<Node> content = extensionElements.content();
-            content.set(content.indexOf(oldE), newE);
+            // 将 zeebe:taskDefinition 替换成 zeebe:calledElement
+            replaceZbTaskDefinitionToCalledElement(oldE);
         }
+    }
+
+    private void replaceZbTaskDefinitionToCalledElement(Element taskDefinition) {
+        String type = taskDefinition.attributeValue(TYPE_ATTRIBUTE);
+        Element parent = taskDefinition.getParent();
+        // 创建 called element
+        Element newE = DocumentHelper.createElement(ZEEBE_CALLED_ELEMENT_QNAME);
+        // 替换特殊字符
+        String processId = ServiceUtil.convertModelKey(type);
+        newE.addAttribute(PROCESS_ID_ATTRIBUTE, processId);
+        newE.addAttribute(PROPAGATE_ALL_CHILD_VARIABLES_ATTRIBUTE, StringPool.FALSE);
+        newE.setParent(parent);
+        // 替换成 calledElement
+        List<Node> content = parent.content();
+        content.set(content.indexOf(taskDefinition), newE);
     }
 
     private void clearServiceTask() {
@@ -306,13 +321,23 @@ public class ProcessDefinitionParser implements
 
         for (Node node : nodes) {
             Element oldE = (Element) node;
-            Iterator<Attribute> iterator = oldE.attributeIterator();
-            // 删除 id, name 之外的其他属性
-            while(iterator.hasNext()) {
-                Attribute attribute = iterator.next();
-                if(!StrUtil.equalsAny(attribute.getName(), ID_ATTRIBUTE, NAME_ATTRIBUTE)) {
-                    iterator.remove();
-                }
+            clearAttribute(oldE, ID_ATTRIBUTE, NAME_ATTRIBUTE);
+        }
+    }
+
+    /**
+     * 清除多余属性
+     *
+     * @param e 元素
+     * @param attributes 保留属性列表
+     */
+    private void clearAttribute(Element e, String... attributes) {
+        Iterator<Attribute> iterator = e.attributeIterator();
+        // 删除 id, name 之外的其他属性
+        while(iterator.hasNext()) {
+            Attribute attribute = iterator.next();
+            if(!StrUtil.equalsAny(attribute.getName(), attributes)) {
+                iterator.remove();
             }
         }
     }
@@ -342,7 +367,7 @@ public class ProcessDefinitionParser implements
         return ret;
     }
 
-    private Element getIoMapping(Element parent) {
+    private Element getZbIoMapping(Element parent) {
         Element ioMapping = (Element) parent.selectSingleNode(ZEEBE_IO_MAPPING_QNAME.getQualifiedName());
 
         if(ioMapping == null) {
@@ -366,7 +391,7 @@ public class ProcessDefinitionParser implements
         List<Namespace> namespaces = root.declaredNamespaces();
         for (Namespace namespace : namespaces) {
             if(StrUtil.equalsAny(namespace.getPrefix(), DI_NAMESPACE_PRIFIX, DC_NAMESPACE_PRIFIX,
-                    BPMNDI_NAMESPACE_PRIFIX, ZEEBE_NAMESPACE.getPrefix(), BPMN_NAMESPACE.getPrefix())) {
+                    BPMNDI_NAMESPACE.getPrefix(), ZEEBE_NAMESPACE.getPrefix(), BPMN_NAMESPACE.getPrefix())) {
                 continue;
             }
             root.remove(namespace);
@@ -399,14 +424,26 @@ public class ProcessDefinitionParser implements
         return REQUEST_PARSER.parse(oldE);
     }
 
-    private void replaceSceneGeneralStartEvent(Element startEvent) {
-        // 获取监听参数
-        requestParams = getRequestParams(startEvent);
+    private void replaceSceneGeneralStartEventToNoneStartEvent(Element bndTaskDefinition) {
+        // 获取监听参数, 获取 startEvent
+        Element oldE = bndTaskDefinition.getParent().getParent();
+        requestParams = getRequestParams(oldE);
         String connectorId = trigger.getConnectorId();
         protocol = TriggerProtocolConstant.getProtocolByConnectorId(connectorId);
+
+        Element parent = oldE.getParent();
+
+        // 替换成 none start event
+        Element newE = ElementCreator.createBpStartEvent();
+        newE.setParent(parent);
+        newE.addAttribute(ID_ATTRIBUTE, oldE.attributeValue(ID_ATTRIBUTE));
+        newE.addAttribute(NAME_ATTRIBUTE, oldE.attributeValue(NAME_ATTRIBUTE));
+        List<Node> content = parent.content();
+        // 替换成 none startEvent
+        content.set(content.indexOf(oldE), newE);
     }
 
-    private void replaceSceneCustomStartEvent(Element startEvent, ConnectorManager manager) {
+    private void replaceSceneCustomStartEventToNoneStartEvent(Element bndTaskDefinition, ConnectorManager manager) {
         String xml = manager.getTriggerXML(trigger);
 
         // 解析自定义触发器内的通用触发器
@@ -420,27 +457,64 @@ public class ProcessDefinitionParser implements
         protocol = triggerProcessDefinition.getProtocol();
         requestParams = triggerProcessDefinition.getRequestParams();
 
+        // 替换成 call activity
+        BndStartEvent bndStartEvent = replaceBndStartEventToCallActivity(bndTaskDefinition);
+
+
+    }
+
+    private BndStartEvent replaceBndStartEventToCallActivity(Element bndTaskDefinition) {
+        Element startEvent = bndTaskDefinition.getParent().getParent();
+
         Element inputMapping = (Element) startEvent.selectSingleNode(StrUtil.join(StringPool.SLASH,
                 BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
                 BRANDNEWDATA_INPUT_MAPPING_QNAME.getQualifiedName()));
-        replaceBrandnewdataInputMapping(inputMapping);
+        ObjectNode inputs = replaceBndInputMappingToZbIoMapping(inputMapping);
 
         Element outputMapping = (Element) startEvent.selectSingleNode(StrUtil.join(StringPool.SLASH,
                 BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
                 BRANDNEWDATA_OUTPUT_MAPPING_QNAME.getQualifiedName()));
-        replaceBrandnewdataInputMapping(outputMapping);
+        replaceBndOutputMappingToZbIoMapping(outputMapping);
 
-        Element ioMapping = null;
-        if(inputMapping != null || outputMapping != null) {
-            // 二者取其一
-            Element parent = inputMapping != null ? inputMapping.getParent() : outputMapping.getParent();
-            ioMapping = getIoMapping(parent);
+        Element zbTaskDefinition = replaceBndTaskDefinitionToZbTaskDefinition(bndTaskDefinition);
+
+        // 将 zeebe:taskDefinition 替换成 zeebe:calledElement
+        replaceZbTaskDefinitionToCalledElement(zbTaskDefinition);
+
+        // 清除多余属性
+        clearAttribute(startEvent, ID_ATTRIBUTE, NAME_ATTRIBUTE);
+
+        String oldId = startEvent.attributeValue(ID_ATTRIBUTE);
+        String newId = ElementCreator.generateActivityId();
+
+        // 修改 startEvent 的 qName
+        startEvent.setQName(BPMN_CALL_ACTIVITY_QNAME);
+        // 替换成新 id
+        startEvent.addAttribute(ID_ATTRIBUTE, newId);
+
+        // 替换 sequence 的属性 source ref
+        XPath sequencePath = DocumentHelper.createXPath(StrUtil.format("//{}[@{}='{}']",
+                BPMN_SEQUENCE_FLOW_QNAME.getQualifiedName(), SOURCE_REF_ATTRIBUTE, oldId));
+        List<Node> nodes = sequencePath.selectNodes(document);
+        if(CollUtil.isNotEmpty(nodes)) {
+            for (Node node : nodes) {
+                Element sequence = (Element) node;
+                sequence.addAttribute(SOURCE_REF_ATTRIBUTE, newId);
+            }
         }
 
-    }
+        // 替换 bpmndi:BPMNShape
+        XPath shapePath = DocumentHelper.createXPath(StrUtil.format("//{}[@{}='{}']",
+                BPMNDI_BPMN_SHAPE_QNAME.getQualifiedName(), BPMN_ELEMENT, oldId));
+        Element shape = (Element) shapePath.selectSingleNode(document);
+        shape.addAttribute(ID_ATTRIBUTE, StrUtil.format("{}_di", newId));
+        shape.addAttribute(BPMN_ELEMENT, newId);
 
-    private Element createCallActivity() {
-        return null;
+        BndStartEvent ret = new BndStartEvent();
+        ret.setInputs(inputs);
+        ret.setCallActivity(startEvent);
+
+        return ret;
     }
 
 
@@ -507,14 +581,12 @@ public class ProcessDefinitionParser implements
 
         trigger = getTriggerOrOperate(type);
 
-        Element startEvent = oldE.getParent().getParent();
-
         if(StrUtil.equals(trigger.getGroupId(), BRANDNEWDATA_DOMAIN)) {
             // 通用触发器
-            replaceSceneGeneralStartEvent(startEvent);
+            replaceSceneGeneralStartEventToNoneStartEvent(oldE);
         } else {
             // 自定义触发器
-            replaceSceneCustomStartEvent(startEvent, manager);
+            replaceSceneCustomStartEventToNoneStartEvent(oldE, manager);
         }
 
         return this;
@@ -545,7 +617,7 @@ public class ProcessDefinitionParser implements
         for (Node node : nodes) {
             Element oldE = (Element) node;
             Element parent = oldE.getParent();
-            Element ioMapping = getIoMapping(parent);
+            Element ioMapping = getZbIoMapping(parent);
             String configId = oldE.attributeValue(CONFIG_ID_ATTRIBUTE);
             if(StrUtil.isBlank(configId)) {
                 continue;
