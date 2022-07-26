@@ -426,21 +426,23 @@ public class ProcessDefinitionParser implements
 
     private void replaceSceneGeneralStartEventToNoneStartEvent(Element bndTaskDefinition) {
         // 获取监听参数, 获取 startEvent
-        Element oldE = bndTaskDefinition.getParent().getParent();
-        requestParams = getRequestParams(oldE);
-        String connectorId = trigger.getConnectorId();
-        protocol = TriggerProtocolConstant.getProtocolByConnectorId(connectorId);
+        Element startEvent = bndTaskDefinition.getParent().getParent();
 
-        Element parent = oldE.getParent();
+        requestParams = getRequestParams(startEvent);
 
-        // 替换成 none start event
-        Element newE = ElementCreator.createBpStartEvent();
-        newE.setParent(parent);
-        newE.addAttribute(ID_ATTRIBUTE, oldE.attributeValue(ID_ATTRIBUTE));
-        newE.addAttribute(NAME_ATTRIBUTE, oldE.attributeValue(NAME_ATTRIBUTE));
-        List<Node> content = parent.content();
-        // 替换成 none startEvent
-        content.set(content.indexOf(oldE), newE);
+        protocol = TriggerProtocolConstant.getProtocolByConnectorId(trigger.getConnectorId());
+
+        // 替换成 空启动事件
+        replaceNoneStartEvent(startEvent);
+    }
+
+    /**
+     * 根据 bnd task definition 解析 trigger
+     * @param bndTaskDefinition
+     */
+    private void parseTrigger(Element bndTaskDefinition) {
+        String type = bndTaskDefinition.attributeValue(TYPE_ATTRIBUTE);
+        trigger = getTriggerOrOperate(type);
     }
 
     private void replaceSceneCustomStartEventToNoneStartEvent(Element bndTaskDefinition, ConnectorManager manager) {
@@ -574,12 +576,20 @@ public class ProcessDefinitionParser implements
                 BRANDNEWDATA_TASK_DEFINITION_QNAME.getQualifiedName()));
         List<Node> nodes = path.selectNodes(document);
         Assert.isTrue(CollUtil.size(nodes) == 1, ErrorMessage.CHECK_ERROR("有且只能有一个触发器", null));
+        Element bndTaskDefinition = (Element) nodes.get(0);
 
-        Element oldE = (Element) nodes.get(0).getParent().getParent();
-        replaceNoneStartEvent(oldE);
+        parseTrigger(bndTaskDefinition);
 
-        requestParams = getRequestParams(oldE);
+        // 触发器的开始事件都是底层通用触发器
+        protocol = TriggerProtocolConstant.getProtocolByConnectorId(trigger.getConnectorId());
 
+        Element startEvent = (Element) bndTaskDefinition.getParent().getParent();
+
+        // 获取 request params
+        requestParams = getRequestParams(startEvent);
+
+        // 替换成 空启动事件
+        replaceNoneStartEvent(startEvent);
         return this;
     }
 
@@ -591,8 +601,8 @@ public class ProcessDefinitionParser implements
         List<Node> nodes = path.selectNodes(document);
         Assert.isTrue(CollUtil.size(nodes) == 1, ErrorMessage.CHECK_ERROR("有且只能有一个触发器", null));
 
-        Element oldE = (Element) nodes.get(0);
-        replaceNoneStartEvent(oldE);
+        Element startEvent = (Element) nodes.get(0);
+        replaceNoneStartEvent(startEvent);
 
         return this;
     }
@@ -611,9 +621,7 @@ public class ProcessDefinitionParser implements
 
         Element oldE = (Element) nodes.get(0);
 
-        String type = oldE.attributeValue(TYPE_ATTRIBUTE);
-
-        trigger = getTriggerOrOperate(type);
+        parseTrigger(oldE);
 
         if(StrUtil.equals(trigger.getGroupId(), BRANDNEWDATA_DOMAIN)) {
             // 通用触发器

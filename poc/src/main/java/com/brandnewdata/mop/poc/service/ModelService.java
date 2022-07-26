@@ -118,7 +118,7 @@ public class ModelService {
             try {
                 triggerProcessConfig.setProcessId(xmldto.getModelKey());
                 triggerProcessConfig.setProcessName(xmldto.getName());
-                triggerProcessConfig.setProtocol(TriggerProtocolConstant.SCHEDULED);
+                triggerProcessConfig.setProtocol(TriggerProtocolConstant.SCHEDULED.getProtocolType());
                 triggerProcessConfig.setConfig(OM.writeValueAsString(xmldto.getRequestParamConfigs()));
                 triggerProcessConfig.setTriggerFullId(xmldto.getTriggerFullId());
                 success = triggerProcessConfClient.save(triggerProcessConfig);

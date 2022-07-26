@@ -1,7 +1,9 @@
 package com.brandnewdata.mop.poc.modeler.parser;
 
 import cn.hutool.core.io.resource.ResourceUtil;
+import cn.hutool.json.JSONUtil;
 import com.brandnewdata.mop.poc.modeler.dto.ProcessDefinition;
+import com.brandnewdata.mop.poc.modeler.dto.TriggerProcessDefinition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
@@ -35,6 +37,20 @@ class ProcessDefinitionParserTest {
         ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(processDefinition);
         ProcessDefinitionParseStep2 step2 = step1.replaceStep1();
         step2.buildProcessDefinition();
+    }
+
+    @Test
+    void testTriggerXMLParse() {
+        String json = ResourceUtil.readUtf8Str("trigger.json");
+        String triggerFullId = "com.develop:wjx.callback:v1";
+        String xml = JSONUtil.parseObj(json).getStr("processEditing");
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setProcessId(triggerFullId);
+        processDefinition.setXml(xml);
+        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(processDefinition);
+        TriggerProcessDefinition triggerProcessDefinition = step1.replaceStep1().replaceTriggerStartEvent()
+                .buildTriggerProcessDefinition();
+        return;
     }
 }
 
