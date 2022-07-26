@@ -46,7 +46,7 @@ public class MybatisPlusConfiguration {
 
         // factory.setConfiguration(null); 原生mybatis相关配置
         factory.setGlobalConfig(globalConfig(schema)); // mybatis plus新增的相关配置
-        // factory.setPlugins(mybatisPlusInterceptor()); // mybatis plus插件相关配置
+        factory.setPlugins(mybatisPlusInterceptor()); // mybatis plus插件相关配置
         // factory.setMapperLocations(resourcePatResolver.getResources(LOCATION_PATTERN));
         return factory.getObject();
     }
