@@ -7,6 +7,9 @@ import com.brandnewdata.mop.poc.modeler.parser.constants.QNameConstants;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
+import static com.brandnewdata.mop.poc.parser.XMLConstants.BPMN_INCOMING_QNAME;
+import static com.brandnewdata.mop.poc.parser.XMLConstants.BPMN_OUTGOING_QNAME;
+
 public class ElementCreator {
 
     private static String FLOW_TEMPLATE = "Flow_{}";
@@ -31,6 +34,14 @@ public class ElementCreator {
         Element e = DocumentHelper.createElement(QNameConstants.BPMN_START_EVENT_QNAME);
         e.addAttribute(AttributeConstants.ID_ATTRIBUTE, generateEventId());
         return e;
+    }
+
+    public static Element createIncoming() {
+        return DocumentHelper.createElement(BPMN_INCOMING_QNAME);
+    }
+
+    public static Element createOutgoing() {
+        return DocumentHelper.createElement(BPMN_OUTGOING_QNAME);
     }
 
     public static String generateFlowId() {

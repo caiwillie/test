@@ -460,6 +460,14 @@ public class ProcessDefinitionParser implements
         // 替换成 call activity
         BndStartEvent bndStartEvent = replaceBndStartEventToCallActivity(bndTaskDefinition);
 
+        Element callActivity = bndStartEvent.getCallActivity();
+
+        // 新增空开始事件
+        Element noneStartEvent = ElementCreator.createBpStartEvent();
+        noneStartEvent.setParent(getBpProcess());
+
+        // 连接 none start event 与 callActivity
+        connectTwoElement(noneStartEvent, callActivity);
 
     }
 
@@ -517,6 +525,32 @@ public class ProcessDefinitionParser implements
         return ret;
     }
 
+    private void connectTwoElement(Element source, Element target) {
+        Element sequenceFlow = ElementCreator.createBpSequenceFlow();
+        sequenceFlow.setParent(getBpProcess());
+
+        sequenceFlow.addAttribute(SOURCE_REF_ATTRIBUTE, source.attributeValue(ID_ATTRIBUTE));
+        sequenceFlow.addAttribute(TARGET_REF_ATTRIBUTE, target.attributeValue(ID_ATTRIBUTE));
+
+        String sequenceId = sequenceFlow.attributeValue(ID_ATTRIBUTE);
+
+        Element outgoing = ElementCreator.createOutgoing();
+        outgoing.setText(sequenceId);
+        outgoing.setParent(source);
+        source.content().add(outgoing);
+
+        Element incoming = ElementCreator.createIncoming();
+        incoming.setText(sequenceId);
+        incoming.setParent(target);
+        target.content().add(incoming);
+    }
+
+
+    private Element getBpProcess() {
+        return (Element) document.selectSingleNode(StrUtil.format(StringPool.SLASH,
+                BPMN_DEFINITIONS_QNAME.getQualifiedName(),
+                BPMN_PROCESS_QNAME.getQualifiedName()));
+    }
 
     @Override
     public ProcessDefinition buildProcessDefinition() {
