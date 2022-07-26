@@ -15,8 +15,13 @@
  */
 package com.brandnewdata.mop.script;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.lang.Pair;
+import cn.hutool.core.map.MapUtil;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,9 +33,9 @@ public class EvaluationMustacheTest {
 
     @Test
     public void shouldReplaceStringVariables() {
-
         final Object result =
-                scriptEvaluator.evaluate("mustache", "{{x}} and {{y}}", Map.of("x", "a", "y", "b"));
+                scriptEvaluator.evaluate("mustache", "{{x}} and {{y}}",
+                        MapUtil.ofEntries(MapUtil.entry("x", "a"), MapUtil.entry("y", "b")));
 
         assertThat(result).isEqualTo("a and b");
     }
@@ -39,7 +44,8 @@ public class EvaluationMustacheTest {
     public void shouldReplaceNumericVariables() {
 
         final Object result =
-                scriptEvaluator.evaluate("mustache", "{{x}} and {{y}}", Map.of("x", "1", "y", "2"));
+                scriptEvaluator.evaluate("mustache", "{{x}} and {{y}}",
+                        MapUtil.ofEntries(MapUtil.entry("x", "1"), MapUtil.entry("y", "2")));
 
         assertThat(result).isEqualTo("1 and 2");
     }
@@ -47,8 +53,10 @@ public class EvaluationMustacheTest {
     @Test
     public void shouldReplaceListVariables() {
 
+
+
         final Object result =
-                scriptEvaluator.evaluate("mustache", "{{x}}", Map.of("x", List.of(1, 2, 3)));
+                scriptEvaluator.evaluate("mustache", "{{x}}", MapUtil.of("x", ListUtil.of(1, 2, 3)));
 
         assertThat(result).isEqualTo("[1, 2, 3]");
     }
@@ -57,7 +65,7 @@ public class EvaluationMustacheTest {
     public void shouldReplaceObjectVariables() {
 
         final Object result =
-                scriptEvaluator.evaluate("mustache", "{{x.y}}", Map.of("x", Map.of("y", 1)));
+                scriptEvaluator.evaluate("mustache", "{{x.y}}", MapUtil.of("x", MapUtil.of("y", 1)));
 
         assertThat(result).isEqualTo("1");
     }
@@ -66,7 +74,7 @@ public class EvaluationMustacheTest {
     public void shouldIterateOverListVariable() {
 
         final Object result =
-                scriptEvaluator.evaluate("mustache", "{{#x}}i:{{.}} {{/x}}", Map.of("x", List.of(1, 2, 3)));
+                scriptEvaluator.evaluate("mustache", "{{#x}}i:{{.}} {{/x}}", MapUtil.of("x", ListUtil.of(1, 2, 3)));
 
         assertThat(result).isEqualTo("i:1 i:2 i:3 ");
     }
