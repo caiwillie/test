@@ -110,14 +110,24 @@ public class BusinessSceneService implements IBusinessSceneService {
 
     @Override
     public BusinessSceneProcessDefinition saveProcessDefinition(BusinessSceneProcessDefinition businessSceneProcessDefinition) {
+        // 保存完成后，得到 process id
         ProcessDefinition processDefinition = processDefinitionService.save(toDTO(businessSceneProcessDefinition));
-        BusinessSceneProcessEntity businessSceneProcessEntity = toEntity(businessSceneProcessDefinition);
-        if(businessSceneProcessEntity.getId() == null) {
+        BusinessSceneProcessEntity businessSceneProcessEntity =
+                getBusinessSceneProcessEntityByProcessId(processDefinition.getProcessId());
+        if(businessSceneProcessEntity == null) {
             // 不存在则新增
+            businessSceneProcessEntity = toEntity(businessSceneProcessDefinition);
+            // 将解析后的 process id 存入
             businessSceneProcessEntity.setProcessId(processDefinition.getProcessId());
             businessSceneProcessDao.insert(businessSceneProcessEntity);
         }
         return toDTO(businessSceneProcessEntity, processDefinition);
+    }
+
+    private BusinessSceneProcessEntity getBusinessSceneProcessEntityByProcessId(String processId) {
+        QueryWrapper<BusinessSceneProcessEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(BusinessSceneProcessEntity.PROCESS_ID, processId);
+        return businessSceneProcessDao.selectOne(queryWrapper);
     }
 
     public BusinessScene toDTO(BusinessSceneEntity entity) {
