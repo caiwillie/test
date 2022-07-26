@@ -33,10 +33,6 @@ public class XMLParser3 implements XMLParseStep1,
         XMLParseStep1.XMLParseStep3,
         XMLParseStep1.XMLParseStep4 {
 
-    private ObjectMapper om = ServiceUtil.OM;
-
-    private MapType mapType = ServiceUtil.MAP_TYPE;
-
     private String modelKey;
 
     private String name;
