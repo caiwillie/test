@@ -46,5 +46,7 @@ public interface LocalNameConstants {
 
     String BPMN_SHAPE_LOCALNAME = "BPMNShape";
 
+    String BOUNDS_LOCALNAME = "Bounds";
+
 
 }

@@ -6,9 +6,17 @@ import com.brandnewdata.mop.poc.modeler.dto.ProcessDefinition;
 import com.brandnewdata.mop.poc.modeler.dto.TriggerProcessDefinition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import static org.mockito.Mockito.*;
+
+
 class ProcessDefinitionParserTest {
+
+
+    @Mock
+    private ConnectorManager manager;
 
     @BeforeEach
     void setUp() {
@@ -49,6 +57,23 @@ class ProcessDefinitionParserTest {
         processDefinition.setXml(xml);
         ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(processDefinition);
         TriggerProcessDefinition triggerProcessDefinition = step1.replaceStep1().replaceTriggerStartEvent()
+                .buildTriggerProcessDefinition();
+        return;
+    }
+
+    @Test
+    void testSceneCustomTriggerXMLParse() {
+        String json = ResourceUtil.readUtf8Str("trigger.json");
+        String xml2 = JSONUtil.parseObj(json).getStr("processEditing");
+
+        // 设置测试桩
+        when(manager.getTriggerXML(any())).thenReturn(xml2);
+
+        String xml = ResourceUtil.readUtf8Str("test.bpmn.xml");
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setXml(xml);
+        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(processDefinition);
+        TriggerProcessDefinition triggerProcessDefinition = step1.replaceStep1().replaceSceneStartEvent(manager)
                 .buildTriggerProcessDefinition();
         return;
     }

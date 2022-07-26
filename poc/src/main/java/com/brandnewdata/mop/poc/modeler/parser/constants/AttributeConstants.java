@@ -32,7 +32,15 @@ public interface AttributeConstants {
 
     String MESSAGE_REF_ATTRIBUTE = "messageRef";
 
-    String BPMN_ELEMENT = "bpmnElement";
+    String BPMN_ELEMENT_ATTRIBUTE = "bpmnElement";
+
+    String WIDTH_ATTRIBUTE = "width";
+
+    String HEIGHT_ATTRIBUTE = "height";
+
+    String X_ATTRIBUTE = "x";
+
+    String Y_ATTRIBUTE = "y";
 
 
 

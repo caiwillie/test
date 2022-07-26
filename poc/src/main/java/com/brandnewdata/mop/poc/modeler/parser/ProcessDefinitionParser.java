@@ -6,10 +6,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.common.constant.TriggerProtocolConstant;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
-import com.brandnewdata.mop.poc.modeler.dto.BndStartEvent;
-import com.brandnewdata.mop.poc.modeler.dto.ProcessDefinition;
-import com.brandnewdata.mop.poc.modeler.dto.TriggerOrOperate;
-import com.brandnewdata.mop.poc.modeler.dto.TriggerProcessDefinition;
+import com.brandnewdata.mop.poc.modeler.dto.*;
 import com.brandnewdata.mop.poc.modeler.parser.constants.StringPool;
 import com.brandnewdata.mop.poc.parser.IOMap;
 import com.brandnewdata.mop.poc.service.ServiceUtil;
@@ -394,7 +391,7 @@ public class ProcessDefinitionParser implements
         Element root = document.getRootElement();
         List<Namespace> namespaces = root.declaredNamespaces();
         for (Namespace namespace : namespaces) {
-            if(StrUtil.equalsAny(namespace.getPrefix(), DI_NAMESPACE_PRIFIX, DC_NAMESPACE_PRIFIX,
+            if(StrUtil.equalsAny(namespace.getPrefix(), DI_NAMESPACE.getPrefix(), DC_NAMESPACE.getPrefix(),
                     BPMNDI_NAMESPACE.getPrefix(), ZEEBE_NAMESPACE.getPrefix(), BPMN_NAMESPACE.getPrefix())) {
                 continue;
             }
@@ -469,8 +466,10 @@ public class ProcessDefinitionParser implements
         Element callActivity = bndStartEvent.getCallActivity();
 
         // 新增空开始事件
+        Element bpProcess = getBpProcess();
         Element noneStartEvent = ElementCreator.createBpStartEvent();
-        noneStartEvent.setParent(getBpProcess());
+        noneStartEvent.setParent(bpProcess);
+        bpProcess.content().add(noneStartEvent);
 
         // 连接 none start event 与 callActivity
         connectTwoElement(noneStartEvent, callActivity);
@@ -506,6 +505,16 @@ public class ProcessDefinitionParser implements
         // 替换成新 id
         startEvent.addAttribute(ID_ATTRIBUTE, newId);
 
+        // 替换 bpmndi:BPMNShape
+        XPath shapePath = DocumentHelper.createXPath(StrUtil.format("//{}[@{}='{}']",
+                BPMNDI_BPMN_SHAPE_QNAME.getQualifiedName(), BPMN_ELEMENT_ATTRIBUTE, oldId));
+        Element shape = (Element) shapePath.selectSingleNode(document);
+        shape.addAttribute(ID_ATTRIBUTE, StrUtil.format("{}_di", newId));
+        shape.addAttribute(BPMN_ELEMENT_ATTRIBUTE, newId);
+
+        // 转换 x, y 的节点
+        convertXY(shape);
+
         // 替换 sequence 的属性 source ref
         XPath sequencePath = DocumentHelper.createXPath(StrUtil.format("//{}[@{}='{}']",
                 BPMN_SEQUENCE_FLOW_QNAME.getQualifiedName(), SOURCE_REF_ATTRIBUTE, oldId));
@@ -517,13 +526,6 @@ public class ProcessDefinitionParser implements
             }
         }
 
-        // 替换 bpmndi:BPMNShape
-        XPath shapePath = DocumentHelper.createXPath(StrUtil.format("//{}[@{}='{}']",
-                BPMNDI_BPMN_SHAPE_QNAME.getQualifiedName(), BPMN_ELEMENT, oldId));
-        Element shape = (Element) shapePath.selectSingleNode(document);
-        shape.addAttribute(ID_ATTRIBUTE, StrUtil.format("{}_di", newId));
-        shape.addAttribute(BPMN_ELEMENT, newId);
-
         BndStartEvent ret = new BndStartEvent();
         ret.setInputs(inputs);
         ret.setCallActivity(startEvent);
@@ -531,9 +533,48 @@ public class ProcessDefinitionParser implements
         return ret;
     }
 
+    private void convertXY(Element shape) {
+        // 修改 bpmndi:BPMNShape 中的 weight, height, x, y
+
+        // 获取中心节点
+        BoundXY boundXY = getBoundXY(shape);
+        long[] center = boundXY.getCenter();
+        setShapeXY(shape, center[0], center[1], 100, 80);
+    }
+
+    private BoundXY getBoundXY(Element shape) {
+        Element bounds = (Element) shape.selectSingleNode(DC_BOUNDS_QNAME.getQualifiedName());
+
+        long x = Long.parseLong(bounds.attributeValue(X_ATTRIBUTE));
+        long y = Long.parseLong(bounds.attributeValue(Y_ATTRIBUTE));
+        long width = Long.parseLong(bounds.attributeValue(WIDTH_ATTRIBUTE));
+        long height = Long.parseLong(bounds.attributeValue(HEIGHT_ATTRIBUTE));
+
+        BoundXY ret = new BoundXY();
+
+        ret.setCenter(new long[] {(long)(x + 0.5 * width), (long)(y + 0.5 * height)});
+        ret.setUp(new long[] {(long)(x + 0.5 * width), y + height});
+        ret.setRight(new long[] {x + width, (long)(y + 0.5 * height)});
+        ret.setDown(new long[] {(long)(x + 0.5 * width), y});
+        ret.setLeft(new long[] {x, (long)(y + 0.5 * height)});
+        return ret;
+    }
+
+    private void setShapeXY(Element shape, long gcX, long gcY, long width, long height) {
+        Element bounds = (Element) shape.selectSingleNode(DC_BOUNDS_QNAME.getQualifiedName());
+        bounds.addAttribute(WIDTH_ATTRIBUTE, String.valueOf(width));
+        bounds.addAttribute(HEIGHT_ATTRIBUTE, String.valueOf(height));
+        long x = (long) (gcX - 0.5 * width);
+        long y = (long) (gcY - 0.5 * height);
+        bounds.addAttribute(X_ATTRIBUTE, String.valueOf(x));
+        bounds.addAttribute(Y_ATTRIBUTE, String.valueOf(y));
+    }
+
     private void connectTwoElement(Element source, Element target) {
         Element sequenceFlow = ElementCreator.createBpSequenceFlow();
-        sequenceFlow.setParent(getBpProcess());
+        Element bpProcess = getBpProcess();
+        sequenceFlow.setParent(bpProcess);
+        bpProcess.content().add(sequenceFlow);
 
         sequenceFlow.addAttribute(SOURCE_REF_ATTRIBUTE, source.attributeValue(ID_ATTRIBUTE));
         sequenceFlow.addAttribute(TARGET_REF_ATTRIBUTE, target.attributeValue(ID_ATTRIBUTE));
