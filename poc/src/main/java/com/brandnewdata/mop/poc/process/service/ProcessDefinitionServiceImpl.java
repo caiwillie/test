@@ -96,6 +96,8 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
 
     @Override
     public ProcessDefinition deploy(ProcessDefinition processDefinition, int type) {
+        String oldXML = processDefinition.getXml();
+
         ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(processDefinition);
 
         if(type == ProcessConstants.PROCESS_TYPE_SCENE) {
@@ -113,11 +115,11 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
 
         String processId = processDefinition.getProcessId();
         String name = processDefinition.getName();
-        String xml = processDefinition.getXml();
+        String newXML = processDefinition.getXml();
 
         // 调用 zeebe 部署
         DeploymentEvent deploymentEvent = zeebe.newDeployResourceCommand()
-                .addResourceStringUtf8(xml, ServiceUtil.convertModelKey(processId) + ".bpmn")
+                .addResourceStringUtf8(newXML, ServiceUtil.convertModelKey(processId) + ".bpmn")
                 .send()
                 .join();
 
@@ -128,7 +130,7 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
         ProcessDeployVersionEntity entity = new ProcessDeployVersionEntity();
         entity.setProcessId(processId);
         entity.setProcessName(name);
-        entity.setProcessXml(xml);
+        entity.setProcessXml(oldXML);
         entity.setZeebeKey(zeebeKey);
         // 设置版本
         entity.setVersion(latestVersion == null ? 0 : latestVersion.getVersion() + 1);

@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.operater.service;
+package com.brandnewdata.mop.poc.operate.service;
 
 import io.camunda.operate.CamundaOperateClient;
 import io.camunda.operate.auth.SimpleAuthentication;
@@ -24,7 +24,7 @@ class OperateServiceTest {
 
     @Test
     void testProcessDefinitionPage() throws OperateException {
-        operateService.processDefinitionPage();
+
     }
 }
 
