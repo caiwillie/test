@@ -7,6 +7,7 @@ import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.process.dao.ProcessDefinitionDao;
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinition;
 import com.brandnewdata.mop.poc.process.entity.ProcessDefinitionEntity;
+import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParser;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -40,14 +41,15 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
 
     @Override
     public ProcessDefinition save(ProcessDefinition processDefinition) {
-        String processId = processDefinition.getProcessId();
-        String name = processDefinition.getName();
         String xml = processDefinition.getXml();
+
+        processDefinition = ProcessDefinitionParser.newInstance(processDefinition).buildProcessDefinition();
 
         // dto to entity 逻辑特殊，不提取公共
         ProcessDefinitionEntity entity = new ProcessDefinitionEntity();
+        String processId = processDefinition.getProcessId();
         entity.setId(processId);
-        entity.setName(name);
+        entity.setName(processDefinition.getName());
         entity.setXml(xml);
 
         if(getOne(processId) != null) {
