@@ -12,8 +12,8 @@ import com.brandnewdata.mop.poc.group.dto.BusinessScene;
 import com.brandnewdata.mop.poc.group.dto.BusinessSceneProcessDefinition;
 import com.brandnewdata.mop.poc.group.entity.BusinessSceneEntity;
 import com.brandnewdata.mop.poc.group.entity.BusinessSceneProcessEntity;
-import com.brandnewdata.mop.poc.modeler.dto.ProcessDefinition;
-import com.brandnewdata.mop.poc.modeler.service.IProcessDefinitionService;
+import com.brandnewdata.mop.poc.process.dto.ProcessDefinition;
+import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

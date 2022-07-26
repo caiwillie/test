@@ -1,6 +1,5 @@
 package com.brandnewdata.mop.poc.group.dto;
 
-import com.brandnewdata.mop.poc.modeler.dto.ProcessDefinition;
 import lombok.Data;
 
 import java.util.List;

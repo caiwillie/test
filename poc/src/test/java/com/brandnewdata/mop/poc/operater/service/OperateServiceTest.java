@@ -1,21 +1,13 @@
 package com.brandnewdata.mop.poc.operater.service;
 
-import com.brandnewdata.mop.poc.common.dto.Page;
-import com.brandnewdata.mop.poc.modeler.dto.ProcessDefinition;
 import io.camunda.operate.CamundaOperateClient;
 import io.camunda.operate.auth.SimpleAuthentication;
 import io.camunda.operate.exception.OperateException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
-
-import java.util.List;
-
-import static org.mockito.Mockito.*;
 
 class OperateServiceTest {
     @Spy

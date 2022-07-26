@@ -1,0 +1,74 @@
+package com.brandnewdata.mop.poc.process.parser.constants;
+
+import cn.hutool.core.util.StrUtil;
+import org.dom4j.DocumentHelper;
+import org.dom4j.QName;
+
+import static com.brandnewdata.mop.poc.process.parser.constants.LocalNameConstants.*;
+import static com.brandnewdata.mop.poc.process.parser.constants.NamespaceConstants.*;
+
+public interface QNameConstants {
+
+    // bpmn2
+    String BPMN2_ALL_QNAME = StrUtil.format("{}:*", BPMN2_NAMESPACE_PRIFIX);
+
+    // bpmn
+    QName BPMN_DEFINITIONS_QNAME = DocumentHelper.createQName(DEFINITIONS_LOCALNAME, BPMN_NAMESPACE);
+
+    QName BPMN_PROCESS_QNAME = DocumentHelper.createQName(PROCESS_LOCALNAME, BPMN_NAMESPACE);
+
+    QName BPMN_START_EVENT_QNAME = DocumentHelper.createQName(START_EVENT_LOCALNAME, BPMN_NAMESPACE);
+
+    QName BPMN_TASK_QNAME = DocumentHelper.createQName(TASK_LOCALNAME, BPMN_NAMESPACE);
+
+    QName BPMN_SERVICE_TASK_QNAME = DocumentHelper.createQName(SERVICE_TASK_LOCALNAME, BPMN_NAMESPACE);
+
+    QName BPMN_CALL_ACTIVITY_QNAME = DocumentHelper.createQName(CALL_ACTIVITY_LOCALNAME, BPMN_NAMESPACE);
+
+    QName BPMN_EXTENSION_ELEMENTS_QNAME = DocumentHelper.createQName(EXTENSION_ELEMENTS_LOCALNAME, BPMN_NAMESPACE);
+
+    QName BPMN_OUTGOING_QNAME = DocumentHelper.createQName(OUTGOING_LOCALNAME, BPMN_NAMESPACE);
+
+    QName BPMN_INCOMING_QNAME = DocumentHelper.createQName(INCOMING_LOCALNAME, BPMN_NAMESPACE);
+
+    QName BPMN_SEQUENCE_FLOW_QNAME = DocumentHelper.createQName(SEQUENCE_FLOW_LOCALNAME, BPMN_NAMESPACE);
+
+    QName BPMN_MESSAGE_QNAME = DocumentHelper.createQName(MESSAGE_LOCALNAME, BPMN_NAMESPACE);
+
+    QName BPMN_MESSAGE_EVENT_DEFINITION_QNAME = DocumentHelper.createQName(MESSAGE_EVENT_DEFINITION_LOCALNAME, BPMN_NAMESPACE);
+
+
+    // bpmndi
+    QName BPMNDI_BPMN_SHAPE_QNAME = DocumentHelper.createQName(BPMN_SHAPE_LOCALNAME, BPMNDI_NAMESPACE);
+
+    // dc
+    QName DC_BOUNDS_QNAME = DocumentHelper.createQName(BOUNDS_LOCALNAME, DC_NAMESPACE);
+
+    // brandnewdata
+    QName BRANDNEWDATA_TASK_DEFINITION_QNAME = DocumentHelper.createQName(TASK_DEFINITION_LOCALNAME, BRANDNEWDATA_NAMESPACE);
+
+    QName BRANDNEWDATA_INPUT_QNAME = DocumentHelper.createQName(INPUT_LOCALNAME, BRANDNEWDATA_NAMESPACE);
+
+    QName BRANDNEWDATA_INPUT_MAPPING_QNAME = DocumentHelper.createQName(INPUT_MAPPING_LOCALNAME, BRANDNEWDATA_NAMESPACE);
+
+    QName BRANDNEWDATA_OUTPUT_MAPPING_QNAME = DocumentHelper.createQName(OUTPUT_MAPPING_LOCALNAME, BRANDNEWDATA_NAMESPACE);
+
+    QName BRANDNEWDATA_OUTPUT_QNAME = DocumentHelper.createQName(OUTPUT_LOCALNAME, BRANDNEWDATA_NAMESPACE);
+
+    QName BRANDNEWDATA_REQUEST_MAPPING_QNAME = DocumentHelper.createQName(REQUEST_MAPPING_LOCALNAME, BRANDNEWDATA_NAMESPACE);
+
+    QName BRANDNEWDATA_REQUEST_QNAME = DocumentHelper.createQName(REQUEST_LOCALNAME, BRANDNEWDATA_NAMESPACE);
+
+    // zeebe
+
+    QName ZEEBE_TASK_DEFINITION_QNAME = DocumentHelper.createQName(TASK_DEFINITION_LOCALNAME, ZEEBE_NAMESPACE);
+
+    QName ZEEBE_CALLED_ELEMENT_QNAME = DocumentHelper.createQName(CALLED_ELEMENT_LOCALNAME, ZEEBE_NAMESPACE);
+
+    QName ZEEBE_IO_MAPPING_QNAME = DocumentHelper.createQName(IO_MAPPING_LOCALNAME, ZEEBE_NAMESPACE);
+
+    QName ZEEBE_INPUT_QNAME = DocumentHelper.createQName(INPUT_LOCALNAME, ZEEBE_NAMESPACE);
+
+    QName ZEEBE_OUTPUT_QNAME = DocumentHelper.createQName(OUTPUT_LOCALNAME, ZEEBE_NAMESPACE);
+
+}
