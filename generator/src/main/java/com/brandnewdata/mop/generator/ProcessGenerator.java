@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * @author caiwillie
  */
-public class ModelerGenerator {
+public class ProcessGenerator {
 
     private static final String IP = "10.101.53.4";
 
@@ -54,9 +54,9 @@ public class ModelerGenerator {
                 .packageConfig(builder -> builder
                         .parent("com.brandnewdata.mop.poc")
                         // entity的包名称
-                        .entity("modeler.entity")
+                        .entity("process.entity")
                         // dao层的包名称
-                        .mapper("dao")
+                        .mapper("process.dao")
                 )
 
                 // 策略配置

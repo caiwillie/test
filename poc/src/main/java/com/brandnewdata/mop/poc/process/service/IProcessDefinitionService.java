@@ -17,5 +17,12 @@ public interface IProcessDefinitionService {
 
     ProcessDefinition getOne(String processId);
 
+    /**
+     * 部署
+     *
+     * @param processDefinition
+     * @param type 1 场景，2 操作，3 触发器
+     * @return
+     */
     ProcessDefinition deploy(ProcessDefinition processDefinition, int type);
 }

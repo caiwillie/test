@@ -4,10 +4,17 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
+import com.brandnewdata.mop.poc.process.ProcessConstants;
 import com.brandnewdata.mop.poc.process.dao.ProcessDefinitionDao;
+import com.brandnewdata.mop.poc.process.dao.ProcessDeployVersionDao;
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinition;
+import com.brandnewdata.mop.poc.process.dto.TriggerProcessDefinition;
 import com.brandnewdata.mop.poc.process.entity.ProcessDefinitionEntity;
+import com.brandnewdata.mop.poc.process.entity.ProcessDeployVersionEntity;
+import com.brandnewdata.mop.poc.process.parser.ConnectorManager;
+import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParseStep1;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParser;
+import io.camunda.zeebe.client.ZeebeClient;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -19,6 +26,15 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
 
     @Resource
     private ProcessDefinitionDao processDefinitionDao;
+
+    @Resource
+    private ProcessDeployVersionDao processDeployVersionDao;
+
+    @Resource
+    private ConnectorManager connectorManager;
+
+    @Resource
+    private ZeebeClient zeebe;
 
     @Override
     public List<ProcessDefinition> list(List<String> ids) {
@@ -78,9 +94,49 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
 
     @Override
     public ProcessDefinition deploy(ProcessDefinition processDefinition, int type) {
+        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(processDefinition);
+
+        TriggerProcessDefinition triggerProcessDefinition = null;
+        if(type == ProcessConstants.PROCESS_TYPE_SCENE) {
+            triggerProcessDefinition = step1.replaceProperties(connectorManager).replaceStep1()
+                    .replaceSceneStartEvent(connectorManager).buildTriggerProcessDefinition();
+        } else if (type == ProcessConstants.PROCESS_TYPE_TRIGGER) {
+            triggerProcessDefinition = step1.replaceProperties(connectorManager).replaceStep1().replaceTriggerStartEvent()
+                    .buildTriggerProcessDefinition();
+        } else if (type == ProcessConstants.PROCESS_TYPE_OPERATE) {
+            triggerProcessDefinition = step1.replaceProperties(connectorManager).replaceStep1().replaceOperateStartEvent()
+                    .buildTriggerProcessDefinition();
+        } else {
+            throw new IllegalArgumentException(ErrorMessage.CHECK_ERROR("触发器类型不支持", null));
+        }
+
+        String processId = triggerProcessDefinition.getProcessId();
+        String name = triggerProcessDefinition.getName();
+        String xml = triggerProcessDefinition.getXml();
+
+        zeebe.newDeployResourceCommand()
+                .addResourceStringUtf8(xmldto.getZeebeXML(), xmldto.getModelKey() + ".bpmn")
+                .send()
+                .join();
+
+        ProcessDeployVersionEntity latestVersion = getLatestDeployVersion(processId);
+
         return null;
     }
 
+
+    private ProcessDeployVersionEntity getLatestDeployVersion(String processId) {
+        QueryWrapper<ProcessDeployVersionEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(ProcessDeployVersionEntity.PROCESS_ID, processId);
+        queryWrapper.orderByDesc(ProcessDeployVersionEntity.VERSION);
+        List<ProcessDeployVersionEntity> list = processDeployVersionDao.selectList(queryWrapper);
+
+        if(CollUtil.isEmpty(list)) {
+            return null;
+        } else {
+            return list.get(0);
+        }
+    }
 
     private ProcessDefinition toDTO(ProcessDefinitionEntity entity) {
         ProcessDefinition dto = new ProcessDefinition();

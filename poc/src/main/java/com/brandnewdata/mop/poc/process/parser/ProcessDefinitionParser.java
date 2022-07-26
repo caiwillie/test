@@ -125,16 +125,16 @@ public class ProcessDefinitionParser implements
      * 解析 process id 和 name
      */
     private void parseProcessIdAndName() {
+        Element bpProcess = getBpProcess();
         if(processId != null && name != null) {
-            return;
+            bpProcess.addAttribute(ID_ATTRIBUTE, ServiceUtil.convertModelKey(processId));
+            bpProcess.addAttribute(NAME_ATTRIBUTE, name);
+        } else {
+            processId = bpProcess.attributeValue(ID_ATTRIBUTE);
+            name = bpProcess.attributeValue(NAME_ATTRIBUTE);
+            Assert.notEmpty(processId, ErrorMessage.NOT_NULL("流程 id"));
+            Assert.notEmpty(name, ErrorMessage.NOT_NULL("流程名称"));
         }
-        XPath path = DocumentHelper.createXPath(StrUtil.join(StringPool.SLASH,
-                BPMN_DEFINITIONS_QNAME.getQualifiedName(),
-                BPMN_PROCESS_QNAME.getQualifiedName()));
-
-        Element node = (Element) path.selectSingleNode(document);
-        processId = node.attributeValue(ID_ATTRIBUTE);
-        name = node.attributeValue(NAME_ATTRIBUTE);
     }
 
     private String serialize(Document document) {
@@ -644,7 +644,7 @@ public class ProcessDefinitionParser implements
     }
 
     @Override
-    public ProcessDefinitionParseStep3 replaceConnectorStartEvent() {
+    public ProcessDefinitionParseStep3 replaceOperateStartEvent() {
         XPath path = DocumentHelper.createXPath(StrUtil.join(StringPool.SLASH,
                 StringPool.SLASH,
                 BPMN_START_EVENT_QNAME.getQualifiedName()));
@@ -695,7 +695,7 @@ public class ProcessDefinitionParser implements
     }
 
     @Override
-    public ProcessDefinitionParseStep2 replaceProperties(ConnectorManager manager) {
+    public ProcessDefinitionParseStep1 replaceProperties(ConnectorManager manager) {
         XPath path = DocumentHelper.createXPath(StrUtil.join(StringPool.SLASH,
                 StringPool.SLASH,
                 BPMN_SERVICE_TASK_QNAME.getQualifiedName(),

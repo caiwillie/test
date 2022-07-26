@@ -7,5 +7,5 @@ public interface ProcessDefinitionParseStep1 {
 
     ProcessDefinitionParseStep2 replaceStep1();
 
-    ProcessDefinitionParseStep2 replaceProperties(ConnectorManager manager);
+    ProcessDefinitionParseStep1 replaceProperties(ConnectorManager manager);
 }

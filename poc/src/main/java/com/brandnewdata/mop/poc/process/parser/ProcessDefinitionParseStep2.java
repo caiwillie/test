@@ -7,7 +7,7 @@ public interface ProcessDefinitionParseStep2 {
     ProcessDefinition buildProcessDefinition();
     ProcessDefinitionParseStep3 replaceTriggerStartEvent();
 
-    ProcessDefinitionParseStep3 replaceConnectorStartEvent();
+    ProcessDefinitionParseStep3 replaceOperateStartEvent();
 
     ProcessDefinitionParseStep3 replaceSceneStartEvent(ConnectorManager manager);
 }
