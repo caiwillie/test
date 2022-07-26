@@ -13,6 +13,4 @@ public class ProcessDefinition {
     private String name;
 
     private String xml;
-
-    private String version;
 }

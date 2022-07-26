@@ -14,7 +14,9 @@ import com.brandnewdata.mop.poc.process.entity.ProcessDeployVersionEntity;
 import com.brandnewdata.mop.poc.process.parser.ConnectorManager;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParseStep1;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParser;
+import com.brandnewdata.mop.poc.service.ServiceUtil;
 import io.camunda.zeebe.client.ZeebeClient;
+import io.camunda.zeebe.client.api.response.DeploymentEvent;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -96,32 +98,45 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
     public ProcessDefinition deploy(ProcessDefinition processDefinition, int type) {
         ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(processDefinition);
 
-        TriggerProcessDefinition triggerProcessDefinition = null;
         if(type == ProcessConstants.PROCESS_TYPE_SCENE) {
-            triggerProcessDefinition = step1.replaceProperties(connectorManager).replaceStep1()
+            processDefinition = step1.replaceProperties(connectorManager).replaceStep1()
                     .replaceSceneStartEvent(connectorManager).buildTriggerProcessDefinition();
         } else if (type == ProcessConstants.PROCESS_TYPE_TRIGGER) {
-            triggerProcessDefinition = step1.replaceProperties(connectorManager).replaceStep1().replaceTriggerStartEvent()
+            processDefinition = step1.replaceProperties(connectorManager).replaceStep1().replaceTriggerStartEvent()
                     .buildTriggerProcessDefinition();
         } else if (type == ProcessConstants.PROCESS_TYPE_OPERATE) {
-            triggerProcessDefinition = step1.replaceProperties(connectorManager).replaceStep1().replaceOperateStartEvent()
+            processDefinition = step1.replaceProperties(connectorManager).replaceStep1().replaceOperateStartEvent()
                     .buildTriggerProcessDefinition();
         } else {
             throw new IllegalArgumentException(ErrorMessage.CHECK_ERROR("触发器类型不支持", null));
         }
 
-        String processId = triggerProcessDefinition.getProcessId();
-        String name = triggerProcessDefinition.getName();
-        String xml = triggerProcessDefinition.getXml();
+        String processId = processDefinition.getProcessId();
+        String name = processDefinition.getName();
+        String xml = processDefinition.getXml();
 
-        zeebe.newDeployResourceCommand()
-                .addResourceStringUtf8(xmldto.getZeebeXML(), xmldto.getModelKey() + ".bpmn")
+        // 调用 zeebe 部署
+        DeploymentEvent deploymentEvent = zeebe.newDeployResourceCommand()
+                .addResourceStringUtf8(xml, ServiceUtil.convertModelKey(processId) + ".bpmn")
                 .send()
                 .join();
 
+        long zeebeKey = deploymentEvent.getKey();
+
         ProcessDeployVersionEntity latestVersion = getLatestDeployVersion(processId);
 
-        return null;
+        ProcessDeployVersionEntity entity = new ProcessDeployVersionEntity();
+        entity.setProcessId(processId);
+        entity.setProcessName(name);
+        entity.setProcessXml(xml);
+        entity.setZeebeKey(zeebeKey);
+        // 设置版本
+        entity.setVersion(latestVersion == null ? 0 : latestVersion.getVersion() + 1);
+        entity.setType(type);
+
+        processDeployVersionDao.insert(entity);
+
+        return processDefinition;
     }
 
 
