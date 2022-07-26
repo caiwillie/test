@@ -79,8 +79,12 @@ public class ProcessDefinitionParser implements
         this.oldDocument = serialize(document);
         this.processId = processDefinition.getProcessId();
         this.name = processDefinition.getName();
+        // 转换namespace zeebe2 =》 zeebe
         convertZeebe2Namespace();
+        // 设置流程名称 和 id
         parseProcessIdAndName();
+        // 设置为可执行
+        setExecutable();
     }
 
     private Document readDocument(String xml) {
@@ -351,7 +355,7 @@ public class ProcessDefinitionParser implements
         Assert.notEmpty(version, ErrorMessage.NOT_NULL("连接器版本"));
 
         // 解析 连接器id.操作或触发器id
-        arr = arr[1].split(".");
+        arr = arr[1].split("\\.");
         Assert.isTrue(arr.length == 2, ErrorMessage.CHECK_ERROR("触发器或者连接器类型错误", type));
         String connectorId = arr[0];
         Assert.notEmpty(connectorId, ErrorMessage.NOT_NULL("连接器 id"));
@@ -547,11 +551,16 @@ public class ProcessDefinitionParser implements
         target.content().add(incoming);
     }
 
-
     private Element getBpProcess() {
-        return (Element) document.selectSingleNode(StrUtil.format(StringPool.SLASH,
+        XPath path = DocumentHelper.createXPath(StrUtil.join(StringPool.SLASH,
                 BPMN_DEFINITIONS_QNAME.getQualifiedName(),
                 BPMN_PROCESS_QNAME.getQualifiedName()));
+        return (Element) path.selectSingleNode(document);
+    }
+
+    private void setExecutable() {
+        Element process = getBpProcess();
+        process.addAttribute(IS_EXECUTABLE_ATTRIBUTE, StringPool.TRUE);
     }
 
     @Override
