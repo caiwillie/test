@@ -32,7 +32,7 @@ public class MybatisPlusConfiguration {
         ret.setBasePackage(String.join(",",
                 "com.brandnewdata.mop.poc.dao",
                 "com.brandnewdata.mop.poc.group.dao",
-                "com.brandnewdata.mop.poc.modeler.dao"));
+                "com.brandnewdata.mop.poc.process.dao"));
         return ret;
     }
 
