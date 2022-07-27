@@ -25,9 +25,9 @@ public class OperateRest {
     /**
      * 流程部署分页列表
      *
-     * @param pageNum 分页页码
+     * @param pageNum  分页页码
      * @param pageSize 分页大小
-     * @return
+     * @return result
      */
     @GetMapping("/rest/operate/deploy/page")
     public Result<Page<ProcessDeploy>> processDeployPage(
@@ -40,9 +40,9 @@ public class OperateRest {
     /**
      * 流程实例分页列表
      *
-     * @param pageNum 分页页码
+     * @param pageNum  分页页码
      * @param pageSize 分页大小
-     * @return
+     * @return result
      */
     @GetMapping("/rest/operate/instance/page")
     public Result<Page<ProcessInstance>> processInstancePage(

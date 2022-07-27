@@ -8,17 +8,7 @@ import com.fasterxml.jackson.databind.type.MapType;
 import java.util.Map;
 
 public class ServiceUtil {
-
-
-    public static final ObjectMapper OM = new ObjectMapper();
-
-    public static final MapType MAP_TYPE =
-            OM.getTypeFactory().constructMapType(Map.class, String.class, Object.class);
-
-    static {
-        OM.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-    }
-
+    
     public static String convertModelKey(String modelKey) {
 
         // modelKey中替换.
