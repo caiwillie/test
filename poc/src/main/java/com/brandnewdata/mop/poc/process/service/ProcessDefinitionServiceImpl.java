@@ -8,6 +8,7 @@ import com.brandnewdata.mop.poc.process.ProcessConstants;
 import com.brandnewdata.mop.poc.process.dao.ProcessDefinitionDao;
 import com.brandnewdata.mop.poc.process.dao.ProcessDeployVersionDao;
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinition;
+import com.brandnewdata.mop.poc.process.dto.ProcessDeploy;
 import com.brandnewdata.mop.poc.process.entity.ProcessDefinitionEntity;
 import com.brandnewdata.mop.poc.process.entity.ProcessDeployVersionEntity;
 import com.brandnewdata.mop.poc.manager.ConnectorManager;
@@ -28,14 +29,8 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
     @Resource
     private ProcessDefinitionDao processDefinitionDao;
 
-    @Resource
-    private ProcessDeployVersionDao processDeployVersionDao;
 
-    @Resource
-    private ConnectorManager connectorManager;
 
-    @Resource
-    private ZeebeClient zeebe;
 
     @Override
     public List<ProcessDefinition> list(List<String> ids) {
@@ -94,66 +89,7 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
         }
     }
 
-    @Override
-    public ProcessDefinition deploy(ProcessDefinition processDefinition, int type) {
-        String oldXML = processDefinition.getXml();
 
-        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(processDefinition);
-
-        if(type == ProcessConstants.PROCESS_TYPE_SCENE) {
-            processDefinition = step1.replaceProperties(connectorManager).replaceStep1()
-                    .replaceSceneStartEvent(connectorManager).buildTriggerProcessDefinition();
-        } else if (type == ProcessConstants.PROCESS_TYPE_TRIGGER) {
-            processDefinition = step1.replaceProperties(connectorManager).replaceStep1().replaceTriggerStartEvent()
-                    .buildTriggerProcessDefinition();
-        } else if (type == ProcessConstants.PROCESS_TYPE_OPERATE) {
-            processDefinition = step1.replaceProperties(connectorManager).replaceStep1().replaceOperateStartEvent()
-                    .buildTriggerProcessDefinition();
-        } else {
-            throw new IllegalArgumentException(ErrorMessage.CHECK_ERROR("触发器类型不支持", null));
-        }
-
-        String processId = processDefinition.getProcessId();
-        String name = processDefinition.getName();
-        String newXML = processDefinition.getXml();
-
-        // 调用 zeebe 部署
-        DeploymentEvent deploymentEvent = zeebe.newDeployResourceCommand()
-                .addResourceStringUtf8(newXML, ServiceUtil.convertModelKey(processId) + ".bpmn")
-                .send()
-                .join();
-
-        long zeebeKey = deploymentEvent.getKey();
-
-        ProcessDeployVersionEntity latestVersion = getLatestDeployVersion(processId);
-
-        ProcessDeployVersionEntity entity = new ProcessDeployVersionEntity();
-        entity.setProcessId(processId);
-        entity.setProcessName(name);
-        entity.setProcessXml(oldXML);
-        entity.setZeebeKey(zeebeKey);
-        // 设置版本
-        entity.setVersion(latestVersion == null ? 0 : latestVersion.getVersion() + 1);
-        entity.setType(type);
-
-        processDeployVersionDao.insert(entity);
-
-        return processDefinition;
-    }
-
-
-    private ProcessDeployVersionEntity getLatestDeployVersion(String processId) {
-        QueryWrapper<ProcessDeployVersionEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(ProcessDeployVersionEntity.PROCESS_ID, processId);
-        queryWrapper.orderByDesc(ProcessDeployVersionEntity.VERSION);
-        List<ProcessDeployVersionEntity> list = processDeployVersionDao.selectList(queryWrapper);
-
-        if(CollUtil.isEmpty(list)) {
-            return null;
-        } else {
-            return list.get(0);
-        }
-    }
 
     private ProcessDefinition toDTO(ProcessDefinitionEntity entity) {
         ProcessDefinition dto = new ProcessDefinition();
@@ -162,5 +98,6 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
         dto.setXml(entity.getXml());
         return dto;
     }
+
 
 }

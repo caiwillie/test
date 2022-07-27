@@ -11,8 +11,13 @@ import com.brandnewdata.mop.api.dto.StartMessage;
 import com.brandnewdata.mop.api.dto.protocol.request.HttpRequest;
 import com.brandnewdata.mop.api.dto.protocol.response.HttpResponse;
 import com.brandnewdata.mop.poc.common.Constants;
+import com.brandnewdata.mop.poc.process.ProcessConstants;
+import com.brandnewdata.mop.poc.process.dto.ProcessDefinition;
+import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService;
+import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import com.brandnewdata.mop.poc.service.ModelService;
 import com.brandnewdata.mop.poc.service.ServiceUtil;
+import com.dxy.library.json.jackson.JacksonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.MapType;
@@ -27,12 +32,8 @@ import java.util.Map;
 @Slf4j
 @RestController
 public class ModelApiImpl implements ModelApi {
-
-    private ObjectMapper om = ServiceUtil.OM;
-    private MapType mapType = ServiceUtil.MAP_TYPE;
-
     @Resource
-    private ModelService modelService;
+    private IProcessDeployService deployService;
 
     @Override
     public Result deployConnector(ConnectorResource resource) {
@@ -47,24 +48,23 @@ public class ModelApiImpl implements ModelApi {
             Assert.isTrue(CollUtil.isNotEmpty(operates) || CollUtil.isNotEmpty(triggers),
                     "操作和触发器为空");
 
-
             if(CollUtil.isNotEmpty(triggers)) {
                 for (BPMNResource trigger : triggers) {
-                    String modelKey = trigger.getModelKey();
-                    String name = trigger.getName();
-                    String xml = trigger.getEditorXML();
-                    name = StrUtil.format("【触发器】{}", name);
-                    modelService.deploy(modelKey, name, xml, Constants.TRIGGER_TYPE_GENERAL);
+                    ProcessDefinition processDefinition = new ProcessDefinition();
+                    processDefinition.setProcessId(trigger.getModelKey());
+                    processDefinition.setName(StrUtil.format("【触发器】{}", trigger.getName()));
+                    processDefinition.setXml(trigger.getEditorXML());
+                    deployService.deploy(processDefinition, ProcessConstants.PROCESS_TYPE_TRIGGER);
                 }
             }
 
             if(CollUtil.isNotEmpty(operates)) {
                 for (BPMNResource operate : operates) {
-                    String modelKey = operate.getModelKey();
-                    String name = operate.getName();
-                    String xml = operate.getEditorXML();
-                    name = StrUtil.format("【操作】{}", name);
-                    modelService.deploy(modelKey, name, xml, Constants.TRIGGER_TYPE_NONE);
+                    ProcessDefinition processDefinition = new ProcessDefinition();
+                    processDefinition.setProcessId(operate.getModelKey());
+                    processDefinition.setName(StrUtil.format("【操作】{}", operate.getName()));
+                    processDefinition.setXml(operate.getEditorXML());
+                    deployService.deploy(processDefinition, ProcessConstants.PROCESS_TYPE_OPERATE);
                 }
             }
 
@@ -87,7 +87,7 @@ public class ModelApiImpl implements ModelApi {
             String protocol = startMessage.getProtocol();
             String content = startMessage.getContent();
             Map<String, Object> requestVariables = getRequestVariables(protocol, content);
-            Map<String, Object> result = modelService.startWithResult(processId, requestVariables);
+            Map<String, Object> result = deployService.startWithResult(processId, requestVariables);
             String response = getResponseVariables(protocol, result);
             return Result.OK(response);
         } catch (Exception e) {
@@ -96,33 +96,29 @@ public class ModelApiImpl implements ModelApi {
         }
     }
 
-    private Map<String, Object> getRequestVariables(String protocol, String content) throws JsonProcessingException {
+    private Map<String, Object> getRequestVariables(String protocol, String content) {
         Map<String, Object> ret = new HashMap<>();
 
         Object request = null;
         if(StrUtil.equalsAny(protocol, Constants.PROTOCOL_HTTP)) {
-            request = om.readValue(content, HttpRequest.class);
+            request = JacksonUtil.from(content, HttpRequest.class);
         }
         ret.put("request", request);
         return ret;
     }
 
 
-    private String getResponseVariables(String protocol, Map<String, Object> result) throws JsonProcessingException {
+    private String getResponseVariables(String protocol, Map<String, Object> result) {
         HttpResponse response = new HttpResponse();
         response.setHeaders(new HashMap<>());
         response.setBody("success");
-        return om.writeValueAsString(response);
+        return JacksonUtil.to(response);
     }
 
     private String getExceptionResponse(Exception e) {
         HttpResponse response = new HttpResponse();
         response.setHeaders(new HashMap<>());
         response.setBody(e.getMessage());
-        try {
-            return om.writeValueAsString(response);
-        } catch (JsonProcessingException ex) {
-            throw new RuntimeException(ex);
-        }
+        return JacksonUtil.to(response);
     }
 }

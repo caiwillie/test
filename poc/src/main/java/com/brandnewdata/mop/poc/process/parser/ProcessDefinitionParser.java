@@ -7,12 +7,17 @@ import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.common.constant.TriggerProtocolConstant;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.manager.ConnectorManager;
+import com.brandnewdata.mop.poc.parser.IOMap;
 import com.brandnewdata.mop.poc.process.dto.*;
 import com.brandnewdata.mop.poc.process.parser.constants.StringPool;
-import com.brandnewdata.mop.poc.parser.IOMap;
 import com.brandnewdata.mop.poc.service.ServiceUtil;
+import com.dxy.library.json.jackson.JacksonUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.type.MapType;
 import lombok.extern.slf4j.Slf4j;
 import org.dom4j.*;
 import org.dom4j.io.OutputFormat;
@@ -30,9 +35,17 @@ import static com.brandnewdata.mop.poc.process.parser.constants.BusinessConstant
 import static com.brandnewdata.mop.poc.process.parser.constants.NamespaceConstants.*;
 import static com.brandnewdata.mop.poc.process.parser.constants.QNameConstants.*;
 
+
 @Slf4j
 public class ProcessDefinitionParser implements
         ProcessDefinitionParseStep1, ProcessDefinitionParseStep2, ProcessDefinitionParseStep3 {
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper(new FeelVariablesJsonFactory());
+
+    private static final MapType MAP_TYPE = OBJECT_MAPPER.getTypeFactory()
+            .constructMapType(Map.class, String.class, Object.class);
+
+
     private String oldDocument;
 
     private String processId;
@@ -484,6 +497,8 @@ public class ProcessDefinitionParser implements
                 BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
                 BRANDNEWDATA_INPUT_MAPPING_QNAME.getQualifiedName()));
         ObjectNode inputs = replaceBndInputMappingToZbIoMapping(inputMapping);
+        // 根据触发器的输入 进行 requestMapping 的表达式计算
+        evalRequestParams(inputs);
 
         Element outputMapping = (Element) startEvent.selectSingleNode(StrUtil.join(StringPool.SLASH,
                 BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
@@ -532,6 +547,27 @@ public class ProcessDefinitionParser implements
         ret.setCallActivity(startEvent);
 
         return ret;
+    }
+
+    public void evalRequestParams(ObjectNode inputs) {
+        if(inputs == null) return;
+
+        try {
+            // 先序列化成字符串，反序列化时，未识别的 token 转换为 null
+            String str = OBJECT_MAPPER.writeValueAsString(inputs);
+            Map<String, Object> values = OBJECT_MAPPER.readValue(str, MAP_TYPE);
+            String expression = JacksonUtil.to(requestParams);
+            Object result = FeelUtil.evalExpression(expression, values);
+
+            scala.collection.immutable.List list = ((scala.collection.immutable.Map) result).toList();
+
+
+            // 将计算完成的结果赋值给 requestParams
+            requestParams = OBJECT_MAPPER.convertValue(result, ObjectNode.class);
+            return;
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void convertXY(Element shape) {
@@ -657,8 +693,6 @@ public class ProcessDefinitionParser implements
 
         return this;
     }
-
-
 
     @Override
     public ProcessDefinitionParseStep3 replaceSceneStartEvent(ConnectorManager manager) {

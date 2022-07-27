@@ -15,4 +15,5 @@ public class ProcessDefinition {
     private String xml;
 
     private String imgUrl;
+
 }

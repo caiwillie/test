@@ -1,6 +1,7 @@
 package com.brandnewdata.mop.poc.process.service;
 
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinition;
+import com.brandnewdata.mop.poc.process.dto.ProcessDeploy;
 
 import java.util.List;
 
@@ -8,8 +9,9 @@ public interface IProcessDefinitionService {
 
     /**
      * 根据 id list 获取定义列表
-     * @param ids
-     * @return
+     *
+     * @param ids the ids
+     * @return list
      */
     List<ProcessDefinition> list(List<String> ids);
 
@@ -21,14 +23,15 @@ public interface IProcessDefinitionService {
      */
     ProcessDefinition save(ProcessDefinition processDefinition);
 
+    /**
+     * 获取流程定义详情
+     *
+     * @param processId the process id
+     * @return the one
+     */
     ProcessDefinition getOne(String processId);
 
-    /**
-     * 部署
-     *
-     * @param processDefinition
-     * @param type 1 场景，2 操作，3 触发器
-     * @return
-     */
-    ProcessDefinition deploy(ProcessDefinition processDefinition, int type);
+
+
+
 }

@@ -172,6 +172,8 @@
                 </brandnewdata:requestMapping>
                 <brandnewdata:inputMapping label="入参配置">
                     <brandnewdata:input type="string" name="access_key" label="密钥" value="&#34;d25749c8-65f8-4cbe-bcac-6d03dd219786&#34;" />
+                    <brandnewdata:input type="string" name="listen_path" label="监听路径" value="&#34;testPath&#34;" />
+                    <brandnewdata:input type="string" name="name" label="监听路径" value="abc" />
                 </brandnewdata:inputMapping>
                 <brandnewdata:requestMapping label="监听配置">
                     <brandnewdata:request type="string" name="listenPath" label="监听路径" value="" />
