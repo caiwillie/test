@@ -68,6 +68,7 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
         entity.setId(processId);
         entity.setName(processDefinition.getName());
         entity.setXml(xml);
+        entity.setImgUrl(processDefinition.getImgUrl());
 
         if(getOne(processId) != null) {
              processDefinitionDao.updateById(entity);

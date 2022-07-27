@@ -147,6 +147,7 @@ public class BusinessSceneService implements IBusinessSceneService {
         dto.setProcessId(businessSceneProcessEntity.getProcessId());
         dto.setName(processDefinition.getName());
         dto.setXml(processDefinition.getXml());
+        dto.setImgUrl(processDefinition.getImgUrl());
         return dto;
     }
 
@@ -169,6 +170,7 @@ public class BusinessSceneService implements IBusinessSceneService {
         dto.setProcessId(businessSceneProcessDefinition.getProcessId());
         dto.setName(businessSceneProcessDefinition.getName());
         dto.setXml(businessSceneProcessDefinition.getXml());
+        dto.setImgUrl(businessSceneProcessDefinition.getImgUrl());
         return dto;
     }
 

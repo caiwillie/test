@@ -13,6 +13,12 @@ public interface IProcessDefinitionService {
      */
     List<ProcessDefinition> list(List<String> ids);
 
+    /**
+     * 保存流程定义
+     *
+     * @param processDefinition the process definition
+     * @return the process definition
+     */
     ProcessDefinition save(ProcessDefinition processDefinition);
 
     ProcessDefinition getOne(String processId);
