@@ -31,4 +31,9 @@ public class BusinessSceneProcessDefinition {
      * 流程 xml
      */
     private String xml;
+
+    /**
+     * 略缩图的 url
+     */
+    private String imgUrl;
 }

@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.poc.process.parser;
 
+import com.brandnewdata.mop.poc.manager.ConnectorManager;
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinition;
 
 public interface ProcessDefinitionParseStep1 {

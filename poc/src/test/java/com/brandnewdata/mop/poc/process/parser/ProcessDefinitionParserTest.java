@@ -2,6 +2,7 @@ package com.brandnewdata.mop.poc.process.parser;
 
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.json.JSONUtil;
+import com.brandnewdata.mop.poc.manager.ConnectorManager;
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinition;
 import com.brandnewdata.mop.poc.process.dto.TriggerProcessDefinition;
 import org.junit.jupiter.api.BeforeEach;
