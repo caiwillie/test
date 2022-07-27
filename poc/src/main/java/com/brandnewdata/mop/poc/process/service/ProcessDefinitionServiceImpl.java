@@ -28,10 +28,7 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
 
     @Resource
     private ProcessDefinitionDao processDefinitionDao;
-
-
-
-
+    
     @Override
     public List<ProcessDefinition> list(List<String> ids) {
         List<ProcessDefinition> ret = new ArrayList<>();

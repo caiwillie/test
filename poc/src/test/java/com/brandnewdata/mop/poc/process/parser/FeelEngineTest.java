@@ -1,13 +1,13 @@
 package com.brandnewdata.mop.poc.process.parser;
 
 import cn.hutool.core.map.MapUtil;
-import com.brandnewdata.mop.poc.process.dto.ProcessDefinition;
-import com.dxy.library.json.jackson.JacksonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.databind.util.RawValue;
+import com.fasterxml.jackson.module.scala.DefaultScalaModule$;
 import org.camunda.feel.FeelEngine;
 import org.camunda.feel.impl.SpiServiceLoader;
 import org.junit.jupiter.api.Test;
@@ -39,14 +39,20 @@ public class FeelEngineTest {
     @Test
     public void test() {
         ObjectMapper objectMapper = new ObjectMapper(new FeelVariablesJsonFactory());
+        objectMapper.registerModule(DefaultScalaModule$.MODULE$);
+        MapType mapType = objectMapper.getTypeFactory().constructMapType(Map.class, String.class, Object.class);
         ObjectNode objectNode = objectMapper.createObjectNode();
-        objectNode.putPOJO("a", new RawValue("\"a\""));
+        objectNode.putPOJO("a", new RawValue("\"a123\""));
         objectNode.putPOJO("b", new RawValue("bb"));
         objectNode.putPOJO("c", new RawValue("\"c\""));
         try {
             String s = objectMapper.writeValueAsString(objectNode);
             JsonNode jsonNode = objectMapper.readTree(s);
-            System.out.println(s);
+            Map<String, Object> values = objectMapper.convertValue(jsonNode, mapType);
+            Object o = FeelUtil.evalExpression("{\"a\": a}", values);
+            Map<String, Object> result = objectMapper.convertValue(o, mapType);
+            return;
+
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

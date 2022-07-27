@@ -29,8 +29,7 @@ public class FeelUtil {
                 Optional.ofNullable(values).orElse(MapUtil.empty()));
 
         if (result.isRight()) {
-            Object value = result.right().get();
-            return value;
+            return result.right().get();
         } else {
             final FeelEngine.Failure failure = result.left().get();
             throw new RuntimeException(failure.message());

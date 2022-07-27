@@ -34,7 +34,7 @@ import static com.brandnewdata.mop.poc.process.parser.constants.AttributeConstan
 import static com.brandnewdata.mop.poc.process.parser.constants.BusinessConstants.*;
 import static com.brandnewdata.mop.poc.process.parser.constants.NamespaceConstants.*;
 import static com.brandnewdata.mop.poc.process.parser.constants.QNameConstants.*;
-
+import com.fasterxml.jackson.module.scala.DefaultScalaModule$;
 
 @Slf4j
 public class ProcessDefinitionParser implements
@@ -45,6 +45,11 @@ public class ProcessDefinitionParser implements
     private static final MapType MAP_TYPE = OBJECT_MAPPER.getTypeFactory()
             .constructMapType(Map.class, String.class, Object.class);
 
+
+    static {
+        // 注册 scala 模块
+        OBJECT_MAPPER.registerModule(DefaultScalaModule$.MODULE$);
+    }
 
     private String oldDocument;
 
@@ -557,13 +562,9 @@ public class ProcessDefinitionParser implements
             String str = OBJECT_MAPPER.writeValueAsString(inputs);
             Map<String, Object> values = OBJECT_MAPPER.readValue(str, MAP_TYPE);
             String expression = JacksonUtil.to(requestParams);
-            Object result = FeelUtil.evalExpression(expression, values);
-
-            scala.collection.immutable.List list = ((scala.collection.immutable.Map) result).toList();
-
-
+            Object obj = FeelUtil.evalExpression(expression, values);
             // 将计算完成的结果赋值给 requestParams
-            requestParams = OBJECT_MAPPER.convertValue(result, ObjectNode.class);
+            requestParams = OBJECT_MAPPER.convertValue(obj, ObjectNode.class);
             return;
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
