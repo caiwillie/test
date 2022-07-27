@@ -9,6 +9,7 @@ import com.brandnewdata.mop.poc.process.ProcessConstants;
 import com.brandnewdata.mop.poc.process.dao.ProcessDeployVersionDao;
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinition;
 import com.brandnewdata.mop.poc.process.dto.ProcessDeploy;
+import com.brandnewdata.mop.poc.process.dto.TriggerProcessDefinition;
 import com.brandnewdata.mop.poc.process.entity.ProcessDeployVersionEntity;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParseStep1;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParser;
@@ -62,15 +63,15 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
     public ProcessDeploy deploy(ProcessDefinition processDefinition, int type) {
         ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(processDefinition);
 
-        ProcessDefinition _processDefinition = null;
+        TriggerProcessDefinition triggerProcessDefinition = null;
         if(type == ProcessConstants.PROCESS_TYPE_SCENE) {
-            _processDefinition = step1.replaceProperties(connectorManager).replaceStep1()
+            triggerProcessDefinition = step1.replaceProperties(connectorManager).replaceStep1()
                     .replaceSceneStartEvent(connectorManager).buildTriggerProcessDefinition();
         } else if (type == ProcessConstants.PROCESS_TYPE_TRIGGER) {
-            _processDefinition = step1.replaceProperties(connectorManager).replaceStep1().replaceTriggerStartEvent()
+            triggerProcessDefinition = step1.replaceProperties(connectorManager).replaceStep1().replaceTriggerStartEvent()
                     .buildTriggerProcessDefinition();
         } else if (type == ProcessConstants.PROCESS_TYPE_OPERATE) {
-            _processDefinition = step1.replaceProperties(connectorManager).replaceStep1().replaceOperateStartEvent()
+            triggerProcessDefinition = step1.replaceProperties(connectorManager).replaceStep1().replaceOperateStartEvent()
                     .buildTriggerProcessDefinition();
         } else {
             throw new IllegalArgumentException(ErrorMessage.CHECK_ERROR("触发器类型不支持", null));
@@ -78,12 +79,12 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
 
         String xml = processDefinition.getXml(); // xml 需要取原始的数据
         // process id 和 name 需要取解析后的
-        String processId = _processDefinition.getProcessId();
-        String name = _processDefinition.getName();
+        String processId = triggerProcessDefinition.getProcessId();
+        String name = triggerProcessDefinition.getName();
 
         // 调用 zeebe 部署
         DeploymentEvent deploymentEvent = zeebe.newDeployResourceCommand()
-                .addResourceStringUtf8(_processDefinition.getXml(), // 取解析后的xml
+                .addResourceStringUtf8(triggerProcessDefinition.getXml(), // 取解析后的xml
                         ServiceUtil.convertModelKey(processId) + ".bpmn")
                 .send()
                 .join();
@@ -102,6 +103,11 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         entity.setType(type);
 
         processDeployVersionDao.insert(entity);
+
+        if(type == ProcessConstants.PROCESS_TYPE_SCENE) {
+            // 如果有场景发布，需要保存监听配置
+            connectorManager.saveRequestParams(triggerProcessDefinition);
+        }
 
         return toDTO(entity);
     }
