@@ -17,4 +17,6 @@ public interface IBusinessSceneService {
 
     BusinessSceneProcessDefinition saveProcessDefinition(BusinessSceneProcessDefinition businessSceneProcessDefinition);
 
+    void deploy(BusinessSceneProcessDefinition businessSceneProcessDefinition);
+
 }

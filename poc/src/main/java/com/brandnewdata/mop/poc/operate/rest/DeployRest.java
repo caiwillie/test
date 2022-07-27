@@ -7,6 +7,7 @@ import com.brandnewdata.mop.poc.process.dto.ProcessDeploy;
 import com.brandnewdata.mop.poc.process.dto.ProcessInstance;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,7 +18,7 @@ import javax.annotation.Resource;
  *
  */
 @RestController
-public class OperateRest {
+public class DeployRest {
 
     @Resource
     private IProcessDeployService deployService;
@@ -30,25 +31,14 @@ public class OperateRest {
      * @return result
      */
     @GetMapping("/rest/operate/deploy/page")
-    public Result<Page<ProcessDeploy>> processDeployPage(
+    public Result<Page<ProcessDeploy>> page (
             @RequestParam int pageNum,
             @RequestParam int pageSize) {
         Page<ProcessDeploy> page = deployService.page(pageNum, pageSize);
         return Result.OK(page);
     }
 
-    /**
-     * 流程实例分页列表
-     *
-     * @param pageNum  分页页码
-     * @param pageSize 分页大小
-     * @return result
-     */
-    @GetMapping("/rest/operate/instance/page")
-    public Result<Page<ProcessInstance>> processInstancePage(
-            @RequestParam int pageNum,
-            @RequestParam int pageSize) {
-        return null;
-    }
+
+
 
 }

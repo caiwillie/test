@@ -12,8 +12,10 @@ import com.brandnewdata.mop.poc.group.dto.BusinessScene;
 import com.brandnewdata.mop.poc.group.dto.BusinessSceneProcessDefinition;
 import com.brandnewdata.mop.poc.group.entity.BusinessSceneEntity;
 import com.brandnewdata.mop.poc.group.entity.BusinessSceneProcessEntity;
+import com.brandnewdata.mop.poc.process.ProcessConstants;
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinition;
 import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService;
+import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -37,6 +39,9 @@ public class BusinessSceneService implements IBusinessSceneService {
 
     @Resource
     private IProcessDefinitionService processDefinitionService;
+
+    @Resource
+    private IProcessDeployService processDeployService;
 
     @Override
     public Page<BusinessScene> page(int pageNumber, int pageSize) {
@@ -122,6 +127,12 @@ public class BusinessSceneService implements IBusinessSceneService {
             businessSceneProcessDao.insert(businessSceneProcessEntity);
         }
         return toDTO(businessSceneProcessEntity, processDefinition);
+    }
+
+    @Override
+    public void deploy(BusinessSceneProcessDefinition businessSceneProcessDefinition) {
+        ProcessDefinition processDefinition = toDTO(businessSceneProcessDefinition);
+        processDeployService.deploy(processDefinition, ProcessConstants.PROCESS_TYPE_SCENE);
     }
 
     private BusinessSceneProcessEntity getBusinessSceneProcessEntityByProcessId(String processId) {

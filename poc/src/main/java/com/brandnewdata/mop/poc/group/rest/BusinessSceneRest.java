@@ -6,6 +6,7 @@ import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.group.dto.BusinessScene;
 import com.brandnewdata.mop.poc.group.dto.BusinessSceneProcessDefinition;
 import com.brandnewdata.mop.poc.group.service.IBusinessSceneService;
+import com.brandnewdata.mop.poc.process.dto.ProcessInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +20,6 @@ public class BusinessSceneRest {
 
     @Autowired
     private IBusinessSceneService service;
-
 
     /**
      * 分页列表
@@ -69,9 +69,17 @@ public class BusinessSceneRest {
      * @return the result
      */
     @PostMapping(value = "/rest/businessScene/saveProcessDefinition")
-    public Result<BusinessSceneProcessDefinition> saveProcessDefinition(@RequestBody BusinessSceneProcessDefinition businessSceneProcessDefinition) {
+    public Result<BusinessSceneProcessDefinition> saveProcessDefinition(
+            @RequestBody BusinessSceneProcessDefinition businessSceneProcessDefinition) {
         businessSceneProcessDefinition = service.saveProcessDefinition(businessSceneProcessDefinition);
         return Result.OK(businessSceneProcessDefinition);
+    }
+
+    @PostMapping("/rest/businessScene/deployProcessDefinition")
+    public Result<Page<ProcessInstance>> deployProcessDefinition (
+            @RequestBody BusinessSceneProcessDefinition businessSceneProcessDefinition) {
+
+        return null;
     }
 
 }
