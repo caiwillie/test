@@ -38,7 +38,4 @@ public class DeployRest {
         return Result.OK(page);
     }
 
-
-
-
 }

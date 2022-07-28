@@ -13,17 +13,17 @@ public class ProcessInstance {
     /**
      * 流程版本
      */
-    private String version;
+    private Long version;
 
     /**
      * 流程实例 id
      */
-    private String instanceId;
+    private Long instanceId;
 
     /**
      * 父级流程实例 id
      */
-    private String parentInstanceId;
+    private Long parentInstanceId;
 
     /**
      * 开始时间
