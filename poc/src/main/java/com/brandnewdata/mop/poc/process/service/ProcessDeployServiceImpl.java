@@ -50,6 +50,7 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
     }
 
     private ProcessDeploy toDTO(ProcessDeployEntity entity) {
+        if(entity == null) return null; //为空返回
         ProcessDeploy dto = new ProcessDeploy();
         dto.setId(entity.getId());
         dto.setProcessId(entity.getProcessId());
@@ -57,6 +58,7 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         dto.setXml(entity.getProcessXml());
         dto.setVersion(entity.getVersion());
         dto.setType(entity.getType());
+        dto.setZeebeKey(entity.getZeebeKey());
         return dto;
     }
 
@@ -145,6 +147,12 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
                 .join();
 
         return result.getVariablesAsMap();
+    }
+
+    @Override
+    public ProcessDeploy getOne(long deployId) {
+        ProcessDeployEntity entity = processDeployDao.selectById(deployId);
+        return toDTO(entity);
     }
 
 

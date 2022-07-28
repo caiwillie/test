@@ -38,4 +38,9 @@ public class ProcessDeploy {
      */
     private int type;
 
+    /**
+     * zeebe 触发 key
+     */
+    private Long zeebeKey;
+
 }

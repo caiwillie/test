@@ -2,16 +2,21 @@ package com.brandnewdata.mop.poc.operate.service;
 
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.PageUtil;
 import com.brandnewdata.mop.poc.common.dto.Page;
+import com.brandnewdata.mop.poc.error.ErrorMessage;
+import com.brandnewdata.mop.poc.process.dto.ProcessDeploy;
 import com.brandnewdata.mop.poc.process.dto.ProcessInstance;
+import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import io.camunda.operate.CamundaOperateClient;
 import io.camunda.operate.auth.SimpleAuthentication;
 import io.camunda.operate.search.*;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +29,9 @@ public class InstanceService {
 
     private CamundaOperateClient client;
 
+    @Resource
+    private IProcessDeployService deployService;
+
     public InstanceService() {
         init();
     }
@@ -35,8 +43,12 @@ public class InstanceService {
     }
 
     @SneakyThrows
-    public Page<ProcessInstance> page(int pageNum, int pageSize) {
-        ProcessInstanceFilter instanceFilter = new ProcessInstanceFilter.Builder().bpmnProcessId("Process_2875dfe6-b543-4d98-bdba-87b1f8c4d993").build();
+    public Page<ProcessInstance> page(long deployId, int pageNum, int pageSize) {
+
+        ProcessDeploy processDeploy = deployService.getOne(deployId);
+        Assert.notNull(processDeploy, ErrorMessage.NOT_NULL("部署 id"));
+
+        ProcessInstanceFilter instanceFilter = new ProcessInstanceFilter.Builder().processDefinitionKey(processDeploy.getZeebeKey()).build();
         SearchQuery instanceQuery = new SearchQuery.Builder().withFilter(instanceFilter).withSize(20).withSort(new Sort("state", SortOrder.ASC)).build();
         List<io.camunda.operate.dto.ProcessInstance> processInstances = client.searchProcessInstances(instanceQuery);
         processInstances = Optional.ofNullable(processInstances).orElse(ListUtil.empty());

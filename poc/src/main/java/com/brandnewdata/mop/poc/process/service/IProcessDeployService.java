@@ -20,4 +20,6 @@ public interface IProcessDeployService {
     Page<ProcessDeploy> page(int pageNum, int pageSize);
 
     Map<String, Object> startWithResult(String processId, Map<String, Object> value);
+
+    ProcessDeploy getOne(long deployId);
 }

@@ -23,13 +23,14 @@ public class InstanceRest {
     /**
      * 流程实例分页列表
      *
+     * @param deployId 部署id
      * @param pageNum  分页页码
      * @param pageSize 分页大小
-     * @return result
+     * @return result result
      */
     @GetMapping("/rest/operate/instance/page")
     public Result<Page<ProcessInstance>> page (
-            @RequestParam String processId,
+            @RequestParam Long deployId,
             @RequestParam int pageNum,
             @RequestParam int pageSize) {
         Page<ProcessInstance> page = instanceService.page(pageNum, pageSize);
