@@ -393,8 +393,8 @@ public class ProcessDefinitionParser implements
     private void logXML() {
         documentStr = serialize(document);
         String TEMPLATE =
-                "\n======================= 转换前 xml =======================\n {}" +
-                        "\n======================= 转换后 xml =======================\n {}";
+                "\n======================= 转换前 xml =======================\n{}" +
+                        "\n======================= 转换后 xml =======================\n{}";
         log.info(StrUtil.format(TEMPLATE, oldDocument, documentStr));
     }
 
@@ -633,15 +633,21 @@ public class ProcessDefinitionParser implements
 
         String sequenceId = sequenceFlow.attributeValue(ID_ATTRIBUTE);
 
+        // ! incoming outgoing 的顺序很重要，incoming 在前，outgoing在后
         Element outgoing = ElementCreator.createOutgoing();
         outgoing.setText(sequenceId);
         outgoing.setParent(source);
         source.content().add(outgoing);
 
+
         Element incoming = ElementCreator.createIncoming();
         incoming.setText(sequenceId);
         incoming.setParent(target);
-        target.content().add(incoming);
+
+        Element firstOutGoing = (Element) target.selectSingleNode(BPMN_OUTGOING_QNAME.getQualifiedName());
+        List<Node> content = target.content();
+        // ! 将 incoming 插入到第一个 outcoimg之前
+        content.add(content.indexOf(firstOutGoing), incoming);
     }
 
     private Element getBpProcess() {
