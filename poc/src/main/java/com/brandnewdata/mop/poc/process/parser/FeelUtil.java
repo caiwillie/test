@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.module.scala.DefaultScalaModule$;
+import lombok.SneakyThrows;
 import org.camunda.feel.FeelEngine;
 import org.camunda.feel.impl.SpiServiceLoader;
 import scala.util.Either;
@@ -48,14 +49,17 @@ public class FeelUtil {
         }
     }
 
+    @SneakyThrows
     public static Map<String, Object> convertMap(Object obj) {
         if (obj == null) return null;
-        return OBJECT_MAPPER.convertValue(obj, MAP_TYPE);
+        String str = OBJECT_MAPPER.writeValueAsString(obj);
+        return OBJECT_MAPPER.readValue(str, MAP_TYPE);
     }
-
+    @SneakyThrows
     public static <T> T convertValue(Object obj, Class<T> toValueType) {
         if (obj == null) return null;
-        return OBJECT_MAPPER.convertValue(obj, toValueType);
+        String str = OBJECT_MAPPER.writeValueAsString(obj);
+        return OBJECT_MAPPER.readValue(str, toValueType);
     }
 
 }
