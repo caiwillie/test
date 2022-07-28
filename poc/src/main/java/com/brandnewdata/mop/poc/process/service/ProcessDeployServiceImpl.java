@@ -1,6 +1,7 @@
 package com.brandnewdata.mop.poc.process.service;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
@@ -53,6 +54,7 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         if(entity == null) return null; //为空返回
         ProcessDeploy dto = new ProcessDeploy();
         dto.setId(entity.getId());
+        dto.setCreateTime(LocalDateTimeUtil.formatNormal(entity.getCreateTime()));
         dto.setProcessId(entity.getProcessId());
         dto.setProcessName(entity.getProcessName());
         dto.setXml(entity.getProcessXml());

@@ -13,6 +13,12 @@ public class ProcessDeploy {
      */
     private Long id;
 
+
+    /**
+     * 部署时间
+     */
+    private String createTime;
+
     /**
      * 流程 id
      */
