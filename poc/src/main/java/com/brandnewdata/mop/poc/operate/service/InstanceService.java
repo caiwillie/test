@@ -41,11 +41,12 @@ public class InstanceService {
         List<io.camunda.operate.dto.ProcessInstance> processInstances = client.searchProcessInstances(instanceQuery);
         processInstances = Optional.ofNullable(processInstances).orElse(ListUtil.empty());
         List<ProcessInstance> list = new ArrayList<>();
+        PageUtil.setFirstPageNo(1);
         int[] startEnd = PageUtil.transToStartEnd(pageNum, pageSize);
         int start = startEnd[0];
         int end = startEnd[1];
         int total = processInstances.size();
-        for (int i = start; i <= total && i <= end; i++) {
+        for (int i = start; i < total && i < end; i++) {
             list.add(toDTO(processInstances.get(i)));
         }
         return new Page<>(total, list);
