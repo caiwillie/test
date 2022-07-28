@@ -37,11 +37,13 @@ public class ProcessDeployEntity implements Serializable {
 
     private String processXml;
 
-    private Long zeebeKey;
-
     private Integer version;
 
     private Integer type;
+
+    private Long zeebeKey;
+
+    private String zeebeXml;
 
 
     public static final String ID = "id";
@@ -54,10 +56,12 @@ public class ProcessDeployEntity implements Serializable {
 
     public static final String PROCESS_XML = "process_xml";
 
-    public static final String ZEEBE_KEY = "zeebe_key";
-
     public static final String VERSION = "version";
 
     public static final String TYPE = "type";
+
+    public static final String ZEEBE_KEY = "zeebe_key";
+
+    public static final String ZEEBE_XML = "zeebe_xml";
 
 }

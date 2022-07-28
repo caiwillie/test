@@ -84,10 +84,11 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         // process id 和 name 需要取解析后的
         String processId = triggerProcessDefinition.getProcessId();
         String name = triggerProcessDefinition.getName();
+        String zeebeXML = triggerProcessDefinition.getXml();
 
         // 调用 zeebe 部署
         DeploymentEvent deploymentEvent = zeebe.newDeployResourceCommand()
-                .addResourceStringUtf8(triggerProcessDefinition.getXml(), // 取解析后的xml
+                .addResourceStringUtf8(zeebeXML, // 取解析后的xml
                         ServiceUtil.convertModelKey(processId) + ".bpmn")
                 .send()
                 .join();
@@ -100,10 +101,11 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         entity.setProcessId(processId);
         entity.setProcessName(name);
         entity.setProcessXml(xml);
-        entity.setZeebeKey(zeebeKey);
         // 设置版本
         entity.setVersion(latestVersion == null ? 0 : latestVersion.getVersion() + 1);
         entity.setType(type);
+        entity.setZeebeKey(zeebeKey);
+        entity.setZeebeXml(zeebeXML);
 
         processDeployDao.insert(entity);
 

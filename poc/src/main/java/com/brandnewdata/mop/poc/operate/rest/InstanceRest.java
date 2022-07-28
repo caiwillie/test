@@ -33,7 +33,7 @@ public class InstanceRest {
             @RequestParam Long deployId,
             @RequestParam int pageNum,
             @RequestParam int pageSize) {
-        Page<ProcessInstance> page = instanceService.page(pageNum, pageSize);
+        Page<ProcessInstance> page = instanceService.page(deployId, pageNum, pageSize);
         return Result.OK(page);
     }
 
