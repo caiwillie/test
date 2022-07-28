@@ -29,6 +29,7 @@ public class InstanceRest {
      */
     @GetMapping("/rest/operate/instance/page")
     public Result<Page<ProcessInstance>> page (
+            @RequestParam String processId,
             @RequestParam int pageNum,
             @RequestParam int pageSize) {
         Page<ProcessInstance> page = instanceService.page(pageNum, pageSize);

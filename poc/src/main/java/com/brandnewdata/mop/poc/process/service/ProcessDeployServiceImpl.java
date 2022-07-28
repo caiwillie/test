@@ -6,11 +6,11 @@ import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.manager.ConnectorManager;
 import com.brandnewdata.mop.poc.process.ProcessConstants;
-import com.brandnewdata.mop.poc.process.dao.ProcessDeployVersionDao;
+import com.brandnewdata.mop.poc.process.dao.ProcessDeployDao;
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinition;
 import com.brandnewdata.mop.poc.process.dto.ProcessDeploy;
 import com.brandnewdata.mop.poc.process.dto.TriggerProcessDefinition;
-import com.brandnewdata.mop.poc.process.entity.ProcessDeployVersionEntity;
+import com.brandnewdata.mop.poc.process.entity.ProcessDeployEntity;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParseStep1;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParser;
 import com.brandnewdata.mop.poc.service.ServiceUtil;
@@ -28,7 +28,7 @@ import java.util.Map;
 public class ProcessDeployServiceImpl implements IProcessDeployService{
 
     @Resource
-    private ProcessDeployVersionDao processDeployVersionDao;
+    private ProcessDeployDao processDeployDao;
 
     @Resource
     private ConnectorManager connectorManager;
@@ -36,11 +36,11 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
     @Resource
     private ZeebeClient zeebe;
 
-    private ProcessDeployVersionEntity getLatestDeployVersion(String processId) {
-        QueryWrapper<ProcessDeployVersionEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(ProcessDeployVersionEntity.PROCESS_ID, processId);
-        queryWrapper.orderByDesc(ProcessDeployVersionEntity.VERSION);
-        List<ProcessDeployVersionEntity> list = processDeployVersionDao.selectList(queryWrapper);
+    private ProcessDeployEntity getLatestDeployVersion(String processId) {
+        QueryWrapper<ProcessDeployEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(ProcessDeployEntity.PROCESS_ID, processId);
+        queryWrapper.orderByDesc(ProcessDeployEntity.VERSION);
+        List<ProcessDeployEntity> list = processDeployDao.selectList(queryWrapper);
 
         if(CollUtil.isEmpty(list)) {
             return null;
@@ -49,8 +49,9 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         }
     }
 
-    private ProcessDeploy toDTO(ProcessDeployVersionEntity entity) {
+    private ProcessDeploy toDTO(ProcessDeployEntity entity) {
         ProcessDeploy dto = new ProcessDeploy();
+        dto.setId(entity.getId());
         dto.setProcessId(entity.getProcessId());
         dto.setProcessName(entity.getProcessName());
         dto.setXml(entity.getProcessXml());
@@ -91,9 +92,9 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
 
         long zeebeKey = deploymentEvent.getKey();
 
-        ProcessDeployVersionEntity latestVersion = getLatestDeployVersion(processId);
+        ProcessDeployEntity latestVersion = getLatestDeployVersion(processId);
 
-        ProcessDeployVersionEntity entity = new ProcessDeployVersionEntity();
+        ProcessDeployEntity entity = new ProcessDeployEntity();
         entity.setProcessId(processId);
         entity.setProcessName(name);
         entity.setProcessXml(xml);
@@ -102,7 +103,7 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         entity.setVersion(latestVersion == null ? 0 : latestVersion.getVersion() + 1);
         entity.setType(type);
 
-        processDeployVersionDao.insert(entity);
+        processDeployDao.insert(entity);
 
         if(type == ProcessConstants.PROCESS_TYPE_SCENE) {
             // 如果有场景发布，需要保存监听配置
@@ -115,16 +116,16 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
 
     @Override
     public Page<ProcessDeploy> page(int pageNum, int pageSize) {
-        com.baomidou.mybatisplus.extension.plugins.pagination.Page<ProcessDeployVersionEntity> page =
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<ProcessDeployEntity> page =
                 com.baomidou.mybatisplus.extension.plugins.pagination.Page.of(pageNum, pageSize);
-        QueryWrapper<ProcessDeployVersionEntity> queryWrapper = new QueryWrapper<>();
-        page = processDeployVersionDao.selectPage(page, queryWrapper);
+        QueryWrapper<ProcessDeployEntity> queryWrapper = new QueryWrapper<>();
+        page = processDeployDao.selectPage(page, queryWrapper);
         List<ProcessDeploy> list = new ArrayList<>();
 
-        List<ProcessDeployVersionEntity> records = page.getRecords();
+        List<ProcessDeployEntity> records = page.getRecords();
 
         if(CollUtil.isNotEmpty(records)) {
-            for (ProcessDeployVersionEntity record : records) {
+            for (ProcessDeployEntity record : records) {
                 ProcessDeploy dto = toDTO(record);
                 list.add(dto);
             }
