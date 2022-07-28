@@ -77,7 +77,6 @@ public class ModelApiImpl implements ModelApi {
 
         StartMessage startMessage = messages.get(0);
         String processId = startMessage.getProcessId();
-        String protocol = startMessage.getProtocol();
         String content = startMessage.getContent();
         Map<String, Object> requestVariables = JacksonUtil.fromMap(content);
         Map<String, Object> result = deployService.startWithResult(processId, requestVariables);

@@ -160,6 +160,7 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         TriggerProcessDefinition triggerProcessDefinition = ProcessDefinitionParser.newInstance(processDefinition).replaceStep1()
                 .replaceSceneStartEvent(connectorManager).buildTriggerProcessDefinition();
 
+        // 解析 xml 后得到响应表达式
         ObjectNode responseParams = triggerProcessDefinition.getResponseParams();
 
         String expression = responseParams == null ? "" : JacksonUtil.to(responseParams);
