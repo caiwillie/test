@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 
+/**
+ * 运行监控相关的接口
+ *
+ */
 @RestController
 public class InstanceRest {
 
