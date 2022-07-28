@@ -33,6 +33,9 @@ public class ProcessDeploy {
      */
     private int version;
 
+    /**
+     * 类型：1 场景，2 触发器，3 操作
+     */
     private int type;
 
 }
