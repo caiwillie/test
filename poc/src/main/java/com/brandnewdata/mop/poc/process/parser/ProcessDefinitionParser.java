@@ -40,16 +40,7 @@ import com.fasterxml.jackson.module.scala.DefaultScalaModule$;
 public class ProcessDefinitionParser implements
         ProcessDefinitionParseStep1, ProcessDefinitionParseStep2, ProcessDefinitionParseStep3 {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper(new FeelVariablesJsonFactory());
 
-    private static final MapType MAP_TYPE = OBJECT_MAPPER.getTypeFactory()
-            .constructMapType(Map.class, String.class, Object.class);
-
-
-    static {
-        // 注册 scala 模块
-        OBJECT_MAPPER.registerModule(DefaultScalaModule$.MODULE$);
-    }
 
     private String oldDocument;
 
@@ -67,6 +58,8 @@ public class ProcessDefinitionParser implements
 
     private ObjectNode requestParams;
 
+    private ObjectNode responseParams;
+
     private static final ParameterParser INPUT_PARSER = new ParameterParser(
             BRANDNEWDATA_INPUT_QNAME.getQualifiedName(),
             NAME_ATTRIBUTE, VALUE_ATTRIBUTE, LABEL_ATTRIBUTE, TYPE_ATTRIBUTE, DATA_TYPE_ATTRIBUTE);
@@ -77,6 +70,10 @@ public class ProcessDefinitionParser implements
 
     private static final ParameterParser REQUEST_PARSER = new ParameterParser(
             BRANDNEWDATA_REQUEST_QNAME.getQualifiedName(),
+            NAME_ATTRIBUTE, VALUE_ATTRIBUTE, LABEL_ATTRIBUTE, TYPE_ATTRIBUTE, DATA_TYPE_ATTRIBUTE);
+
+    private static final ParameterParser RESPONSE_PARSER = new ParameterParser(
+            BRANDNEWDATA_RESPONSE_QNAME.getQualifiedName(),
             NAME_ATTRIBUTE, VALUE_ATTRIBUTE, LABEL_ATTRIBUTE, TYPE_ATTRIBUTE, DATA_TYPE_ATTRIBUTE);
 
     private static final IOMapParser IO_MAP_PARSER = new IOMapParser();
@@ -444,11 +441,27 @@ public class ProcessDefinitionParser implements
         return REQUEST_PARSER.parse(oldE);
     }
 
+    private ObjectNode getResponseParams(Element startEvent) {
+        XPath path = DocumentHelper.createXPath(StrUtil.join(StringPool.SLASH,
+                BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
+                BRANDNEWDATA_RESPONSE_MAPPING_QNAME.getQualifiedName()));
+        Element oldE = (Element) path.selectSingleNode(startEvent);
+        // 缺少监听配置
+        if(oldE == null) {
+            return null;
+        } else {
+            return RESPONSE_PARSER.parse(oldE);
+        }
+    }
+
     private void replaceSceneGeneralStartEventToNoneStartEvent(Element bndTaskDefinition) {
         // 获取监听参数, 获取 startEvent
         Element startEvent = bndTaskDefinition.getParent().getParent();
 
+        // 获取 监听配置 和 响应配置
         requestParams = getRequestParams(startEvent);
+
+        responseParams = getResponseParams(startEvent);
 
         protocol = TriggerProtocolConstant.getProtocolByConnectorId(trigger.getConnectorId());
 
@@ -478,6 +491,7 @@ public class ProcessDefinitionParser implements
         // 替换成真实协议
         protocol = triggerProcessDefinition.getProtocol();
         requestParams = triggerProcessDefinition.getRequestParams();
+        responseParams = triggerProcessDefinition.getResponseParams();
 
         // 替换成 call activity
         BndStartEvent bndStartEvent = replaceBndStartEventToCallActivity(bndTaskDefinition);
@@ -556,19 +570,12 @@ public class ProcessDefinitionParser implements
 
     public void evalRequestParams(ObjectNode inputs) {
         if(inputs == null) return;
-
-        try {
-            // 先序列化成字符串，反序列化时，未识别的 token 转换为 null
-            String str = OBJECT_MAPPER.writeValueAsString(inputs);
-            Map<String, Object> values = OBJECT_MAPPER.readValue(str, MAP_TYPE);
-            String expression = JacksonUtil.to(requestParams);
-            Object obj = FeelUtil.evalExpression(expression, values);
-            // 将计算完成的结果赋值给 requestParams
-            requestParams = OBJECT_MAPPER.convertValue(obj, ObjectNode.class);
-            return;
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        // 先序列化成字符串，反序列化时，未识别的 token 转换为 null
+        Map<String, Object> values = FeelUtil.convertMap(inputs);
+        String expression = JacksonUtil.to(requestParams);
+        Object obj = FeelUtil.evalExpression(expression, values);
+        // 将计算完成的结果赋值给 requestParams
+        requestParams = FeelUtil.convertValue(obj, ObjectNode.class);
     }
 
     private void convertXY(Element shape) {
@@ -676,6 +683,8 @@ public class ProcessDefinitionParser implements
         // 获取 request params
         requestParams = getRequestParams(startEvent);
 
+        responseParams = getResponseParams(startEvent);
+
         // 替换成 空启动事件
         replaceNoneStartEvent(startEvent);
         return this;
@@ -777,6 +786,7 @@ public class ProcessDefinitionParser implements
         ret.setProtocol(protocol);
         ret.setTrigger(trigger);
         ret.setRequestParams(requestParams);
+        ret.setResponseParams(responseParams);
         return ret;
     }
 }

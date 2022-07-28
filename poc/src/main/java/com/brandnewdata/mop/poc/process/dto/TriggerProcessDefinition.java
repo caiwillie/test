@@ -11,4 +11,6 @@ public class TriggerProcessDefinition extends ProcessDefinition {
     private String protocol;
 
     private ObjectNode requestParams;
+
+    private ObjectNode responseParams;
 }

@@ -34,11 +34,15 @@ public interface LocalNameConstants {
 
     String REQUEST_LOCALNAME = "request";
 
+    String RESPONSE_LOCALNAME = "response";
+
     String INPUT_MAPPING_LOCALNAME = "inputMapping";
 
     String OUTPUT_MAPPING_LOCALNAME = "outputMapping";
 
     String REQUEST_MAPPING_LOCALNAME = "requestMapping";
+
+    String RESPONSE_MAPPING_LOCALNAME = "responseMapping";
 
     String IO_MAPPING_LOCALNAME = "ioMapping";
 

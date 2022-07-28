@@ -8,19 +8,12 @@ import com.brandnewdata.mop.api.ModelApi;
 import com.brandnewdata.mop.api.dto.BPMNResource;
 import com.brandnewdata.mop.api.dto.ConnectorResource;
 import com.brandnewdata.mop.api.dto.StartMessage;
-import com.brandnewdata.mop.api.dto.protocol.request.HttpRequest;
 import com.brandnewdata.mop.api.dto.protocol.response.HttpResponse;
-import com.brandnewdata.mop.poc.common.Constants;
 import com.brandnewdata.mop.poc.process.ProcessConstants;
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinition;
-import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
-import com.brandnewdata.mop.poc.service.ModelService;
-import com.brandnewdata.mop.poc.service.ServiceUtil;
 import com.dxy.library.json.jackson.JacksonUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.MapType;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -75,50 +68,19 @@ public class ModelApiImpl implements ModelApi {
         }
     }
 
+    @SneakyThrows
     @Override
     public Result startByConnectorMessages(List<StartMessage> messages) {
         if(CollUtil.isEmpty(messages)) {
             return Result.OK();
         }
 
-        try {
-            StartMessage startMessage = messages.get(0);
-            String processId = startMessage.getProcessId();
-            String protocol = startMessage.getProtocol();
-            String content = startMessage.getContent();
-            Map<String, Object> requestVariables = getRequestVariables(protocol, content);
-            Map<String, Object> result = deployService.startWithResult(processId, requestVariables);
-            String response = getResponseVariables(protocol, result);
-            return Result.OK(response);
-        } catch (Exception e) {
-            String response = getExceptionResponse(e);
-            return Result.error(response);
-        }
-    }
-
-    private Map<String, Object> getRequestVariables(String protocol, String content) {
-        Map<String, Object> ret = new HashMap<>();
-
-        Object request = null;
-        if(StrUtil.equalsAny(protocol, Constants.PROTOCOL_HTTP)) {
-            request = JacksonUtil.from(content, HttpRequest.class);
-        }
-        ret.put("request", request);
-        return ret;
-    }
-
-
-    private String getResponseVariables(String protocol, Map<String, Object> result) {
-        HttpResponse response = new HttpResponse();
-        response.setHeaders(new HashMap<>());
-        response.setBody("success");
-        return JacksonUtil.to(response);
-    }
-
-    private String getExceptionResponse(Exception e) {
-        HttpResponse response = new HttpResponse();
-        response.setHeaders(new HashMap<>());
-        response.setBody(e.getMessage());
-        return JacksonUtil.to(response);
+        StartMessage startMessage = messages.get(0);
+        String processId = startMessage.getProcessId();
+        String protocol = startMessage.getProtocol();
+        String content = startMessage.getContent();
+        Map<String, Object> requestVariables = JacksonUtil.fromMap(content);
+        Map<String, Object> result = deployService.startWithResult(processId, requestVariables);
+        return Result.OK(JacksonUtil.to(result));
     }
 }

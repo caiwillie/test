@@ -2,6 +2,7 @@ package com.brandnewdata.mop.poc.process.service;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
@@ -12,9 +13,16 @@ import com.brandnewdata.mop.poc.process.dto.ProcessDefinition;
 import com.brandnewdata.mop.poc.process.dto.ProcessDeploy;
 import com.brandnewdata.mop.poc.process.dto.TriggerProcessDefinition;
 import com.brandnewdata.mop.poc.process.entity.ProcessDeployEntity;
+import com.brandnewdata.mop.poc.process.parser.FeelUtil;
+import com.brandnewdata.mop.poc.process.parser.FeelVariablesJsonFactory;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParseStep1;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParser;
 import com.brandnewdata.mop.poc.service.ServiceUtil;
+import com.dxy.library.json.jackson.JacksonUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.type.MapType;
+import com.fasterxml.jackson.module.scala.DefaultScalaModule$;
 import io.camunda.zeebe.client.ZeebeClient;
 import io.camunda.zeebe.client.api.response.DeploymentEvent;
 import io.camunda.zeebe.client.api.response.ProcessInstanceResult;
@@ -142,6 +150,20 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
 
     @Override
     public Map<String, Object> startWithResult(String processId, Map<String, Object> values) {
+
+        ProcessDeployEntity processDeployEntity = getLatestDeployVersion(processId);
+        Assert.notNull(processDeployEntity, ErrorMessage.NOT_NULL("流程 id"), processId);
+
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setXml(processDeployEntity.getProcessXml());
+
+        TriggerProcessDefinition triggerProcessDefinition = ProcessDefinitionParser.newInstance(processDefinition).replaceStep1()
+                .replaceSceneStartEvent(connectorManager).buildTriggerProcessDefinition();
+
+        ObjectNode responseParams = triggerProcessDefinition.getResponseParams();
+
+        String expression = responseParams == null ? "" : JacksonUtil.to(responseParams);
+
         ProcessInstanceResult result = zeebe.newCreateInstanceCommand()
                 .bpmnProcessId(ServiceUtil.convertModelKey(processId)) // 使用处理过的 processId
                 .latestVersion()
@@ -150,7 +172,11 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
                 .send()
                 .join();
 
-        return result.getVariablesAsMap();
+        Map<String, Object> resultVariables = result.getVariablesAsMap();
+
+        Object response = FeelUtil.evalExpression(expression, resultVariables);
+
+        return FeelUtil.convertMap(response);
     }
 
     @Override
@@ -158,6 +184,8 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         ProcessDeployEntity entity = processDeployDao.selectById(deployId);
         return toDTO(entity);
     }
+
+
 
 
 }
