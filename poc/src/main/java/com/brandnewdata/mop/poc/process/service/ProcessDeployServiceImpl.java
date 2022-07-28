@@ -164,7 +164,6 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         ObjectNode responseParams = triggerProcessDefinition.getResponseParams();
 
         String expression = responseParams == null ? "" : JacksonUtil.to(responseParams);
-
         ProcessInstanceResult result = zeebe.newCreateInstanceCommand()
                 .bpmnProcessId(ServiceUtil.convertModelKey(processId)) // 使用处理过的 processId
                 .latestVersion()
