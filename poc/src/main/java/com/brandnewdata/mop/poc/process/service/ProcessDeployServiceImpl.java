@@ -99,7 +99,7 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         // 调用 zeebe 部署
         DeploymentEvent deploymentEvent = zeebe.newDeployResourceCommand()
                 .addResourceStringUtf8(zeebeXML, // 取解析后的xml
-                        ServiceUtil.convertModelKey(processId) + ".bpmn")
+                         "a.bpmn")
                 .send()
                 .join();
 

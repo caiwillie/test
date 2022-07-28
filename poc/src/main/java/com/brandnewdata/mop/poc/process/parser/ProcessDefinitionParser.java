@@ -12,12 +12,8 @@ import com.brandnewdata.mop.poc.process.dto.*;
 import com.brandnewdata.mop.poc.process.parser.constants.StringPool;
 import com.brandnewdata.mop.poc.service.ServiceUtil;
 import com.dxy.library.json.jackson.JacksonUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.type.MapType;
 import lombok.extern.slf4j.Slf4j;
 import org.dom4j.*;
 import org.dom4j.io.OutputFormat;
@@ -34,7 +30,6 @@ import static com.brandnewdata.mop.poc.process.parser.constants.AttributeConstan
 import static com.brandnewdata.mop.poc.process.parser.constants.BusinessConstants.*;
 import static com.brandnewdata.mop.poc.process.parser.constants.NamespaceConstants.*;
 import static com.brandnewdata.mop.poc.process.parser.constants.QNameConstants.*;
-import com.fasterxml.jackson.module.scala.DefaultScalaModule$;
 
 @Slf4j
 public class ProcessDefinitionParser implements
@@ -548,7 +543,10 @@ public class ProcessDefinitionParser implements
         shape.addAttribute(BPMN_ELEMENT_ATTRIBUTE, newId);
 
         // 转换 x, y 的节点
-        convertXY(shape);
+        alignRectangle(shape);
+
+        ShapeCenter shapeCenter = getShapeCenter(shape);
+        long[] rightCenter = shapeCenter.getRightCenter();
 
         // 替换 sequence 的属性 source ref
         XPath sequencePath = DocumentHelper.createXPath(StrUtil.format("//{}[@{}='{}']",
@@ -558,6 +556,15 @@ public class ProcessDefinitionParser implements
             for (Node node : nodes) {
                 Element sequence = (Element) node;
                 sequence.addAttribute(SOURCE_REF_ATTRIBUTE, newId);
+                String sequenceId = sequence.attributeValue(ID_ATTRIBUTE);
+                XPath edgePath = DocumentHelper.createXPath(StrUtil.format("//{}[@{}='{}']",
+                        BPMNDI_BPMN_EDGE_QNAME.getQualifiedName(), BPMN_ELEMENT_ATTRIBUTE, sequenceId));
+                Element edge = (Element) edgePath.selectSingleNode(document);
+                List<Node> wayPoints = edge.selectNodes(DI_WAYPOINT_QNAME.getQualifiedName());
+                Element firstWayPoint = (Element) wayPoints.get(0);
+                // 修改所有连线的节点到 右边界中点
+                firstWayPoint.addAttribute(X_ATTRIBUTE, String.valueOf(rightCenter[0]));
+                firstWayPoint.addAttribute(Y_ATTRIBUTE, String.valueOf(rightCenter[1]));
             }
         }
 
@@ -578,16 +585,16 @@ public class ProcessDefinitionParser implements
         requestParams = FeelUtil.convertValue(obj, ObjectNode.class);
     }
 
-    private void convertXY(Element shape) {
+    private void alignRectangle(Element shape) {
         // 修改 bpmndi:BPMNShape 中的 weight, height, x, y
 
         // 获取中心节点
-        BoundXY boundXY = getBoundXY(shape);
-        long[] center = boundXY.getCenter();
-        setShapeXY(shape, center[0], center[1], 100, 80);
+        ShapeCenter shapeCenter = getShapeCenter(shape);
+        long[] rightCenter = shapeCenter.getRightCenter();
+        alignRight(shape, rightCenter[0], rightCenter[1], 100, 80);
     }
 
-    private BoundXY getBoundXY(Element shape) {
+    private ShapeCenter getShapeCenter(Element shape) {
         Element bounds = (Element) shape.selectSingleNode(DC_BOUNDS_QNAME.getQualifiedName());
 
         long x = Long.parseLong(bounds.attributeValue(X_ATTRIBUTE));
@@ -595,22 +602,22 @@ public class ProcessDefinitionParser implements
         long width = Long.parseLong(bounds.attributeValue(WIDTH_ATTRIBUTE));
         long height = Long.parseLong(bounds.attributeValue(HEIGHT_ATTRIBUTE));
 
-        BoundXY ret = new BoundXY();
+        ShapeCenter ret = new ShapeCenter();
 
-        ret.setCenter(new long[] {(long)(x + 0.5 * width), (long)(y + 0.5 * height)});
-        ret.setUp(new long[] {(long)(x + 0.5 * width), y + height});
-        ret.setRight(new long[] {x + width, (long)(y + 0.5 * height)});
-        ret.setDown(new long[] {(long)(x + 0.5 * width), y});
-        ret.setLeft(new long[] {x, (long)(y + 0.5 * height)});
+        ret.setGeometryCenter(new long[] {(long)(x + 0.5 * width), (long)(y + 0.5 * height)});
+        ret.setUpCenter(new long[] {(long)(x + 0.5 * width), y + height});
+        ret.setRightCenter(new long[] {x + width, (long)(y + 0.5 * height)});
+        ret.setDownCenter(new long[] {(long)(x + 0.5 * width), y});
+        ret.setLeftCenter(new long[] {x, (long)(y + 0.5 * height)});
         return ret;
     }
 
-    private void setShapeXY(Element shape, long gcX, long gcY, long width, long height) {
+    private void alignRight(Element shape, long rx, long ry, long width, long height) {
         Element bounds = (Element) shape.selectSingleNode(DC_BOUNDS_QNAME.getQualifiedName());
         bounds.addAttribute(WIDTH_ATTRIBUTE, String.valueOf(width));
         bounds.addAttribute(HEIGHT_ATTRIBUTE, String.valueOf(height));
-        long x = (long) (gcX - 0.5 * width);
-        long y = (long) (gcY - 0.5 * height);
+        long x = (long) (rx - width);
+        long y = (long) (ry - 0.5 * height);
         bounds.addAttribute(X_ATTRIBUTE, String.valueOf(x));
         bounds.addAttribute(Y_ATTRIBUTE, String.valueOf(y));
     }

@@ -41,8 +41,16 @@ public interface QNameConstants {
     // bpmndi
     QName BPMNDI_BPMN_SHAPE_QNAME = DocumentHelper.createQName(BPMN_SHAPE_LOCALNAME, BPMNDI_NAMESPACE);
 
+    QName BPMNDI_BPMN_EDGE_QNAME = DocumentHelper.createQName(BPMN_EDGE_LOCALNAME, BPMNDI_NAMESPACE);
+
+
+
     // dc
     QName DC_BOUNDS_QNAME = DocumentHelper.createQName(BOUNDS_LOCALNAME, DC_NAMESPACE);
+
+    // DI
+    QName DI_WAYPOINT_QNAME = DocumentHelper.createQName(WAYPOINT_LOCALNAME, DI_NAMESPACE);
+
 
     // brandnewdata
     QName BRANDNEWDATA_TASK_DEFINITION_QNAME = DocumentHelper.createQName(TASK_DEFINITION_LOCALNAME, BRANDNEWDATA_NAMESPACE);

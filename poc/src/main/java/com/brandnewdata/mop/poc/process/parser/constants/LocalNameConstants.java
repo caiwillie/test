@@ -50,7 +50,10 @@ public interface LocalNameConstants {
 
     String BPMN_SHAPE_LOCALNAME = "BPMNShape";
 
+    String BPMN_EDGE_LOCALNAME = "BPMNEdge";
+
     String BOUNDS_LOCALNAME = "Bounds";
 
+    String WAYPOINT_LOCALNAME = "waypoint";
 
 }
