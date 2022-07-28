@@ -75,11 +75,17 @@ public class BusinessSceneRest {
         return Result.OK(businessSceneProcessDefinition);
     }
 
+    /**
+     * 部署业务场景下的流程
+     *
+     * @param businessSceneProcessDefinition the business scene process definition
+     * @return the result
+     */
     @PostMapping("/rest/businessScene/deployProcessDefinition")
-    public Result<Page<ProcessInstance>> deployProcessDefinition (
+    public Result deployProcessDefinition (
             @RequestBody BusinessSceneProcessDefinition businessSceneProcessDefinition) {
-
-        return null;
+        service.deploy(businessSceneProcessDefinition);
+        return Result.OK();
     }
 
 }
