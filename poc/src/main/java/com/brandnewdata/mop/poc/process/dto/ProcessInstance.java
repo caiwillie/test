@@ -34,4 +34,9 @@ public class ProcessInstance {
      * 结束时间
      */
     private String endTime;
+
+    /**
+     * 运行状态：ACTIVE 运行，INCIDENT 异常，COMPLETED 完成，CANCELED 取消
+     */
+    private String state;
 }

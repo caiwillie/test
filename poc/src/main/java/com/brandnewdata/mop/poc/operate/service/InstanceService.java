@@ -10,8 +10,11 @@ import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.process.dto.ProcessDeploy;
 import com.brandnewdata.mop.poc.process.dto.ProcessInstance;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
+import com.brandnewdata.mop.poc.service.ServiceUtil;
 import io.camunda.operate.CamundaOperateClient;
 import io.camunda.operate.auth.SimpleAuthentication;
+import io.camunda.operate.beta.CamundaOperateBetaClient;
+import io.camunda.operate.dto.ProcessInstanceState;
 import io.camunda.operate.search.*;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
@@ -48,8 +51,10 @@ public class InstanceService {
         ProcessDeploy processDeploy = deployService.getOne(deployId);
         Assert.notNull(processDeploy, ErrorMessage.NOT_NULL("部署 id"));
 
-        ProcessInstanceFilter instanceFilter = new ProcessInstanceFilter.Builder().bpmnProcessId(processDeploy.getProcessId()).build();
-        SearchQuery instanceQuery = new SearchQuery.Builder().withFilter(instanceFilter).withSize(20).withSort(new Sort("state", SortOrder.ASC)).build();
+        ProcessInstanceFilter instanceFilter = new ProcessInstanceFilter.Builder()
+                .bpmnProcessId(ServiceUtil.convertModelKey(processDeploy.getProcessId())).build();
+        SearchQuery instanceQuery = new SearchQuery.Builder().withFilter(instanceFilter)
+                .withSize(1000).withSort(new Sort("state", SortOrder.ASC)).build();
         List<io.camunda.operate.dto.ProcessInstance> processInstances = client.searchProcessInstances(instanceQuery);
         processInstances = Optional.ofNullable(processInstances).orElse(ListUtil.empty());
         List<ProcessInstance> list = new ArrayList<>();
@@ -73,6 +78,7 @@ public class InstanceService {
         dto.setStartTime(DateUtil.formatTime(processInstance.getStartDate()));
         dto.setEndTime(processInstance.getEndDate() != null ?
                 DateUtil.formatTime(processInstance.getEndDate()) : null);
+        dto.setState(processInstance.getState().name());
         return dto;
     }
 
