@@ -132,6 +132,14 @@ public class ProcessDefinitionParser implements
 
     }
 
+    private void addZeebeNamespace() {
+        Element root = document.getRootElement();
+        Namespace namespace = root.getNamespaceForPrefix(ZEEBE_NAMESPACE.getPrefix());
+        if(namespace == null) {
+            root.add(ZEEBE_NAMESPACE);
+        }
+    }
+
     /**
      * 解析 process id 和 name
      */
@@ -380,6 +388,8 @@ public class ProcessDefinitionParser implements
     }
 
     private Element getZbIoMapping(Element parent) {
+        // 查询 zeebe:ioMapping 之前新增 zeebe namespace
+        addZeebeNamespace();
         Element ioMapping = (Element) parent.selectSingleNode(ZEEBE_IO_MAPPING_QNAME.getQualifiedName());
 
         if(ioMapping == null) {

@@ -48,7 +48,7 @@ public class InstanceService {
         ProcessDeploy processDeploy = deployService.getOne(deployId);
         Assert.notNull(processDeploy, ErrorMessage.NOT_NULL("部署 id"));
 
-        ProcessInstanceFilter instanceFilter = new ProcessInstanceFilter.Builder().processDefinitionKey(processDeploy.getZeebeKey()).build();
+        ProcessInstanceFilter instanceFilter = new ProcessInstanceFilter.Builder().bpmnProcessId(processDeploy.getProcessId()).build();
         SearchQuery instanceQuery = new SearchQuery.Builder().withFilter(instanceFilter).withSize(20).withSort(new Sort("state", SortOrder.ASC)).build();
         List<io.camunda.operate.dto.ProcessInstance> processInstances = client.searchProcessInstances(instanceQuery);
         processInstances = Optional.ofNullable(processInstances).orElse(ListUtil.empty());

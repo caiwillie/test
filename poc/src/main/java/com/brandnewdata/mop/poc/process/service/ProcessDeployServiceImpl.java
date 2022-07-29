@@ -3,6 +3,7 @@ package com.brandnewdata.mop.poc.process.service;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.map.MapUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
@@ -33,6 +34,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -165,11 +167,11 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         // 解析 xml 后得到响应表达式
         ObjectNode responseParams = triggerProcessDefinition.getResponseParams();
 
-        String expression = responseParams == null ? "" : JacksonUtil.to(responseParams);
+        String expression = JacksonUtil.to(responseParams);
         ProcessInstanceResult result = zeebe.newCreateInstanceCommand()
                 .bpmnProcessId(ServiceUtil.convertModelKey(processId)) // 使用处理过的 processId
                 .latestVersion()
-                .variables(values)
+                .variables(Optional.ofNullable(values).orElse(MapUtil.empty()))
                 .withResult()
                 .send()
                 .join();
