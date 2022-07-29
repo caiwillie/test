@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * </p>
  *
  * @author caiwillie
- * @since 2022-07-21
+ * @since 2022-07-29
  */
 public interface BusinessSceneProcessDao extends BaseMapper<BusinessSceneProcessEntity> {
 

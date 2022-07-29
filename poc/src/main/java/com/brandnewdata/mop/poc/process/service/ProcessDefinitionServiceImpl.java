@@ -41,17 +41,18 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
 
     @Override
     public ProcessDefinition save(ProcessDefinition processDefinition) {
-        String xml = processDefinition.getXml();
 
-        processDefinition = ProcessDefinitionParser.newInstance(processDefinition).buildProcessDefinition();
 
         // dto to entity 逻辑特殊，不提取公共
         ProcessDefinitionEntity entity = new ProcessDefinitionEntity();
+        entity.setImgUrl(processDefinition.getImgUrl());
+        entity.setXml(processDefinition.getXml());
+
+        // todo 返回修改的结构体不再用 processDefinition
+        processDefinition = ProcessDefinitionParser.newInstance(processDefinition).buildProcessDefinition();
         String processId = processDefinition.getProcessId();
         entity.setId(processId);
         entity.setName(processDefinition.getName());
-        entity.setXml(xml);
-        entity.setImgUrl(processDefinition.getImgUrl());
 
         if(getOne(processId) != null) {
              processDefinitionDao.updateById(entity);
@@ -77,13 +78,14 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
         }
     }
 
-
-
     private ProcessDefinition toDTO(ProcessDefinitionEntity entity) {
         ProcessDefinition dto = new ProcessDefinition();
         dto.setProcessId(entity.getId());
+        dto.setCreateTime(entity.getCreateTime());
+        dto.setUpdateTime(entity.getUpdateTime());
         dto.setName(entity.getName());
         dto.setXml(entity.getXml());
+        dto.setImgUrl(entity.getImgUrl());
         return dto;
     }
 

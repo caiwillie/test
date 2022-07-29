@@ -29,6 +29,11 @@ public class BusinessScene {
     private String updateTime;
 
     /**
+     * 图片URL
+     */
+    private String imgUrl;
+
+    /**
      * 流程定义列表
      */
     private List<BusinessSceneProcessDefinition> processDefinitions;

@@ -1,6 +1,7 @@
 package com.brandnewdata.mop.poc.group.service;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -19,9 +20,8 @@ import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -49,11 +49,11 @@ public class BusinessSceneService implements IBusinessSceneService {
                 com.baomidou.mybatisplus.extension.plugins.pagination.Page.of(pageNumber, pageSize);
         QueryWrapper<BusinessSceneEntity> queryWrapper = new QueryWrapper<>();
         page = businessSceneDao.selectPage(page, queryWrapper);
-        List<BusinessSceneEntity> entities = page.getRecords();
+        List<BusinessSceneEntity> entities = Optional.ofNullable(page.getRecords()).orElse(ListUtil.empty());
         List<BusinessScene> dtos = new ArrayList<>();
         if(CollUtil.isNotEmpty(entities)) {
             for (BusinessSceneEntity entity : entities) {
-                BusinessScene dto = toDTO(entity);
+                BusinessScene dto = getOne(entity.getId());
                 dtos.add(dto);
             }
         }
@@ -84,6 +84,16 @@ public class BusinessSceneService implements IBusinessSceneService {
         List<String> processIds = businessSceneProcessEntities.stream().map(BusinessSceneProcessEntity::getProcessId).collect(Collectors.toList());
 
         List<ProcessDefinition> processDefinitions = processDefinitionService.list(processIds);
+
+        // 比较流程列表的更新时间
+        Optional<ProcessDefinition> first = processDefinitions.stream().min((o1, o2) -> {
+            LocalDateTime time1 = Optional.ofNullable(o1.getUpdateTime()).orElse(LocalDateTime.MIN);
+            LocalDateTime time2 = Optional.ofNullable(o2.getUpdateTime()).orElse(LocalDateTime.MIN);
+            return time2.compareTo(time1);
+        });
+
+        // 取最后更新的流程中的 img 作为流程图
+        first.ifPresent(processDefinition -> ret.setImgUrl(processDefinition.getImgUrl()));
 
         // get 流程定义 map
         Map<String, ProcessDefinition> processDefinitionMap = processDefinitions.stream()

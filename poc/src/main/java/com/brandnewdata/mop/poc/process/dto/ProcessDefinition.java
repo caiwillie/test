@@ -2,6 +2,8 @@ package com.brandnewdata.mop.poc.process.dto;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 /**
  * @author caiwillie
  */
@@ -16,4 +18,7 @@ public class ProcessDefinition {
 
     private String imgUrl;
 
+    private LocalDateTime createTime;
+
+    private LocalDateTime updateTime;
 }

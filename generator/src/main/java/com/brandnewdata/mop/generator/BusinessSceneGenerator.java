@@ -56,7 +56,7 @@ public class BusinessSceneGenerator {
                         // entity的包名称
                         .entity("group.entity")
                         // dao层的包名称
-                        .mapper("dao")
+                        .mapper("group.dao")
                 )
 
                 // 策略配置

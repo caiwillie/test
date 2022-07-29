@@ -113,8 +113,8 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         entity.setProcessId(processId);
         entity.setProcessName(name);
         entity.setProcessXml(xml);
-        // 设置版本
-        entity.setVersion(latestVersion == null ? 0 : latestVersion.getVersion() + 1);
+        // 设置版本, 初始版本为1
+        entity.setVersion(latestVersion == null ? 1 : latestVersion.getVersion() + 1);
         entity.setType(type);
         entity.setZeebeKey(zeebeKey);
         entity.setZeebeXml(zeebeXML);
