@@ -8,7 +8,6 @@ import com.brandnewdata.mop.api.ModelApi;
 import com.brandnewdata.mop.api.dto.BPMNResource;
 import com.brandnewdata.mop.api.dto.ConnectorResource;
 import com.brandnewdata.mop.api.dto.StartMessage;
-import com.brandnewdata.mop.api.dto.protocol.response.HttpResponse;
 import com.brandnewdata.mop.poc.process.ProcessConstants;
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinition;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
@@ -18,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
