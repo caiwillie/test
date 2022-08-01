@@ -14,3 +14,7 @@ spring:
         server-addr: 10.101.53.4:8848
         namespace: "dev"
         group: DEFAULT_GROUP
+        metadata:
+          preserved.heart.beat.interval: 1000
+          preserved.heart.beat.timeout: 3000
+          preserved.ip.delete.timeout: 3000
