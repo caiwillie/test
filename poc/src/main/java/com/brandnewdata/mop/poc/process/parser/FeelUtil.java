@@ -1,11 +1,7 @@
 package com.brandnewdata.mop.poc.process.parser;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
-import com.dxy.library.json.jackson.JacksonUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.module.scala.DefaultScalaModule$;
 import lombok.SneakyThrows;
@@ -13,7 +9,6 @@ import org.camunda.feel.FeelEngine;
 import org.camunda.feel.impl.SpiServiceLoader;
 import scala.util.Either;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 

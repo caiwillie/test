@@ -5,6 +5,8 @@ spring:
     multipart:
       max-file-size: 8MB
       max-request-size: 16MB
+  elasticsearch:
+    uris: "http://localhost:9200"
 
 # web容器相关配置
 server:

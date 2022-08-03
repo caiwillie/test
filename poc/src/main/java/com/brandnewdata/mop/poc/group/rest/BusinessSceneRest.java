@@ -6,7 +6,6 @@ import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.group.dto.BusinessScene;
 import com.brandnewdata.mop.poc.group.dto.BusinessSceneProcessDefinition;
 import com.brandnewdata.mop.poc.group.service.IBusinessSceneService;
-import com.brandnewdata.mop.poc.process.dto.ProcessInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

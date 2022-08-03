@@ -1,7 +1,6 @@
 package com.brandnewdata.mop.poc.process.service;
 
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinition;
-import com.brandnewdata.mop.poc.process.dto.ProcessDeploy;
 
 import java.util.List;
 
