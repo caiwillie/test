@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.poc.operate.rest;
 
+import cn.hutool.core.lang.Assert;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.process.dto.ProcessDeploy;
@@ -33,6 +34,19 @@ public class DeployRest {
             @RequestParam int pageSize) {
         Page<ProcessDeploy> page = deployService.page(pageNum, pageSize);
         return Result.OK(page);
+    }
+
+    /**
+     * 流程部署详情
+     *
+     * @param id 部署 id
+     * @return the result
+     */
+    @GetMapping("/rest/operate/deploy/detail")
+    public Result<ProcessDeploy> detail(@RequestParam long id) {
+        ProcessDeploy deploy = deployService.getOne(id);
+        Assert.notNull(deploy, "流程部署 {} 不存在", id);
+        return Result.OK(deploy);
     }
 
 }
