@@ -9,6 +9,7 @@ import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.manager.ConnectorManager;
 import com.brandnewdata.mop.poc.process.dto.*;
 import com.brandnewdata.mop.poc.process.parser.constants.StringPool;
+import com.brandnewdata.mop.poc.process.util.ProcessUtil;
 import com.brandnewdata.mop.poc.service.ServiceUtil;
 import com.dxy.library.json.jackson.JacksonUtil;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -145,7 +146,7 @@ public class ProcessDefinitionParser implements
     private void parseProcessIdAndName() {
         Element bpProcess = getBpProcess();
         if(processId != null && name != null) {
-            bpProcess.addAttribute(ID_ATTRIBUTE, ServiceUtil.convertModelKey(processId));
+            bpProcess.addAttribute(ID_ATTRIBUTE, ProcessUtil.convertProcessId(processId));
             bpProcess.addAttribute(NAME_ATTRIBUTE, name);
         } else {
             processId = bpProcess.attributeValue(ID_ATTRIBUTE);
@@ -319,7 +320,7 @@ public class ProcessDefinitionParser implements
         // 创建 called element
         Element newE = DocumentHelper.createElement(ZEEBE_CALLED_ELEMENT_QNAME);
         // 替换特殊字符
-        String processId = ServiceUtil.convertModelKey(type);
+        String processId = ProcessUtil.convertProcessId(type);
         newE.addAttribute(PROCESS_ID_ATTRIBUTE, processId);
         newE.addAttribute(PROPAGATE_ALL_CHILD_VARIABLES_ATTRIBUTE, StringPool.FALSE);
         newE.setParent(parent);

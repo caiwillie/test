@@ -9,6 +9,7 @@ import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.process.dto.ProcessDeploy;
 import com.brandnewdata.mop.poc.process.dto.ProcessInstance;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
+import com.brandnewdata.mop.poc.process.util.ProcessUtil;
 import com.brandnewdata.mop.poc.service.ServiceUtil;
 import io.camunda.operate.CamundaOperateClient;
 import io.camunda.operate.auth.SimpleAuthentication;
@@ -52,7 +53,7 @@ public class InstanceService {
         Assert.notNull(processDeploy, ErrorMessage.NOT_NULL("部署 id"));
 
         ProcessInstanceFilter instanceFilter = new ProcessInstanceFilter.Builder()
-                .bpmnProcessId(ServiceUtil.convertModelKey(processDeploy.getProcessId())).build();
+                .bpmnProcessId(ProcessUtil.convertProcessId(processDeploy.getProcessId())).build();
         SearchQuery instanceQuery = new SearchQuery.Builder().withFilter(instanceFilter)
                 .withSize(1000).withSort(new Sort("state", SortOrder.ASC)).build();
         List<io.camunda.operate.dto.ProcessInstance> processInstances = client.searchProcessInstances(instanceQuery);

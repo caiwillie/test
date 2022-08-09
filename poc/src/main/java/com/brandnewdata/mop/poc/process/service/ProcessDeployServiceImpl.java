@@ -17,6 +17,7 @@ import com.brandnewdata.mop.poc.process.entity.ProcessDeployEntity;
 import com.brandnewdata.mop.poc.process.parser.FeelUtil;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParseStep1;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParser;
+import com.brandnewdata.mop.poc.process.util.ProcessUtil;
 import com.brandnewdata.mop.poc.service.ServiceUtil;
 import com.dxy.library.json.jackson.JacksonUtil;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -81,11 +82,11 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
             triggerProcessDefinition = step1.replaceProperties(connectorManager).replaceStep1()
                     .replaceSceneStartEvent(connectorManager).buildTriggerProcessDefinition();
         } else if (type == ProcessConstants.PROCESS_TYPE_TRIGGER) {
-            triggerProcessDefinition = step1.replaceProperties(connectorManager).replaceStep1().replaceTriggerStartEvent()
-                    .buildTriggerProcessDefinition();
+            triggerProcessDefinition = step1.replaceProperties(connectorManager).replaceStep1()
+                    .replaceTriggerStartEvent(connectorManager).buildTriggerProcessDefinition();
         } else if (type == ProcessConstants.PROCESS_TYPE_OPERATE) {
-            triggerProcessDefinition = step1.replaceProperties(connectorManager).replaceStep1().replaceOperateStartEvent()
-                    .buildTriggerProcessDefinition();
+            triggerProcessDefinition = step1.replaceProperties(connectorManager).replaceStep1()
+                    .replaceOperateStartEvent().buildTriggerProcessDefinition();
         } else {
             throw new IllegalArgumentException(ErrorMessage.CHECK_ERROR("触发器类型不支持", null));
         }
@@ -165,7 +166,7 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
 
         String expression = JacksonUtil.to(responseParams);
         ProcessInstanceResult result = zeebe.newCreateInstanceCommand()
-                .bpmnProcessId(ServiceUtil.convertModelKey(processId)) // 使用处理过的 processId
+                .bpmnProcessId(ProcessUtil.convertProcessId(processId)) // 使用处理过的 processId
                 .latestVersion()
                 .variables(Optional.ofNullable(values).orElse(MapUtil.empty()))
                 .withResult()
