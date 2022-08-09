@@ -7,11 +7,9 @@ import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.proxy.dao.ReverseProxyEndpointDao;
 import com.brandnewdata.mop.poc.proxy.dto.Endpoint;
 import com.brandnewdata.mop.poc.proxy.entity.ReverseProxyEndpointEntity;
-import com.brandnewdata.mop.poc.proxy.entity.ReverseProxyEntity;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import javax.swing.plaf.ListUI;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;

@@ -50,6 +50,9 @@ class ProcessDefinitionParserTest {
 
     @Test
     void testTriggerXMLParse() {
+        // 设置测试桩
+        when(manager.getProtocol(any())).thenReturn("HTTP");
+
         String json = ResourceUtil.readUtf8Str("trigger.json");
         String triggerFullId = "com.develop:wjx.callback:v1";
         String xml = JSONUtil.parseObj(json).getStr("processEditing");
@@ -57,7 +60,7 @@ class ProcessDefinitionParserTest {
         processDefinition.setProcessId(triggerFullId);
         processDefinition.setXml(xml);
         ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(processDefinition);
-        TriggerProcessDefinition triggerProcessDefinition = step1.replaceStep1().replaceTriggerStartEvent()
+        TriggerProcessDefinition triggerProcessDefinition = step1.replaceStep1().replaceTriggerStartEvent(manager)
                 .buildTriggerProcessDefinition();
         return;
     }
@@ -69,6 +72,7 @@ class ProcessDefinitionParserTest {
 
         // 设置测试桩
         when(manager.getTriggerXML(any())).thenReturn(xml2);
+        when(manager.getProtocol(any())).thenReturn("HTTP");
 
         String xml = ResourceUtil.readUtf8Str("test.bpmn.xml");
         ProcessDefinition processDefinition = new ProcessDefinition();

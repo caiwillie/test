@@ -2,7 +2,6 @@ package com.brandnewdata.mop.poc;
 
 import com.brandnewdata.common.annotation.EnableGlobalExceptionHandler;
 import com.brandnewdata.common.annotation.EnableRequestInterceptorComponent;
-import com.brandnewdata.connector.api.IConnectorCommonTriggerProcessConfFeign;
 import io.camunda.zeebe.spring.client.EnableZeebeClient;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

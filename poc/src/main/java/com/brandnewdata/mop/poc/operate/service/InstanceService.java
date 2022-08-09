@@ -10,7 +10,6 @@ import com.brandnewdata.mop.poc.process.dto.ProcessDeploy;
 import com.brandnewdata.mop.poc.process.dto.ProcessInstance;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import com.brandnewdata.mop.poc.process.util.ProcessUtil;
-import com.brandnewdata.mop.poc.service.ServiceUtil;
 import io.camunda.operate.CamundaOperateClient;
 import io.camunda.operate.auth.SimpleAuthentication;
 import io.camunda.operate.search.ProcessInstanceFilter;
