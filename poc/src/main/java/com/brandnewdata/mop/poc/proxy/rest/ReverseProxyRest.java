@@ -4,7 +4,11 @@ import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.proxy.dto.Endpoint;
 import com.brandnewdata.mop.poc.proxy.dto.Proxy;
+import com.brandnewdata.mop.poc.proxy.service.EndpointService;
+import com.brandnewdata.mop.poc.proxy.service.ProxyService;
 import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
 
 /**
  * API管理相关的接口
@@ -14,6 +18,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class ReverseProxyRest {
 
+    @Resource
+    private ProxyService proxyService;
+
+    @Resource
+    private EndpointService endpointService;
 
     /**
      * 新增/更新 API
@@ -23,7 +32,8 @@ public class ReverseProxyRest {
      */
     @PostMapping("/rest/reverseProxy/save")
     public Result<Proxy> save(@RequestBody Proxy reverseProxy) {
-        return null;
+        Proxy result = proxyService.save(reverseProxy);
+        return Result.OK(result);
     }
 
     /**
@@ -33,8 +43,9 @@ public class ReverseProxyRest {
      * @return the result
      */
     @GetMapping("/rest/reverseProxy/detail")
-    public Result<Proxy> detail(@RequestParam Long id) {
-        return null;
+    public Result<Proxy> detail(@RequestParam long id) {
+        Proxy result = proxyService.getOne(id);
+        return Result.OK(result);
     }
 
 
@@ -47,7 +58,8 @@ public class ReverseProxyRest {
      */
     @GetMapping("/rest/reverseProxy/page")
     public Result<Page<Proxy>> page(@RequestParam int pageNum, @RequestParam int pageSize) {
-        return null;
+        Page<Proxy> result = proxyService.page(pageNum, pageSize);
+        return Result.OK(result);
     }
 
     /**
@@ -58,7 +70,8 @@ public class ReverseProxyRest {
      */
     @PostMapping("/rest/reverseProxy/saveEndpoint")
     public Result<Endpoint> saveEndpoint(@RequestBody Endpoint endpoint) {
-        return null;
+        Endpoint result = endpointService.save(endpoint);
+        return Result.OK(result);
     }
 
     /**
@@ -68,8 +81,9 @@ public class ReverseProxyRest {
      * @return the result
      */
     @GetMapping("/rest/reverseProxy/detailEndpoint")
-    public Result<Endpoint> detailEndpoint(@RequestParam Long id) {
-        return null;
+    public Result<Endpoint> detailEndpoint(@RequestParam long id) {
+        Endpoint result = endpointService.getOne(id);
+        return Result.OK(result);
     }
 
     /**
@@ -81,7 +95,8 @@ public class ReverseProxyRest {
      */
     @GetMapping("/rest/reverseProxy/pageEndpoint")
     public Result<Endpoint> pageEndpoint(@RequestParam int pageNum, @RequestParam int pageSize) {
-        return null;
+        Page<Endpoint> result = endpointService.page(pageNum, pageSize);
+        return Result.OK(result);
     }
 
     @PostMapping("/rest/reverseProxy/entry/**")

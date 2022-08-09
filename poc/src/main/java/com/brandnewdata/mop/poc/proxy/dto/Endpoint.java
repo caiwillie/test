@@ -19,4 +19,9 @@ public class Endpoint {
      * 位置
      */
     private String location;
+
+    /**
+     * 描述
+     */
+    private String description;
 }
