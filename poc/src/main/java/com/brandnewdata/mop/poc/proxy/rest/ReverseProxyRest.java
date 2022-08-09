@@ -94,7 +94,7 @@ public class ReverseProxyRest {
      * @return the result
      */
     @GetMapping("/rest/reverseProxy/pageEndpoint")
-    public Result<Endpoint> pageEndpoint(@RequestParam int pageNum, @RequestParam int pageSize) {
+    public Result<Page<Endpoint>> pageEndpoint(@RequestParam int pageNum, @RequestParam int pageSize) {
         Page<Endpoint> result = endpointService.page(pageNum, pageSize);
         return Result.OK(result);
     }
