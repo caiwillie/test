@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.connector.api.IConnectorBasicInfoFeign;
 import com.brandnewdata.connector.api.IConnectorCommonTriggerProcessConfFeign;
 import com.brandnewdata.connector.api.IConnectorConfFeign;
+import com.brandnewdata.connector.api.ITriggerProtocolFeign;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.manager.dto.TriggerInfo;
 import com.brandnewdata.mop.poc.process.dto.TriggerOrOperate;
@@ -29,6 +30,9 @@ public class ConnectorManager {
 
     @Resource
     private IConnectorBasicInfoFeign basicInfoClient;
+
+    @Resource
+    private ITriggerProtocolFeign protocolClient;
 
     public String getProperties(String id) {
         IConnectorConfFeign.ConnectorConfDTO configInfo = confClient.getConfigInfo(Long.parseLong(id));
@@ -76,5 +80,8 @@ public class ConnectorManager {
 
     }
 
+    public String getProtocol(String connectorId) {
+        return protocolClient.getProtocolByConnectorId(connectorId);
+    }
 
 }

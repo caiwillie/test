@@ -458,7 +458,7 @@ public class ProcessDefinitionParser implements
         }
     }
 
-    private void replaceSceneGeneralStartEventToNoneStartEvent(Element bndTaskDefinition) {
+    private void replaceSceneGeneralStartEventToNoneStartEvent(ConnectorManager manager, Element bndTaskDefinition) {
         // 获取监听参数, 获取 startEvent
         Element startEvent = bndTaskDefinition.getParent().getParent();
 
@@ -467,7 +467,7 @@ public class ProcessDefinitionParser implements
 
         responseParams = getResponseParams(startEvent);
 
-        protocol = TriggerProtocolConstant.getProtocolByConnectorId(trigger.getConnectorId());
+        protocol = manager.getProtocol(trigger.getConnectorId());
 
         // 替换成 空启动事件
         replaceNoneStartEvent(startEvent);
@@ -482,7 +482,7 @@ public class ProcessDefinitionParser implements
         trigger = getTriggerOrOperate(type);
     }
 
-    private void replaceSceneCustomStartEventToNoneStartEvent(Element bndTaskDefinition, ConnectorManager manager) {
+    private void replaceSceneCustomStartEventToNoneStartEvent(ConnectorManager manager, Element bndTaskDefinition) {
         String xml = manager.getTriggerXML(trigger);
 
         // 解析自定义触发器内的通用触发器
@@ -490,7 +490,7 @@ public class ProcessDefinitionParser implements
         _processDefintion.setProcessId(trigger.getFullId());
         _processDefintion.setXml(xml);
         TriggerProcessDefinition triggerProcessDefinition = ProcessDefinitionParser.newInstance(_processDefintion)
-                .replaceStep1().replaceTriggerStartEvent().buildTriggerProcessDefinition();
+                .replaceStep1().replaceTriggerStartEvent(manager).buildTriggerProcessDefinition();
 
         // 替换成真实协议
         protocol = triggerProcessDefinition.getProtocol();
@@ -685,7 +685,7 @@ public class ProcessDefinitionParser implements
     }
 
     @Override
-    public ProcessDefinitionParseStep3 replaceTriggerStartEvent() {
+    public ProcessDefinitionParseStep3 replaceTriggerStartEvent(ConnectorManager manager) {
         XPath path = DocumentHelper.createXPath(StrUtil.join(StringPool.SLASH,
                 StringPool.SLASH,
                 BPMN_START_EVENT_QNAME.getQualifiedName(),
@@ -698,7 +698,7 @@ public class ProcessDefinitionParser implements
         parseTrigger(bndTaskDefinition);
 
         // 触发器的开始事件都是底层通用触发器
-        protocol = TriggerProtocolConstant.getProtocolByConnectorId(trigger.getConnectorId());
+        protocol = manager.getProtocol(trigger.getConnectorId());
 
         Element startEvent = (Element) bndTaskDefinition.getParent().getParent();
 
@@ -742,10 +742,10 @@ public class ProcessDefinitionParser implements
 
         if(StrUtil.equals(trigger.getGroupId(), BRANDNEWDATA_DOMAIN)) {
             // 通用触发器
-            replaceSceneGeneralStartEventToNoneStartEvent(oldE);
+            replaceSceneGeneralStartEventToNoneStartEvent(manager, oldE);
         } else {
             // 自定义触发器
-            replaceSceneCustomStartEventToNoneStartEvent(oldE, manager);
+            replaceSceneCustomStartEventToNoneStartEvent(manager, oldE);
         }
 
         return this;

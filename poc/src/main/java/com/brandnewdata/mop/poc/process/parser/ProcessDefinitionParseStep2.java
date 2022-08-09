@@ -6,7 +6,7 @@ import com.brandnewdata.mop.poc.process.dto.ProcessDefinition;
 public interface ProcessDefinitionParseStep2 {
 
     ProcessDefinition buildProcessDefinition();
-    ProcessDefinitionParseStep3 replaceTriggerStartEvent();
+    ProcessDefinitionParseStep3 replaceTriggerStartEvent(ConnectorManager manager);
 
     ProcessDefinitionParseStep3 replaceOperateStartEvent();
 

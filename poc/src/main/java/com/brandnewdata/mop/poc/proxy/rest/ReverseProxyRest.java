@@ -84,4 +84,8 @@ public class ReverseProxyRest {
         return null;
     }
 
+    @PostMapping("/rest/reverseProxy/entry/**")
+    public Result entry() {
+        return null;
+    }
 }
