@@ -80,7 +80,6 @@ class ProcessDefinitionParserTest {
         ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(processDefinition);
         TriggerProcessDefinition triggerProcessDefinition = step1.replaceStep1().replaceSceneStartEvent(manager)
                 .buildTriggerProcessDefinition();
-        return;
     }
 }
 
