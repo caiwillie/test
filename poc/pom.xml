@@ -156,6 +156,13 @@
             <version>7.17.5</version>
         </dependency>
 
+
+        <dependency>
+            <groupId>org.mitre.dsmiley.httpproxy</groupId>
+            <artifactId>smiley-http-proxy-servlet</artifactId>
+            <version>1.12.1</version>
+        </dependency>
+
         <!-- dom4j -->
         <dependency>
             <groupId>org.dom4j</groupId>

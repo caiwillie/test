@@ -3,11 +3,10 @@ package com.brandnewdata.mop.poc.proxy.entity;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * <p>
@@ -15,7 +14,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author caiwillie
- * @since 2022-08-08
+ * @since 2022-08-11
  */
 @Getter
 @Setter
@@ -38,6 +37,10 @@ public class ReverseProxyEndpointEntity implements Serializable {
 
     private String description;
 
+    private Integer backendType;
+
+    private String backendConfig;
+
 
     public static final String ID = "id";
 
@@ -50,5 +53,9 @@ public class ReverseProxyEndpointEntity implements Serializable {
     public static final String LOCATION = "location";
 
     public static final String DESCRIPTION = "description";
+
+    public static final String BACKEND_TYPE = "backend_type";
+
+    public static final String BACKEND_CONFIG = "backend_config";
 
 }

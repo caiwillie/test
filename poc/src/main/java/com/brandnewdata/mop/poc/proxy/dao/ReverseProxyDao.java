@@ -1,7 +1,7 @@
 package com.brandnewdata.mop.poc.proxy.dao;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.brandnewdata.mop.poc.proxy.entity.ReverseProxyEntity;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * <p>
@@ -9,7 +9,7 @@ import com.brandnewdata.mop.poc.proxy.entity.ReverseProxyEntity;
  * </p>
  *
  * @author caiwillie
- * @since 2022-08-08
+ * @since 2022-08-11
  */
 public interface ReverseProxyDao extends BaseMapper<ReverseProxyEntity> {
 
