@@ -1,8 +1,12 @@
 package com.brandnewdata.mop.poc.proxy.service;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.digest.DigestUtil;
+import cn.hutool.crypto.digest.MD5;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.proxy.dao.ReverseProxyDao;
@@ -28,13 +32,32 @@ public class ProxyService {
 
     public Proxy save(Proxy proxy) {
         ReverseProxyEntity entity = toEntity(proxy);
-        if(entity.getId() == null) {
+        Long id = entity.getId();
+        if(id == null) {
+            String name = proxy.getName();
+            String version = proxy.getVersion();
+            String domain = StrUtil.format("api-{}.g2-dev.brandnewdata.com",
+                    DigestUtil.md5Hex(StrUtil.format("{}:{}", name, version)));
+            entity.setDomain(domain);
+            // 判断是否唯一
+            ReverseProxyEntity exist = exist(name, version);
+            Assert.isNull(exist, "api 已存在");
             proxyDao.insert(entity);
-            proxy.setId(entity.getId());
+            proxy.setId(id);
         } else {
+            Proxy oldOne = getOne(id);
+            // 将新对象的值拷贝到旧对象
+            BeanUtil.copyProperties(entity, oldOne);
             proxyDao.updateById(entity);
         }
         return proxy;
+    }
+
+    private ReverseProxyEntity exist(String name, String version) {
+        QueryWrapper<ReverseProxyEntity> query = new QueryWrapper<>();
+        query.eq(ReverseProxyEntity.NAME, name);
+        query.eq(ReverseProxyEntity.VERSION, version);
+        return proxyDao.selectOne(query);
     }
 
     public Proxy getOne(long id) {

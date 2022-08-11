@@ -19,7 +19,7 @@ public class Proxy {
     /**
      * 协议：1 HTTP，2 HTTPS，3 HTTP&HTTPS
      */
-    private int protocol;
+    private Integer protocol;
 
     /**
      * 版本

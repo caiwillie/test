@@ -24,24 +24,34 @@ public class EndpointService {
     @Resource
     private ReverseProxyEndpointDao endpointDao;
 
-
     public Endpoint save(Endpoint endpoint) {
         ReverseProxyEndpointEntity entity = toEntity(endpoint);
-        if(entity.getId() == null) {
+        Long id = entity.getId();
+        if(id == null) {
+            // 唯一性校验
+            ReverseProxyEndpointEntity exist = exist(entity.getProxyId(), entity.getLocation());
+            Assert.isNull(exist, "endpoint 已存在");
+
             endpointDao.insert(entity);
-            endpoint.setId(entity.getId());
+            endpoint.setId(id);
         } else {
+
             endpointDao.updateById(entity);
         }
         return endpoint;
     }
 
+    private ReverseProxyEndpointEntity exist(Long proxyId, String location) {
+        QueryWrapper<ReverseProxyEndpointEntity> query = new QueryWrapper<>();
+        query.eq(ReverseProxyEndpointEntity.PROXY_ID, proxyId);
+        query.eq(ReverseProxyEndpointEntity.LOCATION, location);
+        return endpointDao.selectOne(query);
+    }
 
     public Endpoint getOne(long id) {
         ReverseProxyEndpointEntity entity = endpointDao.selectById(id);
         return Optional.ofNullable(entity).map(this::toDTO).orElse(null);
     }
-
 
     public Page<Endpoint> page(Long proxyId, int pageNum, int pageSize) {
         Assert.isTrue(pageNum > 0);
@@ -63,6 +73,8 @@ public class EndpointService {
         entity.setProxyId(dto.getProxyId());
         entity.setLocation(dto.getLocation());
         entity.setDescription(dto.getDescription());
+        entity.setBackendType(dto.getBackendType());
+        entity.setBackendConfig(dto.getBackendConfig());
         return entity;
     }
 
@@ -73,6 +85,8 @@ public class EndpointService {
         dto.setProxyId(entity.getProxyId());
         dto.setLocation(entity.getLocation());
         dto.setDescription(entity.getDescription());
+        dto.setBackendType(entity.getBackendType());
+        dto.setBackendConfig(entity.getBackendConfig());
         return dto;
     }
 

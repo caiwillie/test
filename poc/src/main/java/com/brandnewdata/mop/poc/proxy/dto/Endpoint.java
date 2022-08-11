@@ -23,7 +23,7 @@ public class Endpoint {
     /**
      * 后端服务类型：1 集成流，2 第三方服务 base url
      */
-    private int backendType;
+    private Integer backendType;
 
     /**
      * 后端服务配置（通过json.stringify序列化成字符串）
