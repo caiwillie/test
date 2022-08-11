@@ -25,13 +25,15 @@ public class BusinessSceneRest {
      *
      * @param pageNum  分页码
      * @param pageSize 分页大小
+     * @param name     名称（模糊搜索）
      * @return the result
      */
     @GetMapping(value = "/rest/businessScene/page")
     public Result<Page<BusinessScene>> page(
             @RequestParam Integer pageNum,
-            @RequestParam Integer pageSize) {
-        Page<BusinessScene> page = service.page(pageNum, pageSize);
+            @RequestParam Integer pageSize,
+            @RequestParam(required = false) String name) {
+        Page<BusinessScene> page = service.page(pageNum, pageSize, name);
         return Result.OK(page);
     }
 

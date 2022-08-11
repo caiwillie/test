@@ -9,7 +9,7 @@ import com.brandnewdata.mop.poc.group.dto.BusinessSceneProcessDefinition;
  */
 public interface IBusinessSceneService {
 
-    Page<BusinessScene> page(int pageNumber, int pageSize);
+    Page<BusinessScene> page(int pageNumber, int pageSize, String name);
 
     BusinessScene getOne(Long id);
 

@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
@@ -47,10 +48,11 @@ public class BusinessSceneService implements IBusinessSceneService {
     private IProcessDeployService processDeployService;
 
     @Override
-    public Page<BusinessScene> page(int pageNumber, int pageSize) {
+    public Page<BusinessScene> page(int pageNumber, int pageSize, String name) {
         com.baomidou.mybatisplus.extension.plugins.pagination.Page<BusinessSceneEntity> page =
                 com.baomidou.mybatisplus.extension.plugins.pagination.Page.of(pageNumber, pageSize);
         QueryWrapper<BusinessSceneEntity> queryWrapper = new QueryWrapper<>();
+        if(StrUtil.isNotBlank(name)) queryWrapper.like(BusinessSceneEntity.NAME, name); // 设置名称
         page = businessSceneDao.selectPage(page, queryWrapper);
         List<BusinessSceneEntity> entities = Optional.ofNullable(page.getRecords()).orElse(ListUtil.empty());
         List<BusinessScene> dtos = new ArrayList<>();
