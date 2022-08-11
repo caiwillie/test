@@ -9,6 +9,8 @@ import com.brandnewdata.mop.poc.proxy.service.ProxyService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * API管理相关的接口
@@ -89,18 +91,19 @@ public class ReverseProxyRest {
     /**
      * endpoint 分页列表
      *
+     * @param proxyId  proxy id
      * @param pageNum  分页码
      * @param pageSize 分页大小
      * @return the result
      */
     @GetMapping("/rest/reverseProxy/pageEndpoint")
-    public Result<Page<Endpoint>> pageEndpoint(@RequestParam int pageNum, @RequestParam int pageSize) {
-        Page<Endpoint> result = endpointService.page(pageNum, pageSize);
+    public Result<Page<Endpoint>> pageEndpoint(
+            @RequestParam Long proxyId,
+            @RequestParam int pageNum,
+            @RequestParam int pageSize) {
+        Page<Endpoint> result = endpointService.page(proxyId, pageNum, pageSize);
         return Result.OK(result);
     }
 
-    @PostMapping("/rest/reverseProxy/entry/**")
-    public Result entry() {
-        return null;
-    }
+
 }

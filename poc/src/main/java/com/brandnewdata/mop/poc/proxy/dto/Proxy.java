@@ -30,4 +30,14 @@ public class Proxy {
      * 描述
      */
     private String description;
+
+    /**
+     * 更新时间
+     */
+    private String updateTime;
+
+    /**
+     * 服务域名
+     */
+    private String domain;
 }

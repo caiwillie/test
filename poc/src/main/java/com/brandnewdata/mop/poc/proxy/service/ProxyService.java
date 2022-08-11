@@ -1,12 +1,15 @@
 package com.brandnewdata.mop.poc.proxy.service;
 
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.proxy.dao.ReverseProxyDao;
 import com.brandnewdata.mop.poc.proxy.dto.Proxy;
+import com.brandnewdata.mop.poc.proxy.entity.ReverseProxyEndpointEntity;
 import com.brandnewdata.mop.poc.proxy.entity.ReverseProxyEntity;
+import org.springframework.boot.context.properties.PropertyMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -59,6 +62,8 @@ public class ProxyService {
         proxy.setProtocol(entity.getProtocol());
         proxy.setVersion(entity.getVersion());
         proxy.setDescription(entity.getDescription());
+        PropertyMapper.get().from(entity::getUpdateTime)
+                .as(LocalDateTimeUtil::formatNormal).to(proxy::setUpdateTime);
         return proxy;
     }
 

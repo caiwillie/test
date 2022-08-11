@@ -8,6 +8,7 @@ import com.brandnewdata.mop.poc.proxy.dao.ReverseProxyEndpointDao;
 import com.brandnewdata.mop.poc.proxy.dto.Endpoint;
 import com.brandnewdata.mop.poc.proxy.entity.ReverseProxyEndpointEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -42,12 +43,13 @@ public class EndpointService {
     }
 
 
-    public Page<Endpoint> page(int pageNum, int pageSize) {
+    public Page<Endpoint> page(Long proxyId, int pageNum, int pageSize) {
         Assert.isTrue(pageNum > 0);
         Assert.isTrue(pageSize > 0);
         com.baomidou.mybatisplus.extension.plugins.pagination.Page<ReverseProxyEndpointEntity> page =
                 new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(pageNum, pageSize);
         QueryWrapper<ReverseProxyEndpointEntity> queryWrapper = new QueryWrapper<>();
+        if(proxyId != null) queryWrapper.eq(ReverseProxyEndpointEntity.PROXY_ID, proxyId);
         page = endpointDao.selectPage(page, queryWrapper);
         List<Endpoint> records = Optional.ofNullable(page.getRecords()).orElse(ListUtil.empty())
                 .stream().map(this::toDTO).collect(Collectors.toList());
