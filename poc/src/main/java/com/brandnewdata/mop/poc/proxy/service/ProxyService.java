@@ -40,8 +40,8 @@ public class ProxyService {
     }
 
     public Page<Proxy> page(int pageNum, int pageSize) {
-        Assert.isTrue(pageNum > 1);
-        Assert.isTrue(pageSize > 1);
+        Assert.isTrue(pageNum > 0);
+        Assert.isTrue(pageSize > 0);
         com.baomidou.mybatisplus.extension.plugins.pagination.Page<ReverseProxyEntity> page =
                 new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(pageNum, pageSize);
         QueryWrapper<ReverseProxyEntity> queryWrapper = new QueryWrapper<>();

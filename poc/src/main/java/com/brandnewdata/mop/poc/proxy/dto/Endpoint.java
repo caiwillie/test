@@ -26,7 +26,7 @@ public class Endpoint {
     private int backendType;
 
     /**
-     * 后端服务配置
+     * 后端服务配置（通过json.stringify序列化成字符串）
      */
     private String backendConfig;
 
