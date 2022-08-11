@@ -21,6 +21,16 @@ public class Endpoint {
     private String location;
 
     /**
+     * 后端服务类型
+     */
+    private int backendType;
+
+    /**
+     * 后端服务配置
+     */
+    private String backendConfig;
+
+    /**
      * 描述
      */
     private String description;
