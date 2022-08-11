@@ -21,7 +21,7 @@ public class Endpoint {
     private String location;
 
     /**
-     * 后端服务类型
+     * 后端服务类型：1 集成流，2 第三方服务 base url
      */
     private int backendType;
 
