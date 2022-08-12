@@ -49,9 +49,8 @@ public class ReverseProxyServlet extends ProxyServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String uri = req.getRequestURI();
+        String uri = req.getPathInfo();
         // 去掉前缀
-        uri = StrUtil.removePrefix(uri, "/proxy");
         String domain = req.getHeader("g2-domain");
 
         Backend backend = backendService.getBackend(domain, uri);
@@ -68,10 +67,9 @@ public class ReverseProxyServlet extends ProxyServlet {
             startProcess(resp, config);
         } else if (backend.getType() == 2) {
             ForwardConfig config = (ForwardConfig) backend.getData();
-            forward(req, resp,  uri, config);
+            forward(req, resp, config);
         }
     }
-
 
     private void startProcess(HttpServletResponse resp, ProcessConfig config) {
         String processId = config.getProcessId();
@@ -81,9 +79,10 @@ public class ReverseProxyServlet extends ProxyServlet {
     }
 
     @SneakyThrows
-    private void forward(HttpServletRequest req, HttpServletResponse resp, String uri, ForwardConfig config) {
-        req.setAttribute(ATTR_TARGET_URI, uri);
+    private void forward(HttpServletRequest req, HttpServletResponse resp, ForwardConfig config) {
+        req.setAttribute(ATTR_TARGET_URI, "");
         req.setAttribute(ATTR_TARGET_HOST, URIUtils.extractHost(new URI(config.getBaseUrl())));
+
         super.service(req, resp);
     }
 
