@@ -43,7 +43,7 @@ public class ReverseProxyServlet extends HttpServlet {
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String uri = req.getRequestURI();
-        String domain = "www.brandnewdata.com";
+        String domain = req.getHeader("g2-domain");
 
         Backend backend = backendService.getBackend(domain, uri);
 
