@@ -10,7 +10,7 @@ public class ReverseProxyServletConfiguration {
 
     @Bean
     public ServletRegistrationBean<ReverseProxyServlet> servletRegistrationBean(ReverseProxyServlet servlet) {
-        return new ServletRegistrationBean<>(servlet, "/forward/*");
+        return new ServletRegistrationBean<>(servlet, "/proxy/*");
     }
 
 }

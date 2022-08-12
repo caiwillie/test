@@ -1,6 +1,7 @@
 package com.brandnewdata.mop.poc.proxy.servlet;
 
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import com.brandnewdata.mop.poc.proxy.dto.Backend;
@@ -43,6 +44,8 @@ public class ReverseProxyServlet extends HttpServlet {
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String uri = req.getRequestURI();
+        // 去掉前缀
+        uri = StrUtil.removePrefix(uri, "/proxy");
         String domain = req.getHeader("g2-domain");
 
         Backend backend = backendService.getBackend(domain, uri);
