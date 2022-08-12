@@ -70,7 +70,7 @@ public class ParameterParser {
         } else if (StrUtil.equals(type, Constants.TYPE_DICT)) {
             ret = parseStruct(root);
         } else if (StrUtil.equals(type, Constants.TYPE_ENUM)) {
-
+            ret = parseList(root);
         } else {
             String value = root.attributeValue(valueAttribute);
             if(StrUtil.isNotBlank(value)) {
