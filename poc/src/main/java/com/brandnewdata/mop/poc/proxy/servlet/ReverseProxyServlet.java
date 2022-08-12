@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.MimeTypeUtils;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -26,7 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Component
-public class ReverseProxyServlet extends HttpServlet {
+public class ReverseProxyServlet extends ProxyServlet {
 
     @Autowired
     private IProcessDeployService deployService;
@@ -34,7 +33,14 @@ public class ReverseProxyServlet extends HttpServlet {
     @Autowired
     private BackendService backendService;
 
-    private static ProxyServlet forwardUtil = new ProxyServlet();
+    /*private ProxyServlet proxyServlet;
+
+    @SneakyThrows
+    @PostConstruct
+    private void postConstruct() {
+        proxyServlet = new ProxyServlet();
+        proxyServlet.init(this);
+    }*/
 
     private static final String ATTR_TARGET_URI =
             ProxyServlet.class.getSimpleName() + ".targetUri";
@@ -62,7 +68,7 @@ public class ReverseProxyServlet extends HttpServlet {
             startProcess(resp, config);
         } else if (backend.getType() == 2) {
             ForwardConfig config = (ForwardConfig) backend.getData();
-            forward(req, resp, config);
+            forward(req, resp,  uri, config);
         }
     }
 
@@ -75,10 +81,10 @@ public class ReverseProxyServlet extends HttpServlet {
     }
 
     @SneakyThrows
-    private void forward(HttpServletRequest req, HttpServletResponse resp, ForwardConfig config) {
-        req.setAttribute(ATTR_TARGET_URI, req.getRequestURI());
+    private void forward(HttpServletRequest req, HttpServletResponse resp, String uri, ForwardConfig config) {
+        req.setAttribute(ATTR_TARGET_URI, uri);
         req.setAttribute(ATTR_TARGET_HOST, URIUtils.extractHost(new URI(config.getBaseUrl())));
-        forwardUtil.service(req, resp);
+        super.service(req, resp);
     }
 
 }

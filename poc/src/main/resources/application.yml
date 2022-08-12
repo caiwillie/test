@@ -27,3 +27,7 @@ zeebe:
       gateway-address: "localhost:26500"
     security:
       plaintext: true
+
+logging:
+  level:
+    root: INFO

@@ -73,6 +73,8 @@ public class ModelApiImpl implements ModelApi {
             return Result.OK();
         }
 
+
+
         StartMessage startMessage = messages.get(0);
         String processId = startMessage.getProcessId();
         String content = startMessage.getContent();
