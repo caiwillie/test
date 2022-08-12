@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class ProcessConfig {
 
-    private long sceneId;
+    private Long sceneId;
 
     private String sceneName;
 

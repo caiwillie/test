@@ -68,7 +68,7 @@ public class ParameterParser {
         } else if (StrUtil.equals(type, Constants.TYPE_LIST)) {
             ret = parseList(root);
         } else if (StrUtil.equals(type, Constants.TYPE_DICT)) {
-
+            ret = parseStruct(root);
         } else if (StrUtil.equals(type, Constants.TYPE_ENUM)) {
 
         } else {
