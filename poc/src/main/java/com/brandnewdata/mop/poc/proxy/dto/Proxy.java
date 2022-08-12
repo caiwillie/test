@@ -39,5 +39,5 @@ public class Proxy {
     /**
      * 服务域名
      */
-    private String domain = "www.brandnewdata.com";
+    private String domain;
 }

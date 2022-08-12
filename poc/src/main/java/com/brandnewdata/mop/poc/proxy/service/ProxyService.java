@@ -36,7 +36,7 @@ public class ProxyService {
         if(id == null) {
             String name = proxy.getName();
             String version = proxy.getVersion();
-            String domain = StrUtil.format("api-{}.g2-dev.brandnewdata.com",
+            String domain = StrUtil.format("api.{}.g2-dev.brandnewdata.com",
                     DigestUtil.md5Hex(StrUtil.format("{}:{}", name, version)));
             entity.setDomain(domain);
             // 判断是否唯一
@@ -87,6 +87,7 @@ public class ProxyService {
         proxy.setDescription(entity.getDescription());
         PropertyMapper.get().from(entity::getUpdateTime)
                 .as(LocalDateTimeUtil::formatNormal).to(proxy::setUpdateTime);
+        proxy.setDomain(entity.getDomain());
         return proxy;
     }
 
