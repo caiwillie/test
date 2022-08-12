@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * </p>
  *
  * @author caiwillie
- * @since 2022-08-11
+ * @since 2022-08-12
  */
 public interface ReverseProxyEndpointDao extends BaseMapper<ReverseProxyEndpointEntity> {
 

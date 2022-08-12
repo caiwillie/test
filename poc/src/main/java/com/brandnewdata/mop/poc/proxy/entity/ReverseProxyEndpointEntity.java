@@ -1,7 +1,9 @@
 package com.brandnewdata.mop.poc.proxy.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -14,7 +16,7 @@ import lombok.Setter;
  * </p>
  *
  * @author caiwillie
- * @since 2022-08-11
+ * @since 2022-08-12
  */
 @Getter
 @Setter
@@ -23,6 +25,7 @@ public class ReverseProxyEndpointEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     @TableField(fill = FieldFill.INSERT)
