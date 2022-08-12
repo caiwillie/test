@@ -33,15 +33,6 @@ public class ReverseProxyServlet extends ProxyServlet {
     @Autowired
     private BackendService backendService;
 
-    /*private ProxyServlet proxyServlet;
-
-    @SneakyThrows
-    @PostConstruct
-    private void postConstruct() {
-        proxyServlet = new ProxyServlet();
-        proxyServlet.init(this);
-    }*/
-
     private static final String ATTR_TARGET_URI =
             ProxyServlet.class.getSimpleName() + ".targetUri";
     private static final String ATTR_TARGET_HOST =
@@ -49,6 +40,12 @@ public class ReverseProxyServlet extends ProxyServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        /*
+        * getRequestUri() 和 getPathInfo() 的区别：
+        * https://www.baeldung.com/http-servlet-request-requesturi-pathinfo
+        * */
+
         String uri = req.getPathInfo();
         // 去掉前缀
         String domain = req.getHeader("g2-domain");
