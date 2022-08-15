@@ -14,24 +14,20 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ElasticSearchConfiguration {
 
-    @Bean(destroyMethod = "close")
-    public ElasticsearchTransport restClientTransport() {
-        SniffOnFailureListener sniffOnFailureListener =
-                new SniffOnFailureListener();
-        RestClient restClient = RestClient.builder(
-                        new HttpHost("localhost", 49200))
-                .setFailureListener(sniffOnFailureListener)
-                .build();
-        Sniffer sniffer = Sniffer.builder(restClient)
-                .setSniffAfterFailureDelayMillis(30000)
-                .build();
-        sniffOnFailureListener.setSniffer(sniffer);
-        return new RestClientTransport(restClient, new JacksonJsonpMapper());
-    }
-
     @Bean
-    public ElasticsearchClient elasticsearchClient(ElasticsearchTransport transport) {
-        return new ElasticsearchClient(transport);
+    public ElasticsearchClient restClientTransport() {
+        // Create the low-level client
+        RestClient restClient = RestClient.builder(
+                new HttpHost("localhost", 49200)).build();
+
+        // Create the transport with a Jackson mapper
+        ElasticsearchTransport transport = new RestClientTransport(
+                restClient, new JacksonJsonpMapper());
+
+        // And create the API client
+        ElasticsearchClient client = new ElasticsearchClient(transport);
+
+        return client;
     }
 
 }

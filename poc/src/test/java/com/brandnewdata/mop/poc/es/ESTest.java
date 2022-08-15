@@ -23,6 +23,9 @@ public class ESTest {
                 ObjectNode.class
         );
 
-        return;
+        while(true) {
+            Thread.sleep(2000);
+        }
+
     }
 }

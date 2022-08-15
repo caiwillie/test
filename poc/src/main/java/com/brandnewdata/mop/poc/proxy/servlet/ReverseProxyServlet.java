@@ -1,7 +1,6 @@
 package com.brandnewdata.mop.poc.proxy.servlet;
 
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import com.brandnewdata.mop.poc.proxy.dto.Backend;
@@ -13,10 +12,15 @@ import lombok.SneakyThrows;
 import org.apache.http.client.utils.URIUtils;
 import org.mitre.dsmiley.httpproxy.ProxyServlet;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MimeTypeUtils;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebInitParam;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -37,6 +41,11 @@ public class ReverseProxyServlet extends ProxyServlet {
             ProxyServlet.class.getSimpleName() + ".targetUri";
     private static final String ATTR_TARGET_HOST =
             ProxyServlet.class.getSimpleName() + ".targetHost";
+
+    public ReverseProxyServlet(IProcessDeployService deployService, BackendService backendService) {
+        this.deployService = deployService;
+        this.backendService = backendService;
+    }
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
