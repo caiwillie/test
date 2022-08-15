@@ -33,7 +33,7 @@ public class EndpointService {
             Assert.isNull(exist, "endpoint 已存在");
 
             endpointDao.insert(entity);
-            endpoint.setId(id);
+            endpoint.setId(entity.getId());
         } else {
 
             endpointDao.updateById(entity);

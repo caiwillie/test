@@ -43,7 +43,7 @@ public class ProxyService {
             ReverseProxyEntity exist = exist(name, version);
             Assert.isNull(exist, "api 已存在");
             proxyDao.insert(entity);
-            proxy.setId(id);
+            proxy.setId(entity.getId());
         } else {
             Proxy oldOne = getOne(id);
             // 将新对象的值拷贝到旧对象
