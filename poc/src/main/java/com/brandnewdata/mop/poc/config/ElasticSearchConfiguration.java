@@ -18,7 +18,7 @@ public class ElasticSearchConfiguration {
     public ElasticsearchClient restClientTransport() {
         // Create the low-level client
         RestClient restClient = RestClient.builder(
-                new HttpHost("localhost", 49200)).build();
+                new HttpHost("10.101.53.4", 49200)).build();
 
         // Create the transport with a Jackson mapper
         ElasticsearchTransport transport = new RestClientTransport(
