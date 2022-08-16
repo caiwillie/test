@@ -22,8 +22,18 @@ public class FlowNodeInstanceDao extends AbstractDao{
                 .index(template.getAlias())
                 .query(q -> q.term(term -> term.field(FlowNodeInstanceTemplate.PROCESS_INSTANCE_KEY).value(request.getProcessInstanceKey())))
                 .build();
-
         return ElasticsearchUtil.scrollAll(client, searchRequest, FlowNodeInstanceEntity.class);
     }
+
+
+    public void getFlowNodeMetadata() {
+
+    }
+
+    public void getFlowNodeStates() {
+
+    }
+
+
 
 }
