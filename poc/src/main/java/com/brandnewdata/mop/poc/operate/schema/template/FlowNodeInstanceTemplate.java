@@ -1,9 +1,10 @@
 package com.brandnewdata.mop.poc.operate.schema.template;
 
+import com.brandnewdata.mop.poc.operate.entity.ProcessInstanceDependant;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FlowNodeInstanceTemplate extends AbstractTemplateDescriptor {
+public class FlowNodeInstanceTemplate extends AbstractTemplateDescriptor implements ProcessInstanceDependant {
     public static final String INDEX_NAME = "flownode-instance";
     public static final String ID = "id";
     public static final String KEY = "key";

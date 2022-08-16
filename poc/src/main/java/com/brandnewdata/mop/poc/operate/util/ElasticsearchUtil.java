@@ -3,25 +3,21 @@ package com.brandnewdata.mop.poc.operate.util;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.FieldSort;
 import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.Time;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.search.Hit;
-import co.elastic.clients.elasticsearch.core.search.HitsMetadata;
 import co.elastic.clients.elasticsearch.core.search.PointInTimeReference;
-import com.aliyuncs.kms.transform.v20160120.ListAliasesResponseUnmarshaller;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.SneakyThrows;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ElasticsearchUtil {
-
 
     @SneakyThrows
     public static <TDocument> List<TDocument> scrollAll(ElasticsearchClient client,
@@ -62,7 +58,7 @@ public class ElasticsearchUtil {
             SearchResponse<TDocument> response = client.search(request, tDocumentClass);
             List<Hit<TDocument>> hits = response.hits().hits();
 
-            sourceList = hits.stream().map(Hit::source).collect(Collectors.toList());
+            sourceList = hits.stream().map(mapSearchHits()).collect(Collectors.toList());
 
             // 设置下一次的builder
             if(CollUtil.isNotEmpty(hits)) {
@@ -82,6 +78,11 @@ public class ElasticsearchUtil {
 
         return ret;
     }
+
+    private static <TDocument> Function<Hit<TDocument>, TDocument> mapSearchHits() {
+        return Hit::source;
+    }
+
 
     @SneakyThrows
     public static String openPointInTime(ElasticsearchClient client, List<String> indices, Time keepAlive) {
