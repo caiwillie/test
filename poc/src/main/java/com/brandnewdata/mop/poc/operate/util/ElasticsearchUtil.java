@@ -96,11 +96,6 @@ public class ElasticsearchUtil {
         return response.id();
     }
 
-
-
-
-
-
     @SneakyThrows
     public static void closePointInTime(ElasticsearchClient client, String pointInTime) {
         ClosePointInTimeRequest request = new ClosePointInTimeRequest.Builder()
