@@ -12,12 +12,8 @@ import lombok.SneakyThrows;
 import org.apache.http.client.utils.URIUtils;
 import org.mitre.dsmiley.httpproxy.ProxyServlet;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 import org.springframework.util.MimeTypeUtils;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebInitParam;
 import javax.servlet.annotation.WebServlet;
@@ -28,7 +24,8 @@ import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
 
-@Component
+@WebServlet(urlPatterns = "/proxy/*", initParams = {
+        @WebInitParam(name = ProxyServlet.P_TARGET_URI, value = "http://www.brandnewdata.com")})
 public class ReverseProxyServlet extends ProxyServlet {
 
     @Autowired

@@ -5,6 +5,7 @@ import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.operate.service.InstanceService;
 import com.brandnewdata.mop.poc.process.dto.ProcessInstance;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,5 +37,6 @@ public class InstanceRest {
         Page<ProcessInstance> page = instanceService.page(deployId, pageNum, pageSize);
         return Result.OK(page);
     }
+
 
 }
