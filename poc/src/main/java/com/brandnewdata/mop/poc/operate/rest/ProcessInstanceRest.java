@@ -21,7 +21,7 @@ public class ProcessInstanceRest {
     private ProcessInstanceService instanceService;
 
     /**
-     * 流程实例分页列表
+     * 获取流程实例分页列表
      *
      * @param deployId 部署id
      * @param pageNum  分页页码
@@ -35,6 +35,17 @@ public class ProcessInstanceRest {
             @RequestParam int pageSize) {
         Page<ProcessInstance> page = instanceService.page(deployId, pageNum, pageSize);
         return Result.OK(page);
+    }
+
+    /**
+     * 获取流程实例详情
+     *
+     * @param processInstanceId 流程实例id
+     * @return the result
+     */
+    @GetMapping("/rest/operate/instance/detail")
+    public Result<ProcessInstance> detail(@RequestParam String processInstanceId) {
+        return null;
     }
 
 
