@@ -34,6 +34,13 @@ public class FlowNodeInstanceRest {
     }
 
 
+    /**
+     * 获取节点实例的详情
+     *
+     * @param processInstanceId  流程实例id
+     * @param flowNodeInstanceId 节点实例id
+     * @return the result
+     */
     @GetMapping("/rest/operate/flowNodeInstance/metadata")
     public Result metadata(@RequestParam String processInstanceId, @RequestParam String flowNodeInstanceId) {
         return null;
