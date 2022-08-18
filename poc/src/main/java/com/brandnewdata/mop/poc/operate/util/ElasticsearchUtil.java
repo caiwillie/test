@@ -20,9 +20,9 @@ import java.util.stream.Collectors;
 public class ElasticsearchUtil {
 
     @SneakyThrows
-    public static <TDocument> List<TDocument> scrollAll(ElasticsearchClient client,
-                                                        SearchRequest searchRequest,
-                                                        Class<TDocument> tDocumentClass) {
+    public static <T> List<T> scrollAll(ElasticsearchClient client,
+                                        SearchRequest searchRequest,
+                                        Class<T> clazz) {
         Time time = Time.of(b -> b.time("1m"));
 
         // 获取初始 pit
@@ -35,8 +35,8 @@ public class ElasticsearchUtil {
         List<SortOptions> sortList = ListUtil.toList(searchRequest.sort());
         sortList.add(SortOptions.of(b -> b.field(f -> f.field("_shard_doc").order(SortOrder.Desc))));
 
-        List<TDocument> ret = new ArrayList<>();
-        List<TDocument> sourceList = null;
+        List<T> ret = new ArrayList<>();
+        List<T> sourceList = null;
         List<String> searchAfter = new ArrayList<>();
 
         do {
@@ -52,18 +52,19 @@ public class ElasticsearchUtil {
             builder.pit(pointInTimeReference)
                     .query(query)
                     .sort(sortList);
+            // 如果 search after 不为空，就直接构造
             if(CollUtil.isNotEmpty(searchAfter)) builder.searchAfter(searchAfter);
 
-            SearchRequest request = builder.build();
-            SearchResponse<TDocument> response = client.search(request, tDocumentClass);
-            List<Hit<TDocument>> hits = response.hits().hits();
+            SearchRequest newRequest = builder.build();
+            SearchResponse<T> response = client.search(newRequest, clazz);
+            List<Hit<T>> hits = response.hits().hits();
 
             sourceList = hits.stream().map(mapSearchHits()).collect(Collectors.toList());
 
             // 设置下一次的builder
             if(CollUtil.isNotEmpty(hits)) {
                 ret.addAll(sourceList);
-                Hit<TDocument> lastHit = hits.get(hits.size() - 1);
+                Hit<T> lastHit = hits.get(hits.size() - 1);
 
                 // 最后一个hit的sort作为search after
                 searchAfter = lastHit.sort();
@@ -77,6 +78,31 @@ public class ElasticsearchUtil {
         closePointInTime(client, pit);// 最后一次查询结果为空就退出
 
         return ret;
+    }
+
+    @SneakyThrows
+    public static <T> T searchOne(ElasticsearchClient client,
+                                  SearchRequest searchRequest,
+                                  Class<T> clazz) {
+        SearchResponse<T> response = client.search(searchRequest, clazz);
+        List<Hit<T>> hits = response.hits().hits();
+
+        if(CollUtil.isEmpty(hits)) {
+            // 为空返回 null
+            return null;
+        } else {
+            return hits.get(0).source();
+        }
+    }
+
+    @SneakyThrows
+    public static <T> T getOne(ElasticsearchClient client, GetRequest getRequest, Class<T> clazz) {
+        GetResponse<T> response = client.get(getRequest, clazz);
+        if(response == null) {
+            return null;
+        } else {
+            return response.source();
+        }
     }
 
     private static <TDocument> Function<Hit<TDocument>, TDocument> mapSearchHits() {

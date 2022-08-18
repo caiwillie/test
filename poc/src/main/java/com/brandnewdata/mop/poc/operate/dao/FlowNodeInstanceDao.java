@@ -1,6 +1,7 @@
 package com.brandnewdata.mop.poc.operate.dao;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch.core.GetRequest;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import com.brandnewdata.mop.poc.operate.dto.FlowNodeInstanceRequest;
 import com.brandnewdata.mop.poc.operate.entity.FlowNodeInstanceEntity;
@@ -20,11 +21,12 @@ public class FlowNodeInstanceDao extends AbstractDao{
     public List<FlowNodeInstanceEntity> queryFlowNodeInstances(FlowNodeInstanceRequest request) {
         SearchRequest searchRequest = new SearchRequest.Builder()
                 .index(template.getAlias())
-                .query(q -> q.term(term -> term.field(FlowNodeInstanceTemplate.PROCESS_INSTANCE_KEY).value(request.getProcessInstanceKey())))
+                .query(new Query.Builder()
+                        .term(t -> t.field(FlowNodeInstanceTemplate.PROCESS_INSTANCE_KEY).value(request.getProcessInstanceId()))
+                        .build())
                 .build();
         return ElasticsearchUtil.scrollAll(client, searchRequest, FlowNodeInstanceEntity.class);
     }
-
 
     public void getFlowNodeMetadata() {
 
@@ -34,6 +36,14 @@ public class FlowNodeInstanceDao extends AbstractDao{
 
     }
 
+    private FlowNodeInstanceEntity getFlowNodeInstance(String flowNodeInstanceId) {
 
+        GetRequest getRequest = new GetRequest.Builder()
+                .index(template.getAlias())
+                .id(flowNodeInstanceId)
+                .build();
+        
+        return ElasticsearchUtil.getOne(client, getRequest, FlowNodeInstanceEntity.class);
+    }
 
 }

@@ -2,10 +2,9 @@ package com.brandnewdata.mop.poc.operate.rest;
 
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.common.dto.Page;
-import com.brandnewdata.mop.poc.operate.service.InstanceService;
+import com.brandnewdata.mop.poc.operate.service.ProcessInstanceService;
 import com.brandnewdata.mop.poc.process.dto.ProcessInstance;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,10 +15,10 @@ import javax.annotation.Resource;
  *
  */
 @RestController
-public class InstanceRest {
+public class ProcessInstanceRest {
 
     @Resource
-    private InstanceService instanceService;
+    private ProcessInstanceService instanceService;
 
     /**
      * 流程实例分页列表

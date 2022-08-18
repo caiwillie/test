@@ -26,7 +26,7 @@ import java.util.Optional;
 
 
 @Service
-public class InstanceService {
+public class ProcessInstanceService {
 
     private static final String URL = "http://10.101.53.4:18081";
 
@@ -35,7 +35,7 @@ public class InstanceService {
     @Resource
     private IProcessDeployService deployService;
 
-    public InstanceService() {
+    public ProcessInstanceService() {
         init();
     }
 

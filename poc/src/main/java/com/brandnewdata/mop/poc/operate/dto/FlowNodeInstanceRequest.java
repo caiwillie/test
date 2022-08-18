@@ -5,6 +5,9 @@ import lombok.Data;
 @Data
 public class FlowNodeInstanceRequest {
 
-    private String processInstanceKey;
+    /**
+     * 流程实例 id
+     */
+    private String processInstanceId;
 
 }
