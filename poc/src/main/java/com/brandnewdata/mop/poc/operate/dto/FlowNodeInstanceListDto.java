@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Getter
 @Setter
-public class FlowNodeInstanceListDto extends OperateZeebeDto implements FromEntity<FlowNodeInstanceListDto, FlowNodeInstanceEntity> {
+public class FlowNodeInstanceListDto extends OperateZeebeDto implements FromOneEntity<FlowNodeInstanceListDto, FlowNodeInstanceEntity> {
 
     private String flowNodeId;
     private LocalDateTime startDate;

@@ -3,7 +3,6 @@ package com.brandnewdata.mop.poc.operate.dao;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.GetRequest;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
-import com.brandnewdata.mop.poc.operate.dto.FlowNodeInstanceRequest;
 import com.brandnewdata.mop.poc.operate.entity.FlowNodeInstanceEntity;
 import com.brandnewdata.mop.poc.operate.schema.template.FlowNodeInstanceTemplate;
 import com.brandnewdata.mop.poc.operate.util.ElasticsearchUtil;
@@ -18,7 +17,7 @@ public class FlowNodeInstanceDao extends AbstractDao{
     @Autowired
     private FlowNodeInstanceTemplate template;
 
-    public List<FlowNodeInstanceEntity> queryFlowNodeInstances(String processInstanceId) {
+    public List<FlowNodeInstanceEntity> list(String processInstanceId) {
         SearchRequest searchRequest = new SearchRequest.Builder()
                 .index(template.getAlias())
                 .query(new Query.Builder()
@@ -36,7 +35,7 @@ public class FlowNodeInstanceDao extends AbstractDao{
 
     }
 
-    public FlowNodeInstanceEntity getFlowNodeInstance(String flowNodeInstanceId) {
+    public FlowNodeInstanceEntity getOne(String flowNodeInstanceId) {
 
         GetRequest getRequest = new GetRequest.Builder()
                 .index(template.getAlias())

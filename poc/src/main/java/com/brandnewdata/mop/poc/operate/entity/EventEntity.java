@@ -1,7 +1,12 @@
 package com.brandnewdata.mop.poc.operate.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.OffsetDateTime;
 
+@Getter
+@Setter
 public class EventEntity extends OperateZeebeEntity<EventEntity> {
     private Long processDefinitionKey;
     private Long processInstanceKey;

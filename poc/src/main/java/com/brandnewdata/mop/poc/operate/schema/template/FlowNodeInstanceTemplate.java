@@ -1,6 +1,5 @@
 package com.brandnewdata.mop.poc.operate.schema.template;
 
-import com.brandnewdata.mop.poc.operate.entity.ProcessInstanceDependant;
 import org.springframework.stereotype.Component;
 
 @Component

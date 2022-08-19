@@ -5,17 +5,12 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.lang.tree.TreeNode;
 import cn.hutool.core.lang.tree.TreeUtil;
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import co.elastic.clients.elasticsearch.core.SearchRequest;
+import com.brandnewdata.mop.poc.operate.dao.EventDao;
 import com.brandnewdata.mop.poc.operate.dao.FlowNodeInstanceDao;
-import com.brandnewdata.mop.poc.operate.dto.FlowNodeInstanceDetailDto;
-import com.brandnewdata.mop.poc.operate.dto.FlowNodeInstanceListDto;
-import com.brandnewdata.mop.poc.operate.dto.FlowNodeInstanceTreeDto;
-import com.brandnewdata.mop.poc.operate.dto.FlowNodeStateDto;
+import com.brandnewdata.mop.poc.operate.dto.*;
+import com.brandnewdata.mop.poc.operate.entity.EventEntity;
 import com.brandnewdata.mop.poc.operate.entity.FlowNodeInstanceEntity;
 import com.brandnewdata.mop.poc.operate.schema.template.FlowNodeInstanceTemplate;
-import com.brandnewdata.mop.poc.operate.util.ElasticsearchUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,15 +27,15 @@ import java.util.stream.Collectors;
 public class FlowNodeInstanceService {
 
     @Autowired
-    private FlowNodeInstanceTemplate template;
+    private FlowNodeInstanceDao flowNodeInstanceDao;
 
     @Autowired
-    private FlowNodeInstanceDao flowNodeInstanceDao;
+    private EventDao eventDao;
 
     public List<FlowNodeInstanceListDto> list(String processInstanceId) {
         Assert.notNull(processInstanceId);
 
-        List<FlowNodeInstanceEntity> flowNodeInstanceEntities = flowNodeInstanceDao.queryFlowNodeInstances(processInstanceId);
+        List<FlowNodeInstanceEntity> flowNodeInstanceEntities = flowNodeInstanceDao.list(processInstanceId);
 
         List<FlowNodeInstanceListDto> flowNodeInstanceListDtos = flowNodeInstanceEntities.stream()
                 .map(entity -> new FlowNodeInstanceListDto().fromEntity(entity)).collect(Collectors.toList());
@@ -116,14 +111,28 @@ public class FlowNodeInstanceService {
         return ret;
     }
 
-    public FlowNodeInstanceDetailDto detail(String flowNodeInstanceId) {
+    public FlowNodeInstanceDetailDto detailByFlowNodeInstanceId(String processInstanceId, String flowNodeInstanceId) {
         Assert.notNull(flowNodeInstanceId);
 
-        FlowNodeInstanceEntity flowNodeInstance = flowNodeInstanceDao.getFlowNodeInstance(flowNodeInstanceId);
+        // 首先查找 instance entity
+        FlowNodeInstanceEntity flowNodeInstance = flowNodeInstanceDao.getOne(flowNodeInstanceId);
 
+        // 查找 event
+        EventEntity eventEntity = eventDao.getOne(flowNodeInstanceId);
+
+        // 转换 metaData
+        FlowNodeInstanceMetaDataDto flowNodeInstanceMetaDataDto =
+                new FlowNodeInstanceMetaDataDto().fromEntity(flowNodeInstance, eventEntity);
+
+        // 查找 incident
 
         return null;
     }
+
+
+    public FlowNodeInstanceDetailDto detailByFlowNodeId(String processInstanceId, String flowNodeId) {
+        return null;
+    };
 
 
 
