@@ -18,11 +18,11 @@ public class FlowNodeInstanceDao extends AbstractDao{
     @Autowired
     private FlowNodeInstanceTemplate template;
 
-    public List<FlowNodeInstanceEntity> queryFlowNodeInstances(FlowNodeInstanceRequest request) {
+    public List<FlowNodeInstanceEntity> queryFlowNodeInstances(String processInstanceId) {
         SearchRequest searchRequest = new SearchRequest.Builder()
                 .index(template.getAlias())
                 .query(new Query.Builder()
-                        .term(t -> t.field(FlowNodeInstanceTemplate.PROCESS_INSTANCE_KEY).value(request.getProcessInstanceId()))
+                        .term(t -> t.field(FlowNodeInstanceTemplate.PROCESS_INSTANCE_KEY).value(processInstanceId))
                         .build())
                 .build();
         return ElasticsearchUtil.scrollAll(client, searchRequest, FlowNodeInstanceEntity.class);
@@ -36,7 +36,7 @@ public class FlowNodeInstanceDao extends AbstractDao{
 
     }
 
-    private FlowNodeInstanceEntity getFlowNodeInstance(String flowNodeInstanceId) {
+    public FlowNodeInstanceEntity getFlowNodeInstance(String flowNodeInstanceId) {
 
         GetRequest getRequest = new GetRequest.Builder()
                 .index(template.getAlias())

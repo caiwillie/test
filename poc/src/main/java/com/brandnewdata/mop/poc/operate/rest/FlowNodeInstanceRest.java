@@ -1,14 +1,13 @@
 package com.brandnewdata.mop.poc.operate.rest;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch.core.SearchResponse;
 import com.brandnewdata.common.webresult.Result;
-import com.brandnewdata.mop.poc.operate.dto.FlowNodeInstanceDto;
-import com.brandnewdata.mop.poc.operate.dto.FlowNodeInstanceRequest;
+import com.brandnewdata.mop.poc.operate.dto.FlowNodeInstanceDetailDto;
+import com.brandnewdata.mop.poc.operate.dto.FlowNodeInstanceListDto;
 import com.brandnewdata.mop.poc.operate.service.FlowNodeInstanceService;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -28,21 +27,35 @@ public class FlowNodeInstanceRest {
      * @return the result
      */
     @GetMapping("/rest/operate/flowNodeInstance/list")
-    public Result<List<FlowNodeInstanceDto>> list(@RequestParam String processInstanceId) {
-        List<FlowNodeInstanceDto> list = service.list(processInstanceId);
+    public Result<List<FlowNodeInstanceListDto>> list(@RequestParam String processInstanceId) {
+        List<FlowNodeInstanceListDto> list = service.list(processInstanceId);
         return Result.OK(list);
     }
 
 
     /**
-     * 获取节点实例的详情
+     * 获取节点实例的详情（从节点树点击）
      *
      * @param processInstanceId  流程实例id
      * @param flowNodeInstanceId 节点实例id
      * @return the result
      */
-    @GetMapping("/rest/operate/flowNodeInstance/detail")
-    public Result detail(@RequestParam String processInstanceId, @RequestParam String flowNodeInstanceId) {
+    @GetMapping("/rest/operate/flowNodeInstance/detailByFlowNodeInstanceId")
+    public Result<FlowNodeInstanceDetailDto> detailByFlowNodeInstanceId(
+            @RequestParam String processInstanceId, @RequestParam String flowNodeInstanceId) {
+        return null;
+    }
+
+    /**
+     * 获取节点实例的详情（从图上点击）
+     *
+     * @param processInstanceId 流程实例id
+     * @param flowNodeId        节点id
+     * @return the result
+     */
+    @GetMapping("/rest/operate/flowNodeInstance/detailByFlowNodeId")
+    public Result<FlowNodeInstanceDetailDto> detailByFlowNodeId(
+            @RequestParam String processInstanceId, @RequestParam String flowNodeId) {
         return null;
     }
 

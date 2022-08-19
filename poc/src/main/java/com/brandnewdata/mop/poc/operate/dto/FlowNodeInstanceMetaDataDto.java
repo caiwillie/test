@@ -4,5 +4,5 @@ import java.util.List;
 
 public class FlowNodeInstanceMetaDataDto {
     private boolean incident;
-    private List<FlowNodeInstanceDto> list;
+    private List<FlowNodeInstanceListDto> list;
 }
