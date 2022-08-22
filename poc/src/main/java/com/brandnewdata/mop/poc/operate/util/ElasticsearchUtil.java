@@ -10,6 +10,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.core.search.PointInTimeReference;
+import com.brandnewdata.mop.poc.operate.schema.index.IndexDescriptor;
 import lombok.SneakyThrows;
 
 import java.util.ArrayList;
@@ -105,13 +106,22 @@ public class ElasticsearchUtil {
         }
     }
 
+    public static <T extends IndexDescriptor> String whereToSearch(T template, QueryType queryType) {
+        switch (queryType) {
+            case ONLY_RUNTIME:
+                return template.getFullQualifiedName();
+            case ALL:
+            default:
+                return template.getAlias();
+        }
+    }
+
     private static <TDocument> Function<Hit<TDocument>, TDocument> mapSearchHits() {
         return Hit::source;
     }
 
-
     @SneakyThrows
-    public static String openPointInTime(ElasticsearchClient client, List<String> indices, Time keepAlive) {
+    private static String openPointInTime(ElasticsearchClient client, List<String> indices, Time keepAlive) {
         SearchRequest searchRequest;
 
         OpenPointInTimeRequest request = new OpenPointInTimeRequest.Builder()
@@ -124,11 +134,18 @@ public class ElasticsearchUtil {
     }
 
     @SneakyThrows
-    public static void closePointInTime(ElasticsearchClient client, String pointInTime) {
+    private static void closePointInTime(ElasticsearchClient client, String pointInTime) {
         ClosePointInTimeRequest request = new ClosePointInTimeRequest.Builder()
                 .id(pointInTime)
                 .build();
         ClosePointInTimeResponse response = client.closePointInTime(request);
     }
+
+
+    public static enum QueryType {
+        ONLY_RUNTIME,
+        ALL;
+    }
+
 
 }

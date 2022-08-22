@@ -1,26 +1,39 @@
 package com.brandnewdata.mop.poc.operate.service;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.lang.tree.TreeNode;
 import cn.hutool.core.lang.tree.TreeUtil;
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.NumberUtil;
+import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.query_dsl.TermsQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
 import com.brandnewdata.mop.poc.operate.dao.EventDao;
 import com.brandnewdata.mop.poc.operate.dao.FlowNodeInstanceDao;
+import com.brandnewdata.mop.poc.operate.dao.IncidentDao;
 import com.brandnewdata.mop.poc.operate.dao.ListViewDao;
 import com.brandnewdata.mop.poc.operate.dto.*;
 import com.brandnewdata.mop.poc.operate.entity.EventEntity;
 import com.brandnewdata.mop.poc.operate.entity.FlowNodeInstanceEntity;
 import com.brandnewdata.mop.poc.operate.entity.FlowNodeType;
+import com.brandnewdata.mop.poc.operate.entity.IncidentEntity;
 import com.brandnewdata.mop.poc.operate.entity.listview.ProcessInstanceForListViewEntity;
+import com.brandnewdata.mop.poc.operate.schema.template.FlowNodeInstanceTemplate;
+import com.brandnewdata.mop.poc.operate.util.ElasticsearchUtil;
+import com.brandnewdata.mop.poc.operate.util.TreePathUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static com.brandnewdata.mop.poc.operate.dto.IncidentDto.FALLBACK_PROCESS_DEFINITION_NAME;
 
 /**
  * @author caiwillie
@@ -35,7 +48,7 @@ public class FlowNodeInstanceService {
     private EventDao eventDao;
 
     @Autowired
-    private IncidentService incidentService;
+    private IncidentDao incidentDao;
 
     @Autowired
     private ListViewDao listViewDao;
@@ -76,7 +89,7 @@ public class FlowNodeInstanceService {
         // 查询 id 中最后一个 /
         int index = id.lastIndexOf('/');
         String parent = null;
-        if(index > 0) {
+        if (index > 0) {
             parent = id.substring(0, index);
         } else {
             throw new RuntimeException("tree path 格式错误");
@@ -90,26 +103,26 @@ public class FlowNodeInstanceService {
         List<FlowNodeInstanceListDto> list = new ArrayList<>();
         ret.setList(list);
         ret.setIncident(false);
-        if(CollUtil.isEmpty(children)) {
+        if (CollUtil.isEmpty(children)) {
             return ret;
         }
 
         for (Tree<String> tree : children) {
             FlowNodeInstanceListDto flowNodeInstanceListDto = pathInstanceMap.get(tree.getId());
-            if(flowNodeInstanceListDto == null) throw new RuntimeException("path 数据错误");
+            if (flowNodeInstanceListDto == null) throw new RuntimeException("path 数据错误");
             // 递归处理
             FlowNodeInstanceTreeDto childrenDto = buildFlowNodeInstanceTree(tree.getChildren(), pathInstanceMap);
 
             // if()
             flowNodeInstanceListDto.setChildren(childrenDto.getList());
 
-            if(childrenDto.isIncident() && !flowNodeInstanceListDto.isIncident()) {
+            if (childrenDto.isIncident() && !flowNodeInstanceListDto.isIncident()) {
                 // 子节点有错误事件，但是本节点无错误事件，修改本节点的事件和状态
                 flowNodeInstanceListDto.setIncident(true);
                 flowNodeInstanceListDto.setState(FlowNodeStateDto.INCIDENT);
             }
 
-            if(flowNodeInstanceListDto.isIncident() && !ret.isIncident()) {
+            if (flowNodeInstanceListDto.isIncident() && !ret.isIncident()) {
                 // 本节点有错误事件，但是总体结果无错误事件时，修改总体结果
                 ret.setIncident(true);
             }
@@ -120,6 +133,8 @@ public class FlowNodeInstanceService {
     }
 
     public FlowNodeInstanceDetailDto detailByFlowNodeInstanceId(String processInstanceId, String flowNodeInstanceId) {
+        FlowNodeInstanceDetailDto ret = new FlowNodeInstanceDetailDto();
+
         Assert.notNull(flowNodeInstanceId);
 
         // 首先查找 instance entity
@@ -132,17 +147,21 @@ public class FlowNodeInstanceService {
         FlowNodeInstanceMetaDataDto metaData =
                 new FlowNodeInstanceMetaDataDto().fromEntity(flowNodeInstance, eventEntity);
 
+        // 添加 call activity
         addCallActivityMetaData(metaData);
 
+        // todo 添加 business rule
+
         // 查找 incident
-        IncidentDto incident = incidentService.getOneByFlowNodeInstance(String.valueOf(flowNodeInstance.getProcessInstanceKey()),
-                flowNodeInstance.getFlowNodeId(), flowNodeInstance.getId());
+        Object[] incidentRet = searchIncident(flowNodeInstance);
+        long incidentCount = (long) incidentRet[0];
+        IncidentDto incidentDto = (IncidentDto) incidentRet[1];
 
-        FlowNodeInstanceDetailDto ret = new FlowNodeInstanceDetailDto();
+
         ret.setRepeated(false);
-        ret.setMeteData(metaData);
-        ret.setIncident(incident);
-
+        ret.setMetaData(metaData);
+        ret.setIncidentCount(incidentCount);
+        ret.setIncident(incidentDto);
         return ret;
     }
 
@@ -164,17 +183,116 @@ public class FlowNodeInstanceService {
     }
 
     private void addBusinessRuleTaskMetaData(FlowNodeInstanceMetaDataDto metaData) {
-        if(metaData.getFlowNodeType().equals(FlowNodeType.BUSINESS_RULE_TASK)) {
+        if (metaData.getFlowNodeType().equals(FlowNodeType.BUSINESS_RULE_TASK)) {
 
         }
     }
 
+    private Object[] searchIncident(FlowNodeInstanceEntity flowNodeInstance) {
+        Object[] ret = new Object[2];
+        IncidentDto incidentDto = new IncidentDto();
+
+        TreePathUtil treePath = new TreePathUtil();
+        Long processInstanceId = flowNodeInstance.getProcessInstanceKey();
+
+        treePath.appendProcessInstance(String.valueOf(processInstanceId));
+        // 类似 PI_{processInstanceId}
+        String firstPath = treePath.toString();
+
+        treePath.appendFlowNode(flowNodeInstance.getFlowNodeId());
+        treePath.appendFlowNodeInstance(flowNodeInstance.getId());
+
+        List<IncidentEntity> incidentEntities = incidentDao.listByTreePath(treePath.toString());
+
+        // 获取incident的个数
+        long incidentCount = incidentEntities.size();
+        ret[0] = incidentCount;
+
+        if (incidentCount != 1) {
+            // 如果事件个数不是 1， 就直接返回
+            return ret;
+        }
+
+        // 查询详情
+        IncidentEntity incidentEntity = incidentEntities.get(0);
+
+        incidentDto.fromEntity(incidentEntity);
+
+        Map<String, IncidentDataHolder> incidentDataHolderMap =
+                collectFlowNodeDataForPropagatedIncidents(ListUtil.of(incidentEntity), processInstanceId, firstPath);
+
+        IncidentDataHolder dataHolder = incidentDataHolderMap.get(incidentEntity.getId());
+
+        Map<Long, String> processNames = MapUtil.empty();
+
+        if (dataHolder != null && !Objects.equals(incidentDto.getFlowNodeInstanceId(), dataHolder.getFinalFlowNodeInstanceId())) {
+            // 如果data holder中的 flowNodeInstanceId 和 incidentDto中不一样，就替换
+            incidentDto.setFlowNodeId(dataHolder.getFinalFlowNodeId());
+            incidentDto.setFlowNodeInstanceId(dataHolder.getFinalFlowNodeInstanceId());
+            ProcessInstanceReferenceDto rootCauseInstance = new ProcessInstanceReferenceDto();
+            rootCauseInstance.setInstanceId(String.valueOf(incidentEntity.getProcessInstanceKey()));
+            rootCauseInstance.setProcessDefinitionId(String.valueOf(incidentEntity.getProcessDefinitionKey()));
+            if (processNames != null && processNames.get(incidentEntity.getProcessDefinitionKey()) != null) {
+                rootCauseInstance.setProcessDefinitionName(processNames.get(incidentEntity.getProcessDefinitionKey()));
+            } else {
+                rootCauseInstance.setProcessDefinitionName(FALLBACK_PROCESS_DEFINITION_NAME);
+            }
+            incidentDto.setRootCauseInstance(rootCauseInstance);
+        }
+
+        ret[1] = incidentDto;
+        return ret;
+    }
+
+    private Map<String, IncidentDataHolder> collectFlowNodeDataForPropagatedIncidents(
+            List<IncidentEntity> incidents, Long processInstanceId, String currentTreePath) {
+
+        HashSet<String> flowNodeInstanceIdsSet = new HashSet<>();
+        HashMap<String, IncidentDataHolder> incDatas = new HashMap<>();
+        Iterator<IncidentEntity> iterator = incidents.iterator();
+        while (true) {
+            if (!iterator.hasNext()) {
+                // caiwillie 查询结束后，查出最终的 finalFlowNodeId
+                if (flowNodeInstanceIdsSet.size() <= 0) return incDatas;
+                Map<String, String> flowNodeIdsMap = this.getFlowNodeIds(flowNodeInstanceIdsSet);
+                incDatas.values().stream().filter(iData -> iData.getFinalFlowNodeId() == null)
+                        .forEach(iData -> iData.setFinalFlowNodeId(flowNodeIdsMap.get(iData.getFinalFlowNodeInstanceId())));
+                return incDatas;
+            }
+            IncidentEntity incident = iterator.next();
+            IncidentDataHolder holder = new IncidentDataHolder();
+            holder.setIncidentId(incident.getId());
+            if (!NumberUtil.equals(incident.getProcessInstanceKey(), processInstanceId)) {
+                // 这里时为了获取异常 call activity 的 instance id
+                String callActivityInstanceId = TreePathUtil.extractFlowNodeInstanceId(incident.getTreePath(), currentTreePath);
+                holder.setFinalFlowNodeInstanceId(callActivityInstanceId);
+                flowNodeInstanceIdsSet.add(callActivityInstanceId);
+            } else {
+                holder.setFinalFlowNodeInstanceId(String.valueOf(incident.getFlowNodeInstanceKey()));
+                holder.setFinalFlowNodeId(incident.getFlowNodeId());
+            }
+            incDatas.put(incident.getId(), holder);
+        }
+
+    }
+
+    private Map<String, String> getFlowNodeIds(Set<String> flowNodeInstanceIds) {
+        HashMap<String, String> flowNodeIdsMap = new HashMap<String, String>();
+        ;
+        Query query = new Query.Builder()
+                .terms(new TermsQuery.Builder()
+                        .field(FlowNodeInstanceTemplate.ID)
+                        .terms(terms -> terms.value(flowNodeInstanceIds.stream().map(FieldValue::of).collect(Collectors.toList())))
+                        .build())
+                .build();
+        List<FlowNodeInstanceEntity> list = flowNodeInstanceDao.list(query, ElasticsearchUtil.QueryType.ONLY_RUNTIME);
+
+        // 转换为 flowNodeInstanceId - flowNodeId 的 map
+        return list.stream().collect(Collectors.toMap(FlowNodeInstanceEntity::getId, FlowNodeInstanceEntity::getFlowNodeId));
+    }
 
     public FlowNodeInstanceDetailDto detailByFlowNodeId(String processInstanceId, String flowNodeId) {
         return null;
-    };
-
-
-
+    }
 
 }

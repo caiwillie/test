@@ -17,13 +17,12 @@ public class IncidentService {
     private IncidentDao incidentDao;
 
     public IncidentDto getOneByFlowNodeInstance(String processInstanceId, String flowNodeId, String flowNodeInstanceId) {
+        IncidentDto ret = new IncidentDto();
         Assert.notNull(processInstanceId);
         Assert.notNull(flowNodeId);
         Assert.notNull(flowNodeInstanceId);
-        String treePath = new TreePathUtil().appendProcessInstance(processInstanceId).appendFlowNode(flowNodeId)
-                .appendFlowNodeInstance(flowNodeInstanceId).toString();
-        IncidentEntity entity = incidentDao.getOneByTreePath(treePath);
-        return new IncidentDto().fromEntity(entity);
+
+        return null;
     }
 
 }

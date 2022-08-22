@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.poc.operate.dao;
 
+import cn.hutool.core.lang.Assert;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.GetRequest;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class FlowNodeInstanceDao extends AbstractDao{
+public class FlowNodeInstanceDao extends AbstractDao {
 
     @Autowired
     private FlowNodeInstanceTemplate template;
@@ -23,6 +24,15 @@ public class FlowNodeInstanceDao extends AbstractDao{
                 .query(new Query.Builder()
                         .term(t -> t.field(FlowNodeInstanceTemplate.PROCESS_INSTANCE_KEY).value(processInstanceId))
                         .build())
+                .build();
+        return ElasticsearchUtil.scrollAll(client, searchRequest, FlowNodeInstanceEntity.class);
+    }
+
+    public List<FlowNodeInstanceEntity> list(Query query, ElasticsearchUtil.QueryType queryType) {
+        Assert.notNull(query);
+        SearchRequest searchRequest = new SearchRequest.Builder()
+                .index(ElasticsearchUtil.whereToSearch(template, queryType))
+                .query(query)
                 .build();
         return ElasticsearchUtil.scrollAll(client, searchRequest, FlowNodeInstanceEntity.class);
     }

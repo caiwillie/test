@@ -28,7 +28,12 @@ public class FlowNodeInstanceDetailDto {
     /**
      * 基本信息
      */
-    private FlowNodeInstanceMetaDataDto meteData;
+    private FlowNodeInstanceMetaDataDto metaData;
+
+    /**
+     * 异常个数
+     */
+    private Long incidentCount;
 
     /**
      * 异常信息
