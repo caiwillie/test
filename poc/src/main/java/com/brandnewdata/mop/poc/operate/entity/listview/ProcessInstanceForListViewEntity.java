@@ -27,4 +27,5 @@ public class ProcessInstanceForListViewEntity extends OperateZeebeEntity<Process
     private ListViewJoinRelation joinRelation;
     @JsonIgnore
     private Object[] sortValues;
+
 }
