@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.poc.operate.dto;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 public class IncidentDto {
@@ -11,9 +12,9 @@ public class IncidentDto {
     private String flowNodeId;
     private String flowNodeInstanceId;
     private String jobId;
-    private OffsetDateTime creationTime;
+    private LocalDateTime creationTime;
     private boolean hasActiveOperation = false;
-    private OperationDto lastOperation;
+    private LocalDateTime lastOperation;
     private ProcessInstanceReferenceDto rootCauseInstance;
     private DecisionInstanceReferenceDto rootCauseDecision;
 
