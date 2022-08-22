@@ -7,11 +7,12 @@ import cn.hutool.core.lang.tree.TreeNode;
 import cn.hutool.core.lang.tree.TreeUtil;
 import com.brandnewdata.mop.poc.operate.dao.EventDao;
 import com.brandnewdata.mop.poc.operate.dao.FlowNodeInstanceDao;
-import com.brandnewdata.mop.poc.operate.dao.IncidentDao;
+import com.brandnewdata.mop.poc.operate.dao.ListViewDao;
 import com.brandnewdata.mop.poc.operate.dto.*;
 import com.brandnewdata.mop.poc.operate.entity.EventEntity;
 import com.brandnewdata.mop.poc.operate.entity.FlowNodeInstanceEntity;
-import com.brandnewdata.mop.poc.operate.schema.template.FlowNodeInstanceTemplate;
+import com.brandnewdata.mop.poc.operate.entity.FlowNodeType;
+import com.brandnewdata.mop.poc.operate.entity.listview.ProcessInstanceForListViewEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +36,9 @@ public class FlowNodeInstanceService {
 
     @Autowired
     private IncidentService incidentService;
+
+    @Autowired
+    private ListViewDao listViewDao;
 
     public List<FlowNodeInstanceListDto> list(String processInstanceId) {
         Assert.notNull(processInstanceId);
@@ -125,16 +129,44 @@ public class FlowNodeInstanceService {
         EventEntity eventEntity = eventDao.getOne(flowNodeInstanceId);
 
         // 转换 metaData
-        FlowNodeInstanceMetaDataDto flowNodeInstanceMetaDataDto =
+        FlowNodeInstanceMetaDataDto metaData =
                 new FlowNodeInstanceMetaDataDto().fromEntity(flowNodeInstance, eventEntity);
+
+        addCallActivityMetaData(metaData);
 
         // 查找 incident
         IncidentDto incident = incidentService.getOneByFlowNodeInstance(String.valueOf(flowNodeInstance.getProcessInstanceKey()),
                 flowNodeInstance.getFlowNodeId(), flowNodeInstance.getId());
 
+        FlowNodeInstanceDetailDto ret = new FlowNodeInstanceDetailDto();
+        ret.setRepeated(false);
+        ret.setMeteData(metaData);
+        ret.setIncident(incident);
+
+        return ret;
+    }
 
 
-        return null;
+    /**
+     * 如果是call activity，就查询更多内容
+     */
+    private void addCallActivityMetaData(FlowNodeInstanceMetaDataDto metaData) {
+        if (metaData.getFlowNodeType().equals(FlowNodeType.CALL_ACTIVITY)) {
+            ProcessInstanceForListViewEntity entity = listViewDao.getOneByParentFlowNodeInstanceId(metaData.getFlowNodeInstanceId());
+            String calledProcessInstanceId = entity.getId();
+            String processName = entity.getProcessName();
+            if (processName == null) {
+                processName = entity.getBpmnProcessId();
+            }
+            metaData.setCalledProcessInstanceId(calledProcessInstanceId);
+            metaData.setCalledProcessDefinitionName(processName);
+        }
+    }
+
+    private void addBusinessRuleTaskMetaData(FlowNodeInstanceMetaDataDto metaData) {
+        if(metaData.getFlowNodeType().equals(FlowNodeType.BUSINESS_RULE_TASK)) {
+
+        }
     }
 
 

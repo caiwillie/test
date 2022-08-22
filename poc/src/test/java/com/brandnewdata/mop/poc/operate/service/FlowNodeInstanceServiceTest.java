@@ -16,6 +16,6 @@ class FlowNodeInstanceServiceTest {
     void list() {
         FlowNodeInstanceRequest request = new FlowNodeInstanceRequest();
         request.setProcessInstanceId("2251799813685305");
-        service.list(request);
+        
     }
 }
