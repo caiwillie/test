@@ -7,6 +7,7 @@ import cn.hutool.core.lang.tree.TreeNode;
 import cn.hutool.core.lang.tree.TreeUtil;
 import com.brandnewdata.mop.poc.operate.dao.EventDao;
 import com.brandnewdata.mop.poc.operate.dao.FlowNodeInstanceDao;
+import com.brandnewdata.mop.poc.operate.dao.IncidentDao;
 import com.brandnewdata.mop.poc.operate.dto.*;
 import com.brandnewdata.mop.poc.operate.entity.EventEntity;
 import com.brandnewdata.mop.poc.operate.entity.FlowNodeInstanceEntity;
@@ -31,6 +32,9 @@ public class FlowNodeInstanceService {
 
     @Autowired
     private EventDao eventDao;
+
+    @Autowired
+    private IncidentService incidentService;
 
     public List<FlowNodeInstanceListDto> list(String processInstanceId) {
         Assert.notNull(processInstanceId);
@@ -125,6 +129,10 @@ public class FlowNodeInstanceService {
                 new FlowNodeInstanceMetaDataDto().fromEntity(flowNodeInstance, eventEntity);
 
         // 查找 incident
+        IncidentDto incident = incidentService.getOneByFlowNodeInstance(String.valueOf(flowNodeInstance.getProcessInstanceKey()),
+                flowNodeInstance.getFlowNodeId(), flowNodeInstance.getId());
+
+
 
         return null;
     }

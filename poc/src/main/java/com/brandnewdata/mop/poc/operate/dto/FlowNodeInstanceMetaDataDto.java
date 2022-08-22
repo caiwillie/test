@@ -12,8 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Data
-public class FlowNodeInstanceMetaDataDto implements
-        FromTwoEntity<FlowNodeInstanceMetaDataDto, FlowNodeInstanceEntity, EventEntity> {
+public class FlowNodeInstanceMetaDataDto {
     private String processInstanceId;
     private String flowNodeId;
     private String flowNodeInstanceId;
@@ -31,7 +30,6 @@ public class FlowNodeInstanceMetaDataDto implements
     private OffsetDateTime jobDeadline;
     private Map<String, String> jobCustomHeaders;
 
-    @Override
     public FlowNodeInstanceMetaDataDto fromEntity(FlowNodeInstanceEntity flowNodeInstanceEntity, EventEntity eventEntity) {
         this.setProcessInstanceId(String.valueOf(flowNodeInstanceEntity.getProcessInstanceKey()));
         this.setFlowNodeInstanceId(flowNodeInstanceEntity.getId());

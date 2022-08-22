@@ -1,6 +1,11 @@
 package com.brandnewdata.mop.poc.operate.service;
 
+import cn.hutool.core.lang.Assert;
+import com.brandnewdata.mop.poc.operate.dao.IncidentDao;
 import com.brandnewdata.mop.poc.operate.dto.IncidentDto;
+import com.brandnewdata.mop.poc.operate.entity.IncidentEntity;
+import com.brandnewdata.mop.poc.operate.util.TreePathUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -8,9 +13,17 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class IncidentService {
+    @Autowired
+    private IncidentDao incidentDao;
 
-    public IncidentDto get() {
-        return null;
+    public IncidentDto getOneByFlowNodeInstance(String processInstanceId, String flowNodeId, String flowNodeInstanceId) {
+        Assert.notNull(processInstanceId);
+        Assert.notNull(flowNodeId);
+        Assert.notNull(flowNodeInstanceId);
+        String treePath = new TreePathUtil().appendProcessInstance(processInstanceId).appendFlowNode(flowNodeId)
+                .appendFlowNodeInstance(flowNodeInstanceId).toString();
+        IncidentEntity entity = incidentDao.getOneByTreePath(treePath);
+        return new IncidentDto().fromEntity(entity);
     }
 
 }
