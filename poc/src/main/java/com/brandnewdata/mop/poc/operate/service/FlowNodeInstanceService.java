@@ -165,7 +165,6 @@ public class FlowNodeInstanceService {
         return ret;
     }
 
-
     /**
      * 如果是call activity，就查询更多内容
      */

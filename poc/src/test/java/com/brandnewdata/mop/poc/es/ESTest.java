@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.poc.es;
 
+import cn.hutool.cache.CacheUtil;
 import cn.hutool.core.collection.ListUtil;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.Time;
@@ -29,6 +30,8 @@ public class ESTest {
                         .id("2251799813685256"),
                 ObjectNode.class
         );
+
+        CacheUtil.newNoCache()
 
         return;
     }
