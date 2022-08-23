@@ -219,36 +219,33 @@ public class FlowNodeInstanceService {
         Map<String, IncidentDataHolder> incidentDataHolderMap =
                 collectFlowNodeDataForPropagatedIncidents(ListUtil.of(incidentEntity), processInstanceId, firstPath);
 
+        // 这说明就是发生了call activity
         IncidentDataHolder dataHolder = incidentDataHolderMap.get(incidentEntity.getId());
 
-        Map<Long, String> processNames = MapUtil.empty();
-
-        String name = null;
-        ProcessEntity processEntity = processCache.getOne(incidentEntity.getProcessDefinitionKey());
-        if(processEntity != null) {
-
-        } else {
-
-        }
-
-
-        if (dataHolder != null && !Objects.equals(incidentDto.getFlowNodeInstanceId(), dataHolder.getFinalFlowNodeInstanceId())) {
+        if (dataHolder != null && !Objects.equals(incidentDto.getFlowNodeInstanceId(),
+                dataHolder.getFinalFlowNodeInstanceId())) {
             // 如果data holder中的 flowNodeInstanceId 和 incidentDto中不一样，就替换
             incidentDto.setFlowNodeId(dataHolder.getFinalFlowNodeId());
             incidentDto.setFlowNodeInstanceId(dataHolder.getFinalFlowNodeInstanceId());
+            // 设置 inner_activity 的错误
             ProcessInstanceReferenceDto rootCauseInstance = new ProcessInstanceReferenceDto();
             rootCauseInstance.setInstanceId(String.valueOf(incidentEntity.getProcessInstanceKey()));
             rootCauseInstance.setProcessDefinitionId(String.valueOf(incidentEntity.getProcessDefinitionKey()));
-            if (processNames != null && processNames.get(incidentEntity.getProcessDefinitionKey()) != null) {
-                rootCauseInstance.setProcessDefinitionName(processNames.get(incidentEntity.getProcessDefinitionKey()));
-            } else {
-                rootCauseInstance.setProcessDefinitionName(FALLBACK_PROCESS_DEFINITION_NAME);
-            }
+            rootCauseInstance.setProcessDefinitionName(getProcessName(incidentEntity.getProcessInstanceKey()));
             incidentDto.setRootCauseInstance(rootCauseInstance);
         }
 
         ret[1] = incidentDto;
         return ret;
+    }
+
+    private String getProcessName(Long processDefinitionKey) {
+        ProcessEntity processEntity = processCache.getOne(processDefinitionKey);
+        if(processEntity != null) {
+            return processEntity.getName() != null ? processEntity.getName() : processEntity.getBpmnProcessId();
+        } else {
+            return FALLBACK_PROCESS_DEFINITION_NAME;
+        }
     }
 
     private Map<String, IncidentDataHolder> collectFlowNodeDataForPropagatedIncidents(
@@ -270,15 +267,13 @@ public class FlowNodeInstanceService {
             IncidentDataHolder holder = new IncidentDataHolder();
             holder.setIncidentId(incident.getId());
             if (!NumberUtil.equals(incident.getProcessInstanceKey(), processInstanceId)) {
-                // 这里时为了获取异常 call activity 的 instance id
+                // 如果不相等，说明call activity 发生异常
+                // 这里是为了提取 out_activity 的 instance id
                 String callActivityInstanceId = TreePathUtil.extractFlowNodeInstanceId(incident.getTreePath(), currentTreePath);
                 holder.setFinalFlowNodeInstanceId(callActivityInstanceId);
                 flowNodeInstanceIdsSet.add(callActivityInstanceId);
-            } else {
-                holder.setFinalFlowNodeInstanceId(String.valueOf(incident.getFlowNodeInstanceKey()));
-                holder.setFinalFlowNodeId(incident.getFlowNodeId());
+                incDatas.put(incident.getId(), holder);
             }
-            incDatas.put(incident.getId(), holder);
         }
 
     }
