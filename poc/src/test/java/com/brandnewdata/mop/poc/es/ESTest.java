@@ -31,7 +31,7 @@ public class ESTest {
                 ObjectNode.class
         );
 
-        CacheUtil.newNoCache()
+        
 
         return;
     }

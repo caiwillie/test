@@ -30,4 +30,12 @@ public class ListViewDao extends AbstractDao{
         return ElasticsearchUtil.searchOne(client, request, ProcessInstanceForListViewEntity.class);
     }
 
+    public ProcessInstanceForListViewEntity searchOne(Query query) {
+        SearchRequest searchRequest = new SearchRequest.Builder()
+                .index(template.getAlias())
+                .query(query)
+                .build();
+        return ElasticsearchUtil.searchOne(client, searchRequest, ProcessInstanceForListViewEntity.class);
+    }
+
 }

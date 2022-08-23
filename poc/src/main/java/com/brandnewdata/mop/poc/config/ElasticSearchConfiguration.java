@@ -4,6 +4,7 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -34,6 +35,9 @@ public class ElasticSearchConfiguration {
 
         // 自动发现注册引入的模块
         objectMapper.findAndRegisterModules();
+
+        // 设置 unknow properties 时不报错
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         HttpHost[] httpHosts = Arrays.stream(uris).map(this::createHttpHost).toArray(HttpHost[]::new);
 
