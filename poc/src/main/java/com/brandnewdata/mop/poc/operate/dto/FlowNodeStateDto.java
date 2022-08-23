@@ -3,9 +3,15 @@ package com.brandnewdata.mop.poc.operate.dto;
 import com.brandnewdata.mop.poc.operate.entity.FlowNodeState;
 
 public enum FlowNodeStateDto {
+
+    /**
+     * 激活
+     */
     ACTIVE,
     INCIDENT,
+
     COMPLETED,
+
     TERMINATED,
     UNSPECIFIED,
     UNKNOWN;
