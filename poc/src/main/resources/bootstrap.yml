@@ -6,12 +6,12 @@ spring:
   cloud:
     nacos:
       config:
-        server-addr: brand-boot-nacos:8848
+        server-addr: brandnewdata-nacos:8848
         namespace: "dev"
         group: DEFAULT_GROUP
         file-extension: yaml
       discovery:
-        server-addr: brand-boot-nacos:8848
+        server-addr: brandnewdata-nacos:8848
         namespace: "dev"
         group: DEFAULT_GROUP
         metadata:
