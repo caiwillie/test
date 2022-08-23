@@ -11,16 +11,13 @@ import cn.hutool.core.util.NumberUtil;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermsQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
+import com.brandnewdata.mop.poc.operate.cache.ProcessCache;
 import com.brandnewdata.mop.poc.operate.dao.EventDao;
 import com.brandnewdata.mop.poc.operate.dao.FlowNodeInstanceDao;
 import com.brandnewdata.mop.poc.operate.dao.IncidentDao;
 import com.brandnewdata.mop.poc.operate.dao.ListViewDao;
 import com.brandnewdata.mop.poc.operate.dto.*;
-import com.brandnewdata.mop.poc.operate.entity.EventEntity;
-import com.brandnewdata.mop.poc.operate.entity.FlowNodeInstanceEntity;
-import com.brandnewdata.mop.poc.operate.entity.FlowNodeType;
-import com.brandnewdata.mop.poc.operate.entity.IncidentEntity;
+import com.brandnewdata.mop.poc.operate.entity.*;
 import com.brandnewdata.mop.poc.operate.entity.listview.ProcessInstanceForListViewEntity;
 import com.brandnewdata.mop.poc.operate.schema.template.FlowNodeInstanceTemplate;
 import com.brandnewdata.mop.poc.operate.util.ElasticsearchUtil;
@@ -28,7 +25,6 @@ import com.brandnewdata.mop.poc.operate.util.TreePathUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -52,6 +48,9 @@ public class FlowNodeInstanceService {
 
     @Autowired
     private ListViewDao listViewDao;
+
+    @Autowired
+    private ProcessCache processCache;
 
     public List<FlowNodeInstanceListDto> list(String processInstanceId) {
         Assert.notNull(processInstanceId);
@@ -223,6 +222,15 @@ public class FlowNodeInstanceService {
         IncidentDataHolder dataHolder = incidentDataHolderMap.get(incidentEntity.getId());
 
         Map<Long, String> processNames = MapUtil.empty();
+
+        String name = null;
+        ProcessEntity processEntity = processCache.getOne(incidentEntity.getProcessDefinitionKey());
+        if(processEntity != null) {
+
+        } else {
+
+        }
+
 
         if (dataHolder != null && !Objects.equals(incidentDto.getFlowNodeInstanceId(), dataHolder.getFinalFlowNodeInstanceId())) {
             // 如果data holder中的 flowNodeInstanceId 和 incidentDto中不一样，就替换

@@ -1,5 +1,8 @@
 package com.brandnewdata.mop.poc.operate.schema.index;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class ProcessIndex extends AbstractIndexDescriptor {
     public static final String INDEX_NAME = "process";
     public static final String ID = "id";
