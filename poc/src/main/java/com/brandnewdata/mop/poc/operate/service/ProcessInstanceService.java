@@ -30,7 +30,7 @@ import java.util.Optional;
 public class ProcessInstanceService {
 
     @Value("${brandnewdata.zeebe.operate.uri}")
-    private String URI;
+    private String uri;
 
     private CamundaOperateClient client;
 
@@ -43,8 +43,8 @@ public class ProcessInstanceService {
 
     @SneakyThrows
     private void init() {
-        SimpleAuthentication sa = new SimpleAuthentication("demo", "demo", URI);
-        client = new CamundaOperateClient.Builder().operateUrl(URI).authentication(sa).build();
+        SimpleAuthentication sa = new SimpleAuthentication("demo", "demo", uri);
+        client = new CamundaOperateClient.Builder().operateUrl(uri).authentication(sa).build();
     }
 
     @SneakyThrows
