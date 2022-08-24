@@ -10,6 +10,7 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication(exclude = ElasticsearchRestClientAutoConfiguration.class)
 @ServletComponentScan
@@ -19,6 +20,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @EnableFeignClients(basePackages = {"com.brandnewdata.connector.api"})
 @EnableGlobalExceptionHandler
 @EnableRequestInterceptorComponent
+@EnableScheduling
 public class PocApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(PocApplication.class, args);

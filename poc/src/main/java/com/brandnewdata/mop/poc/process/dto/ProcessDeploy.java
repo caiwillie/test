@@ -2,6 +2,8 @@ package com.brandnewdata.mop.poc.process.dto;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 /**
  * 流程部署实体
  */
@@ -17,7 +19,7 @@ public class ProcessDeploy {
     /**
      * 部署时间
      */
-    private String createTime;
+    private LocalDateTime createTime;
 
     /**
      * 流程 id

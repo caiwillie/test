@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.manager.ConnectorManager;
+import com.brandnewdata.mop.poc.operate.dto.deploy.GroupDeploy;
 import com.brandnewdata.mop.poc.process.ProcessConstants;
 import com.brandnewdata.mop.poc.process.dao.ProcessDeployDao;
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinition;
@@ -24,6 +25,7 @@ import io.camunda.zeebe.client.ZeebeClient;
 import io.camunda.zeebe.client.api.response.DeploymentEvent;
 import io.camunda.zeebe.client.api.response.ProcessInstanceResult;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.concurrent.ConcurrentUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -62,7 +64,7 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         if(entity == null) return null; //为空返回
         ProcessDeploy dto = new ProcessDeploy();
         dto.setId(entity.getId());
-        dto.setCreateTime(LocalDateTimeUtil.formatNormal(entity.getCreateTime()));
+        dto.setCreateTime(entity.getCreateTime());
         dto.setProcessId(entity.getProcessId());
         dto.setProcessName(entity.getProcessName());
         dto.setXml(entity.getProcessXml());
@@ -149,6 +151,13 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
     }
 
     @Override
+    public Page<GroupDeploy> groupPage(int pageNum, int pageSize) {
+        QueryWrapper<ProcessDeployEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.groupBy(ProcessDeployEntity.PROCESS_ID);
+        return null;
+    }
+
+    @Override
     public Map<String, Object> startWithResult(String processId, Map<String, Object> values) {
 
         ProcessDeployEntity processDeployEntity = getLatestDeployVersion(processId);
@@ -184,8 +193,5 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         ProcessDeployEntity entity = processDeployDao.selectById(deployId);
         return toDTO(entity);
     }
-
-
-
 
 }

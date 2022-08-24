@@ -22,14 +22,30 @@ public class DeployRest {
     private IProcessDeployService deployService;
 
     /**
-     * 流程部署分页列表
+     * 流程部署分页列表（deprecated）
      *
      * @param pageNum  分页页码
      * @param pageSize 分页大小
      * @return result
+     * @deprecated
      */
     @GetMapping("/rest/operate/deploy/page")
     public Result<Page<ProcessDeploy>> page (
+            @RequestParam int pageNum,
+            @RequestParam int pageSize) {
+        Page<ProcessDeploy> page = deployService.page(pageNum, pageSize);
+        return Result.OK(page);
+    }
+
+    /**
+     * 流程部署分页列表（按照流程id分组）
+     *
+     * @param pageNum 分页页码
+     * @param pageSize 分页大小
+     * @return
+     */
+    @GetMapping("/rest/operate/deploy/groupPage")
+    public Result<Page<ProcessDeploy>> groupPage (
             @RequestParam int pageNum,
             @RequestParam int pageSize) {
         Page<ProcessDeploy> page = deployService.page(pageNum, pageSize);
