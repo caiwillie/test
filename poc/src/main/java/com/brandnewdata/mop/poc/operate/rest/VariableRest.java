@@ -29,7 +29,8 @@ public class VariableRest {
     @GetMapping("/rest/operate/variable/listByScopeId")
     public Result<List<VariableDto>> listByFlowNodeInstance(
             @RequestParam String processInstanceId, @RequestParam String scopeId) {
-        return null;
+        List<VariableDto> list = variableService.listByScopeId(processInstanceId, scopeId);
+        return Result.OK(list);
     }
 
 }
