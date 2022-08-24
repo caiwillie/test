@@ -17,6 +17,7 @@ import io.camunda.operate.search.SearchQuery;
 import io.camunda.operate.search.Sort;
 import io.camunda.operate.search.SortOrder;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -28,7 +29,8 @@ import java.util.Optional;
 @Service
 public class ProcessInstanceService {
 
-    private static final String URL = "http://10.101.53.4:18081";
+    @Value("${brandnewdata.zeebe.operate.uri}")
+    private String URI;
 
     private CamundaOperateClient client;
 
@@ -42,7 +44,7 @@ public class ProcessInstanceService {
     @SneakyThrows
     private void init() {
         SimpleAuthentication sa = new SimpleAuthentication("demo", "demo", URL);
-        client = new CamundaOperateClient.Builder().operateUrl(URL).authentication(sa).build();
+        client = new CamundaOperateClient.Builder().operateUrl(URI).authentication(sa).build();
     }
 
     @SneakyThrows

@@ -19,6 +19,11 @@ brandnewdata:
     username: "root"
     password: "caiwillie"
     driver-class-name: "com.mysql.cj.jdbc.Driver"
+  elasticsearch:
+    uris: "http://localhost:49200"
+  zeebe:
+    operate:
+      uri: "http://localhost:18080"
 
 # https://github.com/camunda-community-hub/spring-zeebe/
 zeebe:
