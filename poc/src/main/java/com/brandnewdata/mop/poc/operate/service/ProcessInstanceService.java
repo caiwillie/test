@@ -43,7 +43,7 @@ public class ProcessInstanceService {
 
     @SneakyThrows
     private void init() {
-        SimpleAuthentication sa = new SimpleAuthentication("demo", "demo", URL);
+        SimpleAuthentication sa = new SimpleAuthentication("demo", "demo", URI);
         client = new CamundaOperateClient.Builder().operateUrl(URI).authentication(sa).build();
     }
 
