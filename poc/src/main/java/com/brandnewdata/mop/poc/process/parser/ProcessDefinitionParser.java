@@ -733,7 +733,10 @@ public class ProcessDefinitionParser implements
                 BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
                 BRANDNEWDATA_TASK_DEFINITION_QNAME.getQualifiedName()));
         List<Node> nodes = path.selectNodes(document);
-        Assert.isTrue(CollUtil.size(nodes) == 1, ErrorMessage.CHECK_ERROR("有且只能有一个触发器", null));
+        if(CollUtil.isEmpty(nodes)) {
+            // 场景中的触发器可能是标准的启动事件（空启动，定时启动，消息启动等）
+            return this;
+        }
 
         Element oldE = (Element) nodes.get(0);
 

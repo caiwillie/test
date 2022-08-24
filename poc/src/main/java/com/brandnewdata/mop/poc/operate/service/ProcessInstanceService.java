@@ -54,7 +54,7 @@ public class ProcessInstanceService {
         ProcessInstanceFilter instanceFilter = new ProcessInstanceFilter.Builder()
                 .bpmnProcessId(ProcessUtil.convertProcessId(processDeploy.getProcessId())).build();
         SearchQuery instanceQuery = new SearchQuery.Builder().withFilter(instanceFilter)
-                .withSize(1000).withSort(new Sort("state", SortOrder.ASC)).build();
+                .withSize(100).withSort(new Sort("state", SortOrder.ASC)).build();
         List<io.camunda.operate.dto.ProcessInstance> processInstances = client.searchProcessInstances(instanceQuery);
         processInstances = Optional.ofNullable(processInstances).orElse(ListUtil.empty());
         List<ProcessInstance> list = new ArrayList<>();
