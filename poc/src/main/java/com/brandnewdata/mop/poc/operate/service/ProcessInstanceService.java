@@ -20,6 +20,7 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,10 +38,7 @@ public class ProcessInstanceService {
     @Resource
     private IProcessDeployService deployService;
 
-    public ProcessInstanceService() {
-        init();
-    }
-
+    @PostConstruct
     @SneakyThrows
     private void init() {
         SimpleAuthentication sa = new SimpleAuthentication("demo", "demo", uri);

@@ -23,7 +23,7 @@ brandnewdata:
     uris: "http://localhost:49200"
   zeebe:
     operate:
-      uri: "http://localhost:18080"
+      uri: "http://localhost:18081"
 
 # https://github.com/camunda-community-hub/spring-zeebe/
 zeebe:
