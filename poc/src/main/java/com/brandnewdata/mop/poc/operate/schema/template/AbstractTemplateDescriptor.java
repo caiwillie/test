@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public abstract class AbstractTemplateDescriptor implements TemplateDescriptor{
+public abstract class AbstractTemplateDescriptor implements TemplateDescriptor {
 
     private static final String INDEX_PREFIX = "operate";
 
