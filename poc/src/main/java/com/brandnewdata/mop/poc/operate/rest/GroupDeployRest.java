@@ -70,7 +70,7 @@ public class GroupDeployRest {
 
         Page<GroupDeployResp> ret = new Page<>(deployPage.getTotal(), records);
 
-        return Result.OK(rest);
+        return Result.OK(ret);
     }
 
     private GroupDeployResp toResp(GroupDeployDTO dto) {
