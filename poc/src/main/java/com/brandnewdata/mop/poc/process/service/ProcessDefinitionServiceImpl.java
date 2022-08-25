@@ -2,6 +2,7 @@ package com.brandnewdata.mop.poc.process.service;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.process.dao.ProcessDefinitionDao;
@@ -21,18 +22,25 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
     private ProcessDefinitionDao processDefinitionDao;
     
     @Override
-    public List<ProcessDefinition> list(List<String> ids) {
+    public List<ProcessDefinition> list(List<String> ids, boolean withXML) {
         List<ProcessDefinition> ret = new ArrayList<>();
 
-        if(CollUtil.isNotEmpty(ids)) {
-            QueryWrapper<ProcessDefinitionEntity> queryWrapper = new QueryWrapper<>();
-            queryWrapper.in(ProcessDefinitionEntity.ID, ids);
-            List<ProcessDefinitionEntity> entities = processDefinitionDao.selectList(queryWrapper);
-            if(CollUtil.isNotEmpty(entities)) {
-                for (ProcessDefinitionEntity entity : entities) {
-                    ProcessDefinition dto = toDTO(entity);
-                    ret.add(dto);
-                }
+        if(CollUtil.isEmpty(ids)) {
+            return ret;
+        }
+
+        QueryWrapper<ProcessDefinitionEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in(ProcessDefinitionEntity.ID, ids);
+        if(!withXML) {
+            // 不需要 xml 的话，就不需要查询xml字段
+            queryWrapper.select(tableFieldInfo -> !StrUtil.equals(tableFieldInfo.getColumn(), ProcessDefinitionEntity.XML));
+        }
+
+        List<ProcessDefinitionEntity> entities = processDefinitionDao.selectList(queryWrapper);
+        if(CollUtil.isNotEmpty(entities)) {
+            for (ProcessDefinitionEntity entity : entities) {
+                ProcessDefinition dto = toDTO(entity);
+                ret.add(dto);
             }
         }
 

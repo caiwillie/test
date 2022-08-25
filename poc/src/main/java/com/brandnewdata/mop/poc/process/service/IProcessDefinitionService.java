@@ -12,7 +12,7 @@ public interface IProcessDefinitionService {
      * @param ids the ids
      * @return list
      */
-    List<ProcessDefinition> list(List<String> ids);
+    List<ProcessDefinition> list(List<String> ids, boolean withXML);
 
     /**
      * 保存流程定义

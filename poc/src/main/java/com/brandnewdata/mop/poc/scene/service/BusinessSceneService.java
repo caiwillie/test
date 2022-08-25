@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
@@ -22,10 +23,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -86,9 +84,10 @@ public class BusinessSceneService implements IBusinessSceneService {
             return ret;
         }
 
+        // 获取场景关联的processId
         List<String> processIds = businessSceneProcessEntities.stream().map(BusinessSceneProcessEntity::getProcessId).collect(Collectors.toList());
 
-        List<ProcessDefinition> processDefinitions = processDefinitionService.list(processIds);
+        List<ProcessDefinition> processDefinitions = processDefinitionService.list(processIds, false);
 
         // 比较流程列表的更新时间
         Optional<ProcessDefinition> first = processDefinitions.stream().min((o1, o2) -> {
@@ -163,21 +162,89 @@ public class BusinessSceneService implements IBusinessSceneService {
     }
 
 
-    private List<BusinessSceneDTO> list(List<Long> ids, boolean withDefinitionList) {
-        List<BusinessSceneDTO> ret = new ArrayList<>();
+    private Collection<BusinessSceneDTO> list(List<Long> ids, boolean withXML) {
+        HashMap<Long, BusinessSceneDTO> sceneMap = MapUtil.newHashMap(true);
+
         if(CollUtil.isEmpty(ids)) {
-            return ret;
+            return sceneMap.values();
         }
         QueryWrapper<BusinessSceneEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.in(BusinessSceneEntity.ID, ids);
+        // 按照修改时间倒序
+        queryWrapper.orderByDesc(BusinessSceneEntity.UPDATE_TIME);
 
         List<BusinessSceneEntity> businessSceneEntities = businessSceneDao.selectList(queryWrapper);
 
         if(CollUtil.isEmpty(businessSceneEntities)) {
-            return ret;
+            // sceneIds 不能为空，否则会报错
+            return sceneMap.values();
         }
 
-        return null;
+        List<Long> sceneIds = new ArrayList<>();
+        for (BusinessSceneEntity businessSceneEntity : businessSceneEntities) {
+            // 添加 sceneMap
+            BusinessSceneDTO businessSceneDTO = toDTO(businessSceneEntity);
+            Long id = businessSceneDTO.getId();
+            sceneMap.put(id, businessSceneDTO);
+            sceneIds.add(id);
+        }
+
+        QueryWrapper<BusinessSceneProcessEntity> queryWrapper2 = new QueryWrapper<>();
+        queryWrapper2.in(BusinessSceneProcessEntity.BUSINESS_SCENE_ID, sceneIds);
+
+        List<BusinessSceneProcessEntity> businessSceneProcessEntities = businessSceneProcessDao.selectList(queryWrapper2);
+
+        if(CollUtil.isEmpty(businessSceneProcessEntities)) {
+            // process ids 不能为空
+            return sceneMap.values();
+        }
+
+        // 获取 process 和 scene 的映射
+        Map<String, BusinessSceneProcessEntity> processSceneProcessEntityMap = businessSceneProcessEntities.stream().collect(
+                Collectors.toMap(BusinessSceneProcessEntity::getProcessId, Function.identity()));
+
+        List<ProcessDefinition> processDefinitions = processDefinitionService.list(
+                ListUtil.toList(processSceneProcessEntityMap.keySet()), withXML);
+
+
+        // 收集 scene 和 process definition list 的映射
+        Map<Long, List<ProcessDefinition>> sceneProcessListMap = processDefinitions.stream().collect(Collectors.groupingBy(
+                processDefinition -> processSceneProcessEntityMap.get(processDefinition.getProcessId()).getBusinessSceneId()));
+
+        for (Map.Entry<Long, BusinessSceneDTO> entry : sceneMap.entrySet()) {
+            Long sceneId = entry.getKey();
+            BusinessSceneDTO sceneDTO = entry.getValue();
+
+            List<ProcessDefinition> tempProcessDefinitions = sceneProcessListMap.get(sceneId);
+            if(CollUtil.isEmpty(tempProcessDefinitions)) {
+                continue;
+            }
+
+            // 根据最后更新时间排序
+            tempProcessDefinitions = CollUtil.sort(tempProcessDefinitions, (o1, o2) -> {
+                LocalDateTime time1 = Optional.ofNullable(o1.getUpdateTime()).orElse(LocalDateTime.MIN);
+                LocalDateTime time2 = Optional.ofNullable(o2.getUpdateTime()).orElse(LocalDateTime.MIN);
+                return time2.compareTo(time1);
+            });
+
+            ProcessDefinition first = tempProcessDefinitions.get(0);
+            sceneDTO.setImgUrl(first.getImgUrl());
+
+            if(withXML) {
+                List<BusinessSceneProcessDTO> sceneProcessDTOList = new ArrayList<>();
+                // 如果是带XML，就需要查询出definition
+                for (ProcessDefinition processDefinition : tempProcessDefinitions) {
+                    BusinessSceneProcessEntity businessSceneProcessEntity =
+                            processSceneProcessEntityMap.get(processDefinition.getProcessId());
+                    BusinessSceneProcessDTO businessSceneProcessDTO = toDTO(businessSceneProcessEntity, processDefinition);
+                    sceneProcessDTOList.add(businessSceneProcessDTO);
+                }
+                sceneDTO.setProcessDefinitions(sceneProcessDTOList);
+            }
+
+        }
+
+        return sceneMap.values();
     }
 
     private BusinessSceneDTO toDTO(BusinessSceneEntity entity) {
