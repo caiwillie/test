@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.group.dto;
+package com.brandnewdata.mop.poc.scene.dto;
 
 import lombok.Data;
 
@@ -6,7 +6,7 @@ import lombok.Data;
  * @author caiwillie
  */
 @Data
-public class BusinessSceneProcessDefinition {
+public class BusinessSceneProcessDTO {
     /**
      * id
      */

@@ -3,6 +3,7 @@ package com.brandnewdata.mop.poc.process.service;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
@@ -98,7 +99,7 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         // 调用 zeebe 部署
         DeploymentEvent deploymentEvent = zeebe.newDeployResourceCommand()
                 .addResourceStringUtf8(zeebeXML, // 取解析后的xml
-                         "a.bpmn")
+                        StrUtil.format("{}.bpmn", processId))
                 .send()
                 .join();
 

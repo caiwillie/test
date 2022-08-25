@@ -1,12 +1,11 @@
-package com.brandnewdata.mop.poc.group.dto;
+package com.brandnewdata.mop.api.scene;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.List;
-
-@Data
-public class BusinessScene {
-
+@Getter
+@Setter
+public class SceneDTO {
 
     /**
      * 场景 id
@@ -32,9 +31,4 @@ public class BusinessScene {
      * 图片URL
      */
     private String imgUrl;
-
-    /**
-     * 流程定义列表
-     */
-    private List<BusinessSceneProcessDefinition> processDefinitions;
 }

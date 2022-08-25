@@ -312,6 +312,23 @@ public class ProcessDefinitionParser implements
         }
     }
 
+
+    private void replaceConditionExpression() {
+        XPath path = DocumentHelper.createXPath(StrUtil.join(StringPool.SLASH,
+                StringPool.SLASH,
+                BPMN_SEQUENCE_FLOW_QNAME.getQualifiedName(),
+                BPMN_CONDITION_EXPRESSION_QNAME.getQualifiedName()));
+        List<Node> nodes = path.selectNodes(document);
+        if(CollUtil.isEmpty(nodes)) return;
+
+        for (Node node : nodes) {
+            Element e = (Element) node;
+            Attribute attribute = e.attribute(XSI_TYPE_ATTRIBUTE);
+            // 修改 xsi:type 为 bpmn:tFormalExpression
+            attribute.setValue(BPMN_T_FORMAL_EXPRESSION_QNAME.getQualifiedName());
+        }
+    }
+
     private void replaceZbTaskDefinitionToCalledElement(Element taskDefinition) {
         String type = taskDefinition.attributeValue(TYPE_ATTRIBUTE);
         Element parent = taskDefinition.getParent();
@@ -760,6 +777,9 @@ public class ProcessDefinitionParser implements
         replaceServiceTaskInputMapping();
         replaceServiceTaskOutputMapping();
         replaceCustomServiceTask();
+        
+        // 替换 condition expression
+        replaceConditionExpression();
         return this;
     }
 

@@ -1,7 +1,7 @@
-package com.brandnewdata.mop.poc.group.dao;
+package com.brandnewdata.mop.poc.scene.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.brandnewdata.mop.poc.group.entity.BusinessSceneProcessEntity;
+import com.brandnewdata.mop.poc.scene.entity.BusinessSceneProcessEntity;
 
 /**
  * <p>

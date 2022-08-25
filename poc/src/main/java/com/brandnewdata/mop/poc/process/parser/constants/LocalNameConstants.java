@@ -22,6 +22,10 @@ public interface LocalNameConstants {
 
     String SEQUENCE_FLOW_LOCALNAME = "sequenceFlow";
 
+    String CONDITION_EXPRESSION_LOCALNAME = "conditionExpression";
+
+    String T_FORMAL_EXPRESSION_LOCALNAME = "tFormalExpression";
+
     String MESSAGE_LOCALNAME = "message";
 
     String MESSAGE_EVENT_DEFINITION_LOCALNAME = "messageEventDefinition";

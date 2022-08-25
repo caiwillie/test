@@ -1,11 +1,11 @@
-package com.brandnewdata.mop.poc.group.rest;
+package com.brandnewdata.mop.poc.scene.rest;
 
 import cn.hutool.core.lang.Assert;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.common.dto.Page;
-import com.brandnewdata.mop.poc.group.dto.BusinessScene;
-import com.brandnewdata.mop.poc.group.dto.BusinessSceneProcessDefinition;
-import com.brandnewdata.mop.poc.group.service.IBusinessSceneService;
+import com.brandnewdata.mop.poc.scene.dto.BusinessSceneDTO;
+import com.brandnewdata.mop.poc.scene.dto.BusinessSceneProcessDTO;
+import com.brandnewdata.mop.poc.scene.service.IBusinessSceneService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,11 +29,11 @@ public class BusinessSceneRest {
      * @return the result
      */
     @GetMapping(value = "/rest/businessScene/page")
-    public Result<Page<BusinessScene>> page(
+    public Result<Page<BusinessSceneDTO>> page(
             @RequestParam Integer pageNum,
             @RequestParam Integer pageSize,
             @RequestParam(required = false) String name) {
-        Page<BusinessScene> page = service.page(pageNum, pageSize, name);
+        Page<BusinessSceneDTO> page = service.page(pageNum, pageSize, name);
         return Result.OK(page);
     }
 
@@ -44,48 +44,48 @@ public class BusinessSceneRest {
      * @return the result
      */
     @GetMapping(value = "/rest/businessScene/detail")
-    public Result<BusinessScene> detail(
+    public Result<BusinessSceneDTO> detail(
             @RequestParam Long id) {
-        BusinessScene businessScene = service.getOne(id);
-        Assert.notNull(businessScene, "场景 id 不存在");
-        return Result.OK(businessScene);
+        BusinessSceneDTO businessSceneDTO = service.getOne(id);
+        Assert.notNull(businessSceneDTO, "场景 id 不存在");
+        return Result.OK(businessSceneDTO);
     }
 
     /**
      * 保存业务场景
      *
-     * @param businessScene the business scene
+     * @param businessSceneDTO the business scene
      * @return the result
      */
     @PostMapping(value = "/rest/businessScene/save")
-    public Result<BusinessScene> save(@RequestBody BusinessScene businessScene) {
-        businessScene = service.save(businessScene);
-        return Result.OK(businessScene);
+    public Result<BusinessSceneDTO> save(@RequestBody BusinessSceneDTO businessSceneDTO) {
+        businessSceneDTO = service.save(businessSceneDTO);
+        return Result.OK(businessSceneDTO);
     }
 
     /**
      * 保存业务场景下的流程
      *
-     * @param businessSceneProcessDefinition the business scene process definition
+     * @param businessSceneProcessDTO the business scene process definition
      * @return the result
      */
     @PostMapping(value = "/rest/businessScene/saveProcessDefinition")
-    public Result<BusinessSceneProcessDefinition> saveProcessDefinition(
-            @RequestBody BusinessSceneProcessDefinition businessSceneProcessDefinition) {
-        businessSceneProcessDefinition = service.saveProcessDefinition(businessSceneProcessDefinition);
-        return Result.OK(businessSceneProcessDefinition);
+    public Result<BusinessSceneProcessDTO> saveProcessDefinition(
+            @RequestBody BusinessSceneProcessDTO businessSceneProcessDTO) {
+        businessSceneProcessDTO = service.saveProcessDefinition(businessSceneProcessDTO);
+        return Result.OK(businessSceneProcessDTO);
     }
 
     /**
      * 部署业务场景下的流程
      *
-     * @param businessSceneProcessDefinition the business scene process definition
+     * @param businessSceneProcessDTO the business scene process definition
      * @return the result
      */
     @PostMapping("/rest/businessScene/deployProcessDefinition")
     public Result deployProcessDefinition (
-            @RequestBody BusinessSceneProcessDefinition businessSceneProcessDefinition) {
-        service.deploy(businessSceneProcessDefinition);
+            @RequestBody BusinessSceneProcessDTO businessSceneProcessDTO) {
+        service.deploy(businessSceneProcessDTO);
         return Result.OK();
     }
 

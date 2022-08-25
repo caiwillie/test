@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.group.entity;
+package com.brandnewdata.mop.poc.scene.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
