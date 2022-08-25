@@ -47,6 +47,7 @@ public class DeployCache {
                     processDeploy.setId(entity.getId());
                     processDeploy.setProcessId(entity.getProcessId());
                     processDeploy.setProcessName(entity.getProcessName());
+                    processDeploy.setCreateTime(entity.getCreateTime());
                     tempList.add(processDeploy);
                 }
 

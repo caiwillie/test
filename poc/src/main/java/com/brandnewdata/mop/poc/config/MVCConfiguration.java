@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class MVCConfiguration {
-
     @Bean
     public ObjectMapper objectMapper() {
         return JacksonUtil.getObjectMapper();
