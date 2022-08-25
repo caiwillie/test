@@ -11,6 +11,6 @@ import java.util.List;
 public interface ISceneAPI {
 
     @RequestMapping("/api/scene/listByIds")
-    Result<List<SceneResp>> listByIds(@RequestBody ListReq req);
+    Result<List<SceneResp>> listByIds(@RequestBody ListSceneReq req);
 
 }

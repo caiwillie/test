@@ -7,6 +7,6 @@ import java.util.List;
 
 @Getter
 @Setter
-public class ListReq {
+public class ListSceneReq {
     private List<Long> idList;
 }

@@ -3,7 +3,7 @@ package com.brandnewdata.mop.poc.scene.api;
 import cn.hutool.core.collection.ListUtil;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.api.scene.ISceneAPI;
-import com.brandnewdata.mop.api.scene.ListReq;
+import com.brandnewdata.mop.api.scene.ListSceneReq;
 import com.brandnewdata.mop.api.scene.SceneResp;
 import com.brandnewdata.mop.poc.scene.dto.BusinessSceneDTO;
 import com.brandnewdata.mop.poc.scene.service.IBusinessSceneService;
@@ -21,8 +21,8 @@ public class SceneAPI implements ISceneAPI {
     private IBusinessSceneService service;
 
     @Override
-    public Result<List<SceneResp>> listByIds(ListReq req) {
-        List<Long> ids = Optional.ofNullable(req).map(ListReq::getIdList).orElse(ListUtil.empty());
+    public Result<List<SceneResp>> listByIds(ListSceneReq req) {
+        List<Long> ids = Optional.ofNullable(req).map(ListSceneReq::getIdList).orElse(ListUtil.empty());
 
         List<BusinessSceneDTO> businessSceneDTOS = service.listByIds(ids);
 
