@@ -33,7 +33,8 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
         queryWrapper.in(ProcessDefinitionEntity.ID, ids);
         if(!withXML) {
             // 不需要 xml 的话，就不需要查询xml字段
-            queryWrapper.select(tableFieldInfo -> !StrUtil.equals(tableFieldInfo.getColumn(), ProcessDefinitionEntity.XML));
+            queryWrapper.select(ProcessDefinitionEntity.class,
+                    tableFieldInfo -> !StrUtil.equals(tableFieldInfo.getColumn(), ProcessDefinitionEntity.XML));
         }
 
         List<ProcessDefinitionEntity> entities = processDefinitionDao.selectList(queryWrapper);
