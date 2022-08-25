@@ -41,11 +41,15 @@ public interface QNameConstants {
 
     QName BPMN_MESSAGE_EVENT_DEFINITION_QNAME = DocumentHelper.createQName(MESSAGE_EVENT_DEFINITION_LOCALNAME, BPMN_NAMESPACE);
 
+    // xsi
+    QName XSI_TYPE_QNAME = DocumentHelper.createQName(TYPE_LOCALNAME,XSI_NAMESPACE);
 
     // bpmndi
     QName BPMNDI_BPMN_SHAPE_QNAME = DocumentHelper.createQName(BPMN_SHAPE_LOCALNAME, BPMNDI_NAMESPACE);
 
     QName BPMNDI_BPMN_EDGE_QNAME = DocumentHelper.createQName(BPMN_EDGE_LOCALNAME, BPMNDI_NAMESPACE);
+
+
 
 
 

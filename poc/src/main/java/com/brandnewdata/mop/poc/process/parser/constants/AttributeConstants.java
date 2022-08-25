@@ -42,7 +42,7 @@ public interface AttributeConstants {
 
     String Y_ATTRIBUTE = "y";
 
-    String XSI_TYPE_ATTRIBUTE = "xsi:type";
+
 
 
 

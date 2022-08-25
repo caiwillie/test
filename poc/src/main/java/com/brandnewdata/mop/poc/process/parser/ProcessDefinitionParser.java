@@ -323,7 +323,7 @@ public class ProcessDefinitionParser implements
 
         for (Node node : nodes) {
             Element e = (Element) node;
-            Attribute attribute = e.attribute(XSI_TYPE_ATTRIBUTE);
+            Attribute attribute = e.attribute(XSI_TYPE_QNAME);
             // 修改 xsi:type 为 bpmn:tFormalExpression
             attribute.setValue(BPMN_T_FORMAL_EXPRESSION_QNAME.getQualifiedName());
         }
@@ -777,7 +777,7 @@ public class ProcessDefinitionParser implements
         replaceServiceTaskInputMapping();
         replaceServiceTaskOutputMapping();
         replaceCustomServiceTask();
-        
+
         // 替换 condition expression
         replaceConditionExpression();
         return this;

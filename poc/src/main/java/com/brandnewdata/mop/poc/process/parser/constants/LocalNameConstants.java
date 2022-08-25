@@ -60,4 +60,6 @@ public interface LocalNameConstants {
 
     String WAYPOINT_LOCALNAME = "waypoint";
 
+    String TYPE_LOCALNAME = "type";
+
 }
