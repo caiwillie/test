@@ -51,6 +51,7 @@ public class GroupDeployService {
                 List<ProcessDeploy> list = new ArrayList<>();
                 list.add(processDeploy);
                 groupDeployDTO.setDeploys(list);
+                ret.put(processId, groupDeployDTO);
             } else {
                 // 追赠一个groupDeploy
                 groupDeployDTO.getDeploys().add(processDeploy);
