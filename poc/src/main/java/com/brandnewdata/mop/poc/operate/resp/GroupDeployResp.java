@@ -1,11 +1,14 @@
 package com.brandnewdata.mop.poc.operate.resp;
 
+import com.brandnewdata.mop.poc.process.dto.ProcessDeploy;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
-public class GroupPageResp {
+public class GroupDeployResp {
 
     /**
      * 流程 id
@@ -31,5 +34,11 @@ public class GroupPageResp {
      * 异常实例数
      */
     private int incidentInstanceCount;
+
+
+    /**
+     * 部署的列表
+     */
+    private List<ProcessDeploy> deploys;
 
 }
