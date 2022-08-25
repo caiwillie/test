@@ -6,7 +6,6 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.lang.tree.TreeNode;
 import cn.hutool.core.lang.tree.TreeUtil;
-import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.NumberUtil;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
@@ -31,7 +30,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.brandnewdata.mop.poc.operate.dto.IncidentDto.FALLBACK_PROCESS_DEFINITION_NAME;
+import static com.brandnewdata.mop.poc.operate.dto.IncidentDTO.FALLBACK_PROCESS_DEFINITION_NAME;
 
 /**
  * @author caiwillie
@@ -54,30 +53,30 @@ public class FlowNodeInstanceService {
     @Autowired
     private ProcessCache processCache;
 
-    public List<FlowNodeInstanceListDto> list(String processInstanceId) {
+    public List<FlowNodeInstanceListDTO> list(String processInstanceId) {
         Assert.notNull(processInstanceId);
 
         List<FlowNodeInstanceEntity> flowNodeInstanceEntities = flowNodeInstanceDao.list(processInstanceId);
 
-        List<FlowNodeInstanceListDto> flowNodeInstanceListDtos = flowNodeInstanceEntities.stream()
-                .map(entity -> new FlowNodeInstanceListDto().fromEntity(entity)).collect(Collectors.toList());
+        List<FlowNodeInstanceListDTO> flowNodeInstanceListDTOS = flowNodeInstanceEntities.stream()
+                .map(entity -> new FlowNodeInstanceListDTO().fromEntity(entity)).collect(Collectors.toList());
 
         // 构造 path to instance 的 map
-        Map<String, FlowNodeInstanceListDto> pathInstanceMap = flowNodeInstanceListDtos.stream()
-                .collect(Collectors.toMap(FlowNodeInstanceListDto::getTreePath, Function.identity()));
+        Map<String, FlowNodeInstanceListDTO> pathInstanceMap = flowNodeInstanceListDTOS.stream()
+                .collect(Collectors.toMap(FlowNodeInstanceListDTO::getTreePath, Function.identity()));
 
         // 转换为 treeNode
-        List<TreeNode<String>> treeNodes = flowNodeInstanceListDtos.stream().map(this::toTreeNode).collect(Collectors.toList());
+        List<TreeNode<String>> treeNodes = flowNodeInstanceListDTOS.stream().map(this::toTreeNode).collect(Collectors.toList());
 
         // 根节点是 process instance id
         List<Tree<String>> children = TreeUtil.build(treeNodes, processInstanceId);
 
-        FlowNodeInstanceTreeDto ret = buildFlowNodeInstanceTree(children, pathInstanceMap);
+        FlowNodeInstanceTreeDTO ret = buildFlowNodeInstanceTree(children, pathInstanceMap);
 
         return ret.getList();
     }
 
-    private TreeNode<String> toTreeNode(FlowNodeInstanceListDto flowNodeInstanceListDto) {
+    private TreeNode<String> toTreeNode(FlowNodeInstanceListDTO flowNodeInstanceListDto) {
         // 将 flow node instance 中的 path 最为 id
         String id = flowNodeInstanceListDto.getTreePath();
 
@@ -99,9 +98,9 @@ public class FlowNodeInstanceService {
         return new TreeNode<>(id, parent, name, weight);
     }
 
-    private FlowNodeInstanceTreeDto buildFlowNodeInstanceTree(List<Tree<String>> children, Map<String, FlowNodeInstanceListDto> pathInstanceMap) {
-        FlowNodeInstanceTreeDto ret = new FlowNodeInstanceTreeDto();
-        List<FlowNodeInstanceListDto> list = new ArrayList<>();
+    private FlowNodeInstanceTreeDTO buildFlowNodeInstanceTree(List<Tree<String>> children, Map<String, FlowNodeInstanceListDTO> pathInstanceMap) {
+        FlowNodeInstanceTreeDTO ret = new FlowNodeInstanceTreeDTO();
+        List<FlowNodeInstanceListDTO> list = new ArrayList<>();
         ret.setList(list);
         ret.setIncident(false);
         if (CollUtil.isEmpty(children)) {
@@ -109,10 +108,10 @@ public class FlowNodeInstanceService {
         }
 
         for (Tree<String> tree : children) {
-            FlowNodeInstanceListDto flowNodeInstanceListDto = pathInstanceMap.get(tree.getId());
+            FlowNodeInstanceListDTO flowNodeInstanceListDto = pathInstanceMap.get(tree.getId());
             if (flowNodeInstanceListDto == null) throw new RuntimeException("path 数据错误");
             // 递归处理
-            FlowNodeInstanceTreeDto childrenDto = buildFlowNodeInstanceTree(tree.getChildren(), pathInstanceMap);
+            FlowNodeInstanceTreeDTO childrenDto = buildFlowNodeInstanceTree(tree.getChildren(), pathInstanceMap);
 
             // if()
             flowNodeInstanceListDto.setChildren(childrenDto.getList());
@@ -120,7 +119,7 @@ public class FlowNodeInstanceService {
             if (childrenDto.isIncident() && !flowNodeInstanceListDto.isIncident()) {
                 // 子节点有错误事件，但是本节点无错误事件，修改本节点的事件和状态
                 flowNodeInstanceListDto.setIncident(true);
-                flowNodeInstanceListDto.setState(FlowNodeStateDto.INCIDENT);
+                flowNodeInstanceListDto.setState(FlowNodeStateDTO.INCIDENT);
             }
 
             if (flowNodeInstanceListDto.isIncident() && !ret.isIncident()) {
@@ -133,8 +132,8 @@ public class FlowNodeInstanceService {
         return ret;
     }
 
-    public FlowNodeInstanceDetailDto detailByFlowNodeInstanceId(String processInstanceId, String flowNodeInstanceId) {
-        FlowNodeInstanceDetailDto ret = new FlowNodeInstanceDetailDto();
+    public FlowNodeInstanceDetailDTO detailByFlowNodeInstanceId(String processInstanceId, String flowNodeInstanceId) {
+        FlowNodeInstanceDetailDTO ret = new FlowNodeInstanceDetailDTO();
 
         Assert.notNull(flowNodeInstanceId);
 
@@ -145,8 +144,8 @@ public class FlowNodeInstanceService {
         EventEntity eventEntity = eventDao.getOne(flowNodeInstanceId);
 
         // 转换 metaData
-        FlowNodeInstanceMetaDataDto metaData =
-                new FlowNodeInstanceMetaDataDto().fromEntity(flowNodeInstance, eventEntity);
+        FlowNodeInstanceMetaDataDTO metaData =
+                new FlowNodeInstanceMetaDataDTO().fromEntity(flowNodeInstance, eventEntity);
 
         // 添加 call activity
         addCallActivityMetaData(metaData);
@@ -156,7 +155,7 @@ public class FlowNodeInstanceService {
         // 查找 incident
         Object[] incidentRet = searchIncident(flowNodeInstance);
         long incidentCount = (long) incidentRet[0];
-        IncidentDto incidentDto = (IncidentDto) incidentRet[1];
+        IncidentDTO incidentDto = (IncidentDTO) incidentRet[1];
 
 
         ret.setRepeated(false);
@@ -169,7 +168,7 @@ public class FlowNodeInstanceService {
     /**
      * 如果是call activity，就查询更多内容
      */
-    private void addCallActivityMetaData(FlowNodeInstanceMetaDataDto metaData) {
+    private void addCallActivityMetaData(FlowNodeInstanceMetaDataDTO metaData) {
         if (metaData.getFlowNodeType().equals(FlowNodeType.CALL_ACTIVITY)) {
             ProcessInstanceForListViewEntity entity = listViewDao.getOneByParentFlowNodeInstanceId(metaData.getFlowNodeInstanceId());
             String calledProcessInstanceId = entity.getId();
@@ -182,7 +181,7 @@ public class FlowNodeInstanceService {
         }
     }
 
-    private void addBusinessRuleTaskMetaData(FlowNodeInstanceMetaDataDto metaData) {
+    private void addBusinessRuleTaskMetaData(FlowNodeInstanceMetaDataDTO metaData) {
         if (metaData.getFlowNodeType().equals(FlowNodeType.BUSINESS_RULE_TASK)) {
 
         }
@@ -190,7 +189,7 @@ public class FlowNodeInstanceService {
 
     private Object[] searchIncident(FlowNodeInstanceEntity flowNodeInstance) {
         Object[] ret = new Object[2];
-        IncidentDto incidentDto = new IncidentDto();
+        IncidentDTO incidentDto = new IncidentDTO();
 
         Long processInstanceId = flowNodeInstance.getProcessInstanceKey();
 
@@ -229,7 +228,7 @@ public class FlowNodeInstanceService {
             incidentDto.setFlowNodeId(dataHolder.getFinalFlowNodeId());
             incidentDto.setFlowNodeInstanceId(dataHolder.getFinalFlowNodeInstanceId());
             // 设置 inner_activity 的错误
-            ProcessInstanceReferenceDto rootCauseInstance = new ProcessInstanceReferenceDto();
+            ProcessInstanceReferenceDTO rootCauseInstance = new ProcessInstanceReferenceDTO();
             rootCauseInstance.setInstanceId(String.valueOf(incidentEntity.getProcessInstanceKey()));
             rootCauseInstance.setProcessDefinitionId(String.valueOf(incidentEntity.getProcessDefinitionKey()));
             rootCauseInstance.setProcessDefinitionName(getProcessName(incidentEntity.getProcessDefinitionKey()));
@@ -312,7 +311,7 @@ public class FlowNodeInstanceService {
         return treePath;
     }
 
-    public FlowNodeInstanceDetailDto detailByFlowNodeId(String processInstanceId, String flowNodeId) {
+    public FlowNodeInstanceDetailDTO detailByFlowNodeId(String processInstanceId, String flowNodeId) {
         return null;
     }
 

@@ -3,7 +3,7 @@ package com.brandnewdata.mop.poc.operate.dto;
 import lombok.Data;
 
 @Data
-public class ProcessInstanceReferenceDto {
+public class ProcessInstanceReferenceDTO {
 
     private String instanceId;
 

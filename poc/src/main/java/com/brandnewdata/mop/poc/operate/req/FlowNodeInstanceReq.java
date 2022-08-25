@@ -1,9 +1,9 @@
-package com.brandnewdata.mop.poc.operate.dto;
+package com.brandnewdata.mop.poc.operate.req;
 
 import lombok.Data;
 
 @Data
-public class FlowNodeInstanceRequest {
+public class FlowNodeInstanceReq {
 
     /**
      * 流程实例 id

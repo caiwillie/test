@@ -5,8 +5,7 @@ import cn.hutool.core.lang.Assert;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import com.brandnewdata.mop.poc.operate.dao.VariableDao;
-import com.brandnewdata.mop.poc.operate.dto.VariableDto;
-import com.brandnewdata.mop.poc.operate.entity.ProcessEntity;
+import com.brandnewdata.mop.poc.operate.dto.VariableDTO;
 import com.brandnewdata.mop.poc.operate.entity.VariableEntity;
 import com.brandnewdata.mop.poc.operate.schema.template.VariableTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +20,8 @@ public class VariableService {
     @Autowired
     private VariableDao variableDao;
 
-    public List<VariableDto> listByScopeId(String processInstanceId, String scopeId) {
-        List<VariableDto> ret = new ArrayList<>();
+    public List<VariableDTO> listByScopeId(String processInstanceId, String scopeId) {
+        List<VariableDTO> ret = new ArrayList<>();
 
         Assert.notNull(processInstanceId);
         Assert.notNull(scopeId);
@@ -51,8 +50,8 @@ public class VariableService {
     }
 
 
-    private VariableDto toDto(VariableEntity entity) {
-        VariableDto dto = new VariableDto();
+    private VariableDTO toDto(VariableEntity entity) {
+        VariableDTO dto = new VariableDTO();
         dto.fromEntity(entity);
         return dto;
     }

@@ -3,8 +3,12 @@ package com.brandnewdata.mop.poc.operate.rest;
 import cn.hutool.core.lang.Assert;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.common.dto.Page;
+import com.brandnewdata.mop.poc.operate.dto.GroupDeployDTO;
+import com.brandnewdata.mop.poc.operate.resp.GroupPageResp;
+import com.brandnewdata.mop.poc.operate.service.GroupDeployService;
 import com.brandnewdata.mop.poc.process.dto.ProcessDeploy;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,10 +20,13 @@ import javax.annotation.Resource;
  *
  */
 @RestController
-public class DeployRest {
+public class GroupDeployRest {
 
     @Resource
     private IProcessDeployService deployService;
+
+    @Autowired
+    private GroupDeployService groupDeployService;
 
     /**
      * 流程部署分页列表（deprecated）
@@ -45,11 +52,14 @@ public class DeployRest {
      * @return
      */
     @GetMapping("/rest/operate/deploy/groupPage")
-    public Result<Page<ProcessDeploy>> groupPage (
+    public Result<Page<GroupPageResp>> groupPage (
             @RequestParam int pageNum,
             @RequestParam int pageSize) {
-        Page<ProcessDeploy> page = deployService.page(pageNum, pageSize);
-        return Result.OK(page);
+        // 先获取分页列表
+        Page<GroupDeployDTO> deployPage = groupDeployService.groupDeployPage(pageNum, pageSize);
+
+        // 再获取 instance 信息
+        return null;
     }
 
     /**
@@ -64,5 +74,8 @@ public class DeployRest {
         Assert.notNull(deploy, "流程部署 {} 不存在", id);
         return Result.OK(deploy);
     }
+
+
+
 
 }

@@ -10,13 +10,13 @@ import java.util.Optional;
 
 @Getter
 @Setter
-public class IncidentDto {
+public class IncidentDTO {
 
     public static final String FALLBACK_PROCESS_DEFINITION_NAME = "Unknown process";
 
     private String id;
 
-    private ErrorTypeDto errorType;
+    private ErrorTypeDTO errorType;
 
     private String errorMessage;
 
@@ -32,17 +32,17 @@ public class IncidentDto {
 
     private LocalDateTime lastOperation;
 
-    private ProcessInstanceReferenceDto rootCauseInstance;
+    private ProcessInstanceReferenceDTO rootCauseInstance;
 
-    private DecisionInstanceReferenceDto rootCauseDecision;
+    private DecisionInstanceReferenceDTO rootCauseDecision;
 
 
-    public IncidentDto fromEntity(IncidentEntity incidentEntity) {
+    public IncidentDTO fromEntity(IncidentEntity incidentEntity) {
         this.setId(incidentEntity.getId());
         this.setFlowNodeId(incidentEntity.getFlowNodeId());
         this.setFlowNodeInstanceId(Optional.ofNullable(incidentEntity.getFlowNodeInstanceKey()).map(String::valueOf).orElse(null));
         this.setErrorMessage(incidentEntity.getErrorMessage());
-        this.setErrorType(new ErrorTypeDto().fromEntity(incidentEntity.getErrorType()));
+        this.setErrorType(new ErrorTypeDTO().fromEntity(incidentEntity.getErrorType()));
         this.setJobId(Optional.ofNullable(incidentEntity.getJobKey()).map(String::valueOf).orElse(null));
         this.setCreationTime(Optional.ofNullable(incidentEntity.getCreationTime()).map(OffsetDateTime::toLocalDateTime).orElse(null));
         return this;

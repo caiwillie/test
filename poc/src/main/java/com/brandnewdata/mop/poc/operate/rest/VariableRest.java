@@ -1,7 +1,7 @@
 package com.brandnewdata.mop.poc.operate.rest;
 
 import com.brandnewdata.common.webresult.Result;
-import com.brandnewdata.mop.poc.operate.dto.VariableDto;
+import com.brandnewdata.mop.poc.operate.dto.VariableDTO;
 import com.brandnewdata.mop.poc.operate.service.VariableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,9 +27,9 @@ public class VariableRest {
      * @return the result
      */
     @GetMapping("/rest/operate/variable/listByScopeId")
-    public Result<List<VariableDto>> listByFlowNodeInstance(
+    public Result<List<VariableDTO>> listByFlowNodeInstance(
             @RequestParam String processInstanceId, @RequestParam String scopeId) {
-        List<VariableDto> list = variableService.listByScopeId(processInstanceId, scopeId);
+        List<VariableDTO> list = variableService.listByScopeId(processInstanceId, scopeId);
         return Result.OK(list);
     }
 

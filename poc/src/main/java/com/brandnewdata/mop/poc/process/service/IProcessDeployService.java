@@ -1,7 +1,6 @@
 package com.brandnewdata.mop.poc.process.service;
 
 import com.brandnewdata.mop.poc.common.dto.Page;
-import com.brandnewdata.mop.poc.operate.dto.deploy.GroupDeploy;
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinition;
 import com.brandnewdata.mop.poc.process.dto.ProcessDeploy;
 
@@ -19,8 +18,6 @@ public interface IProcessDeployService {
     ProcessDeploy deploy(ProcessDefinition processDefinition, int type);
 
     Page<ProcessDeploy> page(int pageNum, int pageSize);
-
-    Page<GroupDeploy> groupPage(int pageNum, int pageSize);
 
     Map<String, Object> startWithResult(String processId, Map<String, Object> value);
 

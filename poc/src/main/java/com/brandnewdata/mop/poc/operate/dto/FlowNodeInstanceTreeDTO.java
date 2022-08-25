@@ -7,10 +7,10 @@ import java.util.List;
 
 @Getter
 @Setter
-public class FlowNodeInstanceTreeDto {
+public class FlowNodeInstanceTreeDTO {
 
     private boolean incident;
 
-    private List<FlowNodeInstanceListDto> list;
+    private List<FlowNodeInstanceListDTO> list;
 
 }

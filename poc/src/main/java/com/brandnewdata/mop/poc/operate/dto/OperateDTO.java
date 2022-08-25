@@ -5,9 +5,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class DecisionInstanceReferenceDto {
-
-    private String instanceId;
-
-    private String decisionName;
+public abstract class OperateDTO {
+    private String id;
 }

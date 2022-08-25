@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Getter
 @Setter
-public class FlowNodeInstanceListDto extends OperateZeebeDto implements FromOneEntity<FlowNodeInstanceListDto, FlowNodeInstanceEntity> {
+public class FlowNodeInstanceListDTO extends OperateZeebeDTO implements FromOneEntity<FlowNodeInstanceListDTO, FlowNodeInstanceEntity> {
 
 
     /**
@@ -34,7 +34,7 @@ public class FlowNodeInstanceListDto extends OperateZeebeDto implements FromOneE
      * 节点状态
      * ACTIVE 运行中, INCIDENT 异常, COMPLETED 完成, TERMINATED 取消,
      */
-    private FlowNodeStateDto state;
+    private FlowNodeStateDTO state;
 
     /**
      * 节点类型
@@ -81,15 +81,15 @@ public class FlowNodeInstanceListDto extends OperateZeebeDto implements FromOneE
 
     private boolean incident;
 
-    private List<FlowNodeInstanceListDto> children;
+    private List<FlowNodeInstanceListDTO> children;
 
     @Override
-    public FlowNodeInstanceListDto fromEntity(FlowNodeInstanceEntity entity) {
+    public FlowNodeInstanceListDTO fromEntity(FlowNodeInstanceEntity entity) {
         this.setId(entity.getId());
         this.setFlowNodeId(entity.getFlowNodeId());
         this.setStartDate(Optional.ofNullable(entity.getStartDate()).map(OffsetDateTime::toLocalDateTime).orElse(null));
         this.setEndDate(Optional.ofNullable(entity.getEndDate()).map(OffsetDateTime::toLocalDateTime).orElse(null));
-        this.setState(FlowNodeStateDto.getState(entity.getState()));
+        this.setState(FlowNodeStateDTO.getState(entity.getState()));
         this.setType(entity.getType());
         this.setIncidentKey(entity.getIncidentKey());
         this.setProcessInstanceKey(entity.getProcessInstanceKey());
