@@ -116,14 +116,7 @@ public class BusinessSceneService implements IBusinessSceneService {
 
     @Override
     public List<BusinessSceneDTO> listByIds(List<Long> ids) {
-        List<BusinessSceneDTO> ret = new ArrayList<>();
-        if(CollUtil.isEmpty(ids)) {
-            return ret;
-        }
-
-
-
-        return null;
+        return ListUtil.toList(list(ids, false));
     }
 
     @Override
