@@ -23,13 +23,13 @@ public class GroupPageResp {
     private int versionCount;
 
     /**
-     * 成功实例数
+     * 活动实例数
      */
-    private int successInstanceCount;
+    private int activeInstanceCount;
 
     /**
-     * 失败实例数
+     * 异常实例数
      */
-    private int failInstanceCount;
+    private int incidentInstanceCount;
 
 }

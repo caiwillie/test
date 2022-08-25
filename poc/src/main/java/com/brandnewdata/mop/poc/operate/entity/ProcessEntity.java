@@ -8,9 +8,13 @@ import lombok.Setter;
 public class ProcessEntity extends OperateZeebeEntity<ProcessEntity> {
 
     private String name;
+
     private int version;
+
     private String bpmnProcessId;
+
     private String bpmnXml;
+
     private String resourceName;
 
 }
