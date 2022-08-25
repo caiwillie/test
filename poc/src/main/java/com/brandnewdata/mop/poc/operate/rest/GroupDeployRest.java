@@ -63,7 +63,6 @@ public class GroupDeployRest {
 
         // 再获取 instance 信息
 
-
         // 转换成 resp
 
         List<GroupDeployResp> records = deployPage.getRecords().stream().map(this::toResp).collect(Collectors.toList());
