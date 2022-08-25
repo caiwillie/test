@@ -1,7 +1,5 @@
 package com.brandnewdata.mop.poc.operate.entity;
 
-import lombok.Data;
-
 public abstract class OperateEntity<T extends OperateEntity<T>> {
 
     private String id;

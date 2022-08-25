@@ -2,8 +2,6 @@ package com.brandnewdata.mop.api.dto;
 
 import lombok.Data;
 
-import java.util.Map;
-
 /**
  * 启动消息实体
  */

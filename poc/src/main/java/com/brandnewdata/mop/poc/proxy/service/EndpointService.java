@@ -8,7 +8,6 @@ import com.brandnewdata.mop.poc.proxy.dao.ReverseProxyEndpointDao;
 import com.brandnewdata.mop.poc.proxy.dto.Endpoint;
 import com.brandnewdata.mop.poc.proxy.entity.ReverseProxyEndpointEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
 import java.util.List;

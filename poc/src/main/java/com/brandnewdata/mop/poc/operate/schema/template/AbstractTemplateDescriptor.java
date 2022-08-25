@@ -1,6 +1,5 @@
 package com.brandnewdata.mop.poc.operate.schema.template;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -1,7 +1,7 @@
 package com.brandnewdata.mop.poc.proxy.dao;
 
-import com.brandnewdata.mop.poc.proxy.entity.ReverseProxyEndpointEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.brandnewdata.mop.poc.proxy.entity.ReverseProxyEndpointEntity;
 
 /**
  * <p>

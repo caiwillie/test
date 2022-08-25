@@ -1,8 +1,6 @@
 package com.brandnewdata.mop.poc.operate.entity;
 
-import com.brandnewdata.mop.poc.operate.schema.template.FlowNodeInstanceTemplate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;

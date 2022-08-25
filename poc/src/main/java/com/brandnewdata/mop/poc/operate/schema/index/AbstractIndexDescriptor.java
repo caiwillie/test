@@ -1,7 +1,5 @@
 package com.brandnewdata.mop.poc.operate.schema.index;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 public abstract class AbstractIndexDescriptor implements IndexDescriptor {
     public static final String PARTITION_ID = "partitionId";
 

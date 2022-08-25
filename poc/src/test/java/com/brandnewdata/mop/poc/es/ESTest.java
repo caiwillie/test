@@ -1,7 +1,5 @@
 package com.brandnewdata.mop.poc.es;
 
-import cn.hutool.cache.CacheUtil;
-import cn.hutool.core.collection.ListUtil;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.Time;
 import co.elastic.clients.elasticsearch.core.GetResponse;

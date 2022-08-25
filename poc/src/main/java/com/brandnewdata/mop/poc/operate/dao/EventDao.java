@@ -2,7 +2,6 @@ package com.brandnewdata.mop.poc.operate.dao;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
-import co.elastic.clients.elasticsearch.core.SearchResponse;
 import com.brandnewdata.mop.poc.operate.entity.EventEntity;
 import com.brandnewdata.mop.poc.operate.schema.template.EventTemplate;
 import com.brandnewdata.mop.poc.operate.util.ElasticsearchUtil;

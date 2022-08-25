@@ -2,13 +2,11 @@ package com.brandnewdata.mop.poc.operate.cache;
 
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.brandnewdata.mop.poc.operate.entity.ProcessEntity;
 import com.brandnewdata.mop.poc.process.dao.ProcessDeployDao;
 import com.brandnewdata.mop.poc.process.dto.ProcessDeploy;
 import com.brandnewdata.mop.poc.process.entity.ProcessDeployEntity;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
