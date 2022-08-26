@@ -104,7 +104,14 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
                 .send()
                 .join();
 
-        long zeebeKey = deploymentEvent.getProcesses().get(0).getProcessDefinitionKey();
+        // 只会部署一个process
+        Optional<Process> zeebeProcess = deploymentEvent.getProcesses().stream()
+                .filter(process -> StrUtil.equals(process.getBpmnProcessId(), ProcessUtil.convertProcessId(processId)))
+                .findFirst();
+
+        Assert.isTrue(zeebeProcess.isPresent(), "发布失败");
+
+        long zeebeKey = zeebeProcess.get().getProcessDefinitionKey();
 
         ProcessDeployEntity latestVersion = getLatestDeployVersion(processId);
 
