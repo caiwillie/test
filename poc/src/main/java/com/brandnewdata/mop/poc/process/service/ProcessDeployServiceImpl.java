@@ -59,6 +59,14 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         }
     }
 
+
+    private Optional<ProcessDeployEntity> exist(String processId, int version) {
+        QueryWrapper<ProcessDeployEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(ProcessDeployEntity.PROCESS_ID, processId);
+        queryWrapper.eq(ProcessDeployEntity.VERSION, version);
+        return Optional.ofNullable(processDeployDao.selectOne(queryWrapper));
+    }
+
     private ProcessDeployDTO toDTO(ProcessDeployEntity entity) {
         if(entity == null) return null; //为空返回
         ProcessDeployDTO dto = new ProcessDeployDTO();
@@ -111,24 +119,34 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
 
         Assert.isTrue(zeebeProcess.isPresent(), "发布失败");
 
-        long zeebeKey = zeebeProcess.get().getProcessDefinitionKey();
+        Process process = zeebeProcess.get();
+        long zeebeKey = process.getProcessDefinitionKey();
+        int version = zeebeProcess.get().getVersion();
 
-        ProcessDeployEntity latestVersion = getLatestDeployVersion(processId);
+        Optional<ProcessDeployEntity> exist = exist(processId, version);
+        ProcessDeployEntity entity = null;
+        if(exist.isPresent()) {
+            // 版本未改变
+            entity = exist.get();
+        } else {
+            // 版本更新
+            entity = new ProcessDeployEntity();
+            entity.setProcessId(processId);
+            entity.setProcessName(name);
+            entity.setProcessXml(xml);
+            // 设置版本, 初始版本为1
+            entity.setVersion(version);
+            entity.setType(type);
+            entity.setZeebeKey(zeebeKey);
+            entity.setZeebeXml(zeebeXML);
 
-        ProcessDeployEntity entity = new ProcessDeployEntity();
-        entity.setProcessId(processId);
-        entity.setProcessName(name);
-        entity.setProcessXml(xml);
-        // 设置版本, 初始版本为1
-        entity.setVersion(latestVersion == null ? 1 : latestVersion.getVersion() + 1);
-        entity.setType(type);
-        entity.setZeebeKey(zeebeKey);
-        entity.setZeebeXml(zeebeXML);
+            processDeployDao.insert(entity);
+        }
 
-        processDeployDao.insert(entity);
 
-        if(type == ProcessConstants.PROCESS_TYPE_SCENE) {
-            // 如果有场景发布，需要保存监听配置
+
+        if(type == ProcessConstants.PROCESS_TYPE_SCENE && triggerProcessDefinition.getTrigger() != null) {
+            // 如果有场景发布，并且是自定义触发器时，需要保存监听配置
             connectorManager.saveRequestParams(triggerProcessDefinition);
         }
 
