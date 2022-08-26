@@ -5,7 +5,7 @@ import cn.hutool.core.util.PageUtil;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.operate.cache.DeployCache;
 import com.brandnewdata.mop.poc.operate.dto.GroupDeployDTO;
-import com.brandnewdata.mop.poc.process.dto.ProcessDeploy;
+import com.brandnewdata.mop.poc.process.dto.ProcessDeployDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,16 +30,16 @@ public class GroupDeployService {
 
     private Map<String, GroupDeployDTO> getAllGroupDeployMap() {
         Map<String, GroupDeployDTO> ret = new HashMap<>();
-        Map<Long, ProcessDeploy> processDeployMap = cache.asMap();
+        Map<Long, ProcessDeployDTO> processDeployMap = cache.asMap();
         if(CollUtil.isEmpty(processDeployMap)) {
             return ret;
         }
 
-        for (ProcessDeploy processDeploy : processDeployMap.values()) {
-            String processId = processDeploy.getProcessId();
-            String processName = processDeploy.getProcessName();
-            int version = processDeploy.getVersion();
-            LocalDateTime createTime = processDeploy.getCreateTime();
+        for (ProcessDeployDTO processDeployDTO : processDeployMap.values()) {
+            String processId = processDeployDTO.getProcessId();
+            String processName = processDeployDTO.getProcessName();
+            int version = processDeployDTO.getVersion();
+            LocalDateTime createTime = processDeployDTO.getCreateTime();
 
             GroupDeployDTO groupDeployDTO = ret.get(processId);
             if(groupDeployDTO == null) {
@@ -48,13 +48,13 @@ public class GroupDeployService {
                 groupDeployDTO.setProcessName(processName);
                 groupDeployDTO.setLatestVersion(version);
                 groupDeployDTO.setLatestCreateTime(createTime);
-                List<ProcessDeploy> list = new ArrayList<>();
-                list.add(processDeploy);
+                List<ProcessDeployDTO> list = new ArrayList<>();
+                list.add(processDeployDTO);
                 groupDeployDTO.setDeploys(list);
                 ret.put(processId, groupDeployDTO);
             } else {
                 // 追赠一个groupDeploy
-                groupDeployDTO.getDeploys().add(processDeploy);
+                groupDeployDTO.getDeploys().add(processDeployDTO);
                 if(version > groupDeployDTO.getLatestVersion()) {
                     // 更新最后版本,名称,时间
                     groupDeployDTO.setProcessName(processName);

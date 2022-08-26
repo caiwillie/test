@@ -3,7 +3,7 @@ package com.brandnewdata.mop.poc.process.dto;
 import lombok.Data;
 
 @Data
-public class ProcessInstance {
+public class ProcessInstanceDTO {
 
     /**
      * 流程 id

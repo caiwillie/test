@@ -3,7 +3,7 @@ package com.brandnewdata.mop.poc.operate.rest;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.operate.service.ProcessInstanceService;
-import com.brandnewdata.mop.poc.process.dto.ProcessInstance;
+import com.brandnewdata.mop.poc.process.dto.ProcessInstanceDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,11 +29,11 @@ public class ProcessInstanceRest {
      * @return result result
      */
     @GetMapping("/rest/operate/instance/page")
-    public Result<Page<ProcessInstance>> page (
+    public Result<Page<ProcessInstanceDTO>> page (
             @RequestParam Long deployId,
             @RequestParam int pageNum,
             @RequestParam int pageSize) {
-        Page<ProcessInstance> page = instanceService.page(deployId, pageNum, pageSize);
+        Page<ProcessInstanceDTO> page = instanceService.page(deployId, pageNum, pageSize);
         return Result.OK(page);
     }
 
@@ -44,7 +44,7 @@ public class ProcessInstanceRest {
      * @return the result
      */
     @GetMapping("/rest/operate/instance/detail")
-    public Result<ProcessInstance> detail(@RequestParam String processInstanceId) {
+    public Result<ProcessInstanceDTO> detail(@RequestParam String processInstanceId) {
         return null;
     }
 

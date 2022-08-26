@@ -1,6 +1,6 @@
 package com.brandnewdata.mop.poc.process.service;
 
-import com.brandnewdata.mop.poc.process.dto.ProcessDefinition;
+import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDTO;
 
 import java.util.List;
 
@@ -12,15 +12,15 @@ public interface IProcessDefinitionService {
      * @param ids the ids
      * @return list
      */
-    List<ProcessDefinition> list(List<String> ids, boolean withXML);
+    List<ProcessDefinitionDTO> list(List<String> ids, boolean withXML);
 
     /**
      * 保存流程定义
      *
-     * @param processDefinition the process definition
+     * @param processDefinitionDTO the process definition
      * @return the process definition
      */
-    ProcessDefinition save(ProcessDefinition processDefinition);
+    ProcessDefinitionDTO save(ProcessDefinitionDTO processDefinitionDTO);
 
     /**
      * 获取流程定义详情
@@ -28,7 +28,7 @@ public interface IProcessDefinitionService {
      * @param processId the process id
      * @return the one
      */
-    ProcessDefinition getOne(String processId);
+    ProcessDefinitionDTO getOne(String processId);
 
 
 

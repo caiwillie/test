@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
  * 流程部署实体
  */
 @Data
-public class ProcessDeploy {
+public class ProcessDeployDTO {
 
     /**
      * 部署 id

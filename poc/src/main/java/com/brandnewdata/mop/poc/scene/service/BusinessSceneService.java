@@ -10,7 +10,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.process.ProcessConstants;
-import com.brandnewdata.mop.poc.process.dto.ProcessDefinition;
+import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDTO;
 import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import com.brandnewdata.mop.poc.scene.dao.BusinessSceneDao;
@@ -88,23 +88,23 @@ public class BusinessSceneService implements IBusinessSceneService {
     @Override
     public BusinessSceneProcessDTO saveProcessDefinition(BusinessSceneProcessDTO businessSceneProcessDTO) {
         // 保存完成后，得到 process id
-        ProcessDefinition processDefinition = processDefinitionService.save(toDTO(businessSceneProcessDTO));
+        ProcessDefinitionDTO processDefinitionDTO = processDefinitionService.save(toDTO(businessSceneProcessDTO));
         BusinessSceneProcessEntity businessSceneProcessEntity =
-                getBusinessSceneProcessEntityByProcessId(processDefinition.getProcessId());
+                getBusinessSceneProcessEntityByProcessId(processDefinitionDTO.getProcessId());
         if(businessSceneProcessEntity == null) {
             // 不存在则新增
             businessSceneProcessEntity = toEntity(businessSceneProcessDTO);
             // 将解析后的 process id 存入
-            businessSceneProcessEntity.setProcessId(processDefinition.getProcessId());
+            businessSceneProcessEntity.setProcessId(processDefinitionDTO.getProcessId());
             businessSceneProcessDao.insert(businessSceneProcessEntity);
         }
-        return toDTO(businessSceneProcessEntity, processDefinition);
+        return toDTO(businessSceneProcessEntity, processDefinitionDTO);
     }
 
     @Override
     public void deploy(BusinessSceneProcessDTO businessSceneProcessDTO) {
-        ProcessDefinition processDefinition = toDTO(businessSceneProcessDTO);
-        processDeployService.deploy(processDefinition, ProcessConstants.PROCESS_TYPE_SCENE);
+        ProcessDefinitionDTO processDefinitionDTO = toDTO(businessSceneProcessDTO);
+        processDeployService.deploy(processDefinitionDTO, ProcessConstants.PROCESS_TYPE_SCENE);
     }
 
 
@@ -149,40 +149,40 @@ public class BusinessSceneService implements IBusinessSceneService {
         Map<String, BusinessSceneProcessEntity> processSceneProcessEntityMap = businessSceneProcessEntities.stream().collect(
                 Collectors.toMap(BusinessSceneProcessEntity::getProcessId, Function.identity()));
 
-        List<ProcessDefinition> processDefinitions = processDefinitionService.list(
+        List<ProcessDefinitionDTO> processDefinitionDTOS = processDefinitionService.list(
                 ListUtil.toList(processSceneProcessEntityMap.keySet()), withXML);
 
 
         // 收集 scene 和 process definition list 的映射
-        Map<Long, List<ProcessDefinition>> sceneProcessListMap = processDefinitions.stream().collect(Collectors.groupingBy(
+        Map<Long, List<ProcessDefinitionDTO>> sceneProcessListMap = processDefinitionDTOS.stream().collect(Collectors.groupingBy(
                 processDefinition -> processSceneProcessEntityMap.get(processDefinition.getProcessId()).getBusinessSceneId()));
 
         for (Map.Entry<Long, BusinessSceneDTO> entry : sceneMap.entrySet()) {
             Long sceneId = entry.getKey();
             BusinessSceneDTO sceneDTO = entry.getValue();
 
-            List<ProcessDefinition> tempProcessDefinitions = sceneProcessListMap.get(sceneId);
-            if(CollUtil.isEmpty(tempProcessDefinitions)) {
+            List<ProcessDefinitionDTO> tempProcessDefinitionDTOS = sceneProcessListMap.get(sceneId);
+            if(CollUtil.isEmpty(tempProcessDefinitionDTOS)) {
                 continue;
             }
 
             // 根据最后更新时间排序
-            tempProcessDefinitions = CollUtil.sort(tempProcessDefinitions, (o1, o2) -> {
+            tempProcessDefinitionDTOS = CollUtil.sort(tempProcessDefinitionDTOS, (o1, o2) -> {
                 LocalDateTime time1 = Optional.ofNullable(o1.getUpdateTime()).orElse(LocalDateTime.MIN);
                 LocalDateTime time2 = Optional.ofNullable(o2.getUpdateTime()).orElse(LocalDateTime.MIN);
                 return time2.compareTo(time1);
             });
 
-            ProcessDefinition first = tempProcessDefinitions.get(0);
+            ProcessDefinitionDTO first = tempProcessDefinitionDTOS.get(0);
             sceneDTO.setImgUrl(first.getImgUrl());
 
             if(withXML) {
                 List<BusinessSceneProcessDTO> sceneProcessDTOList = new ArrayList<>();
                 // 如果是带XML，就需要查询出definition
-                for (ProcessDefinition processDefinition : tempProcessDefinitions) {
+                for (ProcessDefinitionDTO processDefinitionDTO : tempProcessDefinitionDTOS) {
                     BusinessSceneProcessEntity businessSceneProcessEntity =
-                            processSceneProcessEntityMap.get(processDefinition.getProcessId());
-                    BusinessSceneProcessDTO businessSceneProcessDTO = toDTO(businessSceneProcessEntity, processDefinition);
+                            processSceneProcessEntityMap.get(processDefinitionDTO.getProcessId());
+                    BusinessSceneProcessDTO businessSceneProcessDTO = toDTO(businessSceneProcessEntity, processDefinitionDTO);
                     sceneProcessDTOList.add(businessSceneProcessDTO);
                 }
                 sceneDTO.setProcessDefinitions(sceneProcessDTOList);
@@ -203,14 +203,14 @@ public class BusinessSceneService implements IBusinessSceneService {
     }
 
     private BusinessSceneProcessDTO toDTO(BusinessSceneProcessEntity businessSceneProcessEntity,
-                                          ProcessDefinition processDefinition) {
+                                          ProcessDefinitionDTO processDefinitionDTO) {
         BusinessSceneProcessDTO dto = new BusinessSceneProcessDTO();
         dto.setId(businessSceneProcessEntity.getId());
         dto.setBusinessSceneId(businessSceneProcessEntity.getBusinessSceneId());
         dto.setProcessId(businessSceneProcessEntity.getProcessId());
-        dto.setName(processDefinition.getName());
-        dto.setXml(processDefinition.getXml());
-        dto.setImgUrl(processDefinition.getImgUrl());
+        dto.setName(processDefinitionDTO.getName());
+        dto.setXml(processDefinitionDTO.getXml());
+        dto.setImgUrl(processDefinitionDTO.getImgUrl());
         return dto;
     }
 
@@ -228,8 +228,8 @@ public class BusinessSceneService implements IBusinessSceneService {
         return entity;
     }
 
-    private ProcessDefinition toDTO(BusinessSceneProcessDTO businessSceneProcessDTO) {
-        ProcessDefinition dto = new ProcessDefinition();
+    private ProcessDefinitionDTO toDTO(BusinessSceneProcessDTO businessSceneProcessDTO) {
+        ProcessDefinitionDTO dto = new ProcessDefinitionDTO();
         dto.setProcessId(businessSceneProcessDTO.getProcessId());
         dto.setName(businessSceneProcessDTO.getName());
         dto.setXml(businessSceneProcessDTO.getXml());

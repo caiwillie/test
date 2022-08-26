@@ -7,7 +7,7 @@ import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.operate.dto.GroupDeployDTO;
 import com.brandnewdata.mop.poc.operate.resp.GroupDeployResp;
 import com.brandnewdata.mop.poc.operate.service.GroupDeployService;
-import com.brandnewdata.mop.poc.process.dto.ProcessDeploy;
+import com.brandnewdata.mop.poc.process.dto.ProcessDeployDTO;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,10 +40,10 @@ public class GroupDeployRest {
      * @deprecated
      */
     @GetMapping("/rest/operate/deploy/page")
-    public Result<Page<ProcessDeploy>> page (
+    public Result<Page<ProcessDeployDTO>> page (
             @RequestParam int pageNum,
             @RequestParam int pageSize) {
-        Page<ProcessDeploy> page = deployService.page(pageNum, pageSize);
+        Page<ProcessDeployDTO> page = deployService.page(pageNum, pageSize);
         return Result.OK(page);
     }
 
@@ -78,7 +78,7 @@ public class GroupDeployRest {
         resp.setProcessName(dto.getProcessName());
 
         // 设置部署版本数量和列表
-        List<ProcessDeploy> deploys = dto.getDeploys();
+        List<ProcessDeployDTO> deploys = dto.getDeploys();
         resp.setVersionCount(CollUtil.size(deploys));
         resp.setDeploys(deploys);
         return resp;
@@ -92,8 +92,8 @@ public class GroupDeployRest {
      * @return the result
      */
     @GetMapping("/rest/operate/deploy/detail")
-    public Result<ProcessDeploy> detail(@RequestParam long id) {
-        ProcessDeploy deploy = deployService.getOne(id);
+    public Result<ProcessDeployDTO> detail(@RequestParam long id) {
+        ProcessDeployDTO deploy = deployService.getOne(id);
         Assert.notNull(deploy, "流程部署 {} 不存在", id);
         return Result.OK(deploy);
     }

@@ -3,8 +3,8 @@ package com.brandnewdata.mop.poc.process.parser;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.json.JSONUtil;
 import com.brandnewdata.mop.poc.manager.ConnectorManager;
-import com.brandnewdata.mop.poc.process.dto.ProcessDefinition;
-import com.brandnewdata.mop.poc.process.dto.TriggerProcessDefinition;
+import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDTO;
+import com.brandnewdata.mop.poc.process.dto.parser.TriggerProcessDefinitionDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -14,7 +14,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 
 
-class ProcessDefinitionParserTest {
+class ProcessDefinitionDTOParserTest {
 
 
     @Mock
@@ -28,11 +28,11 @@ class ProcessDefinitionParserTest {
     @Test
     void testNewInstance() {
         String xml = ResourceUtil.readUtf8Str("test.bpmn.xml");
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setProcessId(null);
-        processDefinition.setName(null);
-        processDefinition.setXml(xml);
-        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(processDefinition);
+        ProcessDefinitionDTO processDefinitionDTO = new ProcessDefinitionDTO();
+        processDefinitionDTO.setProcessId(null);
+        processDefinitionDTO.setName(null);
+        processDefinitionDTO.setXml(xml);
+        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(processDefinitionDTO);
         step1.buildProcessDefinition();
         // Assertions.assertEquals(null, result);
     }
@@ -40,11 +40,11 @@ class ProcessDefinitionParserTest {
     @Test
     void testStep1() {
         String xml = ResourceUtil.readUtf8Str("test.bpmn.xml");
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setProcessId(null);
-        processDefinition.setName(null);
-        processDefinition.setXml(xml);
-        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(processDefinition);
+        ProcessDefinitionDTO processDefinitionDTO = new ProcessDefinitionDTO();
+        processDefinitionDTO.setProcessId(null);
+        processDefinitionDTO.setName(null);
+        processDefinitionDTO.setXml(xml);
+        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(processDefinitionDTO);
         ProcessDefinitionParseStep2 step2 = step1.replaceStep1();
         step2.buildProcessDefinition();
     }
@@ -57,11 +57,11 @@ class ProcessDefinitionParserTest {
         String json = ResourceUtil.readUtf8Str("trigger.json");
         String triggerFullId = "com.develop:wjx.callback:v1";
         String xml = JSONUtil.parseObj(json).getStr("processEditing");
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setProcessId(triggerFullId);
-        processDefinition.setXml(xml);
-        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(processDefinition);
-        TriggerProcessDefinition triggerProcessDefinition = step1.replaceStep1().replaceTriggerStartEvent(manager)
+        ProcessDefinitionDTO processDefinitionDTO = new ProcessDefinitionDTO();
+        processDefinitionDTO.setProcessId(triggerFullId);
+        processDefinitionDTO.setXml(xml);
+        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(processDefinitionDTO);
+        TriggerProcessDefinitionDTO triggerProcessDefinition = step1.replaceStep1().replaceTriggerStartEvent(manager)
                 .buildTriggerProcessDefinition();
         return;
     }
@@ -76,10 +76,10 @@ class ProcessDefinitionParserTest {
         when(manager.getProtocol(any())).thenReturn("HTTP");
 
         String xml = ResourceUtil.readUtf8Str("test.bpmn.xml");
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setXml(xml);
-        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(processDefinition);
-        TriggerProcessDefinition triggerProcessDefinition = step1.replaceStep1().replaceSceneStartEvent(manager)
+        ProcessDefinitionDTO processDefinitionDTO = new ProcessDefinitionDTO();
+        processDefinitionDTO.setXml(xml);
+        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(processDefinitionDTO);
+        TriggerProcessDefinitionDTO triggerProcessDefinition = step1.replaceStep1().replaceSceneStartEvent(manager)
                 .buildTriggerProcessDefinition();
     }
 }

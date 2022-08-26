@@ -1,6 +1,6 @@
 package com.brandnewdata.mop.poc.operate.resp;
 
-import com.brandnewdata.mop.poc.process.dto.ProcessDeploy;
+import com.brandnewdata.mop.poc.process.dto.ProcessDeployDTO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -39,6 +39,6 @@ public class GroupDeployResp {
     /**
      * 部署的列表
      */
-    private List<ProcessDeploy> deploys;
+    private List<ProcessDeployDTO> deploys;
 
 }

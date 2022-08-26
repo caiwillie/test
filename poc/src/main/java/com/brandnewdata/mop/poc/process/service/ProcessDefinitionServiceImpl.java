@@ -6,7 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.process.dao.ProcessDefinitionDao;
-import com.brandnewdata.mop.poc.process.dto.ProcessDefinition;
+import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDTO;
 import com.brandnewdata.mop.poc.process.entity.ProcessDefinitionEntity;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParser;
 import org.springframework.stereotype.Service;
@@ -22,8 +22,8 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
     private ProcessDefinitionDao processDefinitionDao;
     
     @Override
-    public List<ProcessDefinition> list(List<String> ids, boolean withXML) {
-        List<ProcessDefinition> ret = new ArrayList<>();
+    public List<ProcessDefinitionDTO> list(List<String> ids, boolean withXML) {
+        List<ProcessDefinitionDTO> ret = new ArrayList<>();
 
         if(CollUtil.isEmpty(ids)) {
             return ret;
@@ -40,7 +40,7 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
         List<ProcessDefinitionEntity> entities = processDefinitionDao.selectList(queryWrapper);
         if(CollUtil.isNotEmpty(entities)) {
             for (ProcessDefinitionEntity entity : entities) {
-                ProcessDefinition dto = toDTO(entity);
+                ProcessDefinitionDTO dto = toDTO(entity);
                 ret.add(dto);
             }
         }
@@ -49,19 +49,19 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
     }
 
     @Override
-    public ProcessDefinition save(ProcessDefinition processDefinition) {
+    public ProcessDefinitionDTO save(ProcessDefinitionDTO processDefinitionDTO) {
 
 
         // dto to entity 逻辑特殊，不提取公共
         ProcessDefinitionEntity entity = new ProcessDefinitionEntity();
-        entity.setImgUrl(processDefinition.getImgUrl());
-        entity.setXml(processDefinition.getXml());
+        entity.setImgUrl(processDefinitionDTO.getImgUrl());
+        entity.setXml(processDefinitionDTO.getXml());
 
         // todo 返回修改的结构体不再用 processDefinition
-        processDefinition = ProcessDefinitionParser.newInstance(processDefinition).buildProcessDefinition();
-        String processId = processDefinition.getProcessId();
+        processDefinitionDTO = ProcessDefinitionParser.newInstance(processDefinitionDTO).buildProcessDefinition();
+        String processId = processDefinitionDTO.getProcessId();
         entity.setId(processId);
-        entity.setName(processDefinition.getName());
+        entity.setName(processDefinitionDTO.getName());
 
         if(getOne(processId) != null) {
              processDefinitionDao.updateById(entity);
@@ -69,11 +69,11 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
             processDefinitionDao.insert(entity);
         }
 
-        return processDefinition;
+        return processDefinitionDTO;
     }
 
     @Override
-    public ProcessDefinition getOne(String processId) {
+    public ProcessDefinitionDTO getOne(String processId) {
         Assert.notNull(processId, ErrorMessage.NOT_NULL("流程 id"));
 
         QueryWrapper<ProcessDefinitionEntity> queryWrapper = new QueryWrapper<>();
@@ -87,8 +87,8 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
         }
     }
 
-    private ProcessDefinition toDTO(ProcessDefinitionEntity entity) {
-        ProcessDefinition dto = new ProcessDefinition();
+    private ProcessDefinitionDTO toDTO(ProcessDefinitionEntity entity) {
+        ProcessDefinitionDTO dto = new ProcessDefinitionDTO();
         dto.setProcessId(entity.getId());
         dto.setCreateTime(entity.getCreateTime());
         dto.setUpdateTime(entity.getUpdateTime());

@@ -3,7 +3,7 @@ package com.brandnewdata.mop.poc.operate.cache;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.process.dao.ProcessDeployDao;
-import com.brandnewdata.mop.poc.process.dto.ProcessDeploy;
+import com.brandnewdata.mop.poc.process.dto.ProcessDeployDTO;
 import com.brandnewdata.mop.poc.process.entity.ProcessDeployEntity;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -23,12 +23,12 @@ public class DeployCache {
 
     private long lastId = 0;
 
-    private Cache<Long, ProcessDeploy> cache = CacheBuilder.newBuilder().build();
+    private Cache<Long, ProcessDeployDTO> cache = CacheBuilder.newBuilder().build();
 
     @Scheduled(fixedDelay = 1000)
     public void load() {
         long lastId = this.lastId;
-        List<ProcessDeploy> tempList = new ArrayList<>();
+        List<ProcessDeployDTO> tempList = new ArrayList<>();
 
         do {
             QueryWrapper<ProcessDeployEntity> queryWrapper = new QueryWrapper<>();
@@ -41,19 +41,19 @@ public class DeployCache {
             tempList.clear();
             if(CollUtil.isNotEmpty(entities)) {
                 for (ProcessDeployEntity entity : entities) {
-                    ProcessDeploy processDeploy = new ProcessDeploy();
-                    processDeploy.setId(entity.getId());
-                    processDeploy.setProcessId(entity.getProcessId());
-                    processDeploy.setProcessName(entity.getProcessName());
-                    processDeploy.setCreateTime(entity.getCreateTime());
-                    tempList.add(processDeploy);
+                    ProcessDeployDTO processDeployDTO = new ProcessDeployDTO();
+                    processDeployDTO.setId(entity.getId());
+                    processDeployDTO.setProcessId(entity.getProcessId());
+                    processDeployDTO.setProcessName(entity.getProcessName());
+                    processDeployDTO.setCreateTime(entity.getCreateTime());
+                    tempList.add(processDeployDTO);
                 }
 
                 ProcessDeployEntity lastProcessDeploy = entities.get(entities.size() - 1);
                 lastId = lastProcessDeploy.getId();
 
-                for (ProcessDeploy processDeploy : tempList) {
-                    cache.put(processDeploy.getId(), processDeploy);
+                for (ProcessDeployDTO processDeployDTO : tempList) {
+                    cache.put(processDeployDTO.getId(), processDeployDTO);
                 }
             }
         } while(CollUtil.isNotEmpty(tempList));
@@ -62,7 +62,7 @@ public class DeployCache {
         this.lastId = lastId;
     }
 
-    public Map<Long, ProcessDeploy> asMap() {
+    public Map<Long, ProcessDeployDTO> asMap() {
         return cache.asMap();
     }
 

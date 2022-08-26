@@ -6,8 +6,8 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.PageUtil;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
-import com.brandnewdata.mop.poc.process.dto.ProcessDeploy;
-import com.brandnewdata.mop.poc.process.dto.ProcessInstance;
+import com.brandnewdata.mop.poc.process.dto.ProcessDeployDTO;
+import com.brandnewdata.mop.poc.process.dto.ProcessInstanceDTO;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import com.brandnewdata.mop.poc.process.util.ProcessUtil;
 import io.camunda.operate.CamundaOperateClient;
@@ -48,18 +48,20 @@ public class ProcessInstanceService {
     }
 
     @SneakyThrows
-    public Page<ProcessInstance> page(long deployId, int pageNum, int pageSize) {
+    public Page<ProcessInstanceDTO> page(long deployId, int pageNum, int pageSize) {
 
-        ProcessDeploy processDeploy = deployService.getOne(deployId);
-        Assert.notNull(processDeploy, ErrorMessage.NOT_NULL("部署 id"));
+        ProcessDeployDTO processDeployDTO = deployService.getOne(deployId);
+        Assert.notNull(processDeployDTO, ErrorMessage.NOT_NULL("部署 id"));
+
+        processDeployDTO.getZeebeKey();
 
         ProcessInstanceFilter instanceFilter = new ProcessInstanceFilter.Builder()
-                .bpmnProcessId(ProcessUtil.convertProcessId(processDeploy.getProcessId())).build();
+                .bpmnProcessId(ProcessUtil.convertProcessId(processDeployDTO.getProcessId())).build();
         SearchQuery instanceQuery = new SearchQuery.Builder().withFilter(instanceFilter)
                 .withSize(100).withSort(new Sort("state", SortOrder.ASC)).build();
         List<io.camunda.operate.dto.ProcessInstance> processInstances = client.searchProcessInstances(instanceQuery);
         processInstances = Optional.ofNullable(processInstances).orElse(ListUtil.empty());
-        List<ProcessInstance> list = new ArrayList<>();
+        List<ProcessInstanceDTO> list = new ArrayList<>();
         PageUtil.setFirstPageNo(1);
         int[] startEnd = PageUtil.transToStartEnd(pageNum, pageSize);
         int start = startEnd[0];
@@ -71,8 +73,8 @@ public class ProcessInstanceService {
         return new Page<>(total, list);
     }
 
-    private ProcessInstance toDTO(io.camunda.operate.dto.ProcessInstance processInstance) {
-        ProcessInstance dto = new ProcessInstance();
+    private ProcessInstanceDTO toDTO(io.camunda.operate.dto.ProcessInstance processInstance) {
+        ProcessInstanceDTO dto = new ProcessInstanceDTO();
         dto.setProcessId(processInstance.getBpmnProcessId());
         dto.setInstanceId(processInstance.getKey());
         dto.setParentInstanceId(processInstance.getParentKey());

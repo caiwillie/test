@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.process.dto;
+package com.brandnewdata.mop.poc.process.dto.parser;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Data;

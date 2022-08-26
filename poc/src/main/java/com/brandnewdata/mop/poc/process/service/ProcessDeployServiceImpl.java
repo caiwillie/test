@@ -10,9 +10,9 @@ import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.manager.ConnectorManager;
 import com.brandnewdata.mop.poc.process.ProcessConstants;
 import com.brandnewdata.mop.poc.process.dao.ProcessDeployDao;
-import com.brandnewdata.mop.poc.process.dto.ProcessDefinition;
-import com.brandnewdata.mop.poc.process.dto.ProcessDeploy;
-import com.brandnewdata.mop.poc.process.dto.TriggerProcessDefinition;
+import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDTO;
+import com.brandnewdata.mop.poc.process.dto.ProcessDeployDTO;
+import com.brandnewdata.mop.poc.process.dto.parser.TriggerProcessDefinitionDTO;
 import com.brandnewdata.mop.poc.process.entity.ProcessDeployEntity;
 import com.brandnewdata.mop.poc.process.parser.FeelUtil;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParseStep1;
@@ -58,9 +58,9 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         }
     }
 
-    private ProcessDeploy toDTO(ProcessDeployEntity entity) {
+    private ProcessDeployDTO toDTO(ProcessDeployEntity entity) {
         if(entity == null) return null; //为空返回
-        ProcessDeploy dto = new ProcessDeploy();
+        ProcessDeployDTO dto = new ProcessDeployDTO();
         dto.setId(entity.getId());
         dto.setCreateTime(entity.getCreateTime());
         dto.setProcessId(entity.getProcessId());
@@ -73,10 +73,10 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
     }
 
     @Override
-    public ProcessDeploy deploy(ProcessDefinition processDefinition, int type) {
-        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(processDefinition);
+    public ProcessDeployDTO deploy(ProcessDefinitionDTO processDefinitionDTO, int type) {
+        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(processDefinitionDTO);
 
-        TriggerProcessDefinition triggerProcessDefinition = null;
+        TriggerProcessDefinitionDTO triggerProcessDefinition = null;
         if(type == ProcessConstants.PROCESS_TYPE_SCENE) {
             triggerProcessDefinition = step1.replaceProperties(connectorManager).replaceStep1()
                     .replaceSceneStartEvent(connectorManager).buildTriggerProcessDefinition();
@@ -90,7 +90,7 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
             throw new IllegalArgumentException(ErrorMessage.CHECK_ERROR("触发器类型不支持", null));
         }
 
-        String xml = processDefinition.getXml(); // xml 需要取原始的数据
+        String xml = processDefinitionDTO.getXml(); // xml 需要取原始的数据
         // process id 和 name 需要取解析后的
         String processId = triggerProcessDefinition.getProcessId();
         String name = triggerProcessDefinition.getName();
@@ -128,18 +128,18 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
     }
 
     @Override
-    public Page<ProcessDeploy> page(int pageNum, int pageSize) {
+    public Page<ProcessDeployDTO> page(int pageNum, int pageSize) {
         com.baomidou.mybatisplus.extension.plugins.pagination.Page<ProcessDeployEntity> page =
                 com.baomidou.mybatisplus.extension.plugins.pagination.Page.of(pageNum, pageSize);
         QueryWrapper<ProcessDeployEntity> queryWrapper = new QueryWrapper<>();
         page = processDeployDao.selectPage(page, queryWrapper);
-        List<ProcessDeploy> list = new ArrayList<>();
+        List<ProcessDeployDTO> list = new ArrayList<>();
 
         List<ProcessDeployEntity> records = page.getRecords();
 
         if(CollUtil.isNotEmpty(records)) {
             for (ProcessDeployEntity record : records) {
-                ProcessDeploy dto = toDTO(record);
+                ProcessDeployDTO dto = toDTO(record);
                 list.add(dto);
             }
         }
@@ -153,10 +153,10 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         ProcessDeployEntity processDeployEntity = getLatestDeployVersion(processId);
         Assert.notNull(processDeployEntity, ErrorMessage.NOT_NULL("流程 id"), processId);
 
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setXml(processDeployEntity.getProcessXml());
+        ProcessDefinitionDTO processDefinitionDTO = new ProcessDefinitionDTO();
+        processDefinitionDTO.setXml(processDeployEntity.getProcessXml());
 
-        TriggerProcessDefinition triggerProcessDefinition = ProcessDefinitionParser.newInstance(processDefinition).replaceStep1()
+        TriggerProcessDefinitionDTO triggerProcessDefinition = ProcessDefinitionParser.newInstance(processDefinitionDTO).replaceStep1()
                 .replaceSceneStartEvent(connectorManager).buildTriggerProcessDefinition();
 
         // 解析 xml 后得到响应表达式
@@ -179,7 +179,7 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
     }
 
     @Override
-    public ProcessDeploy getOne(long deployId) {
+    public ProcessDeployDTO getOne(long deployId) {
         ProcessDeployEntity entity = processDeployDao.selectById(deployId);
         return toDTO(entity);
     }

@@ -1,6 +1,6 @@
 package com.brandnewdata.mop.poc.operate.dto;
 
-import com.brandnewdata.mop.poc.process.dto.ProcessDeploy;
+import com.brandnewdata.mop.poc.process.dto.ProcessDeployDTO;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -32,6 +32,6 @@ public class GroupDeployDTO {
     /**
      * 部署版本列表
      */
-    private List<ProcessDeploy> deploys = new ArrayList<>();
+    private List<ProcessDeployDTO> deploys = new ArrayList<>();
 
 }

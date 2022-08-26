@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.process.dto;
+package com.brandnewdata.mop.poc.process.dto.parser;
 
 import lombok.Data;
 
