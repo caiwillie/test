@@ -22,6 +22,7 @@ import com.dxy.library.json.jackson.JacksonUtil;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.camunda.zeebe.client.ZeebeClient;
 import io.camunda.zeebe.client.api.response.DeploymentEvent;
+import io.camunda.zeebe.client.api.response.Process;
 import io.camunda.zeebe.client.api.response.ProcessInstanceResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -103,7 +104,7 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
                 .send()
                 .join();
 
-        long zeebeKey = deploymentEvent.getKey();
+        long zeebeKey = deploymentEvent.getProcesses().get(0).getProcessDefinitionKey();
 
         ProcessDeployEntity latestVersion = getLatestDeployVersion(processId);
 
