@@ -80,7 +80,7 @@ public class ProcessInstanceService {
     }
 
 
-    public Page<ListViewProcessInstanceDTO> page(Long deployId, Integer pageNum, Integer pageSize) {
+    public Page<ListViewProcessInstanceDTO> pageNew(Long deployId, Integer pageNum, Integer pageSize) {
         Assert.notNull(deployId);
         Assert.notNull(pageNum);
         Assert.notNull(pageSize);
