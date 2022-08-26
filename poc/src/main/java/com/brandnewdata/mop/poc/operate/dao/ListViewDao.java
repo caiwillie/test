@@ -10,6 +10,8 @@ import com.brandnewdata.mop.poc.operate.util.ElasticsearchUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class ListViewDao extends AbstractDao{
 
@@ -36,6 +38,15 @@ public class ListViewDao extends AbstractDao{
                 .query(query)
                 .build();
         return ElasticsearchUtil.searchOne(client, searchRequest, ProcessInstanceForListViewEntity.class);
+    }
+
+
+    public List<ProcessInstanceForListViewEntity> scrollAll(Query query) {
+        SearchRequest request = new SearchRequest.Builder()
+                .index(template.getAlias())
+                .query(query)
+                .build();
+        return ElasticsearchUtil.scrollAll(client, request, ProcessInstanceForListViewEntity.class);
     }
 
 }

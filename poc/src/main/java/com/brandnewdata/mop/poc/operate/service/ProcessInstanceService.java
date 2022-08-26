@@ -6,6 +6,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.PageUtil;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
+import com.brandnewdata.mop.poc.operate.dao.ListViewDao;
 import com.brandnewdata.mop.poc.process.dto.ProcessDeployDTO;
 import com.brandnewdata.mop.poc.process.dto.ProcessInstanceDTO;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
@@ -17,6 +18,7 @@ import io.camunda.operate.search.SearchQuery;
 import io.camunda.operate.search.Sort;
 import io.camunda.operate.search.SortOrder;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +31,9 @@ import java.util.Optional;
 
 @Service
 public class ProcessInstanceService {
+
+    @Autowired
+    private ListViewDao listViewDao;
 
     @Value("${brandnewdata.zeebe.operate.uri}")
     private String uri;
@@ -72,6 +77,9 @@ public class ProcessInstanceService {
         }
         return new Page<>(total, list);
     }
+
+
+    public Page<ProcessInstanceDTO>
 
     private ProcessInstanceDTO toDTO(io.camunda.operate.dto.ProcessInstance processInstance) {
         ProcessInstanceDTO dto = new ProcessInstanceDTO();
