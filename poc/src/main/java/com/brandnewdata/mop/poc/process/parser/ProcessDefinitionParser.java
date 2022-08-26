@@ -124,7 +124,7 @@ public class ProcessDefinitionParser implements
         }
         Element root = document.getRootElement();
         root.add(BPMN_NAMESPACE);
-        Namespace bpmn2 = root.getNamespaceForPrefix(BPMN2_NAMESPACE_PRIFIX);
+        Namespace bpmn2 = root.getNamespaceForPrefix(BPMN2.getPrefix());
         if(bpmn2 != null) {
             root.remove(bpmn2);
         }
@@ -314,11 +314,9 @@ public class ProcessDefinitionParser implements
     }
 
 
-    private void replaceConditionExpression() {
-        XPath path = DocumentHelper.createXPath(StrUtil.join(StringPool.SLASH,
-                StringPool.SLASH,
-                BPMN_SEQUENCE_FLOW_QNAME.getQualifiedName(),
-                BPMN_CONDITION_EXPRESSION_QNAME.getQualifiedName()));
+    private void replaceTFormalExpression() {
+        XPath path = DocumentHelper.createXPath(StrUtil.format("//*[@{}='{}']",
+                XSI_TYPE_QNAME.getQualifiedName(), BPMN2_T_FORMAL_EXPRESSION_QNAME.getQualifiedName()));
         List<Node> nodes = path.selectNodes(document);
         if(CollUtil.isEmpty(nodes)) return;
 
@@ -779,8 +777,8 @@ public class ProcessDefinitionParser implements
         replaceServiceTaskOutputMapping();
         replaceCustomServiceTask();
 
-        // 替换 condition expression
-        replaceConditionExpression();
+        // 替换 xsi:type = "bpmn2:tFormalExpression"
+        replaceTFormalExpression();
         return this;
     }
 

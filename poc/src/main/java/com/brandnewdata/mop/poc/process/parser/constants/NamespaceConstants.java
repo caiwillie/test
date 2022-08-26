@@ -4,8 +4,8 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Namespace;
 
 public interface NamespaceConstants {
-
-    String BPMN2_NAMESPACE_PRIFIX = "bpmn2";
+    Namespace BPMN2 = DocumentHelper.createNamespace("bpmn2",
+            "http://www.omg.org/spec/BPMN/20100524/MODEL");
 
     Namespace XSI_NAMESPACE = DocumentHelper.createNamespace("xsi",
             "http://www.w3.org/2001/XMLSchema-instance");
