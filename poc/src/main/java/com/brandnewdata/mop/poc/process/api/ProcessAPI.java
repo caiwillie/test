@@ -8,12 +8,12 @@ import com.brandnewdata.mop.api.process.SendMessageReq;
 import com.brandnewdata.mop.api.process.SendMessageResp;
 import io.camunda.zeebe.client.ZeebeClient;
 import io.camunda.zeebe.client.api.response.PublishMessageResponse;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.util.Optional;
 
-@Component
+@RestController
 public class ProcessAPI implements IProcessAPI {
 
     @Resource

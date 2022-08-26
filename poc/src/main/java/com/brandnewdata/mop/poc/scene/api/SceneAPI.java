@@ -9,12 +9,13 @@ import com.brandnewdata.mop.poc.scene.dto.BusinessSceneDTO;
 import com.brandnewdata.mop.poc.scene.service.IBusinessSceneService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Component
+@RestController
 public class SceneAPI implements ISceneAPI {
 
     @Autowired

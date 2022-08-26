@@ -7,6 +7,7 @@ import cn.hutool.core.util.PageUtil;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.operate.dao.ListViewDao;
+import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDTO;
 import com.brandnewdata.mop.poc.process.dto.ProcessDeployDTO;
 import com.brandnewdata.mop.poc.process.dto.ProcessInstanceDTO;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
@@ -79,7 +80,16 @@ public class ProcessInstanceService {
     }
 
 
-    public Page<ProcessInstanceDTO>
+    public Page<ListViewProcessInstanceDTO> page(Long deployId, Integer pageNum, Integer pageSize) {
+        Assert.notNull(deployId);
+        Assert.notNull(pageNum);
+        Assert.notNull(pageSize);
+
+        ProcessDeployDTO deployDTO = deployService.getOne(deployId);
+        // Long zeebeKey = deployDTO.getZeebeKey();
+        return null;
+
+    }
 
     private ProcessInstanceDTO toDTO(io.camunda.operate.dto.ProcessInstance processInstance) {
         ProcessInstanceDTO dto = new ProcessInstanceDTO();
