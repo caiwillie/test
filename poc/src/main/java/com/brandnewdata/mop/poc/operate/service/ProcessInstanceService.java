@@ -4,10 +4,14 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.PageUtil;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.operate.dao.ListViewDao;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDTO;
+import com.brandnewdata.mop.poc.operate.entity.listview.ProcessInstanceForListViewEntity;
+import com.brandnewdata.mop.poc.operate.schema.template.ListViewTemplate;
 import com.brandnewdata.mop.poc.process.dto.ProcessDeployDTO;
 import com.brandnewdata.mop.poc.process.dto.ProcessInstanceDTO;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
@@ -25,9 +29,12 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -43,7 +50,6 @@ public class ProcessInstanceService {
 
     @Resource
     private IProcessDeployService deployService;
-
 
 
     @PostConstruct
@@ -87,8 +93,33 @@ public class ProcessInstanceService {
 
         ProcessDeployDTO deployDTO = deployService.getOne(deployId);
 
-        return null;
+        Long zeebeKey = deployDTO.getZeebeKey();
 
+        Query query = new Query.Builder()
+                .bool(new BoolQuery.Builder()
+                        .must(new Query.Builder()
+                                .term(t -> t.field(ListViewTemplate.JOIN_RELATION).value("processInstance"))
+                                .build(), new Query.Builder()
+                                .term(t -> t.field(ListViewTemplate.PROCESS_KEY).value(zeebeKey))
+                                .build())
+                        .build())
+                .build();
+
+        List<ProcessInstanceForListViewEntity> processInstanceForListViewEntities = listViewDao.scrollAll(query);
+
+        List<ListViewProcessInstanceDTO> processInstanceDTOS = processInstanceForListViewEntities.stream().map(entity -> {
+            ListViewProcessInstanceDTO dto = new ListViewProcessInstanceDTO();
+            dto.from(entity);
+            return dto;
+        }).sorted((o1, o2) -> {
+            LocalDateTime t1 = Optional.ofNullable(o1.getStartDate()).orElse(LocalDateTime.MIN);
+            LocalDateTime t2 = Optional.ofNullable(o2.getStartDate()).orElse(LocalDateTime.MIN);
+            return t1.compareTo(t2);
+        }).collect(Collectors.toList());
+
+
+
+        return null;
     }
 
     private ProcessInstanceDTO toDTO(io.camunda.operate.dto.ProcessInstance processInstance) {
