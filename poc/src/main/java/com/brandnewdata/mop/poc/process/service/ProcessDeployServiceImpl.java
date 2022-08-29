@@ -126,7 +126,7 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         Optional<ProcessDeployEntity> exist = exist(processId, version);
         ProcessDeployEntity entity = null;
         if(exist.isPresent()) {
-            // 版本已存在
+            // 已发布的流程，但是没有任何实例，如果新发布一个版本，可能会存在把空实例版本替换
             entity = exist.get();
         } else {
             // 版本不存在
@@ -149,7 +149,6 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
             // 版本不存在， 新增
             processDeployDao.insert(entity);
         }
-
 
         if(type == ProcessConstants.PROCESS_TYPE_SCENE && triggerProcessDefinition.getTrigger() != null) {
             // 如果有场景发布，并且是自定义触发器时，需要保存监听配置
