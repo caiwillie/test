@@ -126,23 +126,29 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         Optional<ProcessDeployEntity> exist = exist(processId, version);
         ProcessDeployEntity entity = null;
         if(exist.isPresent()) {
-            // 版本未改变
+            // 版本已存在
             entity = exist.get();
         } else {
-            // 版本更新
+            // 版本不存在
             entity = new ProcessDeployEntity();
             entity.setProcessId(processId);
-            entity.setProcessName(name);
-            entity.setProcessXml(xml);
             // 设置版本, 初始版本为1
             entity.setVersion(version);
-            entity.setType(type);
-            entity.setZeebeKey(zeebeKey);
-            entity.setZeebeXml(zeebeXML);
-
-            processDeployDao.insert(entity);
         }
 
+        entity.setProcessName(name);
+        entity.setProcessXml(xml);
+        entity.setType(type);
+        entity.setZeebeKey(zeebeKey);
+        entity.setZeebeXml(zeebeXML);
+
+        if(exist.isPresent()) {
+            // 版本已存在， 更新
+            processDeployDao.updateById(entity);
+        } else {
+            // 版本不存在， 新增
+            processDeployDao.insert(entity);
+        }
 
 
         if(type == ProcessConstants.PROCESS_TYPE_SCENE && triggerProcessDefinition.getTrigger() != null) {
