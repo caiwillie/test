@@ -1,16 +1,17 @@
 package com.brandnewdata.mop.poc.operate.service;
 
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.operate.dao.ListViewDao;
+import com.brandnewdata.mop.poc.operate.dao.SequenceFlowDao;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDTO;
+import com.brandnewdata.mop.poc.operate.entity.SequenceFlowEntity;
 import com.brandnewdata.mop.poc.operate.entity.listview.ProcessInstanceForListViewEntity;
 import com.brandnewdata.mop.poc.operate.schema.template.ListViewTemplate;
+import com.brandnewdata.mop.poc.operate.schema.template.SequenceFlowTemplate;
 import com.brandnewdata.mop.poc.process.dto.ProcessDeployDTO;
-import com.brandnewdata.mop.poc.process.dto.ProcessInstanceDTO;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import com.brandnewdata.mop.poc.util.PageEnhancedUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,9 @@ public class ProcessInstanceService {
 
     @Autowired
     private ListViewDao listViewDao;
+
+    @Autowired
+    private SequenceFlowDao sequenceFlowDao;
 
     @Resource
     private IProcessDeployService deployService;
@@ -69,17 +73,11 @@ public class ProcessInstanceService {
         return new Page<>(processInstanceDTOS.size(), records);
     }
 
-    private ProcessInstanceDTO toDTO(io.camunda.operate.dto.ProcessInstance processInstance) {
-        ProcessInstanceDTO dto = new ProcessInstanceDTO();
-        dto.setProcessId(processInstance.getBpmnProcessId());
-        dto.setInstanceId(processInstance.getKey());
-        dto.setParentInstanceId(processInstance.getParentKey());
-        dto.setVersion(processInstance.getProcessVersion());
-        dto.setStartTime(DateUtil.formatTime(processInstance.getStartDate()));
-        dto.setEndTime(processInstance.getEndDate() != null ?
-                DateUtil.formatTime(processInstance.getEndDate()) : null);
-        dto.setState(processInstance.getState().name());
-        return dto;
+    public List<SequenceFlowEntity> sequenceFlows(Long processInstanceId) {
+        Query query = new Query.Builder()
+                .term(t -> t.field(SequenceFlowTemplate.PROCESS_INSTANCE_KEY).value(processInstanceId))
+                .build();
+        return sequenceFlowDao.scrollAll(query);
     }
 
 }

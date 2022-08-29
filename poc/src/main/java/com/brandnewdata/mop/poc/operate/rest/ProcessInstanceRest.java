@@ -3,14 +3,17 @@ package com.brandnewdata.mop.poc.operate.rest;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDTO;
+import com.brandnewdata.mop.poc.operate.entity.SequenceFlowEntity;
+import com.brandnewdata.mop.poc.operate.resp.FlowNodeStateResp;
 import com.brandnewdata.mop.poc.operate.resp.ProcessInstanceResp;
+import com.brandnewdata.mop.poc.operate.resp.SequenceFlowResp;
 import com.brandnewdata.mop.poc.operate.service.ProcessInstanceService;
-import com.brandnewdata.mop.poc.process.dto.ProcessInstanceDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +25,7 @@ import java.util.stream.Collectors;
 public class ProcessInstanceRest {
 
     @Resource
-    private ProcessInstanceService instanceService;
+    private ProcessInstanceService processInstanceService;
 
     /**
      * 获取流程实例分页列表
@@ -37,7 +40,7 @@ public class ProcessInstanceRest {
             @RequestParam Long deployId,
             @RequestParam int pageNum,
             @RequestParam int pageSize) {
-        Page<ListViewProcessInstanceDTO> page = instanceService.page(deployId, pageNum, pageSize);
+        Page<ListViewProcessInstanceDTO> page = processInstanceService.page(deployId, pageNum, pageSize);
 
 
         List<ListViewProcessInstanceDTO> records = page.getRecords();
@@ -50,16 +53,30 @@ public class ProcessInstanceRest {
     }
 
     /**
-     * 获取流程实例详情
+     * 获取流程实例的轨迹连线
      *
      * @param processInstanceId 流程实例id
      * @return the result
      */
-    @GetMapping("/rest/operate/instance/detail")
-    public Result<ProcessInstanceDTO> detail(@RequestParam String processInstanceId) {
-        return null;
+    @GetMapping("/rest/operate/instance/sequenceFlows")
+    public Result<List<SequenceFlowResp>> sequenceFlows(@RequestParam String processInstanceId) {
+        List<SequenceFlowEntity> sequenceFlowEntities = processInstanceService.sequenceFlows(Long.valueOf(processInstanceId));
+        List<SequenceFlowResp> records = sequenceFlowEntities.stream().map(e -> {
+            SequenceFlowResp resp = new SequenceFlowResp();
+            return resp.from(e);
+        }).sorted(Comparator.comparing(SequenceFlowResp::getSequenceId)).collect(Collectors.toList());
+        return Result.OK(records);
     }
 
+    /**
+     * 获取流程实例的节点状态
+     *
+     * @param processInstanceId 流程实例id
+     * @return
+     */
+    @GetMapping("/rest/operate/instance/flowNodeStates")
+    public Result<List<FlowNodeStateResp>> flowNodeStates(@RequestParam String processInstanceId) {
 
-
+        return null;
+    }
 }
