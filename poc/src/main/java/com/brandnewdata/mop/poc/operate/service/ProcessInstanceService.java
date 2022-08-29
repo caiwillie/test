@@ -131,7 +131,7 @@ public class ProcessInstanceService {
                 // 将父路径也放入异常路径中（异常冒泡）
                 String[] split = treePath.split("/");
                 for (int i = 1; i <= split.length; i++) {
-                    incidentPathSet.add(StringUtils.join(split, 0, 1));
+                    incidentPathSet.add(StringUtils.join(split, '/', 0, i));
                 }
             } else if (incidentPathSet.contains(treePath)) {
                 state = FlowNodeStateDTO.INCIDENT;
