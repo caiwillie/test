@@ -39,6 +39,7 @@ public class ListViewProcessInstanceDTO extends OperateZeebeDTO {
         this.setStartDate(Optional.ofNullable(entity.getStartDate()).map(OffsetDateTime::toLocalDateTime).orElse(null));
         this.setEndDate(Optional.ofNullable(entity.getEndDate()).map(OffsetDateTime::toLocalDateTime).orElse(null));
         if (entity.getState() == ProcessInstanceState.ACTIVE && entity.isIncident()) {
+            // 这一步转换状态
             this.setState(ProcessInstanceStateDto.INCIDENT);
         } else {
             this.setState(ProcessInstanceStateDto.getState(entity.getState()));

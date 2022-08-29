@@ -82,6 +82,21 @@ public class ProcessInstanceService {
         return new Page<>(processInstanceDTOS.size(), records);
     }
 
+    public ListViewProcessInstanceDTO detail(Long processInstanceId) {
+        Query query = new Query.Builder()
+                .bool(new BoolQuery.Builder()
+                        .must(new Query.Builder()
+                                .term(t -> t.field(ListViewTemplate.JOIN_RELATION).value("processInstance"))
+                                .build(), new Query.Builder()
+                                .term(t -> t.field(ListViewTemplate.PROCESS_INSTANCE_KEY).value(processInstanceId))
+                                .build())
+                        .build())
+                .build();
+        ProcessInstanceForListViewEntity entity = listViewDao.searchOne(query);
+        ListViewProcessInstanceDTO dto = new ListViewProcessInstanceDTO();
+        return dto.from(entity);
+    }
+
     public List<SequenceFlowEntity> sequenceFlows(Long processInstanceId) {
         Query query = new Query.Builder()
                 .term(t -> t.field(SequenceFlowTemplate.PROCESS_INSTANCE_KEY).value(processInstanceId))

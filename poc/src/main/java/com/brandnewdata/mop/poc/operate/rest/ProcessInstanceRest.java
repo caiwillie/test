@@ -45,7 +45,6 @@ public class ProcessInstanceRest {
             @RequestParam int pageSize) {
         Page<ListViewProcessInstanceDTO> page = processInstanceService.page(deployId, pageNum, pageSize);
 
-
         List<ListViewProcessInstanceDTO> records = page.getRecords();
         List<ProcessInstanceResp> respList = records.stream().map(dto -> {
             ProcessInstanceResp resp = new ProcessInstanceResp();
@@ -53,6 +52,20 @@ public class ProcessInstanceRest {
         }).collect(Collectors.toList());
 
         return Result.OK(new Page<>(page.getTotal(), respList));
+    }
+
+
+    /**
+     * 获取流程实例的详情
+     *
+     * @param processInstanceId 流程实例id
+     * @return the result
+     */
+    public Result<ProcessInstanceResp> detail(@RequestParam String processInstanceId) {
+        ListViewProcessInstanceDTO dto = processInstanceService.detail(Long.valueOf(processInstanceId));
+        ProcessInstanceResp resp = new ProcessInstanceResp();
+        resp.from(dto);
+        return Result.OK(resp);
     }
 
     /**
