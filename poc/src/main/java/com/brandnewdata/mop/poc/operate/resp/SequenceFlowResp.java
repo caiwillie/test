@@ -16,12 +16,12 @@ public class SequenceFlowResp {
     /**
      * 节点id
      */
-    private String sequenceId;
+    private String sequenceFlowId;
 
 
     public SequenceFlowResp from(SequenceFlowEntity entity) {
         this.setProcessInstanceId(String.valueOf(entity.getProcessInstanceKey()));
-        this.setSequenceId(entity.getActivityId());
+        this.setSequenceFlowId(entity.getActivityId());
         return this;
     }
 }

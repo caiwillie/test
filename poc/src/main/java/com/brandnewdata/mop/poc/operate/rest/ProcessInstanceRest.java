@@ -64,7 +64,7 @@ public class ProcessInstanceRest {
         List<SequenceFlowResp> records = sequenceFlowEntities.stream().map(e -> {
             SequenceFlowResp resp = new SequenceFlowResp();
             return resp.from(e);
-        }).sorted(Comparator.comparing(SequenceFlowResp::getSequenceId)).collect(Collectors.toList());
+        }).sorted(Comparator.comparing(SequenceFlowResp::getSequenceFlowId)).collect(Collectors.toList());
         return Result.OK(records);
     }
 
