@@ -1,7 +1,7 @@
 package com.brandnewdata.mop.poc.process.dao;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.brandnewdata.mop.poc.process.entity.ProcessDeployEntity;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * <p>
@@ -9,7 +9,7 @@ import com.brandnewdata.mop.poc.process.entity.ProcessDeployEntity;
  * </p>
  *
  * @author caiwillie
- * @since 2022-07-28
+ * @since 2022-08-29
  */
 public interface ProcessDeployDao extends BaseMapper<ProcessDeployEntity> {
 

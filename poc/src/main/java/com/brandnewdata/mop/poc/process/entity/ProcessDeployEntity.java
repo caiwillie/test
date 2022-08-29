@@ -1,11 +1,14 @@
 package com.brandnewdata.mop.poc.process.entity;
 
-import com.baomidou.mybatisplus.annotation.*;
-import lombok.Getter;
-import lombok.Setter;
-
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * <p>
@@ -13,7 +16,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author caiwillie
- * @since 2022-07-28
+ * @since 2022-08-29
  */
 @Getter
 @Setter
@@ -27,6 +30,9 @@ public class ProcessDeployEntity implements Serializable {
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
+
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updateTime;
 
     private String processId;
 
@@ -46,6 +52,8 @@ public class ProcessDeployEntity implements Serializable {
     public static final String ID = "id";
 
     public static final String CREATE_TIME = "create_time";
+
+    public static final String UPDATE_TIME = "update_time";
 
     public static final String PROCESS_ID = "process_id";
 
