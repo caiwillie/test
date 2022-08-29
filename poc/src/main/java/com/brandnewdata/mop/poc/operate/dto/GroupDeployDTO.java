@@ -27,7 +27,7 @@ public class GroupDeployDTO {
     /**
      * 最后一个更新时间
      */
-    private LocalDateTime latestCreateTime;
+    private LocalDateTime latestUpdateTime;
 
     /**
      * 部署版本列表

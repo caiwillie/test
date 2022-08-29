@@ -32,40 +32,39 @@ public class ListViewProcessInstanceDTO extends OperateZeebeDTO {
     private String[] sortValues;
 
     public ListViewProcessInstanceDTO from(ProcessInstanceForListViewEntity entity) {
-        ListViewProcessInstanceDTO dto = new ListViewProcessInstanceDTO();
         if (entity == null) {
             return null;
         }
-        dto.setId(entity.getId());
-        dto.setStartDate(Optional.ofNullable(entity.getStartDate()).map(OffsetDateTime::toLocalDateTime).orElse(null));
-        dto.setEndDate(Optional.ofNullable(entity.getEndDate()).map(OffsetDateTime::toLocalDateTime).orElse(null));
+        this.setId(entity.getId());
+        this.setStartDate(Optional.ofNullable(entity.getStartDate()).map(OffsetDateTime::toLocalDateTime).orElse(null));
+        this.setEndDate(Optional.ofNullable(entity.getEndDate()).map(OffsetDateTime::toLocalDateTime).orElse(null));
         if (entity.getState() == ProcessInstanceState.ACTIVE && entity.isIncident()) {
-            dto.setState(ProcessInstanceStateDto.INCIDENT);
+            this.setState(ProcessInstanceStateDto.INCIDENT);
         } else {
-            dto.setState(ProcessInstanceStateDto.getState(entity.getState()));
+            this.setState(ProcessInstanceStateDto.getState(entity.getState()));
         }
-        dto.setProcessId(Optional.ofNullable(entity.getProcessDefinitionKey()).map(String::valueOf).orElse(null));
-        dto.setBpmnProcessId(entity.getBpmnProcessId());
-        dto.setProcessName(entity.getProcessName());
-        dto.setProcessVersion(entity.getProcessVersion());
+        this.setProcessId(Optional.ofNullable(entity.getProcessDefinitionKey()).map(String::valueOf).orElse(null));
+        this.setBpmnProcessId(entity.getBpmnProcessId());
+        this.setProcessName(entity.getProcessName());
+        this.setProcessVersion(entity.getProcessVersion());
 
         // dto.setOperations(DtoCreator.create(operations, OperationDto.class));
 
-        dto.setParentInstanceId(Optional.ofNullable(entity.getParentProcessInstanceKey()).map(String::valueOf).orElse(null));
+        this.setParentInstanceId(Optional.ofNullable(entity.getParentProcessInstanceKey()).map(String::valueOf).orElse(null));
         if (entity.getSortValues() != null) {
-            dto.setSortValues(Arrays.stream(entity.getSortValues()).map(String::valueOf).toArray(String[]::new));
+            this.setSortValues(Arrays.stream(entity.getSortValues()).map(String::valueOf).toArray(String[]::new));
         }
         if (entity.getTreePath() != null) {
             String rootInstanceId = new TreePathUtil(entity.getTreePath()).extractRootInstanceId();
             // 如果 rootInstanceId 和 id 不相等，就设置
             if (!entity.getId().equals(rootInstanceId)) {
-                dto.setRootInstanceId(rootInstanceId);
+                this.setRootInstanceId(rootInstanceId);
             }
         }
 
         // operation 和 callHierarchy 还没弄好
 
-        return dto;
+        return this;
     }
 
 }

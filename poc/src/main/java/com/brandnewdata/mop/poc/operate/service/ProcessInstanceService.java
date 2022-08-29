@@ -110,7 +110,7 @@ public class ProcessInstanceService {
         }).sorted((o1, o2) -> {
             LocalDateTime t1 = Optional.ofNullable(o1.getStartDate()).orElse(LocalDateTime.MIN);
             LocalDateTime t2 = Optional.ofNullable(o2.getStartDate()).orElse(LocalDateTime.MIN);
-            return t1.compareTo(t2);
+            return t2.compareTo(t1);
         }).collect(Collectors.toList());
 
         PageEnhancedUtil.setFirstPageNo(1);

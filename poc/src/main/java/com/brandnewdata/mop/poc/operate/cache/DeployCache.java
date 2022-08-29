@@ -47,6 +47,7 @@ public class DeployCache {
                     processDeployDTO.setProcessName(entity.getProcessName());
                     processDeployDTO.setVersion(entity.getVersion());
                     processDeployDTO.setCreateTime(entity.getCreateTime());
+                    processDeployDTO.setUpdateTime(entity.getUpdateTime());
                     tempList.add(processDeployDTO);
                 }
 

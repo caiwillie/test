@@ -1,7 +1,6 @@
 package com.brandnewdata.mop.poc.operate.service;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.PageUtil;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.operate.cache.DeployCache;
 import com.brandnewdata.mop.poc.operate.dto.GroupDeployDTO;
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class GroupDeployService {
@@ -40,15 +40,19 @@ public class GroupDeployService {
             String processId = processDeployDTO.getProcessId();
             String processName = processDeployDTO.getProcessName();
             int version = processDeployDTO.getVersion();
-            LocalDateTime createTime = processDeployDTO.getCreateTime();
 
+            LocalDateTime updateTime = processDeployDTO.getUpdateTime();
+            // updateTime 不为空，就取 updateTime，否则就取 createTime
+            updateTime = updateTime != null ? updateTime : processDeployDTO.getCreateTime();
+
+            // 根据 processId 获取 group deploy
             GroupDeployDTO groupDeployDTO = ret.get(processId);
             if(groupDeployDTO == null) {
                 groupDeployDTO = new GroupDeployDTO();
                 groupDeployDTO.setProcessId(processId);
                 groupDeployDTO.setProcessName(processName);
                 groupDeployDTO.setLatestVersion(version);
-                groupDeployDTO.setLatestCreateTime(createTime);
+                groupDeployDTO.setLatestUpdateTime(updateTime);
                 List<ProcessDeployDTO> list = new ArrayList<>();
                 list.add(processDeployDTO);
                 groupDeployDTO.setDeploys(list);
@@ -60,10 +64,12 @@ public class GroupDeployService {
                     // 更新最后版本,名称,时间
                     groupDeployDTO.setProcessName(processName);
                     groupDeployDTO.setLatestVersion(version);
-                    groupDeployDTO.setLatestCreateTime(createTime);
+                    groupDeployDTO.setLatestUpdateTime(updateTime);
                 }
             }
         }
+
+
 
         return ret;
     }
@@ -73,13 +79,23 @@ public class GroupDeployService {
 
         Collection<GroupDeployDTO> values = groupDeployMap.values();
         List<GroupDeployDTO> newValues = CollUtil.sort(values, (o1, o2) -> {
-            LocalDateTime time1 = o1.getLatestCreateTime();
-            LocalDateTime time2 = o2.getLatestCreateTime();
-            return time1.compareTo(time2);
+            LocalDateTime time1 = o1.getLatestUpdateTime();
+            LocalDateTime time2 = o2.getLatestUpdateTime();
+            return time2.compareTo(time1);
         });
 
         PageEnhancedUtil.setFirstPageNo(1);
         List<GroupDeployDTO> filterList = PageEnhancedUtil.slice(pageNum, pageSize, newValues);
+
+        for (GroupDeployDTO groupDeployDTO : filterList) {
+            List<ProcessDeployDTO> deploys = groupDeployDTO.getDeploys();
+
+            // 对 deploy 列表进行排序
+            List<ProcessDeployDTO> deployDTOS = deploys.stream().sorted((o1, o2) -> Integer.compare(o2.getVersion(), o1.getVersion()))
+                    .collect(Collectors.toList());
+            groupDeployDTO.setDeploys(deployDTOS);
+        }
+
         ret.setTotal(newValues.size());
         ret.setRecords(filterList);
         return ret;

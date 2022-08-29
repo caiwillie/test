@@ -22,6 +22,11 @@ public class ProcessDeployDTO {
     private LocalDateTime createTime;
 
     /**
+     * 更新时间
+     */
+    private LocalDateTime updateTime;
+
+    /**
      * 流程 id
      */
     private String processId;
