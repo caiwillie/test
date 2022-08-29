@@ -61,6 +61,7 @@ public class ProcessInstanceRest {
      * @param processInstanceId 流程实例id
      * @return the result
      */
+    @GetMapping("/rest/operate/instance/detail")
     public Result<ProcessInstanceResp> detail(@RequestParam String processInstanceId) {
         ListViewProcessInstanceDTO dto = processInstanceService.detail(Long.valueOf(processInstanceId));
         ProcessInstanceResp resp = new ProcessInstanceResp();
