@@ -1,39 +1,23 @@
 package com.brandnewdata.mop.poc.operate.service;
 
-import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.PageUtil;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import com.brandnewdata.mop.poc.common.dto.Page;
-import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.operate.dao.ListViewDao;
-import com.brandnewdata.mop.poc.operate.dto.GroupDeployDTO;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDTO;
 import com.brandnewdata.mop.poc.operate.entity.listview.ProcessInstanceForListViewEntity;
 import com.brandnewdata.mop.poc.operate.schema.template.ListViewTemplate;
 import com.brandnewdata.mop.poc.process.dto.ProcessDeployDTO;
 import com.brandnewdata.mop.poc.process.dto.ProcessInstanceDTO;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
-import com.brandnewdata.mop.poc.process.util.ProcessUtil;
 import com.brandnewdata.mop.poc.util.PageEnhancedUtil;
-import io.camunda.operate.CamundaOperateClient;
-import io.camunda.operate.auth.SimpleAuthentication;
-import io.camunda.operate.search.ProcessInstanceFilter;
-import io.camunda.operate.search.SearchQuery;
-import io.camunda.operate.search.Sort;
-import io.camunda.operate.search.SortOrder;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -45,42 +29,8 @@ public class ProcessInstanceService {
     @Autowired
     private ListViewDao listViewDao;
 
-    @Value("${brandnewdata.zeebe.operate.uri}")
-    private String uri;
-
-    private CamundaOperateClient client;
-
     @Resource
     private IProcessDeployService deployService;
-
-
-    @PostConstruct
-    @SneakyThrows
-    private void init() {
-        SimpleAuthentication sa = new SimpleAuthentication("demo", "demo", uri);
-        client = new CamundaOperateClient.Builder().operateUrl(uri).authentication(sa).build();
-    }
-
-    @SneakyThrows
-    public Page<ProcessInstanceDTO> pageOld(long deployId, int pageNum, int pageSize) {
-
-        ProcessDeployDTO processDeployDTO = deployService.getOne(deployId);
-        Assert.notNull(processDeployDTO, ErrorMessage.NOT_NULL("部署 id"));
-
-        processDeployDTO.getZeebeKey();
-
-        ProcessInstanceFilter instanceFilter = new ProcessInstanceFilter.Builder()
-                .bpmnProcessId(ProcessUtil.convertProcessId(processDeployDTO.getProcessId())).build();
-        SearchQuery instanceQuery = new SearchQuery.Builder().withFilter(instanceFilter)
-                .withSize(100).withSort(new Sort("state", SortOrder.ASC)).build();
-        List<io.camunda.operate.dto.ProcessInstance> processInstances = client.searchProcessInstances(instanceQuery);
-        processInstances = Optional.ofNullable(processInstances).orElse(ListUtil.empty());
-
-        PageEnhancedUtil.setFirstPageNo(1);
-        List<ProcessInstanceDTO> list = PageEnhancedUtil.slice(pageNum, pageSize, processInstances, this::toDTO);
-        return new Page<>(processInstances.size(), list);
-    }
-
 
     public Page<ListViewProcessInstanceDTO> page(Long deployId, Integer pageNum, Integer pageSize) {
         Assert.notNull(deployId);
