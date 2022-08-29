@@ -2,6 +2,7 @@ package com.brandnewdata.mop.poc.operate.rest;
 
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.common.dto.Page;
+import com.brandnewdata.mop.poc.operate.dto.FlowNodeStateDTO;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDTO;
 import com.brandnewdata.mop.poc.operate.entity.SequenceFlowEntity;
 import com.brandnewdata.mop.poc.operate.resp.FlowNodeStateResp;
@@ -13,8 +14,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -76,7 +79,17 @@ public class ProcessInstanceRest {
      */
     @GetMapping("/rest/operate/instance/flowNodeStates")
     public Result<List<FlowNodeStateResp>> flowNodeStates(@RequestParam String processInstanceId) {
-
-        return null;
+        List<FlowNodeStateResp> ret = new ArrayList<>();
+        Map<String, FlowNodeStateDTO> flowNodeStateMap = processInstanceService.getFlowNodeStateMap(Long.valueOf(processInstanceId));
+        for (Map.Entry<String, FlowNodeStateDTO> entry : flowNodeStateMap.entrySet()) {
+            String flowNodeId = entry.getKey();
+            FlowNodeStateDTO state = entry.getValue();
+            FlowNodeStateResp resp = new FlowNodeStateResp();
+            resp.setProcessInstanceId(processInstanceId);
+            resp.setFlowNodeId(flowNodeId);
+            resp.setState(state.name());
+            ret.add(resp);
+        }
+        return Result.OK(ret);
     }
 }
