@@ -42,7 +42,7 @@ public class IncidentDTO {
         this.setFlowNodeId(incidentEntity.getFlowNodeId());
         this.setFlowNodeInstanceId(Optional.ofNullable(incidentEntity.getFlowNodeInstanceKey()).map(String::valueOf).orElse(null));
         this.setErrorMessage(incidentEntity.getErrorMessage());
-        this.setErrorType(new ErrorTypeDTO().fromEntity(incidentEntity.getErrorType()));
+        this.setErrorType(new ErrorTypeDTO().from(incidentEntity.getErrorType()));
         this.setJobId(Optional.ofNullable(incidentEntity.getJobKey()).map(String::valueOf).orElse(null));
         this.setCreationTime(Optional.ofNullable(incidentEntity.getCreationTime()).map(OffsetDateTime::toLocalDateTime).orElse(null));
         return this;

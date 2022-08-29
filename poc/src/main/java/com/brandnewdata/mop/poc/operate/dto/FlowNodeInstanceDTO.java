@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Getter
 @Setter
-public class FlowNodeInstanceListDTO extends OperateZeebeDTO implements FromOneEntity<FlowNodeInstanceListDTO, FlowNodeInstanceEntity> {
+public class FlowNodeInstanceDTO extends OperateZeebeDTO implements FromOneEntity<FlowNodeInstanceDTO, FlowNodeInstanceEntity> {
 
 
     /**
@@ -81,10 +81,10 @@ public class FlowNodeInstanceListDTO extends OperateZeebeDTO implements FromOneE
 
     private boolean incident;
 
-    private List<FlowNodeInstanceListDTO> children;
+    private List<FlowNodeInstanceDTO> children;
 
     @Override
-    public FlowNodeInstanceListDTO fromEntity(FlowNodeInstanceEntity entity) {
+    public FlowNodeInstanceDTO from(FlowNodeInstanceEntity entity) {
         this.setId(entity.getId());
         this.setFlowNodeId(entity.getFlowNodeId());
         this.setStartDate(Optional.ofNullable(entity.getStartDate()).map(OffsetDateTime::toLocalDateTime).orElse(null));

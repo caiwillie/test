@@ -2,7 +2,7 @@ package com.brandnewdata.mop.poc.operate.rest;
 
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.operate.dto.FlowNodeInstanceDetailDTO;
-import com.brandnewdata.mop.poc.operate.dto.FlowNodeInstanceListDTO;
+import com.brandnewdata.mop.poc.operate.dto.FlowNodeInstanceDTO;
 import com.brandnewdata.mop.poc.operate.service.FlowNodeInstanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,8 +27,8 @@ public class FlowNodeInstanceRest {
      * @return the result
      */
     @GetMapping("/rest/operate/flowNodeInstance/list")
-    public Result<List<FlowNodeInstanceListDTO>> list(@RequestParam String processInstanceId) {
-        List<FlowNodeInstanceListDTO> list = service.list(processInstanceId);
+    public Result<List<FlowNodeInstanceDTO>> list(@RequestParam String processInstanceId) {
+        List<FlowNodeInstanceDTO> list = service.list(processInstanceId);
         return Result.OK(list);
     }
 

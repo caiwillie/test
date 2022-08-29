@@ -22,7 +22,7 @@ public class OperationDTO implements FromOneEntity<OperationDTO, OperationEntity
     private String errorMessage;
 
     @Override
-    public OperationDTO fromEntity(OperationEntity entity) {
+    public OperationDTO from(OperationEntity entity) {
         this.setId(entity.getId());
         this.setType(entity.getType());
         this.setState(entity.getState());

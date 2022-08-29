@@ -13,7 +13,7 @@ public class ErrorTypeDTO implements FromOneEntity<ErrorTypeDTO, ErrorType> {
     private String name;
 
     @Override
-    public ErrorTypeDTO fromEntity(ErrorType entity) {
+    public ErrorTypeDTO from(ErrorType entity) {
         this.setId(entity.name());
         this.setName(entity.getTitle());
         return this;

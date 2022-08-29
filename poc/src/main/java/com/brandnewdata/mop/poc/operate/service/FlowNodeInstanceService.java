@@ -53,20 +53,20 @@ public class FlowNodeInstanceService {
     @Autowired
     private ProcessCache processCache;
 
-    public List<FlowNodeInstanceListDTO> list(String processInstanceId) {
+    public List<FlowNodeInstanceDTO> list(String processInstanceId) {
         Assert.notNull(processInstanceId);
 
         List<FlowNodeInstanceEntity> flowNodeInstanceEntities = flowNodeInstanceDao.list(processInstanceId);
 
-        List<FlowNodeInstanceListDTO> flowNodeInstanceListDTOS = flowNodeInstanceEntities.stream()
-                .map(entity -> new FlowNodeInstanceListDTO().fromEntity(entity)).collect(Collectors.toList());
+        List<FlowNodeInstanceDTO> flowNodeInstanceDTOS = flowNodeInstanceEntities.stream()
+                .map(entity -> new FlowNodeInstanceDTO().from(entity)).collect(Collectors.toList());
 
         // 构造 path to instance 的 map
-        Map<String, FlowNodeInstanceListDTO> pathInstanceMap = flowNodeInstanceListDTOS.stream()
-                .collect(Collectors.toMap(FlowNodeInstanceListDTO::getTreePath, Function.identity()));
+        Map<String, FlowNodeInstanceDTO> pathInstanceMap = flowNodeInstanceDTOS.stream()
+                .collect(Collectors.toMap(FlowNodeInstanceDTO::getTreePath, Function.identity()));
 
         // 转换为 treeNode
-        List<TreeNode<String>> treeNodes = flowNodeInstanceListDTOS.stream().map(this::toTreeNode).collect(Collectors.toList());
+        List<TreeNode<String>> treeNodes = flowNodeInstanceDTOS.stream().map(this::toTreeNode).collect(Collectors.toList());
 
         // 根节点是 process instance id
         List<Tree<String>> children = TreeUtil.build(treeNodes, processInstanceId);
@@ -76,15 +76,15 @@ public class FlowNodeInstanceService {
         return ret.getList();
     }
 
-    private TreeNode<String> toTreeNode(FlowNodeInstanceListDTO flowNodeInstanceListDto) {
+    private TreeNode<String> toTreeNode(FlowNodeInstanceDTO flowNodeInstanceDto) {
         // 将 flow node instance 中的 path 最为 id
-        String id = flowNodeInstanceListDto.getTreePath();
+        String id = flowNodeInstanceDto.getTreePath();
 
         // 将类似 START_EVENT_1 作为name
-        String name = flowNodeInstanceListDto.getFlowNodeId();
+        String name = flowNodeInstanceDto.getFlowNodeId();
 
         // 将 id 作为排序字段
-        String weight = flowNodeInstanceListDto.getId();
+        String weight = flowNodeInstanceDto.getId();
 
         // 查询 id 中最后一个 /
         int index = id.lastIndexOf('/');
@@ -98,9 +98,9 @@ public class FlowNodeInstanceService {
         return new TreeNode<>(id, parent, name, weight);
     }
 
-    private FlowNodeInstanceTreeDTO buildFlowNodeInstanceTree(List<Tree<String>> children, Map<String, FlowNodeInstanceListDTO> pathInstanceMap) {
+    private FlowNodeInstanceTreeDTO buildFlowNodeInstanceTree(List<Tree<String>> children, Map<String, FlowNodeInstanceDTO> pathInstanceMap) {
         FlowNodeInstanceTreeDTO ret = new FlowNodeInstanceTreeDTO();
-        List<FlowNodeInstanceListDTO> list = new ArrayList<>();
+        List<FlowNodeInstanceDTO> list = new ArrayList<>();
         ret.setList(list);
         ret.setIncident(false);
         if (CollUtil.isEmpty(children)) {
@@ -108,25 +108,25 @@ public class FlowNodeInstanceService {
         }
 
         for (Tree<String> tree : children) {
-            FlowNodeInstanceListDTO flowNodeInstanceListDto = pathInstanceMap.get(tree.getId());
-            if (flowNodeInstanceListDto == null) throw new RuntimeException("path 数据错误");
+            FlowNodeInstanceDTO flowNodeInstanceDto = pathInstanceMap.get(tree.getId());
+            if (flowNodeInstanceDto == null) throw new RuntimeException("path 数据错误");
             // 递归处理
             FlowNodeInstanceTreeDTO childrenDto = buildFlowNodeInstanceTree(tree.getChildren(), pathInstanceMap);
 
             // if()
-            flowNodeInstanceListDto.setChildren(childrenDto.getList());
+            flowNodeInstanceDto.setChildren(childrenDto.getList());
 
-            if (childrenDto.isIncident() && !flowNodeInstanceListDto.isIncident()) {
+            if (childrenDto.isIncident() && !flowNodeInstanceDto.isIncident()) {
                 // 子节点有错误事件，但是本节点无错误事件，修改本节点的事件和状态
-                flowNodeInstanceListDto.setIncident(true);
-                flowNodeInstanceListDto.setState(FlowNodeStateDTO.INCIDENT);
+                flowNodeInstanceDto.setIncident(true);
+                flowNodeInstanceDto.setState(FlowNodeStateDTO.INCIDENT);
             }
 
-            if (flowNodeInstanceListDto.isIncident() && !ret.isIncident()) {
+            if (flowNodeInstanceDto.isIncident() && !ret.isIncident()) {
                 // 本节点有错误事件，但是总体结果无错误事件时，修改总体结果
                 ret.setIncident(true);
             }
-            list.add(flowNodeInstanceListDto);
+            list.add(flowNodeInstanceDto);
         }
 
         return ret;
