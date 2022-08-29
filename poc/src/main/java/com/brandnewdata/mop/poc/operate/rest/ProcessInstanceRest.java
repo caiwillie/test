@@ -2,6 +2,8 @@ package com.brandnewdata.mop.poc.operate.rest;
 
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.common.dto.Page;
+import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDTO;
+import com.brandnewdata.mop.poc.operate.resp.ProcessInstanceResp;
 import com.brandnewdata.mop.poc.operate.service.ProcessInstanceService;
 import com.brandnewdata.mop.poc.process.dto.ProcessInstanceDTO;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 运行监控相关的接口
@@ -29,12 +33,20 @@ public class ProcessInstanceRest {
      * @return result result
      */
     @GetMapping("/rest/operate/instance/page")
-    public Result<Page<ProcessInstanceDTO>> page (
+    public Result<Page<ProcessInstanceResp>> page (
             @RequestParam Long deployId,
             @RequestParam int pageNum,
             @RequestParam int pageSize) {
-        Page<ProcessInstanceDTO> page = instanceService.page(deployId, pageNum, pageSize);
-        return Result.OK(page);
+        Page<ListViewProcessInstanceDTO> page = instanceService.page(deployId, pageNum, pageSize);
+
+
+        List<ListViewProcessInstanceDTO> records = page.getRecords();
+        List<ProcessInstanceResp> respList = records.stream().map(dto -> {
+            ProcessInstanceResp resp = new ProcessInstanceResp();
+            return resp.from(dto);
+        }).collect(Collectors.toList());
+
+        return Result.OK(new Page<>(page.getTotal(), respList));
     }
 
     /**
@@ -47,6 +59,7 @@ public class ProcessInstanceRest {
     public Result<ProcessInstanceDTO> detail(@RequestParam String processInstanceId) {
         return null;
     }
+
 
 
 }

@@ -6,6 +6,7 @@ import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.operate.cache.DeployCache;
 import com.brandnewdata.mop.poc.operate.dto.GroupDeployDTO;
 import com.brandnewdata.mop.poc.process.dto.ProcessDeployDTO;
+import com.brandnewdata.mop.poc.util.PageEnhancedUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -77,17 +78,9 @@ public class GroupDeployService {
             return time1.compareTo(time2);
         });
 
-        List<GroupDeployDTO> filterList = new ArrayList<>();
-        PageUtil.setFirstPageNo(1);
-        int[] startEnd = PageUtil.transToStartEnd(pageNum, pageSize);
-        int start = startEnd[0];
-        int end = startEnd[1];
-        int total = newValues.size();
-        for (int i = start; i < total && i < end; i++) {
-            filterList.add(newValues.get(i));
-        }
-
-        ret.setTotal(total);
+        PageEnhancedUtil.setFirstPageNo(1);
+        List<GroupDeployDTO> filterList = PageEnhancedUtil.slice(pageNum, pageSize, newValues);
+        ret.setTotal(newValues.size());
         ret.setRecords(filterList);
         return ret;
     }
