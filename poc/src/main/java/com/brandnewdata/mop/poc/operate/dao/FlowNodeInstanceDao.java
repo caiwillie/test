@@ -2,7 +2,6 @@ package com.brandnewdata.mop.poc.operate.dao;
 
 import cn.hutool.core.lang.Assert;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import co.elastic.clients.elasticsearch.core.GetRequest;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import com.brandnewdata.mop.poc.operate.entity.FlowNodeInstanceEntity;
 import com.brandnewdata.mop.poc.operate.schema.template.FlowNodeInstanceTemplate;
