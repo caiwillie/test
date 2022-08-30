@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @WebServlet(urlPatterns = "/proxy/*", initParams = {
-        @WebInitParam(name = ProxyServlet.P_TARGET_URI, value = "http://www.brandnewdata.com")})
+@WebInitParam(name = ProxyServlet.P_TARGET_URI, value = "http://www.brandnewdata.com")})
 public class ReverseProxyServlet extends ProxyServlet {
 
     @Autowired
