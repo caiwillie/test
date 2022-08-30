@@ -56,7 +56,7 @@ public class BusinessSceneService implements IBusinessSceneService {
 
         List<Long> sceneIdList = entities.stream().map(BusinessSceneEntity::getId).collect(Collectors.toList());
 
-        Collection<BusinessSceneDTO> list = list(sceneIdList, false);
+        Collection<BusinessSceneDTO> list = list(sceneIdList, true);
 
         return new Page<>(page.getTotal(), ListUtil.toList(list));
     }
