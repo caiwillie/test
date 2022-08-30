@@ -138,7 +138,7 @@ public class FlowNodeInstanceService {
         Assert.notNull(flowNodeInstanceId);
 
         // 首先查找 instance entity
-        FlowNodeInstanceEntity flowNodeInstance = flowNodeInstanceDao.getOne(flowNodeInstanceId);
+        FlowNodeInstanceEntity flowNodeInstance = flowNodeInstanceDao.searchOne(flowNodeInstanceId);
 
         // 查找 event
         EventEntity eventEntity = eventDao.getOne(flowNodeInstanceId);

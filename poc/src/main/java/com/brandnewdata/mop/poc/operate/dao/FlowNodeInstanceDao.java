@@ -45,14 +45,17 @@ public class FlowNodeInstanceDao extends AbstractDao {
 
     }
 
-    public FlowNodeInstanceEntity getOne(String flowNodeInstanceId) {
+    public FlowNodeInstanceEntity searchOne(String flowNodeInstanceId) {
+        Query query = new Query.Builder()
+                .term(t -> t.field(FlowNodeInstanceTemplate.ID).value(flowNodeInstanceId))
+                .build();
 
-        GetRequest getRequest = new GetRequest.Builder()
+        SearchRequest request = new SearchRequest.Builder()
                 .index(template.getAlias())
-                .id(flowNodeInstanceId)
+                .query(query)
                 .build();
         
-        return ElasticsearchUtil.getOne(client, getRequest, FlowNodeInstanceEntity.class);
+        return ElasticsearchUtil.searchOne(client, request, FlowNodeInstanceEntity.class);
     }
 
 }
