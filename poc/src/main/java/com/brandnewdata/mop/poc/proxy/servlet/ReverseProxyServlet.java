@@ -60,7 +60,7 @@ public class ReverseProxyServlet extends ProxyServlet {
 
         if (backend == null) {
             // 后端配置未找到，直接返回
-            ServletUtil.write(resp, "未配置该API", MimeTypeUtils.TEXT_PLAIN_VALUE);
+            ServletUtil.write(resp, "API Not Found", MimeTypeUtils.TEXT_PLAIN_VALUE);
             return;
         }
 
