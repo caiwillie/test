@@ -1,8 +1,13 @@
 package com.brandnewdata.mop.poc.operate.service;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
+import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.query_dsl.TermsQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.operate.dao.FlowNodeInstanceDao;
 import com.brandnewdata.mop.poc.operate.dao.ListViewDao;
@@ -20,6 +25,8 @@ import com.brandnewdata.mop.poc.operate.util.ElasticsearchUtil;
 import com.brandnewdata.mop.poc.process.dto.ProcessDeployDTO;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import com.brandnewdata.mop.poc.util.PageEnhancedUtil;
+import com.sun.org.apache.xpath.internal.operations.Bool;
+import io.camunda.operate.dto.ProcessInstanceState;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -64,7 +71,7 @@ public class ProcessInstanceService {
                         .build())
                 .build();
 
-        List<ProcessInstanceForListViewEntity> processInstanceForListViewEntities = listViewDao.scrollAll(query);
+        List<ProcessInstanceForListViewEntity> processInstanceForListViewEntities = listViewDao.scrollAll(query, ElasticsearchUtil.QueryType.ALL);
 
         List<ListViewProcessInstanceDTO> processInstanceDTOS = processInstanceForListViewEntities.stream().map(entity -> {
             ListViewProcessInstanceDTO dto = new ListViewProcessInstanceDTO();
@@ -121,7 +128,7 @@ public class ProcessInstanceService {
             int level1 = o1.getLevel();
             int level2 = o2.getLevel();
             compare = Integer.compare(level2, level1);
-            if(compare != 0) return compare;
+            if (compare != 0) return compare;
 
             // 再按照flowNodeId排序
             String flowNodeId1 = o1.getFlowNodeId();
@@ -141,7 +148,7 @@ public class ProcessInstanceService {
             String treePath = flowNodeInstanceDTO.getTreePath();
             boolean incident = flowNodeInstanceDTO.isIncident();
             FlowNodeStateDTO state = flowNodeInstanceDTO.getState();
-            if(incident) {
+            if (incident) {
                 state = FlowNodeStateDTO.INCIDENT;
                 // 将父路径也放入异常路径中（异常冒泡）
                 String[] split = treePath.split("/");
@@ -154,6 +161,46 @@ public class ProcessInstanceService {
             ret.put(flowNodeId, state);
         }
 
+        return ret;
+    }
+
+    public Map<Long, List<ListViewProcessInstanceDTO>> listByProcessDefinitionKeyList(List<Long> keys) {
+        Map<Long, List<ListViewProcessInstanceDTO>> ret = new HashMap<>();
+        if (CollUtil.isEmpty(keys)) {
+            return ret;
+        }
+
+        Query query = new Query.Builder()
+                .bool(new BoolQuery.Builder()
+                        .must(new Query.Builder()
+                                .term(t -> t.field(ListViewTemplate.JOIN_RELATION).value("processInstance"))
+                                .build(), new Query.Builder()
+
+                                .terms(new TermsQuery.Builder()
+                                        .field(ListViewTemplate.PROCESS_KEY)
+                                        .terms(new TermsQueryField.Builder()
+                                                .value(keys.stream().map(FieldValue::of).collect(Collectors.toList()))
+                                                .build())
+                                        .build())
+                                .build(), new Query.Builder()
+
+                                // 添加 activityState = active 的条件
+                                .term(t -> t.field(ListViewTemplate.ACTIVITY_STATE).value(ProcessInstanceState.ACTIVE.name()))
+                                .build())
+                        .build())
+                .build();
+
+        List<ProcessInstanceForListViewEntity> entities = listViewDao.scrollAll(query, ElasticsearchUtil.QueryType.ONLY_RUNTIME);
+
+        for (ProcessInstanceForListViewEntity entity : entities) {
+            // 转换为 list dto
+            ListViewProcessInstanceDTO dto = new ListViewProcessInstanceDTO();
+            dto.from(entity);
+
+            Long processId = dto.getProcessId();
+            List<ListViewProcessInstanceDTO> dtos = ret.putIfAbsent(processId, new ArrayList<>());
+            dtos.add(dto);
+        }
         return ret;
     }
 

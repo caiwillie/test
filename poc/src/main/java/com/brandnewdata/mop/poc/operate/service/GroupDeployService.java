@@ -77,15 +77,15 @@ public class GroupDeployService {
     private Page<GroupDeployDTO> filter(Map<String, GroupDeployDTO> groupDeployMap, int pageNum, int pageSize) {
         Page<GroupDeployDTO> ret = new Page<>();
 
-        Collection<GroupDeployDTO> values = groupDeployMap.values();
-        List<GroupDeployDTO> newValues = CollUtil.sort(values, (o1, o2) -> {
+        // 对所有分组完成的流程进行排序
+        List<GroupDeployDTO> values = CollUtil.sort(groupDeployMap.values(), (o1, o2) -> {
             LocalDateTime time1 = o1.getLatestUpdateTime();
             LocalDateTime time2 = o2.getLatestUpdateTime();
             return time2.compareTo(time1);
         });
 
         PageEnhancedUtil.setFirstPageNo(1);
-        List<GroupDeployDTO> filterList = PageEnhancedUtil.slice(pageNum, pageSize, newValues);
+        List<GroupDeployDTO> filterList = PageEnhancedUtil.slice(pageNum, pageSize, values);
 
         for (GroupDeployDTO groupDeployDTO : filterList) {
             List<ProcessDeployDTO> deploys = groupDeployDTO.getDeploys();
@@ -96,10 +96,12 @@ public class GroupDeployService {
             groupDeployDTO.setDeploys(deployDTOS);
         }
 
-        ret.setTotal(newValues.size());
+        ret.setTotal(values.size());
         ret.setRecords(filterList);
         return ret;
     }
+
+
 
 
 }

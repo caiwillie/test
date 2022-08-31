@@ -17,7 +17,7 @@ import java.util.Optional;
 @Setter
 public class ListViewProcessInstanceDTO extends OperateZeebeDTO {
     private String id;
-    private String processId;
+    private Long processId;
     private String processName;
     private Integer processVersion;
     private LocalDateTime startDate;
@@ -44,7 +44,7 @@ public class ListViewProcessInstanceDTO extends OperateZeebeDTO {
         } else {
             this.setState(ProcessInstanceStateDto.getState(entity.getState()));
         }
-        this.setProcessId(Optional.ofNullable(entity.getProcessDefinitionKey()).map(String::valueOf).orElse(null));
+        this.setProcessId(entity.getProcessDefinitionKey());
         this.setBpmnProcessId(entity.getBpmnProcessId());
         this.setProcessName(entity.getProcessName());
         this.setProcessVersion(entity.getProcessVersion());

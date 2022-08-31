@@ -5,8 +5,11 @@ import cn.hutool.core.lang.Assert;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.operate.dto.GroupDeployDTO;
+import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDTO;
+import com.brandnewdata.mop.poc.operate.dto.ProcessInstanceStateDto;
 import com.brandnewdata.mop.poc.operate.resp.GroupDeployResp;
 import com.brandnewdata.mop.poc.operate.service.GroupDeployService;
+import com.brandnewdata.mop.poc.operate.service.ProcessInstanceService;
 import com.brandnewdata.mop.poc.process.dto.ProcessDeployDTO;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -30,6 +35,9 @@ public class GroupDeployRest {
 
     @Autowired
     private GroupDeployService groupDeployService;
+
+    @Autowired
+    private ProcessInstanceService processInstanceService;
 
     /**
      * 流程部署分页列表（deprecated）
@@ -79,8 +87,34 @@ public class GroupDeployRest {
 
         // 设置部署版本数量和列表
         List<ProcessDeployDTO> deploys = dto.getDeploys();
-        resp.setVersionCount(CollUtil.size(deploys));
+        int size = CollUtil.size(deploys);
+        resp.setVersionCount(size);
         resp.setDeploys(deploys);
+        if(size == 0) {
+            return resp;
+        }
+
+        // 如果版本号不为0，需要查询运行实例
+        List<Long> processDefinitionKeys = deploys.stream().map(ProcessDeployDTO::getZeebeKey).collect(Collectors.toList());
+
+        // 得到 flat map之后的 process instance list
+        Map<Long, List<ListViewProcessInstanceDTO>> map = processInstanceService.listByProcessDefinitionKeyList(processDefinitionKeys);
+        List<ListViewProcessInstanceDTO> collect = map.values().stream().flatMap(Collection::stream).collect(Collectors.toList());
+
+        // 统计正常和异常的数量
+        int activeCount = 0;
+        int incidentCount = 0;
+        for (ListViewProcessInstanceDTO processInstanceDTO : collect) {
+            if(processInstanceDTO.getState() == ProcessInstanceStateDto.INCIDENT) {
+                incidentCount++;
+            } else {
+                activeCount++;
+            }
+        }
+
+        resp.setIncidentInstanceCount(incidentCount);
+        resp.setActiveInstanceCount(activeCount);
+
         return resp;
     }
 
