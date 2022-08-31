@@ -116,16 +116,13 @@ public class FlowNodeInstanceService {
             // if()
             flowNodeInstanceDto.setChildren(childrenDto.getList());
 
-            if (childrenDto.isIncident() && !flowNodeInstanceDto.isIncident()) {
-                // 子节点有错误事件，但是本节点无错误事件，修改本节点的事件和状态
+            if (childrenDto.isIncident() || flowNodeInstanceDto.isIncident()) {
+                // 子节点有错误事件，或者节点本生有错误
+                ret.setIncident(true);
                 flowNodeInstanceDto.setIncident(true);
                 flowNodeInstanceDto.setState(FlowNodeStateDTO.INCIDENT);
             }
 
-            if (flowNodeInstanceDto.isIncident() && !ret.isIncident()) {
-                // 本节点有错误事件，但是总体结果无错误事件时，修改总体结果
-                ret.setIncident(true);
-            }
             list.add(flowNodeInstanceDto);
         }
 
