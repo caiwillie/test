@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.poc.config;
 
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
@@ -17,6 +18,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import javax.sql.DataSource;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Date;
 
 /**
  * @author caiwillie
@@ -64,13 +66,14 @@ public class MybatisPlusConfiguration {
         config.setMetaObjectHandler(new MetaObjectHandler() {
             @Override
             public void insertFill(MetaObject metaObject) {
-                this.strictInsertFill(metaObject, "createTime", LocalDateTime.class, LocalDateTime.now());
-                this.strictInsertFill(metaObject, "updateTime", LocalDateTime.class, LocalDateTime.now());
+                Date now = DateUtil.date().toJdkDate();
+                this.strictInsertFill(metaObject, "createTime", Date.class, now);
+                this.strictInsertFill(metaObject, "updateTime", Date.class, now);
             }
-
             @Override
             public void updateFill(MetaObject metaObject) {
-                this.strictUpdateFill(metaObject, "updateTime", LocalDateTime.class, LocalDateTime.now());
+                Date now = DateUtil.date().toJdkDate();
+                this.strictUpdateFill(metaObject, "updateTime", Date.class, now);
             }
 
         });

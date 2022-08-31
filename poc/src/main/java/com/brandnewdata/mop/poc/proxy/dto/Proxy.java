@@ -2,6 +2,8 @@ package com.brandnewdata.mop.poc.proxy.dto;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 public class Proxy {
 
@@ -32,9 +34,14 @@ public class Proxy {
     private String description;
 
     /**
+     * 创建时间
+     */
+    private LocalDateTime createTime;
+
+    /**
      * 更新时间
      */
-    private String updateTime;
+    private LocalDateTime updateTime;
 
     /**
      * 服务域名

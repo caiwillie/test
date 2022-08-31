@@ -1,6 +1,8 @@
 package com.brandnewdata.mop.poc.process.service;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
@@ -71,7 +73,8 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         if(entity == null) return null; //为空返回
         ProcessDeployDTO dto = new ProcessDeployDTO();
         dto.setId(entity.getId());
-        dto.setCreateTime(entity.getCreateTime());
+        dto.setCreateTime(LocalDateTimeUtil.of(entity.getCreateTime()));
+        dto.setUpdateTime(LocalDateTimeUtil.of(entity.getUpdateTime()));
         dto.setProcessId(entity.getProcessId());
         dto.setProcessName(entity.getProcessName());
         dto.setXml(entity.getProcessXml());

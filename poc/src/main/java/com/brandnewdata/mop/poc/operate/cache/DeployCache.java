@@ -1,6 +1,7 @@
 package com.brandnewdata.mop.poc.operate.cache;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.process.dao.ProcessDeployDao;
 import com.brandnewdata.mop.poc.process.dto.ProcessDeployDTO;
@@ -46,8 +47,8 @@ public class DeployCache {
                     processDeployDTO.setProcessId(entity.getProcessId());
                     processDeployDTO.setProcessName(entity.getProcessName());
                     processDeployDTO.setVersion(entity.getVersion());
-                    processDeployDTO.setCreateTime(entity.getCreateTime());
-                    processDeployDTO.setUpdateTime(entity.getUpdateTime());
+                    processDeployDTO.setCreateTime(LocalDateTimeUtil.of(entity.getCreateTime()));
+                    processDeployDTO.setUpdateTime(LocalDateTimeUtil.of(entity.getUpdateTime()));
                     tempList.add(processDeployDTO);
                 }
 

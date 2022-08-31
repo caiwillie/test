@@ -1,6 +1,7 @@
 package com.brandnewdata.mop.poc.process.service;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
@@ -90,8 +92,8 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
     private ProcessDefinitionDTO toDTO(ProcessDefinitionEntity entity) {
         ProcessDefinitionDTO dto = new ProcessDefinitionDTO();
         dto.setProcessId(entity.getId());
-        dto.setCreateTime(entity.getCreateTime());
-        dto.setUpdateTime(entity.getUpdateTime());
+        dto.setCreateTime(LocalDateTimeUtil.of(entity.getCreateTime()));
+        dto.setUpdateTime(LocalDateTimeUtil.of(entity.getUpdateTime()));
         dto.setName(entity.getName());
         dto.setXml(entity.getXml());
         dto.setImgUrl(entity.getImgUrl());

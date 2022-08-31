@@ -83,8 +83,8 @@ public class ProxyService {
         proxy.setProtocol(entity.getProtocol());
         proxy.setVersion(entity.getVersion());
         proxy.setDescription(entity.getDescription());
-        PropertyMapper.get().from(entity::getUpdateTime)
-                .as(LocalDateTimeUtil::formatNormal).to(proxy::setUpdateTime);
+        proxy.setCreateTime(LocalDateTimeUtil.of(entity.getCreateTime()));
+        proxy.setUpdateTime(LocalDateTimeUtil.of(entity.getUpdateTime()));
         proxy.setDomain(entity.getDomain());
         return proxy;
     }

@@ -39,7 +39,7 @@ public class ProxyGenerator {
                 .globalConfig((scanner, builder) -> builder
                         .author(StrUtil.isNotBlank(AUTHOR) ? AUTHOR : scanner.apply("请输入作者名称？"))
                         .outputDir(System.getProperty("user.dir") + "/" + OUTPUT)
-                        .dateType(DateType.TIME_PACK)
+                        .dateType(DateType.ONLY_DATE)
                         .fileOverride() // 覆盖已生成的文件
                         .disableOpenDir() // 生成完成后不打开目录
                 )

@@ -197,8 +197,8 @@ public class BusinessSceneService implements IBusinessSceneService {
         BusinessSceneDTO dto = new BusinessSceneDTO();
         dto.setId(entity.getId());
         dto.setName(entity.getName());
-        dto.setCreateTime(LocalDateTimeUtil.formatNormal(entity.getCreateTime()));
-        dto.setUpdateTime(LocalDateTimeUtil.formatNormal(entity.getUpdateTime()));
+        dto.setCreateTime(LocalDateTimeUtil.of(entity.getCreateTime()));
+        dto.setUpdateTime(LocalDateTimeUtil.of(entity.getUpdateTime()));
         return dto;
     }
 

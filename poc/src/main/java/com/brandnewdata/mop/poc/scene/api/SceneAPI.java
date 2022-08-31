@@ -1,6 +1,7 @@
 package com.brandnewdata.mop.poc.scene.api;
 
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.api.scene.ISceneAPI;
 import com.brandnewdata.mop.api.scene.ListSceneReq;
@@ -36,8 +37,8 @@ public class SceneAPI implements ISceneAPI {
         SceneResp sceneResp = new SceneResp();
         sceneResp.setId(businessSceneDTO.getId());
         sceneResp.setName(businessSceneDTO.getName());
-        sceneResp.setCreateTime(businessSceneDTO.getCreateTime());
-        sceneResp.setUpdateTime(businessSceneDTO.getUpdateTime());
+        sceneResp.setCreateTime(LocalDateTimeUtil.formatNormal(businessSceneDTO.getCreateTime()));
+        sceneResp.setUpdateTime(LocalDateTimeUtil.formatNormal(businessSceneDTO.getUpdateTime()));
         sceneResp.setImgUrl(businessSceneDTO.getImgUrl());
         return sceneResp;
     }
