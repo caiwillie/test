@@ -1,7 +1,6 @@
 package com.brandnewdata.mop.poc.operate.service;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
@@ -25,7 +24,6 @@ import com.brandnewdata.mop.poc.operate.util.ElasticsearchUtil;
 import com.brandnewdata.mop.poc.process.dto.ProcessDeployDTO;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import com.brandnewdata.mop.poc.util.PageEnhancedUtil;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import io.camunda.operate.dto.ProcessInstanceState;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -185,7 +183,7 @@ public class ProcessInstanceService {
                                 .build(), new Query.Builder()
 
                                 // 添加 activityState = active 的条件
-                                .term(t -> t.field(ListViewTemplate.ACTIVITY_STATE).value(ProcessInstanceState.ACTIVE.name()))
+                                .term(t -> t.field(ListViewTemplate.STATE).value(ProcessInstanceState.ACTIVE.name()))
                                 .build())
                         .build())
                 .build();
@@ -198,7 +196,8 @@ public class ProcessInstanceService {
             dto.from(entity);
 
             Long processId = dto.getProcessId();
-            List<ListViewProcessInstanceDTO> dtos = ret.putIfAbsent(processId, new ArrayList<>());
+            List<ListViewProcessInstanceDTO> dtos = ret.computeIfAbsent(processId, k -> new ArrayList<>());
+
             dtos.add(dto);
         }
         return ret;

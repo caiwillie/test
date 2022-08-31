@@ -49,6 +49,7 @@ public class DeployCache {
                     processDeployDTO.setVersion(entity.getVersion());
                     processDeployDTO.setCreateTime(LocalDateTimeUtil.of(entity.getCreateTime()));
                     processDeployDTO.setUpdateTime(LocalDateTimeUtil.of(entity.getUpdateTime()));
+                    processDeployDTO.setZeebeKey(entity.getZeebeKey());
                     tempList.add(processDeployDTO);
                 }
 
