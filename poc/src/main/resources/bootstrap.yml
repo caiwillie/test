@@ -1,20 +1,32 @@
 spring:
   application:
     name: poc
+  profiles:
+    active: dev
 
-  # nacos 相关配置
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
   cloud:
     nacos:
       config:
         server-addr: brandnewdata-nacos:8848
-        namespace: "dev"
-        group: DEFAULT_GROUP
+        namespace: ${CONFIG_NAMESPACE:dev}
+        group: ${CONFIG_GROUP:DEFAULT_GROUP}
         file-extension: yaml
-      discovery:
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  cloud:
+    nacos:
+      config:
         server-addr: brandnewdata-nacos:8848
-        namespace: "dev"
-        group: DEFAULT_GROUP
-        metadata:
-          preserved.heart.beat.interval: 1000
-          preserved.heart.beat.timeout: 3000
-          preserved.ip.delete.timeout: 3000
+        namespace: ${CONFIG_NAMESPACE:test}
+        group: ${CONFIG_GROUP:DEFAULT_GROUP}
+        file-extension: yaml
