@@ -57,6 +57,7 @@ public class TreePathUtil {
     }
 
     public String extractRootInstanceId() {
+        // caiwillie 只解析遇到的第一个PI开头的
         Pattern piPattern = Pattern.compile("PI_(\\d*).*");
         Stream<String> stream = Arrays.stream(this.treePath.toString().split("/"));
         Objects.requireNonNull(piPattern);
@@ -65,6 +66,7 @@ public class TreePathUtil {
     }
 
     public List<String> extractProcessInstanceIds() {
+        // caiwillie 解析遇到的所有PI开头的
         List<String> processInstanceIds = new ArrayList<>();
         Pattern piPattern = Pattern.compile("PI_(\\d*)$");
         Stream<String> stream = Arrays.stream(this.treePath.toString().split("/"));
