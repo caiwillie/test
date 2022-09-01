@@ -56,7 +56,7 @@ public class FlowNodeInstanceRest {
     @GetMapping("/rest/operate/flowNodeInstance/detailByFlowNodeId")
     public Result<FlowNodeInstanceDetailDTO> detailByFlowNodeId(
             @RequestParam String processInstanceId, @RequestParam String flowNodeId) {
-        FlowNodeInstanceDetailDTO data = service.detailByFlowNodeId(processInstanceId, flowNodeId);
+        FlowNodeInstanceDetailDTO data = service.detailByFlowNodeId(Long.valueOf(processInstanceId), flowNodeId);
         return Result.OK(data);
     }
 

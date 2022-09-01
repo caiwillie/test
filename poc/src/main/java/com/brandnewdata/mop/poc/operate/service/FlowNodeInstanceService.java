@@ -143,7 +143,7 @@ public class FlowNodeInstanceService {
     }
 
 
-    public FlowNodeInstanceDetailDTO detailByFlowNodeId(String processInstanceId, String flowNodeId) {
+    public FlowNodeInstanceDetailDTO detailByFlowNodeId(Long processInstanceId, String flowNodeId) {
 
         FlowNodeInstanceDetailDTO ret = new FlowNodeInstanceDetailDTO();
 
@@ -163,9 +163,21 @@ public class FlowNodeInstanceService {
             return ret;
         }
 
+        FlowNodeInstanceEntity flowNodeInstanceEntity = entities.get(0);
+        if(entities.size() == 1) {
+            return getFlowNodeInstanceDetailDTO(entities.get(0));
+        } else {
+            FlowNodeType flowNodeType = flowNodeInstanceEntity.getType();
+            ret.setInstanceCount(entities.size());
+            ret.setFlowNodeId(flowNodeId);
+            ret.setFlowNodeType(flowNodeType.name());
 
+            IncidentInfo incidentInfo = searchIncidentByFlowNodeId(processInstanceId, flowNodeId, flowNodeType);
+            ret.setIncidentCount(incidentInfo.getCount());
+            ret.setIncident(incidentInfo.getIncidentDTO());
+        }
 
-        return null;
+        return ret;
     }
 
     private FlowNodeInstanceDetailDTO getFlowNodeInstanceDetailDTO(FlowNodeInstanceEntity flowNodeInstanceEntity) {
@@ -185,12 +197,12 @@ public class FlowNodeInstanceService {
         // 添加 call activity
         addCallActivityMetaData(metaData);
 
-
-
         // 查找 incident
-        Object[] incidentRet = searchIncidentByFlowNodeInstanceId(flowNodeInstanceEntity);
-        long incidentCount = (long) incidentRet[0];
-        IncidentDTO incidentDto = (IncidentDTO) incidentRet[1];
+        IncidentInfo incidentInfo = searchIncidentByFlowNodeInstanceId(
+                flowNodeInstanceEntity.getProcessInstanceKey(), flowNodeInstanceEntity.getFlowNodeId(),
+                flowNodeInstanceEntity.getId(), flowNodeInstanceEntity.getType());
+        Integer incidentCount = incidentInfo.getCount();
+        IncidentDTO incidentDto = incidentInfo.getIncidentDTO();
 
 
         ret.setRepeated(false);

@@ -23,7 +23,7 @@ public class FlowNodeInstanceDetailDTO {
     /**
      * 当前节点重复运行的实例数
      */
-    private int instanceCount;
+    private Integer instanceCount;
 
     /**
      * 基本信息
@@ -33,7 +33,7 @@ public class FlowNodeInstanceDetailDTO {
     /**
      * 异常个数
      */
-    private Long incidentCount;
+    private Integer incidentCount;
 
     /**
      * 异常信息
