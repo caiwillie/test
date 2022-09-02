@@ -98,6 +98,9 @@ public class BusinessSceneService implements IBusinessSceneService {
             businessSceneProcessEntity.setProcessId(processDefinitionDTO.getProcessId());
             businessSceneProcessDao.insert(businessSceneProcessEntity);
         }
+
+        // 更新 business scene id
+        updateSceneUpdateTime(businessSceneProcessDTO.getBusinessSceneId());
         return toDTO(businessSceneProcessEntity, processDefinitionDTO);
     }
 
@@ -105,8 +108,13 @@ public class BusinessSceneService implements IBusinessSceneService {
     public void deploy(BusinessSceneProcessDTO businessSceneProcessDTO) {
         ProcessDefinitionDTO processDefinitionDTO = toDTO(businessSceneProcessDTO);
         processDeployService.deploy(processDefinitionDTO, ProcessConstants.PROCESS_TYPE_SCENE);
+        updateSceneUpdateTime(businessSceneProcessDTO.getBusinessSceneId());
     }
 
+    private void updateSceneUpdateTime(Long sceneId) {
+        BusinessSceneEntity sceneEntity = businessSceneDao.selectById(sceneId);
+        businessSceneDao.updateById(sceneEntity);
+    }
 
     private Collection<BusinessSceneDTO> list(List<Long> ids, boolean withXML) {
         HashMap<Long, BusinessSceneDTO> sceneMap = MapUtil.newHashMap(true);

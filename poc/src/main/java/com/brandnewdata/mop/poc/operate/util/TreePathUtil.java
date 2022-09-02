@@ -62,7 +62,7 @@ public class TreePathUtil {
         Stream<String> stream = Arrays.stream(this.treePath.toString().split("/"));
         Objects.requireNonNull(piPattern);
         Optional<Matcher> firstMatch = stream.map(piPattern::matcher).filter(Matcher::matches).findFirst();
-        return firstMatch.isPresent() ? ((Matcher)firstMatch.get()).group(1) : null;
+        return firstMatch.isPresent() ? firstMatch.get().group(1) : null;
     }
 
     public List<String> extractProcessInstanceIds() {
