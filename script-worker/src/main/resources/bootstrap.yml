@@ -1,16 +1,31 @@
 spring:
   application:
     name: script-worker
+  profiles:
+    active: dev
 
-  # nacos 相关配置
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
   cloud:
     nacos:
       config:
-        server-addr: 10.101.53.4:8848
-        namespace: "dev"
-        group: DEFAULT_GROUP
+        server-addr: brandnewdata-nacos:8848
+        namespace: ${CONFIG_NAMESPACE:dev}
+        group: ${CONFIG_GROUP:DEFAULT_GROUP}
         file-extension: yaml
-      discovery:
-        server-addr: 10.101.53.4:8848
-        namespace: "dev"
-        group: DEFAULT_GROUP
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  cloud:
+    nacos:
+      config:
+        server-addr: brandnewdata-nacos:8848
+        namespace: ${CONFIG_NAMESPACE:test}
+        group: ${CONFIG_GROUP:DEFAULT_GROUP}
+        file-extension: yaml
