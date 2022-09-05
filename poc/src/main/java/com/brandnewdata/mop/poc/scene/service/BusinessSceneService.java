@@ -184,18 +184,15 @@ public class BusinessSceneService implements IBusinessSceneService {
             ProcessDefinitionDTO first = tempProcessDefinitionDTOS.get(0);
             sceneDTO.setImgUrl(first.getImgUrl());
 
-            if(withXML) {
-                List<BusinessSceneProcessDTO> sceneProcessDTOList = new ArrayList<>();
-                // 如果是带XML，就需要查询出definition
-                for (ProcessDefinitionDTO processDefinitionDTO : tempProcessDefinitionDTOS) {
-                    BusinessSceneProcessEntity businessSceneProcessEntity =
-                            processSceneProcessEntityMap.get(processDefinitionDTO.getProcessId());
-                    BusinessSceneProcessDTO businessSceneProcessDTO = toDTO(businessSceneProcessEntity, processDefinitionDTO);
-                    sceneProcessDTOList.add(businessSceneProcessDTO);
-                }
-                sceneDTO.setProcessDefinitions(sceneProcessDTOList);
+            List<BusinessSceneProcessDTO> sceneProcessDTOList = new ArrayList<>();
+            // 如果是带XML，就需要查询出definition
+            for (ProcessDefinitionDTO processDefinitionDTO : tempProcessDefinitionDTOS) {
+                BusinessSceneProcessEntity businessSceneProcessEntity =
+                        processSceneProcessEntityMap.get(processDefinitionDTO.getProcessId());
+                BusinessSceneProcessDTO businessSceneProcessDTO = toDTO(businessSceneProcessEntity, processDefinitionDTO);
+                sceneProcessDTOList.add(businessSceneProcessDTO);
             }
-
+            sceneDTO.setProcessDefinitions(sceneProcessDTOList);
         }
 
         return sceneMap.values();

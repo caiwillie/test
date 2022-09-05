@@ -2,30 +2,17 @@ spring:
   application:
     name: poc
   profiles:
-    active: dev
+    active: public
 
 ---
 spring:
   config:
     activate:
-      on-profile: dev
+      on-profile: public
   cloud:
     nacos:
       config:
         server-addr: brandnewdata-nacos:8848
-        namespace: ${CONFIG_NAMESPACE:dev}
-        group: ${CONFIG_GROUP:DEFAULT_GROUP}
-        file-extension: yaml
-
----
-spring:
-  config:
-    activate:
-      on-profile: test
-  cloud:
-    nacos:
-      config:
-        server-addr: brandnewdata-nacos:8848
-        namespace: ${CONFIG_NAMESPACE:test}
+        namespace: ${CONFIG_NAMESPACE:public}
         group: ${CONFIG_GROUP:DEFAULT_GROUP}
         file-extension: yaml
