@@ -167,9 +167,10 @@ public class FlowNodeInstanceService {
         if(entities.size() == 1) {
             return getFlowNodeInstanceDetailDTO(entities.get(0));
         } else {
-            FlowNodeType flowNodeType = flowNodeInstanceEntity.getType();
+            ret.setRepeated(true);
             ret.setInstanceCount(entities.size());
             ret.setFlowNodeId(flowNodeId);
+            FlowNodeType flowNodeType = flowNodeInstanceEntity.getType();
             ret.setFlowNodeType(flowNodeType.name());
 
             IncidentInfo incidentInfo = searchIncidentByFlowNodeId(processInstanceId, flowNodeId, flowNodeType);

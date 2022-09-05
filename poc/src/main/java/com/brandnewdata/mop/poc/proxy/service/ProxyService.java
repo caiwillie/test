@@ -96,6 +96,7 @@ public class ProxyService {
         entity.setName(proxy.getName());
         entity.setProtocol(proxy.getProtocol());
         entity.setVersion(proxy.getVersion());
+        entity.setDescription(proxy.getDescription());
         return entity;
     }
 
