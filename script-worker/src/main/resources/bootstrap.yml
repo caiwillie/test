@@ -1,6 +1,6 @@
 spring:
   application:
-    name: script-worker
+    name: poc
   profiles:
     active: dev
 
@@ -27,5 +27,18 @@ spring:
       config:
         server-addr: brandnewdata-nacos:8848
         namespace: ${CONFIG_NAMESPACE:test}
+        group: ${CONFIG_GROUP:DEFAULT_GROUP}
+        file-extension: yaml
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  cloud:
+    nacos:
+      config:
+        server-addr: brandnewdata-nacos:8848
+        namespace: ${CONFIG_NAMESPACE:prod}
         group: ${CONFIG_GROUP:DEFAULT_GROUP}
         file-extension: yaml
