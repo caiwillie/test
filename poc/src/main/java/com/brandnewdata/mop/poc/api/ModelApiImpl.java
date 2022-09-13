@@ -2,6 +2,7 @@ package com.brandnewdata.mop.poc.api;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.api.ModelApi;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -73,13 +75,17 @@ public class ModelApiImpl implements ModelApi {
             return Result.OK();
         }
 
-
-
         StartMessage startMessage = messages.get(0);
         String processId = startMessage.getProcessId();
         String content = startMessage.getContent();
         Map<String, Object> requestVariables = JacksonUtil.fromMap(content);
         Map<String, Object> result = deployService.startWithResult(processId, requestVariables);
+        return Result.OK(JacksonUtil.to(result));
+    }
+
+    @Override
+    public Result start(String processId, Map<String, Object> data) {
+        Map<String, Object> result = deployService.startWithResult(processId, Optional.ofNullable(data).orElse(MapUtil.empty()));
         return Result.OK(JacksonUtil.to(result));
     }
 }

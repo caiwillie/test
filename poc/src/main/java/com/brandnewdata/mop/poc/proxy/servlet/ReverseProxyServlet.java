@@ -57,6 +57,7 @@ public class ReverseProxyServlet extends ProxyServlet {
         String uri = req.getPathInfo();
         // 去掉前缀
         String domain = req.getHeader("g2-domain");
+        log.info("api proxy uri: {}, g2-domain: {}", uri, domain);
 
         Backend backend = backendService.getBackend(domain, uri);
 
