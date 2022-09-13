@@ -9,6 +9,7 @@ import com.brandnewdata.mop.poc.proxy.dto.ProcessConfig;
 import com.brandnewdata.mop.poc.proxy.service.BackendService;
 import com.dxy.library.json.jackson.JacksonUtil;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.utils.URIUtils;
 import org.mitre.dsmiley.httpproxy.ProxyServlet;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @WebServlet(urlPatterns = "/proxy/*", initParams = {
 @WebInitParam(name = ProxyServlet.P_TARGET_URI, value = "http://www.brandnewdata.com")})
 public class ReverseProxyServlet extends ProxyServlet {
@@ -79,6 +81,7 @@ public class ReverseProxyServlet extends ProxyServlet {
     private void startProcess(HttpServletResponse resp, ProcessConfig config) {
         String processId = config.getProcessId();
         Map<String, Object> result = deployService.startWithResult(processId, MapUtil.empty());
+        log.info("response is: {}", JacksonUtil.to(result));
         result = Optional.ofNullable(result).orElse(MapUtil.empty());
         ServletUtil.write(resp, JacksonUtil.to(result), MimeTypeUtils.APPLICATION_JSON_VALUE);
     }

@@ -219,6 +219,7 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
             response = resultVariables.get(ProcessConstants.PROCESS_RESPONSE_VARIABLE_NAME);
         }
 
+        log.info("start process response: {}", JacksonUtil.to(response));
         return FeelUtil.convertMap(response);
     }
 
