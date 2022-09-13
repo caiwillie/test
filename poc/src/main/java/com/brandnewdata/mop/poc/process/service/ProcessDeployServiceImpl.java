@@ -228,6 +228,7 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         if(response == null) {
             return null;
         } else {
+            // 转换成string，再反序列化成map
             return JacksonUtil.fromMap(JacksonUtil.to(response));
         }
     }
