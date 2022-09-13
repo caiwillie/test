@@ -219,7 +219,6 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         if(StrUtil.isNotBlank(expression)) {
             response = FeelUtil.evalExpression(expression, resultVariables);
         } else {
-            log.info("haha");
             // 如果表达式为空就返回特定字段的内容
             for (Map.Entry<String, Object> entry : resultVariables.entrySet()) {
                 String key = entry.getKey();
