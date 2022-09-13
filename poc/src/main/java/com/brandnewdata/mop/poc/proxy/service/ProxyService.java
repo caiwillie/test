@@ -11,6 +11,7 @@ import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.proxy.dao.ReverseProxyDao;
 import com.brandnewdata.mop.poc.proxy.dto.Proxy;
 import com.brandnewdata.mop.poc.proxy.entity.ReverseProxyEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.PropertyMapper;
 import org.springframework.stereotype.Service;
 
@@ -28,14 +29,17 @@ public class ProxyService {
     @Resource
     private ReverseProxyDao proxyDao;
 
+    @Value("${brnadnewdata.api.suffixDomain}")
+    private String apiSuffixDomain;
+
     public Proxy save(Proxy proxy) {
         ReverseProxyEntity entity = toEntity(proxy);
         Long id = entity.getId();
         if(id == null) {
             String name = proxy.getName();
             String version = proxy.getVersion();
-            String domain = StrUtil.format("api.{}.g2-dev.brandnewdata.com",
-                    DigestUtil.md5Hex(StrUtil.format("{}:{}", name, version)));
+            String domain = StrUtil.format("api.{}.{}",
+                    DigestUtil.md5Hex(StrUtil.format("{}:{}", name, version)), apiSuffixDomain);
             entity.setDomain(domain);
             // 判断是否唯一
             ReverseProxyEntity exist = exist(name, version);
