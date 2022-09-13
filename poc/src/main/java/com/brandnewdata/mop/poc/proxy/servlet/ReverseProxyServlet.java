@@ -83,7 +83,7 @@ public class ReverseProxyServlet extends ProxyServlet {
         Map<String, Object> result = deployService.startWithResult(processId, MapUtil.empty());
         log.info("response is: {}", JacksonUtil.to(result));
         result = Optional.ofNullable(result).orElse(MapUtil.empty());
-        ServletUtil.write(resp, JacksonUtil.to(result), MimeTypeUtils.APPLICATION_JSON_VALUE);
+        ServletUtil.write(resp, JacksonUtil.to(result), "application/json;charset=utf-8");
     }
 
     @SneakyThrows
