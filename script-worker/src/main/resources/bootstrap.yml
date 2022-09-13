@@ -1,6 +1,6 @@
 spring:
   application:
-    name: poc
+    name: script-worker
   profiles:
     active: dev
 
