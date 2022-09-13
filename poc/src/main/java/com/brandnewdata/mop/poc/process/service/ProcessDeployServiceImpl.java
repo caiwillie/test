@@ -224,7 +224,12 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         }
 
         log.info("start process response: {}", JacksonUtil.to(response));
-        return FeelUtil.convertMap(response);
+
+        if(response == null) {
+            return null;
+        } else {
+            return JacksonUtil.fromMap(JacksonUtil.to(response));
+        }
     }
 
     @Override
