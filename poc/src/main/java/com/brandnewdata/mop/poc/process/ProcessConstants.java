@@ -8,4 +8,6 @@ public interface ProcessConstants {
 
     int PROCESS_TYPE_OPERATE = 3;
 
+    String PROCESS_RESPONSE_VARIABLE_NAME = "resp";
+
 }

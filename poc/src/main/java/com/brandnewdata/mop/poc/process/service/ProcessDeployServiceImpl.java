@@ -209,10 +209,10 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
 
         Object response = null;
         if(StrUtil.isNotBlank(expression)) {
-            // 如果表达式为空就返回全部
             response = FeelUtil.evalExpression(expression, resultVariables);
         } else {
-            response = resultVariables;
+            // 如果表达式为空就返回特定字段的内容
+            response = resultVariables.get(ProcessConstants.PROCESS_RESPONSE_VARIABLE_NAME);
         }
 
         return FeelUtil.convertMap(response);
