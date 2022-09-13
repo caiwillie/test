@@ -208,13 +208,14 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
 
         Map<String, Object> resultVariables = result.getVariablesAsMap();
         log.info("start process result variables: {}", JacksonUtil.to(resultVariables));
-        log.info("start process response expression: {}", expression);
+        log.info("start process response expression: {}, {}", expression, StrUtil.isNotBlank(expression));
 
 
         Object response = null;
         if(StrUtil.isNotBlank(expression)) {
             response = FeelUtil.evalExpression(expression, resultVariables);
         } else {
+            log.info("haha");
             // 如果表达式为空就返回特定字段的内容
             for (Map.Entry<String, Object> entry : resultVariables.entrySet()) {
                 String key = entry.getKey();
