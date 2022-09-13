@@ -220,13 +220,7 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
             response = FeelUtil.evalExpression(expression, resultVariables);
         } else {
             // 如果表达式为空就返回特定字段的内容
-            for (Map.Entry<String, Object> entry : resultVariables.entrySet()) {
-                String key = entry.getKey();
-                if(StrUtil.equals(key, ProcessConstants.PROCESS_RESPONSE_VARIABLE_NAME)) {
-                    response = entry.getValue();
-                    break;
-                }
-            }
+            response = resultVariables.get(ProcessConstants.PROCESS_RESPONSE_VARIABLE_NAME);
         }
 
         log.info("start process response: {}", JacksonUtil.to(response));
