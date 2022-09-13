@@ -66,9 +66,11 @@ public class ReverseProxyServlet extends ProxyServlet {
 
         // 不同类型，不同处理
         if (backend.getType() == 1) {
+            // 代理启动流程
             ProcessConfig config = (ProcessConfig) backend.getData();
             startProcess(resp, config);
         } else if (backend.getType() == 2) {
+            // 代理第三方
             ForwardConfig config = (ForwardConfig) backend.getData();
             forward(req, resp, config);
         }

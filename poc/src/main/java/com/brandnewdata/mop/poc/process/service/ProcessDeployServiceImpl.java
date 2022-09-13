@@ -205,7 +205,11 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
                 .send()
                 .join();
 
+
         Map<String, Object> resultVariables = result.getVariablesAsMap();
+        log.info("start process result variables: {}", JacksonUtil.to(resultVariables));
+        log.info("start process response expression: {}", expression);
+
 
         Object response = null;
         if(StrUtil.isNotBlank(expression)) {
