@@ -207,7 +207,13 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
 
         Map<String, Object> resultVariables = result.getVariablesAsMap();
 
-        Object response = FeelUtil.evalExpression(expression, resultVariables);
+        Object response = null;
+        if(StrUtil.isNotBlank(expression)) {
+            // 如果表达式为空就返回全部
+            response = FeelUtil.evalExpression(expression, resultVariables);
+        } else {
+            response = resultVariables;
+        }
 
         return FeelUtil.convertMap(response);
     }
