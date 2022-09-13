@@ -196,7 +196,13 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         // 解析 xml 后得到响应表达式
         ObjectNode responseParams = triggerProcessDefinition.getResponseParams();
 
-        String expression = JacksonUtil.to(responseParams);
+        String expression = "";
+        if(responseParams != null) {
+            // todo caiwillie 还要验证一下
+            expression = JacksonUtil.to(responseParams);
+        }
+        log.info("start process response expression: {}, {}", expression, StrUtil.isNotBlank(expression));
+
         ProcessInstanceResult result = zeebe.newCreateInstanceCommand()
                 .bpmnProcessId(ProcessUtil.convertProcessId(processId)) // 使用处理过的 processId
                 .latestVersion()
@@ -208,8 +214,6 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
 
         Map<String, Object> resultVariables = result.getVariablesAsMap();
         log.info("start process result variables: {}", JacksonUtil.to(resultVariables));
-        log.info("start process response expression: {}, {}", expression, StrUtil.isNotBlank(expression));
-
 
         Object response = null;
         if(StrUtil.isNotBlank(expression)) {
