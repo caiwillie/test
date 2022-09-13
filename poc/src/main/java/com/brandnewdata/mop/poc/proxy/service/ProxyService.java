@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.PropertyMapper;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Optional;
@@ -29,8 +30,13 @@ public class ProxyService {
     @Resource
     private ReverseProxyDao proxyDao;
 
-    @Value("${brnadnewdata.api.suffixDomain}")
+    @Value("${brandnewdata.api.suffixDomain}")
     private String apiSuffixDomain;
+
+    @PostConstruct
+    public void postConstruct() {
+        return;
+    }
 
     public Proxy save(Proxy proxy) {
         ReverseProxyEntity entity = toEntity(proxy);
