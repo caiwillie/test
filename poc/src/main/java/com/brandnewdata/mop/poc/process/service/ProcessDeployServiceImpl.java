@@ -234,6 +234,22 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
     }
 
     @Override
+    public Map<String, Object> startWithResultTest(String processId, Map<String, Object> values) {
+        ProcessInstanceResult result = zeebe.newCreateInstanceCommand()
+                .bpmnProcessId(ProcessUtil.convertProcessId(processId)) // 使用处理过的 processId
+                .latestVersion()
+                .variables(Optional.ofNullable(values).orElse(MapUtil.empty()))
+                .withResult()
+                .send()
+                .join();
+
+
+        Map<String, Object> resultVariables = result.getVariablesAsMap();
+        log.info("start process result variables: {}", JacksonUtil.to(resultVariables));
+        return resultVariables;
+    }
+
+    @Override
     public ProcessDeployDTO getOne(long deployId) {
         ProcessDeployEntity entity = processDeployDao.selectById(deployId);
         return toDTO(entity);

@@ -85,7 +85,7 @@ public class ModelApiImpl implements ModelApi {
 
     @Override
     public Result start(String processId, Map<String, Object> data) {
-        Map<String, Object> result = deployService.startWithResult(processId, Optional.ofNullable(data).orElse(MapUtil.empty()));
+        Map<String, Object> result = deployService.startWithResultTest(processId, Optional.ofNullable(data).orElse(MapUtil.empty()));
         return Result.OK(JacksonUtil.to(result));
     }
 }

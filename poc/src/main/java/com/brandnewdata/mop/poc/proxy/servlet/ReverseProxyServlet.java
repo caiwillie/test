@@ -1,7 +1,10 @@
 package com.brandnewdata.mop.poc.proxy.servlet;
 
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
+import cn.hutool.http.ContentType;
+import cn.hutool.http.HttpUtil;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import com.brandnewdata.mop.poc.proxy.dto.Backend;
 import com.brandnewdata.mop.poc.proxy.dto.ForwardConfig;
@@ -71,7 +74,7 @@ public class ReverseProxyServlet extends ProxyServlet {
         if (backend.getType() == 1) {
             // 代理启动流程
             ProcessConfig config = (ProcessConfig) backend.getData();
-            startProcess(resp, config);
+            startProcess(req, resp, config);
         } else if (backend.getType() == 2) {
             // 代理第三方
             ForwardConfig config = (ForwardConfig) backend.getData();
@@ -79,9 +82,16 @@ public class ReverseProxyServlet extends ProxyServlet {
         }
     }
 
-    private void startProcess(HttpServletResponse resp, ProcessConfig config) {
+    private void startProcess(HttpServletRequest req, HttpServletResponse resp, ProcessConfig config) {
+        String body = ServletUtil.getBody(req);
+        String contentType = HttpUtil.getContentTypeByRequestBody(body);
+        Map<String, Object> variables = MapUtil.empty();
+        if(StrUtil.equals(contentType, ContentType.JSON.toString())) {
+            // 如果是json类型，并且是object
+            variables = JacksonUtil.fromMap(body);
+        }
         String processId = config.getProcessId();
-        Map<String, Object> result = deployService.startWithResult(processId, MapUtil.empty());
+        Map<String, Object> result = deployService.startWithResult(processId, variables);
         log.info("response is: {}", JacksonUtil.to(result));
         result = Optional.ofNullable(result).orElse(MapUtil.empty());
         ServletUtil.write(resp, JacksonUtil.to(result), "application/json;charset=utf-8");

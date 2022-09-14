@@ -19,7 +19,9 @@ public interface IProcessDeployService {
 
     Page<ProcessDeployDTO> page(int pageNum, int pageSize);
 
-    Map<String, Object> startWithResult(String processId, Map<String, Object> value);
+    Map<String, Object> startWithResult(String processId, Map<String, Object> values);
+
+    Map<String, Object> startWithResultTest(String processId, Map<String, Object> values);
 
     ProcessDeployDTO getOne(long deployId);
 }
