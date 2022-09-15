@@ -86,6 +86,7 @@ public class ReverseProxyServlet extends ProxyServlet {
         String body = ServletUtil.getBody(req);
         String contentType = HttpUtil.getContentTypeByRequestBody(body);
         Map<String, Object> variables = MapUtil.empty();
+        String errorMessage = null;
         if(StrUtil.equals(contentType, ContentType.JSON.toString())) {
             // 如果是json类型，并且是object
             variables = JacksonUtil.fromMap(body);
