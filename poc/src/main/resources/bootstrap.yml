@@ -17,6 +17,7 @@ spring:
         group: ${CONFIG_GROUP:DEFAULT_GROUP}
         file-extension: yaml
 
+
 ---
 spring:
   config:
