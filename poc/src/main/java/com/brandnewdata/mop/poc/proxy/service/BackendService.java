@@ -10,11 +10,13 @@ import com.brandnewdata.mop.poc.proxy.dto.ProcessConfig;
 import com.brandnewdata.mop.poc.proxy.entity.ReverseProxyEndpointEntity;
 import com.brandnewdata.mop.poc.proxy.entity.ReverseProxyEntity;
 import com.dxy.library.json.jackson.JacksonUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
 
+@Slf4j
 @Service
 public class BackendService {
 
@@ -30,7 +32,9 @@ public class BackendService {
         ReverseProxyEntity proxy = proxyDao.selectOne(queryWrapper1);
 
         // 没找到就直接返回 null
-        if(proxy == null) return null;
+        if(proxy == null) {
+            return null;
+        }
 
         Long proxyId = proxy.getId();
         QueryWrapper<ReverseProxyEndpointEntity> queryWrapper2 = new QueryWrapper<>();
