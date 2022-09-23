@@ -108,7 +108,6 @@ public class BusinessSceneService implements IBusinessSceneService {
     public void deploy(BusinessSceneProcessDTO businessSceneProcessDTO) {
         ProcessDefinitionDTO processDefinitionDTO = toDTO(businessSceneProcessDTO);
         processDeployService.deploy(processDefinitionDTO, ProcessConstants.PROCESS_TYPE_SCENE);
-        updateSceneUpdateTime(businessSceneProcessDTO.getBusinessSceneId());
     }
 
     private void updateSceneUpdateTime(Long sceneId) {

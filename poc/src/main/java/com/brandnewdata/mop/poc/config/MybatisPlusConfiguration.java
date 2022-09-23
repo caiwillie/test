@@ -1,6 +1,7 @@
 package com.brandnewdata.mop.poc.config;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
@@ -19,6 +20,8 @@ import javax.sql.DataSource;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * @author caiwillie
@@ -76,6 +79,19 @@ public class MybatisPlusConfiguration {
                 this.strictUpdateFill(metaObject, "updateTime", Date.class, now);
             }
 
+            @Override
+            public MetaObjectHandler strictFillStrategy(MetaObject metaObject, String fieldName, Supplier<?> fieldVal) {
+                if (metaObject.getValue(fieldName) == null
+                        || StrUtil.equals(fieldName, "updateTime")) {
+                    // 避免因为 updateTime 中存在旧值，就不更新的状况
+                    Object obj = fieldVal.get();
+                    if (Objects.nonNull(obj)) {
+                        metaObject.setValue(fieldName, obj);
+                    }
+                }
+                return this;
+            }
+
         });
         return config;
     }
@@ -91,6 +107,5 @@ public class MybatisPlusConfiguration {
                 optimisticLockerInnerInterceptor));
         return ret;
     }
-
 
 }
