@@ -32,7 +32,6 @@ import java.util.Optional;
 @WebServlet(urlPatterns = "/proxy/*", initParams = {
 @WebInitParam(name = ProxyServlet.P_TARGET_URI, value = "http://www.brandnewdata.com")})
 public class ReverseProxyServlet extends ProxyServlet {
-
     @Autowired
     private IProcessDeployService deployService;
 
@@ -41,6 +40,7 @@ public class ReverseProxyServlet extends ProxyServlet {
 
     private static final String ATTR_TARGET_URI =
             ProxyServlet.class.getSimpleName() + ".targetUri";
+
     private static final String ATTR_TARGET_HOST =
             ProxyServlet.class.getSimpleName() + ".targetHost";
 
