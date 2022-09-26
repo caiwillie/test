@@ -3,8 +3,11 @@ package com.brandnewdata.mop.poc.proxy.rest;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.proxy.req.ImportFromFileReq;
+import com.brandnewdata.mop.poc.proxy.req.ProxyReq;
 import com.brandnewdata.mop.poc.proxy.resp.ApiResp;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * API管理相关的接口
@@ -15,22 +18,56 @@ import org.springframework.web.bind.annotation.*;
 public class ApiRest {
 
     /**
+     * 标签列表（不分页）
+     *
+     * @return the result
+     */
+    @GetMapping("/rest/reverseProxy/listTags")
+    public Result<List<String>> listTags() {
+        return null;
+    }
+
+
+    /**
      * API 分页列表（V2）
      *
      * @param pageNum  分页页码
      * @param pageSize 分页大小
      * @param name     搜索名称
+     * @param tags     标签（多个用‘,’分隔）
      * @return the result
      */
     @GetMapping("/rest/reverseProxy/v2/page")
     public Result<Page<ApiResp>> page(@RequestParam int pageNum,
                                       @RequestParam int pageSize,
-                                      @RequestParam(required = false) String name) {
+                                      @RequestParam(required = false) String name,
+                                      @RequestParam(required = false) String tags) {
         return null;
     }
 
+    /**
+     * 创建自配置文件
+     *
+     * @param req the req
+     * @return the result
+     */
     @GetMapping("/rest/reverseProxy/importFromFile")
     public Result<ApiResp> importFromFile (@RequestBody ImportFromFileReq req) {
+        return null;
+    }
+
+    @PostMapping("/rest/reverseProxy/delete")
+    public Result delete(@RequestBody ProxyReq proxyReq) {
+        return null;
+    }
+
+    @PostMapping("/rest/reverseProxy/changeState")
+    public Result changeState(@RequestBody ProxyReq proxyReq) {
+        return null;
+    }
+
+    @PostMapping("/rest/reverseProxy/deleteEndpoint")
+    public Result deleteEndpoint(@RequestBody EndpointReq req) {
         return null;
     }
 
