@@ -30,7 +30,7 @@ public class ApiRest {
 
 
     /**
-     * API 分页列表（V2）
+     * 【V2】API 分页列表
      *
      * @param pageNum  分页页码
      * @param pageSize 分页大小

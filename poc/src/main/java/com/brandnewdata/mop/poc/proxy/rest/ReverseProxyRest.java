@@ -50,7 +50,7 @@ public class ReverseProxyRest {
 
 
     /**
-     * API 分页列表
+     * 【废弃】API 分页列表
      *
      * @param pageNum  分页码
      * @param pageSize 分页大小
