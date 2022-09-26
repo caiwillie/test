@@ -181,6 +181,10 @@ public class ProxyService {
         proxyDao.updateById(oldEntity);
     }
 
+    public List<String> listTags() {
+        return proxyDao.listTags();
+    }
+
     private static class VersionComparator implements Comparator<ReverseProxyEntity> {
 
         @Override

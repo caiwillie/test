@@ -37,7 +37,8 @@ public class ApiRest {
      */
     @GetMapping("/rest/reverseProxy/listTags")
     public Result<List<String>> listTags() {
-        return null;
+        List<String> tags = proxyService.listTags();
+        return Result.OK(tags);
     }
 
 
