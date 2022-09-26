@@ -4,6 +4,10 @@ import lombok.Data;
 
 @Data
 public class VersionSpecifiedResp {
+    /**
+     * API 的ID
+     */
+    private Long id;
 
     /**
      * 版本号
