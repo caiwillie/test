@@ -1,15 +1,19 @@
 package com.brandnewdata.mop.poc.proxy.rest;
 
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.lang.Assert;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.proxy.req.ImportFromFileReq;
 import com.brandnewdata.mop.poc.proxy.req.ProxyReq;
 import com.brandnewdata.mop.poc.proxy.resp.ApiResp;
 import com.brandnewdata.mop.poc.proxy.resp.InspectResp;
+import com.brandnewdata.mop.poc.proxy.service.EndpointService;
 import com.brandnewdata.mop.poc.proxy.service.ProxyService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.swing.plaf.ListUI;
 import java.util.List;
 
 /**
@@ -22,6 +26,9 @@ public class ApiRest {
 
     @Resource
     private ProxyService proxyService;
+
+    @Resource
+    private EndpointService endpointService;
 
     /**
      * 标签列表（不分页）
@@ -71,18 +78,23 @@ public class ApiRest {
      */
     @PostMapping("/rest/reverseProxy/delete")
     public Result delete(@RequestBody ProxyReq proxyReq) {
-        return null;
+        Long id = proxyReq.getId();
+        proxyService.delete(id);
+        return Result.OK();
     }
 
     /**
      * 更改API的状态
      *
-     * @param proxyReq the proxy req
+     * @param req the proxy req
      * @return the result
      */
     @PostMapping("/rest/reverseProxy/changeState")
-    public Result changeState(@RequestBody ProxyReq proxyReq) {
-        return null;
+    public Result changeState(@RequestBody ProxyReq req) {
+        Long id = req.getId();
+        Integer state = req.getState();
+        proxyService.changeState(id, state);
+        return Result.OK();
     }
 
     /**
@@ -93,7 +105,10 @@ public class ApiRest {
      */
     @PostMapping("/rest/reverseProxy/deleteEndpoint")
     public Result deleteEndpoint(@RequestBody EndpointReq req) {
-        return null;
+        Long id = req.getId();
+        Assert.notNull(id, "路径 id 不能为空");
+        endpointService.deleteByIdList(ListUtil.of(id));
+        return Result.OK();
     }
 
     /**

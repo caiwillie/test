@@ -45,5 +45,4 @@ public interface Constants {
     int TRIGGER_TYPE_GENERAL = 1;
 
     int TRIGGER_TYPE_CUSTOM = 2;
-
 }

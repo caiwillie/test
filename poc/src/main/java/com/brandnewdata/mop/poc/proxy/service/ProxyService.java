@@ -6,10 +6,12 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
+import com.brandnewdata.mop.poc.proxy.ProxyConstants;
 import com.brandnewdata.mop.poc.proxy.dao.ReverseProxyDao;
 import com.brandnewdata.mop.poc.proxy.dto.Endpoint;
 import com.brandnewdata.mop.poc.proxy.dto.Proxy;
@@ -50,16 +52,18 @@ public class ProxyService {
             String version = proxy.getVersion();
             // 判断 名称和版本 是否唯一
             ReverseProxyEntity exist = exist(name, version);
-            Assert.isNull(exist, "API {}, 版本 {} 已存在", name, version);
+            Assert.isNull(exist, "版本 {} 已存在", name, version);
             String domain = StrUtil.format("api.{}.{}",
                     DigestUtil.md5Hex(StrUtil.format("{}:{}", name, version)), apiSuffixDomain);
             entity.setDomain(domain);
+            // 设置默认状态是 停止
+            entity.setState(ProxyConstants.STATE_STOP);
             proxyDao.insert(entity);
             proxy.setId(entity.getId());
         } else {
-            Proxy oldOne = getOne(id);
-            // 将新对象的值拷贝到旧对象
-            BeanUtil.copyProperties(entity, oldOne);
+            ReverseProxyEntity oldEntity = proxyDao.selectById(id);
+            // 将新对象的值拷贝到旧对象，排除掉 state 字段
+            BeanUtil.copyProperties(entity, oldEntity, "state");
             proxyDao.updateById(entity);
         }
         return proxy;
@@ -157,6 +161,24 @@ public class ProxyService {
         }
 
         return new Page(sortedList.size(), records);
+    }
+
+    public void delete(Long id) {
+        Assert.notNull(id, "api id 不能为空");
+        List<Endpoint> endpoints = endpointService.listByProxyIdList(ListUtil.of(id));
+        List<Long> endpointIdList = endpoints.stream().map(Endpoint::getId).collect(Collectors.toList());
+        endpointService.deleteByIdList(endpointIdList);
+        proxyDao.deleteById(id);
+    }
+
+    public void changeState(Long id, Integer state) {
+        Assert.notNull(id, "api id 不能为空");
+        Assert.isTrue(state != null
+                && (state == ProxyConstants.STATE_STOP || state == ProxyConstants.STATE_RUNNING),
+                "状态不能为空，且只能是 停止或运行");
+        ReverseProxyEntity oldEntity = proxyDao.selectById(id);
+        oldEntity.setState(state);
+        proxyDao.updateById(oldEntity);
     }
 
     private static class VersionComparator implements Comparator<ReverseProxyEntity> {

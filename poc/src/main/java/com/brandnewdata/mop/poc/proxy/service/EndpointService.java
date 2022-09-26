@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.poc.proxy.service;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
@@ -7,6 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.proxy.dao.ReverseProxyEndpointDao;
 import com.brandnewdata.mop.poc.proxy.dto.Endpoint;
+import com.brandnewdata.mop.poc.proxy.dto.Proxy;
 import com.brandnewdata.mop.poc.proxy.entity.ReverseProxyEndpointEntity;
 import org.springframework.stereotype.Service;
 
@@ -30,12 +32,15 @@ public class EndpointService {
         if(id == null) {
             // 唯一性校验
             ReverseProxyEndpointEntity exist = exist(entity.getProxyId(), entity.getLocation());
-            Assert.isNull(exist, "endpoint 已存在");
+            Assert.isNull(exist, "路径 {} 已存在", endpoint.getLocation());
 
             endpointDao.insert(entity);
             endpoint.setId(entity.getId());
         } else {
+            ReverseProxyEndpointEntity oldEntity = endpointDao.selectById(id);
 
+            // 将新对象的值拷贝到旧对象，排除掉 proxyId
+            BeanUtil.copyProperties(entity, oldEntity, "proxyId");
             endpointDao.updateById(entity);
         }
         return endpoint;
@@ -64,6 +69,14 @@ public class EndpointService {
         List<Endpoint> records = Optional.ofNullable(page.getRecords()).orElse(ListUtil.empty())
                 .stream().map(this::toDTO).collect(Collectors.toList());
         return new Page<>(page.getTotal(), records);
+    }
+
+    public void deleteByIdList(List<Long> idList) {
+        if(CollUtil.isEmpty(idList)) {
+            return;
+        }
+        // 根据 id list 删除
+        endpointDao.deleteBatchIds(idList);
     }
 
     public List<Endpoint> listByProxyIdList(List<Long> proxyIdList) {
