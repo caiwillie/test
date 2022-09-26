@@ -1,12 +1,14 @@
 package com.brandnewdata.mop.poc.proxy.entity;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import java.io.Serializable;
+import java.util.Date;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  * <p>
@@ -14,7 +16,7 @@ import java.util.Date;
  * </p>
  *
  * @author caiwillie
- * @since 2022-08-11
+ * @since 2022-09-26
  */
 @Getter
 @Setter
@@ -42,6 +44,13 @@ public class ReverseProxyEntity implements Serializable {
 
     private String domain;
 
+    private String tag;
+
+    /**
+     * 状态：1 停止，2 运行
+     */
+    private Integer state;
+
 
     public static final String ID = "id";
 
@@ -58,5 +67,9 @@ public class ReverseProxyEntity implements Serializable {
     public static final String DESCRIPTION = "description";
 
     public static final String DOMAIN = "domain";
+
+    public static final String TAG = "tag";
+
+    public static final String STATE = "state";
 
 }

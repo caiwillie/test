@@ -6,8 +6,10 @@ import com.brandnewdata.mop.poc.proxy.req.ImportFromFileReq;
 import com.brandnewdata.mop.poc.proxy.req.ProxyReq;
 import com.brandnewdata.mop.poc.proxy.resp.ApiResp;
 import com.brandnewdata.mop.poc.proxy.resp.InspectResp;
+import com.brandnewdata.mop.poc.proxy.service.ProxyService;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -17,6 +19,9 @@ import java.util.List;
  */
 @RestController
 public class ApiRest {
+
+    @Resource
+    private ProxyService proxyService;
 
     /**
      * 标签列表（不分页）
@@ -43,7 +48,8 @@ public class ApiRest {
                                       @RequestParam int pageSize,
                                       @RequestParam(required = false) String name,
                                       @RequestParam(required = false) String tags) {
-        return null;
+        Page<ApiResp> resp = proxyService.pageV2(pageNum, pageSize, name, tags);
+        return Result.OK(resp);
     }
 
     /**

@@ -14,9 +14,10 @@ public class VersionSpecifiedResp {
      */
     private String version;
     /**
-     * 状态
+     * 1 停止（操作显示运行），
+     * 2 运行（操作显示停止）
      */
-    private String states;
+    private Integer state;
 
     /**
      * 服务域名
@@ -31,5 +32,5 @@ public class VersionSpecifiedResp {
     /**
      * endpoint总数
      */
-    private int endpointTotal;
+    private Long endpointTotal;
 }

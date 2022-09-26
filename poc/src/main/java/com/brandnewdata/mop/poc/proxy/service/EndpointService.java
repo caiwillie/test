@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.poc.proxy.service;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -63,6 +64,17 @@ public class EndpointService {
         List<Endpoint> records = Optional.ofNullable(page.getRecords()).orElse(ListUtil.empty())
                 .stream().map(this::toDTO).collect(Collectors.toList());
         return new Page<>(page.getTotal(), records);
+    }
+
+    public List<Endpoint> listByProxyIdList(List<Long> proxyIdList) {
+        if(CollUtil.isEmpty(proxyIdList)) {
+            return ListUtil.empty();
+        }
+        QueryWrapper<ReverseProxyEndpointEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in(ReverseProxyEndpointEntity.PROXY_ID, proxyIdList);
+        List<ReverseProxyEndpointEntity> list = endpointDao.selectList(queryWrapper);
+        List<Endpoint> ret = list.stream().map(this::toDTO).collect(Collectors.toList());
+        return ret;
     }
 
     private ReverseProxyEndpointEntity toEntity(Endpoint dto) {
