@@ -11,6 +11,7 @@ import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.proxy.dao.ReverseProxyDao;
 import com.brandnewdata.mop.poc.proxy.dto.Proxy;
 import com.brandnewdata.mop.poc.proxy.entity.ReverseProxyEntity;
+import com.brandnewdata.mop.poc.proxy.resp.ApiResp;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.PropertyMapper;
 import org.springframework.stereotype.Service;
@@ -83,6 +84,18 @@ public class ProxyService {
         List<Proxy> records = Optional.ofNullable(page.getRecords()).orElse(ListUtil.empty())
                 .stream().map(this::toDTO).collect(Collectors.toList());
         return new Page<>(page.getTotal(), records);
+    }
+
+    public Page<ApiResp> pageV2(int pageNum, int pageSize, String name, String tags) {
+        QueryWrapper<ReverseProxyEntity> queryWrapper = new QueryWrapper<>();
+        if(StrUtil.isNotBlank(name)) {
+            queryWrapper.like(ReverseProxyEntity.NAME, name);
+        }
+
+        if(StrUtil.isNotBlank(tags)) {
+
+        }
+        return null;
     }
 
     private Proxy toDTO(ReverseProxyEntity entity) {
