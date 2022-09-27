@@ -10,6 +10,10 @@ import java.util.function.Function;
 
 public class PageEnhancedUtil extends PageUtil {
 
+    static {
+        setFirstPageNo(1);
+    }
+
     public static <T> List<T> slice(int pageNo, int pageSize, List<T> list) {
        return slice(pageNo, pageSize, list, Function.identity());
     }
