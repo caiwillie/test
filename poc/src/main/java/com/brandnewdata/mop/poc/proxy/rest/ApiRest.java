@@ -66,7 +66,8 @@ public class ApiRest {
      */
     @PostMapping("/rest/reverseProxy/importFromFile")
     public Result<ApiResp> importFromFile (@RequestBody ImportFromFileReq req) {
-        return null;
+        proxyService.importFromFile(req);
+        return Result.OK();
     }
 
     /**
