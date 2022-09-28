@@ -13,14 +13,25 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.proxy.ProxyConstants;
 import com.brandnewdata.mop.poc.proxy.dao.ReverseProxyDao;
+import com.brandnewdata.mop.poc.proxy.dto.APIDefinition;
 import com.brandnewdata.mop.poc.proxy.dto.Endpoint;
+import com.brandnewdata.mop.poc.proxy.dto.ImportDTO;
 import com.brandnewdata.mop.poc.proxy.dto.Proxy;
 import com.brandnewdata.mop.poc.proxy.entity.ReverseProxyEntity;
+import com.brandnewdata.mop.poc.proxy.req.ImportFromFileReq;
 import com.brandnewdata.mop.poc.proxy.resp.ApiResp;
 import com.brandnewdata.mop.poc.proxy.resp.VersionSpecifiedResp;
+import com.brandnewdata.mop.poc.proxy.util.SwaggerUtil;
 import com.brandnewdata.mop.poc.util.PageEnhancedUtil;
+import com.dxy.library.json.jackson.JacksonUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.Paths;
+import io.swagger.v3.oas.models.info.Info;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.yaml.snakeyaml.Yaml;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -77,8 +88,9 @@ public class ProxyService {
     }
 
     public Proxy getOne(long id) {
-        ReverseProxyEntity reverseProxyEntity = proxyDao.selectById(id);
-        return Optional.ofNullable(reverseProxyEntity).map(this::toDTO).orElse(null);
+        ReverseProxyEntity entity = proxyDao.selectById(id);
+        Assert.notNull(entity, "id 不存在");
+        return toDTO(entity);
     }
 
     public Page<Proxy> page(int pageNum, int pageSize) {
@@ -183,6 +195,75 @@ public class ProxyService {
 
     public List<String> listTags() {
         return proxyDao.listTags();
+    }
+
+    public void importFromFile(ImportFromFileReq req) {
+        String content = req.getFileContent();
+        ImportDTO dto = SwaggerUtil.parse(content);
+        // 保存 proxy
+        Proxy proxy = dto.getProxy();
+        proxy = save(proxy);
+        Long proxyId = proxy.getId();
+
+        // 保存endpoints
+        List<Endpoint> endpointList = dto.getEndpointList();
+        if(CollUtil.isNotEmpty(endpointList)) {
+            for (Endpoint endpoint : endpointList) {
+                endpoint.setProxyId(proxyId);
+                endpointService.save(endpoint);
+            }
+        }
+    }
+
+    public String inspect(Long proxyId, String format) {
+        APIDefinition apiDefinition = new APIDefinition();
+
+        Info info = getInfo(proxyId);
+
+        Paths paths = getPaths(proxyId);
+
+        apiDefinition.setInfo(info);
+        apiDefinition.setPaths(paths);
+
+        String ret = null;
+        if(StrUtil.equals(format, ProxyConstants.FORMAT_JSON)) {
+            try {
+                // 格式化输出
+                JacksonUtil.getObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(apiDefinition);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        } else if (StrUtil.equals(format, ProxyConstants.FORMAT_YAML)) {
+            Yaml yaml = new Yaml();
+            ret = yaml.dump(apiDefinition);
+        }
+
+        return ret;
+    }
+
+    private Info getInfo(Long proxyId) {
+        Info ret = new Info();
+        Proxy proxy = getOne(proxyId);
+        ret.setTitle(proxy.getName());
+        ret.setVersion(proxy.getVersion());
+        ret.setDescription(proxy.getDescription());
+        return ret;
+    }
+
+
+    private Paths getPaths(Long proxyId) {
+        Paths ret = new Paths();
+        List<Endpoint> endpoints = endpointService.listByProxyIdList(ListUtil.of(proxyId));
+        if(CollUtil.isEmpty(endpoints)) {
+            return ret;
+        }
+
+        for (Endpoint endpoint : endpoints) {
+            String location = endpoint.getLocation();
+            PathItem pathItem = new PathItem();
+            ret.put(location, pathItem);
+        }
+        return ret;
     }
 
     private static class VersionComparator implements Comparator<ReverseProxyEntity> {

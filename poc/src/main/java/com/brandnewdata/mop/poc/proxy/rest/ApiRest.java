@@ -114,12 +114,17 @@ public class ApiRest {
     /**
      * 查看描述文件
      *
-     * @param proxyReq the proxy req
+     * @param proxyId api id
+     * @param format  格式：YAML
      * @return the result
      */
-    @PostMapping("/rest/reverseProxy/inspect")
-    public Result<InspectResp> inspect(@RequestBody ProxyReq proxyReq) {
-        return null;
+    @GetMapping("/rest/reverseProxy/inspect")
+    public Result<InspectResp> inspect(@RequestParam Long proxyId, @RequestParam String format) {
+        InspectResp ret = new InspectResp();
+        String content = proxyService.inspect(proxyId, format);
+        ret.setFormat(format);
+        ret.setContent(content);
+        return ret;
     }
 
 

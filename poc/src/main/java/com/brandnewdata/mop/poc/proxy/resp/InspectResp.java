@@ -6,7 +6,7 @@ import lombok.Data;
 public class InspectResp {
 
     /**
-     * 描述文件格式：JSON
+     * 描述文件格式：YAML
      */
     private String format;
 

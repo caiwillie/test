@@ -6,12 +6,12 @@ import lombok.Data;
 public class ImportFromFileReq {
 
     /**
-     * 文件类型：JSON，YAML
+     * 文件类型：YAML
      */
     private String fileType;
 
     /**
      * 文件内容
      */
-    private int fileContent;
+    private String fileContent;
 }
