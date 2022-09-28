@@ -124,7 +124,7 @@ public class ApiRest {
         String content = proxyService.inspect(proxyId, format);
         ret.setFormat(format);
         ret.setContent(content);
-        return ret;
+        return Result.OK(ret);
     }
 
 
