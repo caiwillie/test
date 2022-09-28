@@ -115,7 +115,7 @@ public class ApiRest {
      * 查看描述文件
      *
      * @param proxyId api id
-     * @param format  格式：YAML
+     * @param format  格式：JSON, YAML
      * @return the result
      */
     @GetMapping("/rest/reverseProxy/inspect")
