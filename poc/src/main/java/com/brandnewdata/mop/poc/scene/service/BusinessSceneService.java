@@ -110,6 +110,7 @@ public class BusinessSceneService implements IBusinessSceneService {
         processDeployService.deploy(processDefinitionDTO, ProcessConstants.PROCESS_TYPE_SCENE);
     }
 
+    @Override
     public void deleteProcessDefinition(BusinessSceneProcessDTO businessSceneProcessDTO) {
         // 先删除流程定义
         ProcessDefinitionDTO processDefinitionDTO = toDTO(businessSceneProcessDTO);
@@ -120,7 +121,7 @@ public class BusinessSceneService implements IBusinessSceneService {
         businessSceneProcessDao.deleteById(id);
     }
 
-
+    @Override
     public void delete(BusinessSceneDTO businessSceneDTO) {
         // 先删除绑定的流程
         Long sceneId = businessSceneDTO.getId();

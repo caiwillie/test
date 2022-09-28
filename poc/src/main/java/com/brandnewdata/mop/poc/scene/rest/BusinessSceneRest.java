@@ -89,4 +89,28 @@ public class BusinessSceneRest {
         return Result.OK();
     }
 
+    /**
+     * 删除业务场景下的流程
+     *
+     * @param businessSceneProcessDTO the business scene process dto
+     * @return the result
+     */
+    @PostMapping(value = "/rest/businessScene/deleteProcessDefinition")
+    public Result deleteProcessDefinition(@RequestBody BusinessSceneProcessDTO businessSceneProcessDTO) {
+        service.deleteProcessDefinition(businessSceneProcessDTO);
+        return Result.OK();
+    }
+
+    /**
+     * 删除业务场景
+     *
+     * @param businessSceneDTO the business scene dto
+     * @return the result
+     */
+    @PostMapping(value = "/rest/businessScene/delete")
+    public Result delete(@RequestBody BusinessSceneDTO businessSceneDTO) {
+        service.delete(businessSceneDTO);
+        return Result.OK();
+    }
+
 }

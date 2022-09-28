@@ -23,4 +23,8 @@ public interface IBusinessSceneService {
 
     void deploy(BusinessSceneProcessDTO businessSceneProcessDTO);
 
+    void deleteProcessDefinition(BusinessSceneProcessDTO businessSceneProcessDTO);
+
+    void delete(BusinessSceneDTO businessSceneDTO);
+
 }
