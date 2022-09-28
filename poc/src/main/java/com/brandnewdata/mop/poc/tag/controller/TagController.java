@@ -1,9 +1,7 @@
 package com.brandnewdata.mop.poc.tag.controller;
 
 import com.brandnewdata.common.webresult.Result;
-import com.brandnewdata.mop.poc.tag.req.TagReq;
 import com.brandnewdata.mop.poc.tag.resp.TagResp;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;

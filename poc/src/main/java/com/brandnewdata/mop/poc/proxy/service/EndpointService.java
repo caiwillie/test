@@ -8,7 +8,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.proxy.dao.ReverseProxyEndpointDao;
 import com.brandnewdata.mop.poc.proxy.dto.Endpoint;
-import com.brandnewdata.mop.poc.proxy.dto.Proxy;
 import com.brandnewdata.mop.poc.proxy.entity.ReverseProxyEndpointEntity;
 import org.springframework.stereotype.Service;
 

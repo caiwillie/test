@@ -6,7 +6,6 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -25,7 +24,6 @@ import com.brandnewdata.mop.poc.proxy.util.SwaggerUtil;
 import com.brandnewdata.mop.poc.util.PageEnhancedUtil;
 import com.dxy.library.json.jackson.JacksonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.info.Info;
@@ -33,7 +31,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.Yaml;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -229,13 +226,15 @@ public class ProxyService {
         if(StrUtil.equals(format, ProxyConstants.FORMAT_JSON)) {
             try {
                 // 格式化输出
-                JacksonUtil.getObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(apiDefinition);
+                ret = JacksonUtil.getObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(apiDefinition);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
         } else if (StrUtil.equals(format, ProxyConstants.FORMAT_YAML)) {
+            String temp = JacksonUtil.to(apiDefinition);
+            Map<String, Object> tempMap = JacksonUtil.fromMap(temp);
             Yaml yaml = new Yaml();
-            ret = yaml.dump(apiDefinition);
+            ret = yaml.dump(tempMap);
         }
 
         return ret;

@@ -1,7 +1,6 @@
 package com.brandnewdata.mop.poc.process.dto.parser;
 
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDTO;
-import com.brandnewdata.mop.poc.process.dto.parser.TriggerOrOperate;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Data;
 

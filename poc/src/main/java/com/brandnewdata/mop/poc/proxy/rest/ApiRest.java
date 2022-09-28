@@ -13,7 +13,6 @@ import com.brandnewdata.mop.poc.proxy.service.ProxyService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.swing.plaf.ListUI;
 import java.util.List;
 
 /**
@@ -65,7 +64,7 @@ public class ApiRest {
      * @param req the req
      * @return the result
      */
-    @GetMapping("/rest/reverseProxy/importFromFile")
+    @PostMapping("/rest/reverseProxy/importFromFile")
     public Result<ApiResp> importFromFile (@RequestBody ImportFromFileReq req) {
         return null;
     }

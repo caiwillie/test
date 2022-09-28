@@ -9,7 +9,6 @@ import com.brandnewdata.mop.api.scene.SceneResp;
 import com.brandnewdata.mop.poc.scene.dto.BusinessSceneDTO;
 import com.brandnewdata.mop.poc.scene.service.IBusinessSceneService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;

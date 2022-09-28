@@ -6,7 +6,6 @@ import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.mop.poc.proxy.dto.Endpoint;
 import com.brandnewdata.mop.poc.proxy.dto.ImportDTO;
 import com.brandnewdata.mop.poc.proxy.dto.Proxy;
-import com.dxy.library.json.jackson.JacksonUtil;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;

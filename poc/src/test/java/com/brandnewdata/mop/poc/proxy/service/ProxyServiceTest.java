@@ -1,24 +1,19 @@
 package com.brandnewdata.mop.poc.proxy.service;
 
 import cn.hutool.core.collection.ListUtil;
-import com.brandnewdata.mop.poc.common.dto.Page;
+import cn.hutool.core.date.DateUtil;
 import com.brandnewdata.mop.poc.proxy.dao.ReverseProxyDao;
-import com.brandnewdata.mop.poc.proxy.dto.Endpoint;
-import com.brandnewdata.mop.poc.proxy.dto.Proxy;
 import com.brandnewdata.mop.poc.proxy.entity.ReverseProxyEntity;
-import com.brandnewdata.mop.poc.proxy.resp.ApiResp;
-import com.xxl.job.core.util.DateUtil;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
 
 class ProxyServiceTest {
     @Mock
