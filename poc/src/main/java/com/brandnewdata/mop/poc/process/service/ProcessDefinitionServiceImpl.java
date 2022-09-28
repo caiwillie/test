@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
+public class ProcessDefinitionServiceImpl implements IProcessDefinitionService {
 
     @Resource
     private ProcessDefinitionDao processDefinitionDao;
@@ -58,14 +58,16 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
         entity.setImgUrl(processDefinitionDTO.getImgUrl());
         entity.setXml(processDefinitionDTO.getXml());
 
-        // todo 返回修改的结构体不再用 processDefinition
+        // 返回的 processDefinitionDTO 发生了一些改变，一些数据得到补充
         processDefinitionDTO = ProcessDefinitionParser.newInstance(processDefinitionDTO).buildProcessDefinition();
         String processId = processDefinitionDTO.getProcessId();
         entity.setId(processId);
         entity.setName(processDefinitionDTO.getName());
 
-        if(getOne(processId) != null) {
-             processDefinitionDao.updateById(entity);
+        ProcessDefinitionEntity oldEntity = exist(processId);
+
+        if(oldEntity != null) {
+            processDefinitionDao.updateById(entity);
         } else {
             processDefinitionDao.insert(entity);
         }
@@ -74,18 +76,25 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService{
     }
 
     @Override
+    public void delete(ProcessDefinitionDTO processDefinitionDTO) {
+        String processId = processDefinitionDTO.getProcessId();
+        ProcessDefinitionEntity oldEntity = exist(processId);
+        Assert.notNull(oldEntity, "流程不存在：{}", processId);
+        processDefinitionDao.deleteById(processId);
+    }
+
+    @Override
     public ProcessDefinitionDTO getOne(String processId) {
         Assert.notNull(processId, ErrorMessage.NOT_NULL("流程 id"));
+        ProcessDefinitionEntity entity = exist(processId);
+        Assert.notNull(entity, "流程id不存在：{}", processId);
+        return toDTO(entity);
+    }
 
+    private ProcessDefinitionEntity exist(String processId) {
         QueryWrapper<ProcessDefinitionEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(ProcessDefinitionEntity.ID, processId);
-        ProcessDefinitionEntity entity = processDefinitionDao.selectOne(queryWrapper);
-
-        if(entity == null) {
-            return null;
-        } else {
-            return toDTO(entity);
-        }
+        return processDefinitionDao.selectOne(queryWrapper);
     }
 
     private ProcessDefinitionDTO toDTO(ProcessDefinitionEntity entity) {

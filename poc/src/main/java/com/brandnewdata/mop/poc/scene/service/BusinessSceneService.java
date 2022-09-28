@@ -76,8 +76,8 @@ public class BusinessSceneService implements IBusinessSceneService {
     public BusinessSceneDTO save(BusinessSceneDTO businessSceneDTO) {
         Assert.notNull(businessSceneDTO.getName(), ErrorMessage.NOT_NULL("场景名称"));
         BusinessSceneEntity entity = toEntity(businessSceneDTO);
-        Long id = entity.getId();
-        if(id == null) {
+        BusinessSceneEntity oldEntity = exist(businessSceneDTO.getId());
+        if(oldEntity == null) {
             businessSceneDao.insert(entity);
         } else {
             businessSceneDao.updateById(entity);
@@ -108,6 +108,15 @@ public class BusinessSceneService implements IBusinessSceneService {
     public void deploy(BusinessSceneProcessDTO businessSceneProcessDTO) {
         ProcessDefinitionDTO processDefinitionDTO = toDTO(businessSceneProcessDTO);
         processDeployService.deploy(processDefinitionDTO, ProcessConstants.PROCESS_TYPE_SCENE);
+    }
+
+    public void deleteProcessDefinition(BusinessSceneProcessDTO businessSceneProcessDTO) {
+
+    }
+
+    private BusinessSceneEntity exist(Long id) {
+        if(id == null) return null;
+        return businessSceneDao.selectById(id);
     }
 
     private void updateSceneUpdateTime(Long sceneId) {

@@ -22,6 +22,8 @@ public interface IProcessDefinitionService {
      */
     ProcessDefinitionDTO save(ProcessDefinitionDTO processDefinitionDTO);
 
+    void delete(ProcessDefinitionDTO processDefinitionDTO);
+
     /**
      * 获取流程定义详情
      *
