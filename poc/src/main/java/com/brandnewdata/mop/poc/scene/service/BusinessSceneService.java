@@ -111,7 +111,34 @@ public class BusinessSceneService implements IBusinessSceneService {
     }
 
     public void deleteProcessDefinition(BusinessSceneProcessDTO businessSceneProcessDTO) {
+        // 先删除流程定义
+        ProcessDefinitionDTO processDefinitionDTO = toDTO(businessSceneProcessDTO);
+        processDefinitionService.delete(processDefinitionDTO);
 
+        // 再删除关联关系
+        Long id = businessSceneProcessDTO.getId();
+        businessSceneProcessDao.deleteById(id);
+    }
+
+
+    public void delete(BusinessSceneDTO businessSceneDTO) {
+        // 先删除绑定的流程
+        Long sceneId = businessSceneDTO.getId();
+        List<BusinessSceneProcessEntity> businessSceneProcessEntities = listSceneProcessBySceneId(sceneId);
+        if(CollUtil.isNotEmpty(businessSceneProcessEntities)) {
+            for (BusinessSceneProcessEntity businessSceneProcessEntity : businessSceneProcessEntities) {
+                BusinessSceneProcessDTO businessSceneProcessDTO = toDTO(businessSceneProcessEntity, null);
+                deleteProcessDefinition(businessSceneProcessDTO);
+            }
+        }
+        // 再删除场景
+        businessSceneDao.deleteById(sceneId);
+    }
+
+    private List<BusinessSceneProcessEntity> listSceneProcessBySceneId(Long sceneId) {
+        QueryWrapper<BusinessSceneProcessEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(BusinessSceneProcessEntity.BUSINESS_SCENE_ID, sceneId);
+        return businessSceneProcessDao.selectList(queryWrapper);
     }
 
     private BusinessSceneEntity exist(Long id) {
@@ -221,9 +248,11 @@ public class BusinessSceneService implements IBusinessSceneService {
         dto.setId(businessSceneProcessEntity.getId());
         dto.setBusinessSceneId(businessSceneProcessEntity.getBusinessSceneId());
         dto.setProcessId(businessSceneProcessEntity.getProcessId());
-        dto.setName(processDefinitionDTO.getName());
-        dto.setXml(processDefinitionDTO.getXml());
-        dto.setImgUrl(processDefinitionDTO.getImgUrl());
+        if(processDefinitionDTO != null) {
+            dto.setName(processDefinitionDTO.getName());
+            dto.setXml(processDefinitionDTO.getXml());
+            dto.setImgUrl(processDefinitionDTO.getImgUrl());
+        }
         return dto;
     }
 
