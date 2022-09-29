@@ -31,7 +31,7 @@ public class BusinessSceneRest {
      */
     @GetMapping(value = "/rest/businessScene/page")
     public Result<Page<BusinessSceneDTO>> page(
-            @RequestParam String projectId,
+            @RequestParam(required = false) String projectId,
             @RequestParam Integer pageNum,
             @RequestParam Integer pageSize,
             @RequestParam(required = false) String name) {
