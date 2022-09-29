@@ -15,6 +15,11 @@ public class BusinessSceneDTO {
     private Long id;
 
     /**
+     * 项目id
+     */
+    private String projectId;
+
+    /**
      * 场景名称
      */
     private String name;

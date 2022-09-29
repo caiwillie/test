@@ -23,13 +23,15 @@ public class BusinessSceneRest {
     /**
      * 分页列表
      *
-     * @param pageNum  分页码
-     * @param pageSize 分页大小
-     * @param name     名称（模糊搜索）
+     * @param projectId 项目id
+     * @param pageNum   分页码
+     * @param pageSize  分页大小
+     * @param name      名称（模糊搜索）
      * @return the result
      */
     @GetMapping(value = "/rest/businessScene/page")
     public Result<Page<BusinessSceneDTO>> page(
+            @RequestParam String projectId,
             @RequestParam Integer pageNum,
             @RequestParam Integer pageSize,
             @RequestParam(required = false) String name) {
