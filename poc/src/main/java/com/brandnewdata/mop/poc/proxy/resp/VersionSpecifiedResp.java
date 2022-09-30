@@ -30,6 +30,11 @@ public class VersionSpecifiedResp {
     private String updateTime;
 
     /**
+     * 协议：1 HTTP，2 HTTPS，3 HTTP&HTTPS
+     */
+    private Integer protocol;
+
+    /**
      * endpoint总数
      */
     private Long endpointTotal;

@@ -157,6 +157,7 @@ public class ProxyService {
                 versionSpecifiedResp.setVersion(entity.getVersion());
                 versionSpecifiedResp.setDomain(entity.getDomain());
                 versionSpecifiedResp.setState(entity.getState());
+                versionSpecifiedResp.setProtocol(entity.getProtocol());
                 versionSpecifiedResp.setUpdateTime(DateUtil.formatDateTime(entity.getUpdateTime()));
                 // 设置 endpoint 的总数
                 versionSpecifiedResp.setEndpointTotal(Optional.ofNullable(apiMap.get(apiId)).orElse(0L));
