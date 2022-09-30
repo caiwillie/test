@@ -19,7 +19,7 @@ public class VariableDao extends AbstractDao {
 
     public List<VariableEntity> list(Query query) {
         SearchRequest request = new SearchRequest.Builder()
-                .index(template.getFullQualifiedName())
+                .index(template.getAlias())
                 .query(query)
                 .build();
         return ElasticsearchUtil.scrollAll(client, request, VariableEntity.class);

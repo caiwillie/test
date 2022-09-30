@@ -8,12 +8,14 @@ import com.brandnewdata.mop.poc.operate.dao.VariableDao;
 import com.brandnewdata.mop.poc.operate.dto.VariableDTO;
 import com.brandnewdata.mop.poc.operate.entity.VariableEntity;
 import com.brandnewdata.mop.poc.operate.schema.template.VariableTemplate;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class VariableService {
 
@@ -34,6 +36,8 @@ public class VariableService {
                                 .build())
                         .build())
                 .build();
+
+        log.debug(query.toString());
 
         List<VariableEntity> entities = variableDao.list(query);
 
