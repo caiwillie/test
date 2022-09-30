@@ -47,12 +47,16 @@ public class ProxyService {
     @Resource
     private EndpointService endpointService;
 
-    @Value("${brandnewdata.api.suffixDomain}")
-    private String apiSuffixDomain;
+    @Value("${brandnewdata.api.domainPattern}")
+    private String domainPattern;
+
+    @Value("${brandnewdata.api.domainRegEx}")
+    private String domainRegEx;
 
     private static VersionComparator VERSION_COMPARATOR = new VersionComparator();
 
     public Proxy save(Proxy proxy) {
+
         ReverseProxyEntity entity = toEntity(proxy);
         Long id = entity.getId();
         if(id == null) {
@@ -61,20 +65,18 @@ public class ProxyService {
             // 判断 名称和版本 是否唯一
             ReverseProxyEntity exist = exist(name, version);
             Assert.isNull(exist, "版本 {} 已存在", name, version);
-            String domain = StrUtil.format("api.{}.{}",
-                    DigestUtil.md5Hex(StrUtil.format("{}:{}", name, version)), apiSuffixDomain);
+            String domain = DigestUtil.md5Hex(StrUtil.format("{}:{}", name, version));
             entity.setDomain(domain);
             // 设置默认状态是 停止
             entity.setState(ProxyConstants.STATE_STOP);
             proxyDao.insert(entity);
-            proxy.setId(entity.getId());
         } else {
             ReverseProxyEntity oldEntity = proxyDao.selectById(id);
             // 将新对象的值拷贝到旧对象，排除掉 state 字段
             BeanUtil.copyProperties(entity, oldEntity, "state");
             proxyDao.updateById(entity);
         }
-        return proxy;
+        return toDTO(entity);
     }
 
     private ReverseProxyEntity exist(String name, String version) {
@@ -287,7 +289,7 @@ public class ProxyService {
         proxy.setDescription(entity.getDescription());
         proxy.setCreateTime(LocalDateTimeUtil.of(entity.getCreateTime()));
         proxy.setUpdateTime(LocalDateTimeUtil.of(entity.getUpdateTime()));
-        proxy.setDomain(entity.getDomain());
+        proxy.setDomain(StrUtil.format(domainPattern, entity.getDomain()));
         return proxy;
     }
 
