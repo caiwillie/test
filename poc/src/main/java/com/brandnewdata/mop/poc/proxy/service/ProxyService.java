@@ -50,8 +50,7 @@ public class ProxyService {
     @Value("${brandnewdata.api.domainPattern}")
     private String domainPattern;
 
-    @Value("${brandnewdata.api.domainRegEx}")
-    private String domainRegEx;
+
 
     private static VersionComparator VERSION_COMPARATOR = new VersionComparator();
 

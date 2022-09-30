@@ -1,6 +1,8 @@
 package com.brandnewdata.mop.poc.proxy.service;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.RegexPool;
+import cn.hutool.core.util.ReUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.proxy.dao.ReverseProxyDao;
 import com.brandnewdata.mop.poc.proxy.dao.ReverseProxyEndpointDao;
@@ -11,6 +13,7 @@ import com.brandnewdata.mop.poc.proxy.entity.ReverseProxyEndpointEntity;
 import com.brandnewdata.mop.poc.proxy.entity.ReverseProxyEntity;
 import com.dxy.library.json.jackson.JacksonUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -26,7 +29,13 @@ public class BackendService {
     @Resource
     private ReverseProxyEndpointDao proxyEndpointDao;
 
+    @Value("${brandnewdata.api.domainRegEx}")
+    private String domainRegEx;
+
     public Backend getBackend(String domain, String uri) {
+        // 解析domain，获取正则表达式中的第一个括号中的内容
+        domain = ReUtil.getGroup1(domainRegEx, domain);
+
         QueryWrapper<ReverseProxyEntity> queryWrapper1 = new QueryWrapper<>();
         queryWrapper1.eq(ReverseProxyEntity.DOMAIN, domain);
         ReverseProxyEntity proxy = proxyDao.selectOne(queryWrapper1);
