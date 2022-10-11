@@ -6,6 +6,8 @@ public interface ProxyConstants {
 
     int STATE_RUNNING = 2;
 
+    int STATE_DEVELOPING = 3;
+
     String FORMAT_JSON = "JSON";
 
     String FORMAT_YAML = "YAML";

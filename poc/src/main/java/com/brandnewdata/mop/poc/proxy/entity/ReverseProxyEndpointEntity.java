@@ -1,11 +1,14 @@
 package com.brandnewdata.mop.poc.proxy.entity;
 
-import com.baomidou.mybatisplus.annotation.*;
-import lombok.Getter;
-import lombok.Setter;
-
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * <p>
@@ -13,7 +16,7 @@ import java.util.Date;
  * </p>
  *
  * @author caiwillie
- * @since 2022-08-12
+ * @since 2022-10-11
  */
 @Getter
 @Setter
@@ -41,6 +44,7 @@ public class ReverseProxyEndpointEntity implements Serializable {
 
     private String backendConfig;
 
+    private String tag;
 
     public static final String ID = "id";
 
@@ -57,5 +61,7 @@ public class ReverseProxyEndpointEntity implements Serializable {
     public static final String BACKEND_TYPE = "backend_type";
 
     public static final String BACKEND_CONFIG = "backend_config";
+
+    public static final String TAG = "tag";
 
 }

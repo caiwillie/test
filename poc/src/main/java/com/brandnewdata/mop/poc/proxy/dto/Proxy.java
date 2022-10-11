@@ -47,4 +47,14 @@ public class Proxy {
      * 服务域名
      */
     private String domain;
+
+    /**
+     * 标签
+     */
+    private String tag;
+
+    /**
+     * 状态：1 停止，2 运行，3 开发中
+     */
+    private Integer state;
 }

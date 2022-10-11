@@ -9,7 +9,7 @@ import com.brandnewdata.mop.poc.proxy.entity.ReverseProxyEndpointEntity;
  * </p>
  *
  * @author caiwillie
- * @since 2022-08-12
+ * @since 2022-10-11
  */
 public interface ReverseProxyEndpointDao extends BaseMapper<ReverseProxyEndpointEntity> {
 

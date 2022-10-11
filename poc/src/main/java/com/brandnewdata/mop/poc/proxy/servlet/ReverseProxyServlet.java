@@ -59,6 +59,7 @@ public class ReverseProxyServlet extends ProxyServlet {
         * */
 
         String uri = req.getPathInfo();
+
         String queryString = req.getQueryString();
         // 去掉前缀
         String domain = req.getHeader("g2-domain");

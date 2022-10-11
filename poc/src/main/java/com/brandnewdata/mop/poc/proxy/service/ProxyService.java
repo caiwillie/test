@@ -6,6 +6,7 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -59,20 +60,31 @@ public class ProxyService {
         ReverseProxyEntity entity = toEntity(proxy);
         Long id = entity.getId();
         if(id == null) {
-            String name = proxy.getName();
-            String version = proxy.getVersion();
+            String name = entity.getName();
+            String version = entity.getVersion();
+            Assert.notNull(name, "API 名称不能为空");
+            Assert.notNull(version, "API 版本不能为空");
+
             // 判断 名称和版本 是否唯一
             ReverseProxyEntity exist = exist(name, version);
             Assert.isNull(exist, "版本 {} 已存在", name, version);
             String domain = DigestUtil.md5Hex(StrUtil.format("{}:{}", name, version));
             entity.setDomain(domain);
             // 设置默认状态是 停止
-            entity.setState(ProxyConstants.STATE_STOP);
+            entity.setState(Optional.ofNullable(entity.getState()).orElse(ProxyConstants.STATE_STOP));
+            if(!NumberUtil.equals(entity.getState(), ProxyConstants.STATE_DEVELOPING)) {
+                // 如果不是开发中，就需要校验协议
+                Assert.notNull(entity.getProtocol(), "API 协议不能为空");
+            }
             proxyDao.insert(entity);
         } else {
+            Assert.notNull(entity.getProtocol(), "协议不能为空");
+
             ReverseProxyEntity oldEntity = proxyDao.selectById(id);
-            // 将新对象的值拷贝到旧对象，排除掉 state 字段
-            BeanUtil.copyProperties(entity, oldEntity, "state");
+            // 将新对象的值拷贝到旧对象，只能修改 protocol，tag, description
+            oldEntity.setProtocol(entity.getProtocol());
+            oldEntity.setTag(entity.getTag());
+            oldEntity.setDescription(entity.getDescription());
             proxyDao.updateById(entity);
         }
         return toDTO(entity);
