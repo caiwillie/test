@@ -4,6 +4,8 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
 import com.brandnewdata.mop.poc.proxy.dao.ReverseProxyDao;
 import com.brandnewdata.mop.poc.proxy.entity.ReverseProxyEntity;
+import com.brandnewdata.mop.poc.proxy.req.ImportFromFileReq;
+import com.dxy.library.json.jackson.JacksonUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -61,6 +63,14 @@ class ProxyServiceTest {
         entity4.setVersion("2.0.0");
 
         return ListUtil.of(entity1, entity2, entity3, entity4);
+    }
+
+    @Test
+    void importFromFile() {
+        String source = "{\"fileContent\":\"{\\n  \\\"openapi\\\" : \\\"3.0.1\\\",\\n  \\\"info\\\" : {\\n    \\\"title\\\" : \\\"前端text\\\",\\n    \\\"version\\\" : \\\"1.0.0\\\"\\n  },\\n  \\\"paths\\\" : {\\n    \\\"/test\\\" : { },\\n    \\\"/test2\\\" : { },\\n    \\\"/test111\\\" : { },\\n    \\\"/test11\\\" : { }\\n  }\\n}\",\"fileType\":\"JSON\"}";
+        ImportFromFileReq req = JacksonUtil.from(source, ImportFromFileReq.class);
+        when(endpointService.save(any())).thenReturn(null);
+        proxyService.importFromFile(req);
     }
 }
 
