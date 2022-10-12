@@ -38,4 +38,9 @@ public class VersionSpecifiedResp {
      * endpoint总数
      */
     private Long endpointTotal;
+
+    /**
+     * 标签
+     */
+    private String tag;
 }

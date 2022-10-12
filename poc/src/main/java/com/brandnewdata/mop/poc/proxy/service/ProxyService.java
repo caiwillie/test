@@ -171,6 +171,7 @@ public class ProxyService {
                 versionSpecifiedResp.setState(entity.getState());
                 versionSpecifiedResp.setProtocol(entity.getProtocol());
                 versionSpecifiedResp.setUpdateTime(DateUtil.formatDateTime(entity.getUpdateTime()));
+                versionSpecifiedResp.setTag(entity.getTag());
                 // 设置 endpoint 的总数
                 versionSpecifiedResp.setEndpointTotal(Optional.ofNullable(apiMap.get(apiId)).orElse(0L));
                 return versionSpecifiedResp;
@@ -312,6 +313,7 @@ public class ProxyService {
         proxy.setCreateTime(LocalDateTimeUtil.of(entity.getCreateTime()));
         proxy.setUpdateTime(LocalDateTimeUtil.of(entity.getUpdateTime()));
         proxy.setDomain(StrUtil.format(domainPattern, entity.getDomain()));
+        proxy.setTag(entity.getTag());
         return proxy;
     }
 
