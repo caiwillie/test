@@ -98,6 +98,7 @@ public class EndpointService {
         entity.setDescription(dto.getDescription());
         entity.setBackendType(dto.getBackendType());
         entity.setBackendConfig(dto.getBackendConfig());
+        entity.setTag(dto.getTag());
         return entity;
     }
 
