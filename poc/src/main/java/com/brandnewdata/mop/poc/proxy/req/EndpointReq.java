@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.proxy.rest;
+package com.brandnewdata.mop.poc.proxy.req;
 
 import lombok.Data;
 

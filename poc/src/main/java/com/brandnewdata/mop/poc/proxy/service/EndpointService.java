@@ -29,7 +29,7 @@ public class EndpointService {
         ReverseProxyEndpointEntity entity = toEntity(endpoint);
         Long id = entity.getId();
         if(id == null) {
-            // 唯一性校验
+            // endpoint 的唯一性校验
             ReverseProxyEndpointEntity exist = exist(entity.getProxyId(), entity.getLocation());
             Assert.isNull(exist, "路径 {} 已存在", endpoint.getLocation());
 
