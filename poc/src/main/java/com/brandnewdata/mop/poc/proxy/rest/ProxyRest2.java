@@ -22,7 +22,7 @@ import java.util.List;
  * @author caiwillie
  */
 @RestController
-public class ApiRest {
+public class ProxyRest2 {
 
     @Resource
     private ProxyService proxyService;
@@ -42,7 +42,7 @@ public class ApiRest {
     }
 
     /**
-     * Endpoint标签列表（不分组）
+     * Endpoint标签列表（不分页）
      *
      * @param proxyId the proxy id
      * @return the result
