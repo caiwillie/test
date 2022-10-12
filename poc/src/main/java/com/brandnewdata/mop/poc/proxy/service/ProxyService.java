@@ -275,7 +275,6 @@ public class ProxyService {
         return ret;
     }
 
-
     private Paths getPaths(Long proxyId) {
         Paths ret = new Paths();
         List<Endpoint> endpoints = endpointService.listByProxyIdList(ListUtil.of(proxyId));
