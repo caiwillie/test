@@ -323,6 +323,7 @@ public class ProxyService {
         entity.setProtocol(proxy.getProtocol());
         entity.setVersion(proxy.getVersion());
         entity.setDescription(proxy.getDescription());
+        entity.setTag(proxy.getTag());
         return entity;
     }
 

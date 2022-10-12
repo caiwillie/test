@@ -16,7 +16,7 @@ import javax.annotation.Resource;
  * @author caiwillie
  */
 @RestController
-public class ReverseProxyRest {
+public class ProxyRest {
 
     @Resource
     private ProxyService proxyService;
@@ -27,12 +27,12 @@ public class ReverseProxyRest {
     /**
      * 新增/更新 API
      *
-     * @param reverseProxy the reverse proxy
+     * @param proxy the reverse proxy
      * @return the result
      */
     @PostMapping("/rest/reverseProxy/save")
-    public Result<Proxy> save(@RequestBody Proxy reverseProxy) {
-        Proxy result = proxyService.save(reverseProxy);
+    public Result<Proxy> save(@RequestBody Proxy proxy) {
+        Proxy result = proxyService.save(proxy);
         return Result.OK(result);
     }
 
