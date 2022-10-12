@@ -1,6 +1,5 @@
 package com.brandnewdata.mop.poc.proxy.service;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
@@ -51,8 +50,6 @@ public class ProxyService {
     @Value("${brandnewdata.api.domainPattern}")
     private String domainPattern;
 
-
-
     private static VersionComparator VERSION_COMPARATOR = new VersionComparator();
 
     public Proxy save(Proxy proxy) {
@@ -68,6 +65,7 @@ public class ProxyService {
             // 判断 名称和版本 是否唯一
             ReverseProxyEntity exist = exist(name, version);
             Assert.isNull(exist, "版本 {} 已存在", name, version);
+
             String domain = DigestUtil.md5Hex(StrUtil.format("{}:{}", name, version));
             entity.setDomain(domain);
             // 设置默认状态是 停止
@@ -98,6 +96,7 @@ public class ProxyService {
     }
 
     public Proxy getOne(long id) {
+        Assert.notNull(id, "proxy id 不能为空");
         ReverseProxyEntity entity = proxyDao.selectById(id);
         Assert.notNull(entity, "id 不存在");
         return toDTO(entity);
@@ -168,7 +167,7 @@ public class ProxyService {
                 Long apiId = entity.getId();
                 versionSpecifiedResp.setId(apiId);
                 versionSpecifiedResp.setVersion(entity.getVersion());
-                versionSpecifiedResp.setDomain(entity.getDomain());
+                versionSpecifiedResp.setDomain(StrUtil.format(domainPattern, entity.getDomain()));
                 versionSpecifiedResp.setState(entity.getState());
                 versionSpecifiedResp.setProtocol(entity.getProtocol());
                 versionSpecifiedResp.setUpdateTime(DateUtil.formatDateTime(entity.getUpdateTime()));
@@ -208,11 +207,23 @@ public class ProxyService {
         return proxyDao.listTags();
     }
 
+    public List<String> listEndpointTags(Long proxyId) {
+        List<String> ret = new ArrayList<>();
+        getOne(proxyId);
+        List<Endpoint> endpoints = endpointService.listByProxyIdList(ListUtil.of(proxyId));
+        if(CollUtil.isEmpty(endpoints)) return ret;
+        ret.addAll(endpoints.stream().map(Endpoint::getTag).filter(StrUtil::isNotEmpty).distinct().collect(Collectors.toList()));
+        return ret;
+    }
+
     public void importFromFile(ImportFromFileReq req) {
         String content = req.getFileContent();
         ImportDTO dto = SwaggerUtil.parse(content);
         // 保存 proxy
         Proxy proxy = dto.getProxy();
+
+        // 从文件导入的状态都设置为开发中
+        proxy.setState(ProxyConstants.STATE_DEVELOPING);
         proxy = save(proxy);
         Long proxyId = proxy.getId();
 

@@ -34,4 +34,9 @@ public class Endpoint {
      * 描述
      */
     private String description;
+
+    /**
+     * 分组
+     */
+    private String tag;
 }

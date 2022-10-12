@@ -41,6 +41,18 @@ public class ApiRest {
     }
 
     /**
+     * Endpoint标签列表（不分组）
+     *
+     * @param proxyId the proxy id
+     * @return the result
+     */
+    @GetMapping("/rest/reverseProxy/listEndpointTags")
+    public Result<List<String>> listEndpointTags(@RequestParam Long proxyId) {
+        List<String> resp = proxyService.listEndpointTags(proxyId);
+        return Result.ok(resp);
+    }
+
+    /**
      * 【V2】API 分页列表
      *
      * @param pageNum  分页页码
