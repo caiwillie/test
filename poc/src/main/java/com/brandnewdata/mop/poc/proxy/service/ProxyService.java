@@ -69,7 +69,7 @@ public class ProxyService {
             String domain = DigestUtil.md5Hex(StrUtil.format("{}:{}", name, version));
             entity.setDomain(domain);
             // 设置默认状态是 停止
-            entity.setState(Optional.ofNullable(entity.getState()).orElse(ProxyConstants.STATE_STOP));
+            entity.setState(Optional.ofNullable(proxy.getState()).orElse(ProxyConstants.STATE_STOP));
             if(!NumberUtil.equals(entity.getState(), ProxyConstants.STATE_DEVELOPING)) {
                 // 如果不是开发中，就需要校验协议
                 Assert.notNull(entity.getProtocol(), "API 协议不能为空");
