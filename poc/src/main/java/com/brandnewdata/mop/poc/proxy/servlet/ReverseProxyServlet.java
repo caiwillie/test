@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -88,12 +89,19 @@ public class ReverseProxyServlet extends ProxyServlet {
     private void startProcess(HttpServletRequest req, HttpServletResponse resp, ProcessConfig config) {
         String body = ServletUtil.getBody(req);
         String contentType = HttpUtil.getContentTypeByRequestBody(body);
-        Map<String, Object> variables = MapUtil.empty();
-        String errorMessage = null;
-        if(StrUtil.equals(contentType, ContentType.JSON.toString())) {
+        Map<String, Object> variables = new HashMap<>();
+
+        // 将query参数放入map中
+        variables.putAll(ServletUtil.getParamMap(req));
+
+        // 如果content type是JSON，将body参数放入map中
+        if(StrUtil.equals(contentType, ContentType.JSON.toString())
+                && StrUtil.isNotBlank(body)) {
             // 如果是json类型，并且是object
-            variables = JacksonUtil.fromMap(body);
+            variables.putAll(JacksonUtil.fromMap(body));
         }
+
+        String errorMessage = null;
         String processId = config.getProcessId();
         Map<String, Object> result = deployService.startWithResult(processId, variables);
         log.info("response is: {}", JacksonUtil.to(result));
