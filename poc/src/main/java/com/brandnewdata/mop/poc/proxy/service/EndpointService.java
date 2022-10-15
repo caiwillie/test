@@ -40,7 +40,7 @@ public class EndpointService {
 
             // 将新对象的值拷贝到旧对象，排除掉 proxyId
             BeanUtil.copyProperties(entity, oldEntity, "proxyId");
-            endpointDao.updateById(entity);
+            endpointDao.updateById(oldEntity);
         }
         return endpoint;
     }

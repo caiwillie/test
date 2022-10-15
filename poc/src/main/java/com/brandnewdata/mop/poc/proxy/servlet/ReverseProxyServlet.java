@@ -58,7 +58,6 @@ public class ReverseProxyServlet extends ProxyServlet {
         * getRequestUri() 和 getPathInfo() 的区别：
         * https://www.baeldung.com/http-servlet-request-requesturi-pathinfo
         * */
-
         String uri = req.getPathInfo();
 
         String queryString = req.getQueryString();
