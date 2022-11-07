@@ -19,7 +19,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @TableName("mop_business_scene_process")
-public class BusinessSceneProcessEntity implements Serializable {
+public class SceneProcessEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

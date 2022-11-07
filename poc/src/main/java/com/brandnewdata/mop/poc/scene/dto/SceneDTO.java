@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-public class BusinessSceneDTO {
+public class SceneDTO {
 
 
     /**
@@ -42,5 +42,5 @@ public class BusinessSceneDTO {
     /**
      * 流程定义列表
      */
-    private List<BusinessSceneProcessDTO> processDefinitions;
+    private List<SceneProcessDTO> processDefinitions;
 }
