@@ -228,10 +228,12 @@
                     <execution>
                         <goals>
                             <goal>repackage</goal>
+                            <!--<goal>build-image</goal>-->
                         </goals>
                     </execution>
                 </executions>
                 <configuration>
+                    <mainClass>${start-class}</mainClass>
                     <image>
                         <builder>registry.cn-hangzhou.aliyuncs.com/caiwillie/paketobuildpacks_builder:base</builder>
                         <name>brandnewdata.com/library/${project.artifactId}</name>
@@ -247,7 +249,7 @@
                         </launchCache>
                         <bindings>
                             <!-- /platform/bindings是默认的绑定目录 -->
-                            <binding>${basedir}/bindings/dependency-mapping:/platform/bindings/dependency-mapping</binding>
+                            <binding>${project.basedir}/../bindings/dependency-mapping:/platform/bindings/dependency-mapping</binding>
                         </bindings>
                     </image>
                 </configuration>
