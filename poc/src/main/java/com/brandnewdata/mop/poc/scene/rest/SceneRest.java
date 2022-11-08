@@ -11,8 +11,10 @@ import com.brandnewdata.mop.poc.scene.dto.SceneDTO;
 import com.brandnewdata.mop.poc.scene.dto.SceneProcessDTO;
 import com.brandnewdata.mop.poc.scene.request.ExportReq;
 import com.brandnewdata.mop.poc.scene.service.ISceneService;
+import com.dxy.library.json.jackson.JacksonUtil;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +29,7 @@ import java.util.List;
  *
  * @author caiwillie
  */
+@Slf4j
 @RestController
 public class SceneRest {
 
@@ -135,10 +138,11 @@ public class SceneRest {
      * @param req      the req
      * @throws IOException the io exception
      */
-    @PostMapping("/export")
+    @PostMapping("/rest/businessScene/export")
     public void export(
             HttpServletResponse response,
             @RequestBody ExportReq req) throws IOException {
+        log.info("path: /rest/businessScene/export, req: {}", JacksonUtil.to(req));
         String fileName = "case.yaml";
         InputStream inputStream = ResourceUtil.getStream(fileName);
         final String contentType = ObjectUtil.defaultIfNull(FileUtil.getMimeType(fileName), "application/octet-stream");
@@ -152,7 +156,7 @@ public class SceneRest {
      * @return result
      */
     @ApiOperation(value = "导入数据")
-    @PostMapping("/load")
+    @PostMapping("/rest/businessScene/load")
     public Result load(@RequestParam MultipartFile file) {
         return Result.OK();
     }
