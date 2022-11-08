@@ -223,6 +223,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring.boot.version}</version>
                 <executions>
                     <execution>
                         <goals>
@@ -230,6 +231,26 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <image>
+                        <builder>registry.cn-hangzhou.aliyuncs.com/caiwillie/paketobuildpacks_builder:base</builder>
+                        <name>brandnewdata.com/library/${project.artifactId}</name>
+                        <buildCache>
+                            <volume>
+                                <name>cache-${project.artifactId}.build</name>
+                            </volume>
+                        </buildCache>
+                        <launchCache>
+                            <volume>
+                                <name>cache-${project.artifactId}.launch</name>
+                            </volume>
+                        </launchCache>
+                        <bindings>
+                            <!-- /platform/bindings是默认的绑定目录 -->
+                            <binding>${basedir}/bindings/dependency-mapping:/platform/bindings/dependency-mapping</binding>
+                        </bindings>
+                    </image>
+                </configuration>
             </plugin>
         </plugins>
     </build>

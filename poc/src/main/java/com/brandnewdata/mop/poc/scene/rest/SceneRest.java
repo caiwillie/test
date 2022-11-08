@@ -5,9 +5,17 @@ import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.scene.dto.SceneDTO;
 import com.brandnewdata.mop.poc.scene.dto.SceneProcessDTO;
+import com.brandnewdata.mop.poc.scene.request.ExportReq;
 import com.brandnewdata.mop.poc.scene.service.ISceneService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * 业务场景集成相关的接口
@@ -112,6 +120,31 @@ public class SceneRest {
     @PostMapping(value = "/rest/businessScene/delete")
     public Result delete(@RequestBody SceneDTO sceneDTO) {
         service.delete(sceneDTO);
+        return Result.OK();
+    }
+
+    /**
+     * 导出场景
+     *
+     * @param response the response
+     * @param req      the req
+     * @throws IOException the io exception
+     */
+    @PostMapping("/export")
+    public void export(
+            HttpServletResponse response,
+            @RequestBody ExportReq req) throws IOException {
+    }
+
+    /**
+     * 导入场景
+     *
+     * @param file the file
+     * @return result
+     */
+    @ApiOperation(value = "导入数据")
+    @PostMapping("/uploadData")
+    public Result load(@RequestParam MultipartFile file) {
         return Result.OK();
     }
 
