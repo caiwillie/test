@@ -1,6 +1,10 @@
 package com.brandnewdata.mop.poc.scene.rest;
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.extra.servlet.ServletUtil;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.scene.dto.SceneDTO;
@@ -15,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -134,6 +139,10 @@ public class SceneRest {
     public void export(
             HttpServletResponse response,
             @RequestBody ExportReq req) throws IOException {
+        String fileName = "case.yaml";
+        InputStream inputStream = ResourceUtil.getStream(fileName);
+        final String contentType = ObjectUtil.defaultIfNull(FileUtil.getMimeType(fileName), "application/octet-stream");
+        ServletUtil.write(response, inputStream, contentType, fileName);
     }
 
     /**
