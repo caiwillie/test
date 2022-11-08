@@ -147,7 +147,6 @@ public class SceneRest {
         InputStream inputStream = ResourceUtil.getStream(fileName);
         final String contentType = ObjectUtil.defaultIfNull(FileUtil.getMimeType(fileName), "application/octet-stream");
         response.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
-
         ServletUtil.write(response, inputStream, contentType, fileName);
     }
 
