@@ -143,7 +143,7 @@ public class SceneRest {
      * @return result
      */
     @ApiOperation(value = "导入数据")
-    @PostMapping("/uploadData")
+    @PostMapping("/load")
     public Result load(@RequestParam MultipartFile file) {
         return Result.OK();
     }
