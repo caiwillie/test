@@ -2,10 +2,11 @@ package com.brandnewdata.mop.poc.process.parser;
 
 import com.brandnewdata.mop.poc.manager.ConnectorManager;
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDto;
+import com.brandnewdata.mop.poc.process.dto.parser.Step2Result;
 
 public interface ProcessDefinitionParseStep2 {
 
-    ProcessDefinitionDto buildProcessDefinition();
+    Step2Result step2Result();
     ProcessDefinitionParseStep3 replaceTriggerStartEvent(ConnectorManager manager);
 
     ProcessDefinitionParseStep3 replaceOperateStartEvent();

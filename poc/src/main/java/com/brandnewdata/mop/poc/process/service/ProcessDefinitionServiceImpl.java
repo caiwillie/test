@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.process.dao.ProcessDefinitionDao;
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDto;
+import com.brandnewdata.mop.poc.process.dto.parser.Step1Result;
 import com.brandnewdata.mop.poc.process.entity.ProcessDefinitionEntity;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParser;
 import org.springframework.stereotype.Service;
@@ -50,19 +51,20 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService {
     }
 
     @Override
-    public ProcessDefinitionDto save(ProcessDefinitionDto processDefinitionDTO) {
-
+    public ProcessDefinitionDto save(ProcessDefinitionDto dto) {
 
         // dto to entity 逻辑特殊，不提取公共
         ProcessDefinitionEntity entity = new ProcessDefinitionEntity();
-        entity.setImgUrl(processDefinitionDTO.getImgUrl());
-        entity.setXml(processDefinitionDTO.getXml());
+        entity.setImgUrl(dto.getImgUrl());
+        entity.setXml(dto.getXml());
 
-        // 返回的 processDefinitionDTO 发生了一些改变，一些数据得到补充
-        processDefinitionDTO = ProcessDefinitionParser.newInstance(processDefinitionDTO).buildProcessDefinition();
-        String processId = processDefinitionDTO.getProcessId();
+        // 这里主要是校验，并解析 id、name
+        Step1Result step1Result = ProcessDefinitionParser
+                .newInstance(dto.getProcessId(), dto.getName(), dto.getXml())
+                .step1Result();
+        String processId = step1Result.getProcessId();
         entity.setId(processId);
-        entity.setName(processDefinitionDTO.getName());
+        entity.setName(step1Result.getName());
 
         ProcessDefinitionEntity oldEntity = exist(processId);
 
@@ -72,7 +74,7 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService {
             processDefinitionDao.insert(entity);
         }
 
-        return processDefinitionDTO;
+        return dto;
     }
 
     @Override

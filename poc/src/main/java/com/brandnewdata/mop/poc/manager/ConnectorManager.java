@@ -9,6 +9,7 @@ import com.brandnewdata.connector.api.IConnectorConfFeign;
 import com.brandnewdata.connector.api.ITriggerProtocolFeign;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.manager.dto.TriggerInfo;
+import com.brandnewdata.mop.poc.process.dto.parser.Step3Result;
 import com.brandnewdata.mop.poc.process.dto.parser.TriggerOrOperate;
 import com.brandnewdata.mop.poc.process.dto.parser.TriggerProcessDefinitionDto;
 import com.dxy.library.json.jackson.JacksonUtil;
@@ -65,14 +66,14 @@ public class ConnectorManager {
     }
 
     @SneakyThrows
-    public void saveRequestParams(TriggerProcessDefinitionDto processDefinition) {
+    public void saveRequestParams(Step3Result step3Result) {
         IConnectorCommonTriggerProcessConfFeign.ConnectorCommonTriggerProcessConfParamDTO dto =
                 new IConnectorCommonTriggerProcessConfFeign.ConnectorCommonTriggerProcessConfParamDTO();
-        dto.setProcessId(processDefinition.getProcessId());
-        dto.setProcessName(processDefinition.getName());
-        dto.setProtocol(processDefinition.getProtocol());
-        dto.setConfig(JacksonUtil.to(processDefinition.getRequestParams()));
-        dto.setTriggerFullId(processDefinition.getTrigger().getFullId());
+        dto.setProcessId(step3Result.getProcessId());
+        dto.setProcessName(step3Result.getName());
+        dto.setProtocol(step3Result.getProtocol());
+        dto.setConfig(JacksonUtil.to(step3Result.getRequestParams()));
+        dto.setTriggerFullId(step3Result.getTrigger().getFullId());
         Integer success = triggerClient.save(dto);
         if(success == null || success != 1) {
             throw new RuntimeException("保存监听配置失败");

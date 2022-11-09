@@ -1,10 +1,13 @@
 package com.brandnewdata.mop.poc.scene.request;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 public class ExportReq {
     private String version;
     private List<String> processIds;

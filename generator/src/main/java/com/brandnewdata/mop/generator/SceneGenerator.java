@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * @author caiwillie
  */
-public class BusinessSceneGenerator {
+public class SceneGenerator {
 
     private static final String IP = "10.101.53.4";
 
@@ -54,9 +54,9 @@ public class BusinessSceneGenerator {
                 .packageConfig(builder -> builder
                         .parent("com.brandnewdata.mop.poc")
                         // entity的包名称
-                        .entity("group.entity")
+                        .entity("scene.entity")
                         // dao层的包名称
-                        .mapper("group.dao")
+                        .mapper("scene.dao")
                 )
 
                 // 策略配置

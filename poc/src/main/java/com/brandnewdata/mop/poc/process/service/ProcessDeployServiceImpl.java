@@ -13,6 +13,7 @@ import com.brandnewdata.mop.poc.process.ProcessConstants;
 import com.brandnewdata.mop.poc.process.dao.ProcessDeployDao;
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDto;
 import com.brandnewdata.mop.poc.process.dto.ProcessDeployDto;
+import com.brandnewdata.mop.poc.process.dto.parser.Step3Result;
 import com.brandnewdata.mop.poc.process.dto.parser.TriggerProcessDefinitionDto;
 import com.brandnewdata.mop.poc.process.entity.ProcessDeployEntity;
 import com.brandnewdata.mop.poc.process.parser.FeelUtil;
@@ -84,28 +85,28 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
     }
 
     @Override
-    public ProcessDeployDto deploy(ProcessDefinitionDto processDefinitionDTO, int type) {
-        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(processDefinitionDTO);
+    public ProcessDeployDto deploy(ProcessDefinitionDto dto, int type) {
+        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(dto.getProcessId(), dto.getName(), dto.getXml());
 
-        TriggerProcessDefinitionDto triggerProcessDefinition = null;
+        Step3Result step3Result = null;
         if(type == ProcessConstants.PROCESS_TYPE_SCENE) {
-            triggerProcessDefinition = step1.replaceProperties(connectorManager).replaceStep1()
-                    .replaceSceneStartEvent(connectorManager).buildTriggerProcessDefinition();
+            step3Result = step1.parseConnConfig(connectorManager).replaceStep1()
+                    .replaceSceneStartEvent(connectorManager).step3Result();
         } else if (type == ProcessConstants.PROCESS_TYPE_TRIGGER) {
-            triggerProcessDefinition = step1.replaceProperties(connectorManager).replaceStep1()
-                    .replaceTriggerStartEvent(connectorManager).buildTriggerProcessDefinition();
+            step3Result = step1.parseConnConfig(connectorManager).replaceStep1()
+                    .replaceTriggerStartEvent(connectorManager).step3Result();
         } else if (type == ProcessConstants.PROCESS_TYPE_OPERATE) {
-            triggerProcessDefinition = step1.replaceProperties(connectorManager).replaceStep1()
-                    .replaceOperateStartEvent().buildTriggerProcessDefinition();
+            step3Result = step1.parseConnConfig(connectorManager).replaceStep1()
+                    .replaceOperateStartEvent().step3Result();
         } else {
             throw new IllegalArgumentException(ErrorMessage.CHECK_ERROR("触发器类型不支持", null));
         }
 
-        String xml = processDefinitionDTO.getXml(); // xml 需要取原始的数据
+        String xml = dto.getXml(); // xml 需要取原始的数据
         // process id 和 name 需要取解析后的
-        String processId = triggerProcessDefinition.getProcessId();
-        String name = triggerProcessDefinition.getName();
-        String zeebeXML = triggerProcessDefinition.getXml();
+        String processId = step3Result.getProcessId();
+        String name = step3Result.getName();
+        String zeebeXML = step3Result.getXml();
 
         // 调用 zeebe 部署
         DeploymentEvent deploymentEvent = zeebe.newDeployResourceCommand()
@@ -152,9 +153,9 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
             processDeployDao.insert(entity);
         }
 
-        if(type == ProcessConstants.PROCESS_TYPE_SCENE && triggerProcessDefinition.getTrigger() != null) {
+        if(type == ProcessConstants.PROCESS_TYPE_SCENE && step3Result.getTrigger() != null) {
             // 如果有场景发布，并且是自定义触发器时，需要保存监听配置
-            connectorManager.saveRequestParams(triggerProcessDefinition);
+            connectorManager.saveRequestParams(step3Result);
         }
 
         return toDTO(entity);
@@ -186,14 +187,14 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         ProcessDeployEntity processDeployEntity = getLatestDeployVersion(processId);
         Assert.notNull(processDeployEntity, ErrorMessage.NOT_NULL("流程 id"), processId);
 
-        ProcessDefinitionDto processDefinitionDTO = new ProcessDefinitionDto();
-        processDefinitionDTO.setXml(processDeployEntity.getProcessXml());
-
-        TriggerProcessDefinitionDto triggerProcessDefinition = ProcessDefinitionParser.newInstance(processDefinitionDTO).replaceStep1()
-                .replaceSceneStartEvent(connectorManager).buildTriggerProcessDefinition();
+        Step3Result step3Result = ProcessDefinitionParser
+                .newInstance(null, null, processDeployEntity.getProcessXml())
+                .replaceStep1()
+                .replaceSceneStartEvent(connectorManager)
+                .step3Result();
 
         // 解析 xml 后得到响应表达式
-        ObjectNode responseParams = triggerProcessDefinition.getResponseParams();
+        ObjectNode responseParams = step3Result.getResponseParams();
 
         String expression = "";
         if(responseParams != null) {

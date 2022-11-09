@@ -21,6 +21,7 @@ import org.dom4j.io.XMLWriter;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +55,8 @@ public class ProcessDefinitionParser implements
 
     private ObjectNode responseParams;
 
+    private Map<String, String> configMap = new HashMap<>();
+
     private static final ParameterParser INPUT_PARSER = new ParameterParser(
             BRANDNEWDATA_INPUT_QNAME.getQualifiedName(),
             NAME_ATTRIBUTE, VALUE_ATTRIBUTE, LABEL_ATTRIBUTE, TYPE_ATTRIBUTE, DATA_TYPE_ATTRIBUTE);
@@ -73,19 +76,20 @@ public class ProcessDefinitionParser implements
     private static final IOMapParser IO_MAP_PARSER = new IOMapParser();
 
     // 工厂模式
-    private ProcessDefinitionParser(ProcessDefinitionDto processDefinitionDTO) {
-        init(processDefinitionDTO);
+    private ProcessDefinitionParser(String processId, String name, String xml) {
+        init(processId, name, xml);
     }
 
-    public static ProcessDefinitionParseStep1 newInstance(ProcessDefinitionDto processDefinitionDTO) {
-        return new ProcessDefinitionParser(processDefinitionDTO);
+    public static ProcessDefinitionParseStep1 newInstance(String processId, String name, String xml) {
+        return new ProcessDefinitionParser(processId, name, xml);
     }
 
-    private void init(ProcessDefinitionDto processDefinitionDTO) {
-        this.document = readDocument(processDefinitionDTO.getXml());
+    private void init(String name, String processId, String xml) {
+        this.processId = processId;
+        this.name = name;
+        this.document = readDocument(xml);
         this.oldDocument = serialize(document);
-        this.processId = processDefinitionDTO.getProcessId();
-        this.name = processDefinitionDTO.getName();
+
         // 转换namespace zeebe2 =》 zeebe
         convertZeebe2Namespace();
         // 设置流程名称 和 id
@@ -501,16 +505,16 @@ public class ProcessDefinitionParser implements
         String xml = manager.getTriggerXML(trigger);
 
         // 解析自定义触发器内的通用触发器
-        ProcessDefinitionDto _processDefintion = new ProcessDefinitionDto();
-        _processDefintion.setProcessId(trigger.getFullId());
-        _processDefintion.setXml(xml);
-        TriggerProcessDefinitionDto triggerProcessDefinition = ProcessDefinitionParser.newInstance(_processDefintion)
-                .replaceStep1().replaceTriggerStartEvent(manager).buildTriggerProcessDefinition();
+        Step3Result step3Result = ProcessDefinitionParser
+                .newInstance(trigger.getFullId(), null, xml)
+                .replaceStep1()
+                .replaceTriggerStartEvent(manager)
+                .step3Result();
 
         // 替换成真实协议
-        protocol = triggerProcessDefinition.getProtocol();
-        requestParams = triggerProcessDefinition.getRequestParams();
-        responseParams = triggerProcessDefinition.getResponseParams();
+        protocol = step3Result.getProtocol();
+        requestParams = step3Result.getRequestParams();
+        responseParams = step3Result.getResponseParams();
 
         // 替换成 call activity
         BndStartEvent bndStartEvent = replaceBndStartEventToCallActivity(bndTaskDefinition);
@@ -687,16 +691,22 @@ public class ProcessDefinitionParser implements
     }
 
     @Override
-    public ProcessDefinitionDto buildProcessDefinition() {
+    public Step1Result step1Result() {
         // 移除无用信息
         removeUnusedNamespace();
         // 打xml日志
         logXML();
-        ProcessDefinitionDto ret = new ProcessDefinitionDto();
+        Step1Result ret = new Step1Result();
         ret.setProcessId(processId);
         ret.setName(name);
         ret.setXml(documentStr);
+        ret.setConfigMap(configMap);
         return ret;
+    }
+
+    @Override
+    public Step2Result step2Result() {
+        return null;
     }
 
     @Override
@@ -783,7 +793,7 @@ public class ProcessDefinitionParser implements
     }
 
     @Override
-    public ProcessDefinitionParseStep1 replaceProperties(ConnectorManager manager) {
+    public ProcessDefinitionParseStep1 parseConnConfig(ConnectorManager manager) {
         XPath path = DocumentHelper.createXPath(StrUtil.join(StringPool.SLASH,
                 StringPool.SLASH,
                 BPMN_SERVICE_TASK_QNAME.getQualifiedName(),
@@ -798,6 +808,7 @@ public class ProcessDefinitionParser implements
             Element oldE = (Element) node;
             Element parent = oldE.getParent();
             Element ioMapping = getZbIoMapping(parent);
+            String type = oldE.attributeValue(TYPE_ATTRIBUTE);
             String configId = oldE.attributeValue(CONFIG_ID_ATTRIBUTE);
             if(StrUtil.isBlank(configId)) {
                 continue;
@@ -810,6 +821,9 @@ public class ProcessDefinitionParser implements
                 newE.setParent(ioMapping);
                 ioMapping.content().add(newE);
             }
+
+            // 存放连接器的配置信息
+            configMap.put(type, configId);
         }
 
         // 这里不需要删除 brandnewdata:taskDefinition
@@ -817,12 +831,12 @@ public class ProcessDefinitionParser implements
     }
 
     @Override
-    public TriggerProcessDefinitionDto buildTriggerProcessDefinition() {
+    public Step3Result step3Result() {
         // 移除无用信息
         removeUnusedNamespace();
         // 打xml日志
         logXML();
-        TriggerProcessDefinitionDto ret = new TriggerProcessDefinitionDto();
+        Step3Result ret = new Step3Result();
         ret.setProcessId(processId);
         ret.setName(name);
         ret.setXml(documentStr);

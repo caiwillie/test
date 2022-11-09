@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * 业务场景集成相关的接口
@@ -155,8 +156,8 @@ public class SceneRest {
         File file = dataExternalService.export(req);
         InputStream inputStream = FileUtil.getInputStream(file);
 
-        String fileName = StrUtil.format("场景导出({}).zip",
-                LocalDateTimeUtil.format(LocalDate.now(), DatePattern.PURE_DATETIME_PATTERN));
+        String fileName = StrUtil.format("SceneExport({}).zip",
+                LocalDateTimeUtil.format(LocalDateTime.now(), DatePattern.PURE_DATETIME_PATTERN));
         String contentType = ObjectUtil.defaultIfNull(FileUtil.getMimeType(fileName), "application/octet-stream");
 
         response.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
@@ -172,6 +173,7 @@ public class SceneRest {
     @ApiOperation(value = "导入数据")
     @PostMapping("/rest/businessScene/load")
     public Result load(@RequestParam MultipartFile file) {
+
         return Result.OK();
     }
 

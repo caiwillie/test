@@ -1,12 +1,12 @@
 package com.brandnewdata.mop.poc.process.parser;
 
 import com.brandnewdata.mop.poc.manager.ConnectorManager;
-import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDto;
+import com.brandnewdata.mop.poc.process.dto.parser.Step1Result;
 
 public interface ProcessDefinitionParseStep1 {
-    ProcessDefinitionDto buildProcessDefinition();
+    Step1Result step1Result();
 
     ProcessDefinitionParseStep2 replaceStep1();
 
-    ProcessDefinitionParseStep1 replaceProperties(ConnectorManager manager);
+    ProcessDefinitionParseStep1 parseConnConfig(ConnectorManager manager);
 }
