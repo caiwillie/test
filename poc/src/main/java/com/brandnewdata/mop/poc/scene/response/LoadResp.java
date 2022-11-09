@@ -1,6 +1,5 @@
 package com.brandnewdata.mop.poc.scene.response;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 

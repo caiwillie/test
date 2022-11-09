@@ -3,8 +3,6 @@ package com.brandnewdata.mop.poc.operate.service;
 import cn.hutool.core.collection.ListUtil;
 import com.brandnewdata.mop.poc.operate.dao.VariableDao;
 import com.brandnewdata.mop.poc.operate.dto.VariableDTO;
-import com.brandnewdata.mop.poc.operate.entity.VariableEntity;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -14,7 +12,8 @@ import org.slf4j.Logger;
 
 import java.util.List;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
 
 class VariableServiceTest {
     @Mock

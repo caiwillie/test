@@ -11,7 +11,6 @@ import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.manager.dto.TriggerInfo;
 import com.brandnewdata.mop.poc.process.dto.parser.Step3Result;
 import com.brandnewdata.mop.poc.process.dto.parser.TriggerOrOperate;
-import com.brandnewdata.mop.poc.process.dto.parser.TriggerProcessDefinitionDto;
 import com.dxy.library.json.jackson.JacksonUtil;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;

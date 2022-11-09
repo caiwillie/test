@@ -1,7 +1,6 @@
 package com.brandnewdata.mop.poc.proxy.service;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.lang.RegexPool;
 import cn.hutool.core.util.ReUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.proxy.dao.ReverseProxyDao;
