@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
  * @author caiwillie
  */
 @Data
-public class ProcessDefinitionDTO {
+public class ProcessDefinitionDto {
 
     private String processId;
 

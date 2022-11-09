@@ -10,7 +10,7 @@ import com.brandnewdata.mop.poc.operate.dto.ProcessInstanceStateDto;
 import com.brandnewdata.mop.poc.operate.resp.GroupDeployResp;
 import com.brandnewdata.mop.poc.operate.service.GroupDeployService;
 import com.brandnewdata.mop.poc.operate.service.ProcessInstanceService;
-import com.brandnewdata.mop.poc.process.dto.ProcessDeployDTO;
+import com.brandnewdata.mop.poc.process.dto.ProcessDeployDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,10 +48,10 @@ public class GroupDeployRest {
      * @deprecated
      */
     @GetMapping("/rest/operate/deploy/page")
-    public Result<Page<ProcessDeployDTO>> page (
+    public Result<Page<ProcessDeployDto>> page (
             @RequestParam int pageNum,
             @RequestParam int pageSize) {
-        Page<ProcessDeployDTO> page = deployService.page(pageNum, pageSize);
+        Page<ProcessDeployDto> page = deployService.page(pageNum, pageSize);
         return Result.OK(page);
     }
 
@@ -86,7 +86,7 @@ public class GroupDeployRest {
         resp.setProcessName(dto.getProcessName());
 
         // 设置部署版本数量和列表
-        List<ProcessDeployDTO> deploys = dto.getDeploys();
+        List<ProcessDeployDto> deploys = dto.getDeploys();
         int size = CollUtil.size(deploys);
         resp.setVersionCount(size);
         resp.setDeploys(deploys);
@@ -95,7 +95,7 @@ public class GroupDeployRest {
         }
 
         // 如果版本号不为0，需要查询运行实例
-        List<Long> processDefinitionKeys = deploys.stream().map(ProcessDeployDTO::getZeebeKey).collect(Collectors.toList());
+        List<Long> processDefinitionKeys = deploys.stream().map(ProcessDeployDto::getZeebeKey).collect(Collectors.toList());
 
         // 得到 flat map之后的 process instance list
         Map<Long, List<ListViewProcessInstanceDTO>> map = processInstanceService.listByProcessDefinitionKeyList(processDefinitionKeys);
@@ -126,8 +126,8 @@ public class GroupDeployRest {
      * @return the result
      */
     @GetMapping("/rest/operate/deploy/detail")
-    public Result<ProcessDeployDTO> detail(@RequestParam long id) {
-        ProcessDeployDTO deploy = deployService.getOne(id);
+    public Result<ProcessDeployDto> detail(@RequestParam long id) {
+        ProcessDeployDto deploy = deployService.getOne(id);
         Assert.notNull(deploy, "流程部署 {} 不存在", id);
         return Result.OK(deploy);
     }

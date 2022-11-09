@@ -10,7 +10,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.process.ProcessConstants;
-import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDTO;
+import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import com.brandnewdata.mop.poc.scene.dao.SceneDao;
@@ -88,7 +88,7 @@ public class SceneService implements ISceneService {
     @Override
     public SceneProcessDTO saveProcessDefinition(SceneProcessDTO sceneProcessDTO) {
         // 保存完成后，得到 process id
-        ProcessDefinitionDTO processDefinitionDTO = processDefinitionService.save(toDTO(sceneProcessDTO));
+        ProcessDefinitionDto processDefinitionDTO = processDefinitionService.save(toDTO(sceneProcessDTO));
         SceneProcessEntity sceneProcessEntity =
                 getBusinessSceneProcessEntityByProcessId(processDefinitionDTO.getProcessId());
         if(sceneProcessEntity == null) {
@@ -106,14 +106,14 @@ public class SceneService implements ISceneService {
 
     @Override
     public void deploy(SceneProcessDTO sceneProcessDTO) {
-        ProcessDefinitionDTO processDefinitionDTO = toDTO(sceneProcessDTO);
+        ProcessDefinitionDto processDefinitionDTO = toDTO(sceneProcessDTO);
         processDeployService.deploy(processDefinitionDTO, ProcessConstants.PROCESS_TYPE_SCENE);
     }
 
     @Override
     public void deleteProcessDefinition(SceneProcessDTO sceneProcessDTO) {
         // 先删除流程定义
-        ProcessDefinitionDTO processDefinitionDTO = toDTO(sceneProcessDTO);
+        ProcessDefinitionDto processDefinitionDTO = toDTO(sceneProcessDTO);
         processDefinitionService.delete(processDefinitionDTO);
 
         // 再删除关联关系
@@ -193,36 +193,36 @@ public class SceneService implements ISceneService {
         Map<String, SceneProcessEntity> processSceneProcessEntityMap = businessSceneProcessEntities.stream().collect(
                 Collectors.toMap(SceneProcessEntity::getProcessId, Function.identity()));
 
-        List<ProcessDefinitionDTO> processDefinitionDTOS = processDefinitionService.list(
+        List<ProcessDefinitionDto> processDefinitionDtos = processDefinitionService.list(
                 ListUtil.toList(processSceneProcessEntityMap.keySet()), withXML);
 
 
         // 收集 scene 和 process definition list 的映射
-        Map<Long, List<ProcessDefinitionDTO>> sceneProcessListMap = processDefinitionDTOS.stream().collect(Collectors.groupingBy(
+        Map<Long, List<ProcessDefinitionDto>> sceneProcessListMap = processDefinitionDtos.stream().collect(Collectors.groupingBy(
                 processDefinition -> processSceneProcessEntityMap.get(processDefinition.getProcessId()).getBusinessSceneId()));
 
         for (Map.Entry<Long, SceneDTO> entry : sceneMap.entrySet()) {
             Long sceneId = entry.getKey();
             SceneDTO sceneDTO = entry.getValue();
 
-            List<ProcessDefinitionDTO> tempProcessDefinitionDTOS = sceneProcessListMap.get(sceneId);
-            if(CollUtil.isEmpty(tempProcessDefinitionDTOS)) {
+            List<ProcessDefinitionDto> tempProcessDefinitionDtos = sceneProcessListMap.get(sceneId);
+            if(CollUtil.isEmpty(tempProcessDefinitionDtos)) {
                 continue;
             }
 
             // 根据最后更新时间排序
-            tempProcessDefinitionDTOS = CollUtil.sort(tempProcessDefinitionDTOS, (o1, o2) -> {
+            tempProcessDefinitionDtos = CollUtil.sort(tempProcessDefinitionDtos, (o1, o2) -> {
                 LocalDateTime time1 = Optional.ofNullable(o1.getUpdateTime()).orElse(LocalDateTime.MIN);
                 LocalDateTime time2 = Optional.ofNullable(o2.getUpdateTime()).orElse(LocalDateTime.MIN);
                 return time2.compareTo(time1);
             });
 
-            ProcessDefinitionDTO first = tempProcessDefinitionDTOS.get(0);
+            ProcessDefinitionDto first = tempProcessDefinitionDtos.get(0);
             sceneDTO.setImgUrl(first.getImgUrl());
 
             List<SceneProcessDTO> sceneProcessDTOList = new ArrayList<>();
             // 如果是带XML，就需要查询出definition
-            for (ProcessDefinitionDTO processDefinitionDTO : tempProcessDefinitionDTOS) {
+            for (ProcessDefinitionDto processDefinitionDTO : tempProcessDefinitionDtos) {
                 SceneProcessEntity sceneProcessEntity =
                         processSceneProcessEntityMap.get(processDefinitionDTO.getProcessId());
                 SceneProcessDTO sceneProcessDTO = toDTO(sceneProcessEntity, processDefinitionDTO);
@@ -244,7 +244,7 @@ public class SceneService implements ISceneService {
     }
 
     private SceneProcessDTO toDTO(SceneProcessEntity sceneProcessEntity,
-                                  ProcessDefinitionDTO processDefinitionDTO) {
+                                  ProcessDefinitionDto processDefinitionDTO) {
         SceneProcessDTO dto = new SceneProcessDTO();
         dto.setId(sceneProcessEntity.getId());
         dto.setBusinessSceneId(sceneProcessEntity.getBusinessSceneId());
@@ -271,8 +271,8 @@ public class SceneService implements ISceneService {
         return entity;
     }
 
-    private ProcessDefinitionDTO toDTO(SceneProcessDTO sceneProcessDTO) {
-        ProcessDefinitionDTO dto = new ProcessDefinitionDTO();
+    private ProcessDefinitionDto toDTO(SceneProcessDTO sceneProcessDTO) {
+        ProcessDefinitionDto dto = new ProcessDefinitionDto();
         dto.setProcessId(sceneProcessDTO.getProcessId());
         dto.setName(sceneProcessDTO.getName());
         dto.setXml(sceneProcessDTO.getXml());

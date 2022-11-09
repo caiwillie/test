@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.operate.cache.DeployCache;
 import com.brandnewdata.mop.poc.operate.dto.GroupDeployDTO;
-import com.brandnewdata.mop.poc.process.dto.ProcessDeployDTO;
+import com.brandnewdata.mop.poc.process.dto.ProcessDeployDto;
 import com.brandnewdata.mop.poc.util.PageEnhancedUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,12 +34,12 @@ public class GroupDeployService {
 
     private Map<String, GroupDeployDTO> getAllGroupDeployMap() {
         Map<String, GroupDeployDTO> ret = new HashMap<>();
-        Map<Long, ProcessDeployDTO> processDeployMap = cache.asMap();
+        Map<Long, ProcessDeployDto> processDeployMap = cache.asMap();
         if(CollUtil.isEmpty(processDeployMap)) {
             return ret;
         }
 
-        for (ProcessDeployDTO processDeployDTO : processDeployMap.values()) {
+        for (ProcessDeployDto processDeployDTO : processDeployMap.values()) {
             String processId = processDeployDTO.getProcessId();
             String processName = processDeployDTO.getProcessName();
             int version = processDeployDTO.getVersion();
@@ -56,7 +56,7 @@ public class GroupDeployService {
                 groupDeployDTO.setProcessName(processName);
                 groupDeployDTO.setLatestVersion(version);
                 groupDeployDTO.setLatestUpdateTime(updateTime);
-                List<ProcessDeployDTO> list = new ArrayList<>();
+                List<ProcessDeployDto> list = new ArrayList<>();
                 list.add(processDeployDTO);
                 groupDeployDTO.setDeploys(list);
                 ret.put(processId, groupDeployDTO);
@@ -91,10 +91,10 @@ public class GroupDeployService {
         List<GroupDeployDTO> filterList = PageEnhancedUtil.slice(pageNum, pageSize, values);
 
         for (GroupDeployDTO groupDeployDTO : filterList) {
-            List<ProcessDeployDTO> deploys = groupDeployDTO.getDeploys();
+            List<ProcessDeployDto> deploys = groupDeployDTO.getDeploys();
 
             // 对 deploy 列表进行排序
-            List<ProcessDeployDTO> deployDTOS = deploys.stream().sorted((o1, o2) -> Integer.compare(o2.getVersion(), o1.getVersion()))
+            List<ProcessDeployDto> deployDTOS = deploys.stream().sorted((o1, o2) -> Integer.compare(o2.getVersion(), o1.getVersion()))
                     .collect(Collectors.toList());
             groupDeployDTO.setDeploys(deployDTOS);
         }

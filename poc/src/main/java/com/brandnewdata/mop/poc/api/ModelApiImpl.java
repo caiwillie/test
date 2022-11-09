@@ -10,7 +10,7 @@ import com.brandnewdata.mop.api.dto.BPMNResource;
 import com.brandnewdata.mop.api.dto.ConnectorResource;
 import com.brandnewdata.mop.api.dto.StartMessage;
 import com.brandnewdata.mop.poc.process.ProcessConstants;
-import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDTO;
+import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import com.dxy.library.json.jackson.JacksonUtil;
 import lombok.SneakyThrows;
@@ -43,7 +43,7 @@ public class ModelApiImpl implements ModelApi {
 
             if(CollUtil.isNotEmpty(triggers)) {
                 for (BPMNResource trigger : triggers) {
-                    ProcessDefinitionDTO processDefinitionDTO = new ProcessDefinitionDTO();
+                    ProcessDefinitionDto processDefinitionDTO = new ProcessDefinitionDto();
                     processDefinitionDTO.setProcessId(trigger.getModelKey());
                     processDefinitionDTO.setName(StrUtil.format("【触发器】{}", trigger.getName()));
                     processDefinitionDTO.setXml(trigger.getEditorXML());
@@ -53,7 +53,7 @@ public class ModelApiImpl implements ModelApi {
 
             if(CollUtil.isNotEmpty(operates)) {
                 for (BPMNResource operate : operates) {
-                    ProcessDefinitionDTO processDefinitionDTO = new ProcessDefinitionDTO();
+                    ProcessDefinitionDto processDefinitionDTO = new ProcessDefinitionDto();
                     processDefinitionDTO.setProcessId(operate.getModelKey());
                     processDefinitionDTO.setName(StrUtil.format("【操作】{}", operate.getName()));
                     processDefinitionDTO.setXml(operate.getEditorXML());

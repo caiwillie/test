@@ -3,8 +3,8 @@ package com.brandnewdata.mop.poc.process.parser;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.json.JSONUtil;
 import com.brandnewdata.mop.poc.manager.ConnectorManager;
-import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDTO;
-import com.brandnewdata.mop.poc.process.dto.parser.TriggerProcessDefinitionDTO;
+import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDto;
+import com.brandnewdata.mop.poc.process.dto.parser.TriggerProcessDefinitionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -14,7 +14,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 
 
-class ProcessDefinitionDTOParserTest {
+class ProcessDefinitionDtoParserTest {
 
 
     @Mock
@@ -28,7 +28,7 @@ class ProcessDefinitionDTOParserTest {
     @Test
     void testNewInstance() {
         String xml = ResourceUtil.readUtf8Str("test.bpmn.xml");
-        ProcessDefinitionDTO processDefinitionDTO = new ProcessDefinitionDTO();
+        ProcessDefinitionDto processDefinitionDTO = new ProcessDefinitionDto();
         processDefinitionDTO.setProcessId(null);
         processDefinitionDTO.setName(null);
         processDefinitionDTO.setXml(xml);
@@ -40,7 +40,7 @@ class ProcessDefinitionDTOParserTest {
     @Test
     void testStep1() {
         String xml = ResourceUtil.readUtf8Str("test.bpmn.xml");
-        ProcessDefinitionDTO processDefinitionDTO = new ProcessDefinitionDTO();
+        ProcessDefinitionDto processDefinitionDTO = new ProcessDefinitionDto();
         processDefinitionDTO.setProcessId(null);
         processDefinitionDTO.setName(null);
         processDefinitionDTO.setXml(xml);
@@ -57,11 +57,11 @@ class ProcessDefinitionDTOParserTest {
         String json = ResourceUtil.readUtf8Str("trigger.json");
         String triggerFullId = "com.develop:wjx.callback:v1";
         String xml = JSONUtil.parseObj(json).getStr("processEditing");
-        ProcessDefinitionDTO processDefinitionDTO = new ProcessDefinitionDTO();
+        ProcessDefinitionDto processDefinitionDTO = new ProcessDefinitionDto();
         processDefinitionDTO.setProcessId(triggerFullId);
         processDefinitionDTO.setXml(xml);
         ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(processDefinitionDTO);
-        TriggerProcessDefinitionDTO triggerProcessDefinition = step1.replaceStep1().replaceTriggerStartEvent(manager)
+        TriggerProcessDefinitionDto triggerProcessDefinition = step1.replaceStep1().replaceTriggerStartEvent(manager)
                 .buildTriggerProcessDefinition();
         return;
     }
@@ -76,10 +76,10 @@ class ProcessDefinitionDTOParserTest {
         when(manager.getProtocol(any())).thenReturn("HTTP");
 
         String xml = ResourceUtil.readUtf8Str("test.bpmn.xml");
-        ProcessDefinitionDTO processDefinitionDTO = new ProcessDefinitionDTO();
+        ProcessDefinitionDto processDefinitionDTO = new ProcessDefinitionDto();
         processDefinitionDTO.setXml(xml);
         ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(processDefinitionDTO);
-        TriggerProcessDefinitionDTO triggerProcessDefinition = step1.replaceStep1().replaceSceneStartEvent(manager)
+        TriggerProcessDefinitionDto triggerProcessDefinition = step1.replaceStep1().replaceSceneStartEvent(manager)
                 .buildTriggerProcessDefinition();
     }
 }

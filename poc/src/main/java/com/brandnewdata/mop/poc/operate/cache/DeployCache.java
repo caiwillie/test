@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.process.dao.ProcessDeployDao;
-import com.brandnewdata.mop.poc.process.dto.ProcessDeployDTO;
+import com.brandnewdata.mop.poc.process.dto.ProcessDeployDto;
 import com.brandnewdata.mop.poc.process.entity.ProcessDeployEntity;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -24,12 +24,12 @@ public class DeployCache {
 
     private long lastId = 0;
 
-    private Cache<Long, ProcessDeployDTO> cache = CacheBuilder.newBuilder().build();
+    private Cache<Long, ProcessDeployDto> cache = CacheBuilder.newBuilder().build();
 
     @Scheduled(fixedDelay = 1000)
     public void load() {
         long lastId = this.lastId;
-        List<ProcessDeployDTO> tempList = new ArrayList<>();
+        List<ProcessDeployDto> tempList = new ArrayList<>();
 
         do {
             QueryWrapper<ProcessDeployEntity> queryWrapper = new QueryWrapper<>();
@@ -42,7 +42,7 @@ public class DeployCache {
             tempList.clear();
             if(CollUtil.isNotEmpty(entities)) {
                 for (ProcessDeployEntity entity : entities) {
-                    ProcessDeployDTO processDeployDTO = new ProcessDeployDTO();
+                    ProcessDeployDto processDeployDTO = new ProcessDeployDto();
                     processDeployDTO.setId(entity.getId());
                     processDeployDTO.setProcessId(entity.getProcessId());
                     processDeployDTO.setProcessName(entity.getProcessName());
@@ -56,7 +56,7 @@ public class DeployCache {
                 ProcessDeployEntity lastProcessDeploy = entities.get(entities.size() - 1);
                 lastId = lastProcessDeploy.getId();
 
-                for (ProcessDeployDTO processDeployDTO : tempList) {
+                for (ProcessDeployDto processDeployDTO : tempList) {
                     cache.put(processDeployDTO.getId(), processDeployDTO);
                 }
             }
@@ -66,7 +66,7 @@ public class DeployCache {
         this.lastId = lastId;
     }
 
-    public Map<Long, ProcessDeployDTO> asMap() {
+    public Map<Long, ProcessDeployDto> asMap() {
         return cache.asMap();
     }
 

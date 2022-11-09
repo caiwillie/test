@@ -21,7 +21,7 @@ import com.brandnewdata.mop.poc.operate.schema.template.FlowNodeInstanceTemplate
 import com.brandnewdata.mop.poc.operate.schema.template.ListViewTemplate;
 import com.brandnewdata.mop.poc.operate.schema.template.SequenceFlowTemplate;
 import com.brandnewdata.mop.poc.operate.util.ElasticsearchUtil;
-import com.brandnewdata.mop.poc.process.dto.ProcessDeployDTO;
+import com.brandnewdata.mop.poc.process.dto.ProcessDeployDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import com.brandnewdata.mop.poc.util.PageEnhancedUtil;
 import io.camunda.operate.dto.ProcessInstanceState;
@@ -55,7 +55,7 @@ public class ProcessInstanceService {
         Assert.notNull(pageNum);
         Assert.notNull(pageSize);
 
-        ProcessDeployDTO deployDTO = deployService.getOne(deployId);
+        ProcessDeployDto deployDTO = deployService.getOne(deployId);
 
         Long zeebeKey = deployDTO.getZeebeKey();
 

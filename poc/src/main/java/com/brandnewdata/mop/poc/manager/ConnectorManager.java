@@ -10,7 +10,7 @@ import com.brandnewdata.connector.api.ITriggerProtocolFeign;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.manager.dto.TriggerInfo;
 import com.brandnewdata.mop.poc.process.dto.parser.TriggerOrOperate;
-import com.brandnewdata.mop.poc.process.dto.parser.TriggerProcessDefinitionDTO;
+import com.brandnewdata.mop.poc.process.dto.parser.TriggerProcessDefinitionDto;
 import com.dxy.library.json.jackson.JacksonUtil;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
@@ -65,7 +65,7 @@ public class ConnectorManager {
     }
 
     @SneakyThrows
-    public void saveRequestParams(TriggerProcessDefinitionDTO processDefinition) {
+    public void saveRequestParams(TriggerProcessDefinitionDto processDefinition) {
         IConnectorCommonTriggerProcessConfFeign.ConnectorCommonTriggerProcessConfParamDTO dto =
                 new IConnectorCommonTriggerProcessConfFeign.ConnectorCommonTriggerProcessConfParamDTO();
         dto.setProcessId(processDefinition.getProcessId());

@@ -6,7 +6,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.manager.ConnectorManager;
-import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDTO;
+import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDto;
 import com.brandnewdata.mop.poc.process.dto.parser.*;
 import com.brandnewdata.mop.poc.process.parser.constants.StringPool;
 import com.brandnewdata.mop.poc.process.util.ProcessUtil;
@@ -73,15 +73,15 @@ public class ProcessDefinitionParser implements
     private static final IOMapParser IO_MAP_PARSER = new IOMapParser();
 
     // 工厂模式
-    private ProcessDefinitionParser(ProcessDefinitionDTO processDefinitionDTO) {
+    private ProcessDefinitionParser(ProcessDefinitionDto processDefinitionDTO) {
         init(processDefinitionDTO);
     }
 
-    public static ProcessDefinitionParseStep1 newInstance(ProcessDefinitionDTO processDefinitionDTO) {
+    public static ProcessDefinitionParseStep1 newInstance(ProcessDefinitionDto processDefinitionDTO) {
         return new ProcessDefinitionParser(processDefinitionDTO);
     }
 
-    private void init(ProcessDefinitionDTO processDefinitionDTO) {
+    private void init(ProcessDefinitionDto processDefinitionDTO) {
         this.document = readDocument(processDefinitionDTO.getXml());
         this.oldDocument = serialize(document);
         this.processId = processDefinitionDTO.getProcessId();
@@ -501,10 +501,10 @@ public class ProcessDefinitionParser implements
         String xml = manager.getTriggerXML(trigger);
 
         // 解析自定义触发器内的通用触发器
-        ProcessDefinitionDTO _processDefintion = new ProcessDefinitionDTO();
+        ProcessDefinitionDto _processDefintion = new ProcessDefinitionDto();
         _processDefintion.setProcessId(trigger.getFullId());
         _processDefintion.setXml(xml);
-        TriggerProcessDefinitionDTO triggerProcessDefinition = ProcessDefinitionParser.newInstance(_processDefintion)
+        TriggerProcessDefinitionDto triggerProcessDefinition = ProcessDefinitionParser.newInstance(_processDefintion)
                 .replaceStep1().replaceTriggerStartEvent(manager).buildTriggerProcessDefinition();
 
         // 替换成真实协议
@@ -687,12 +687,12 @@ public class ProcessDefinitionParser implements
     }
 
     @Override
-    public ProcessDefinitionDTO buildProcessDefinition() {
+    public ProcessDefinitionDto buildProcessDefinition() {
         // 移除无用信息
         removeUnusedNamespace();
         // 打xml日志
         logXML();
-        ProcessDefinitionDTO ret = new ProcessDefinitionDTO();
+        ProcessDefinitionDto ret = new ProcessDefinitionDto();
         ret.setProcessId(processId);
         ret.setName(name);
         ret.setXml(documentStr);
@@ -817,12 +817,12 @@ public class ProcessDefinitionParser implements
     }
 
     @Override
-    public TriggerProcessDefinitionDTO buildTriggerProcessDefinition() {
+    public TriggerProcessDefinitionDto buildTriggerProcessDefinition() {
         // 移除无用信息
         removeUnusedNamespace();
         // 打xml日志
         logXML();
-        TriggerProcessDefinitionDTO ret = new TriggerProcessDefinitionDTO();
+        TriggerProcessDefinitionDto ret = new TriggerProcessDefinitionDto();
         ret.setProcessId(processId);
         ret.setName(name);
         ret.setXml(documentStr);

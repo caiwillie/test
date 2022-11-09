@@ -1,28 +1,35 @@
 package com.brandnewdata.mop.poc.scene.rest;
 
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.scene.dto.SceneDTO;
 import com.brandnewdata.mop.poc.scene.dto.SceneProcessDTO;
 import com.brandnewdata.mop.poc.scene.request.ExportReq;
+import com.brandnewdata.mop.poc.scene.service.DataExternalService;
 import com.brandnewdata.mop.poc.scene.service.ISceneService;
 import com.dxy.library.json.jackson.JacksonUtil;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
+import java.time.LocalDate;
 
 /**
  * 业务场景集成相关的接口
@@ -35,6 +42,9 @@ public class SceneRest {
 
     @Autowired
     private ISceneService service;
+
+    @Resource
+    private DataExternalService dataExternalService;
 
     /**
      * 分页列表
@@ -139,13 +149,16 @@ public class SceneRest {
      * @throws IOException the io exception
      */
     @PostMapping("/rest/businessScene/export")
-    public void export(
-            HttpServletResponse response,
-            @RequestBody ExportReq req) throws IOException {
+    public void export(HttpServletResponse response, @RequestBody ExportReq req) {
         log.info("path: /rest/businessScene/export, req: {}", JacksonUtil.to(req));
-        String fileName = "case.yaml";
-        InputStream inputStream = ResourceUtil.getStream(fileName);
-        final String contentType = ObjectUtil.defaultIfNull(FileUtil.getMimeType(fileName), "application/octet-stream");
+
+        File file = dataExternalService.export(req);
+        InputStream inputStream = FileUtil.getInputStream(file);
+
+        String fileName = StrUtil.format("场景导出({}).zip",
+                LocalDateTimeUtil.format(LocalDate.now(), DatePattern.PURE_DATETIME_PATTERN));
+        String contentType = ObjectUtil.defaultIfNull(FileUtil.getMimeType(fileName), "application/octet-stream");
+
         response.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
         ServletUtil.write(response, inputStream, contentType, fileName);
     }
