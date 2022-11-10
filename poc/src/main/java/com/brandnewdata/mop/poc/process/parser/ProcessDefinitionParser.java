@@ -254,7 +254,7 @@ public class ProcessDefinitionParser implements
      * @param processId
      * @param xml
      */
-    private void init(String name, String processId, String xml) {
+    private void init(String processId, String name, String xml) {
         this.processId = processId;
         this.name = name;
         this.document = readRoot(xml);

@@ -30,7 +30,6 @@ public class SceneProcessEntity implements Serializable {
 
     private String processId;
 
-
     public static final String ID = "id";
 
     public static final String BUSINESS_SCENE_ID = "business_scene_id";
