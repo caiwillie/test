@@ -34,8 +34,6 @@ import static com.brandnewdata.mop.poc.process.parser.constants.QNameConstants.*
 public class ProcessDefinitionParser implements
         ProcessDefinitionParseStep1, ProcessDefinitionParseStep2, ProcessDefinitionParseStep3 {
 
-
-
     private String oldDocument;
 
     private String processId;
@@ -104,6 +102,16 @@ public class ProcessDefinitionParser implements
         }
 
         return this;
+    }
+
+    @Override
+    public ProcessDefinitionParseStep1 replProcessId(String processId) {
+        return null;
+    }
+
+    @Override
+    public ProcessDefinitionParseStep1 replConfigId(Map<String, String> configMapping) {
+        return null;
     }
 
     @Override
@@ -322,15 +330,19 @@ public class ProcessDefinitionParser implements
      */
     private void parseIdName() {
         Element bpProcess = getBpProcess();
-        if(processId != null && name != null) {
+
+        if(processId != null) {
             bpProcess.addAttribute(ID_ATTRIBUTE, ProcessUtil.convertProcessId(processId));
-            bpProcess.addAttribute(NAME_ATTRIBUTE, name);
-        } else {
-            processId = bpProcess.attributeValue(ID_ATTRIBUTE);
-            name = bpProcess.attributeValue(NAME_ATTRIBUTE);
-            Assert.notEmpty(processId, ErrorMessage.NOT_NULL("流程 id"));
-            Assert.notEmpty(name, ErrorMessage.NOT_NULL("流程名称"));
         }
+
+        if(name != null) {
+            bpProcess.addAttribute(NAME_ATTRIBUTE, name);
+        }
+
+        processId = bpProcess.attributeValue(ID_ATTRIBUTE);
+        name = bpProcess.attributeValue(NAME_ATTRIBUTE);
+        Assert.notEmpty(processId, ErrorMessage.NOT_NULL("流程 id"));
+        Assert.notEmpty(name, ErrorMessage.NOT_NULL("流程名称"));
     }
 
     /**

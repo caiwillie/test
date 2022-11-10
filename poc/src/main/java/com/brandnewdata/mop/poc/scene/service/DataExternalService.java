@@ -127,6 +127,44 @@ public class DataExternalService {
         return zip;
     }
 
+    public LoadResp load(byte[] bytes) {
+        LoadResp resp = new LoadResp();
+        File dir = unzip(bytes);
+
+        File sceneFile = new File(dir, FILENAME__SCENE_PROCESS);
+        File definitionFile = new File(dir, FILENAME__PROCESS_DEFINITION);
+        File configFile = new File(dir, FILENAME__CONFIG);
+        Assert.isTrue(fileExist(sceneFile), "[0x01] 文件缺失");
+        Assert.isTrue(fileExist(definitionFile), "[0x02] 文件缺失");
+        Assert.isTrue(fileExist(configFile), "[0x03] 文件缺失");
+
+        // 解析压缩包内的文件
+        Map<Long, SceneProcessExternal> processMap = null;
+        Map<String, ProcessDefinitionExternal> definitionMap = null;
+        Map<String, ConfigExternal> configMap = null;
+        try {
+            processMap = OM.readValue(sceneFile, MAP_TYPE1);
+            processMap = Opt.ofNullable(processMap).orElse(MapUtil.empty());
+            definitionMap = OM.readValue(definitionFile, MAP_TYPE2);
+            definitionMap = Opt.ofNullable(definitionMap).orElse(MapUtil.empty());
+            configMap = OM.readValue(configFile, MAP_TYPE3);
+            configMap = Opt.ofNullable(configMap).orElse(MapUtil.empty());
+        } catch (IOException e) {
+            throw new IllegalArgumentException("[0x01] 文件格式错误");
+        }
+
+        // 将上传文件保存至数据库
+        SceneLoadEntity sceneLoadEntity = new SceneLoadEntity();
+        sceneLoadEntity.setZipBytes(bytes);
+        loadDao.insert(sceneLoadEntity);
+
+        resp.setId(sceneLoadEntity.getId());
+        List<ConnConfResp> configureList = getConnConfRespList(configMap.values());
+        resp.setConfigureList(configureList);
+
+        return resp;
+    }
+
     private static File createTempFile(String content) {
         Path path = null;
         try {
@@ -188,44 +226,6 @@ public class DataExternalService {
             }
         }
         return ret;
-    }
-
-    public LoadResp load(byte[] bytes) {
-        LoadResp resp = new LoadResp();
-        File dir = unzip(bytes);
-
-        File sceneFile = new File(dir, FILENAME__SCENE_PROCESS);
-        File definitionFile = new File(dir, FILENAME__PROCESS_DEFINITION);
-        File configFile = new File(dir, FILENAME__CONFIG);
-        Assert.isTrue(fileExist(sceneFile), "[0x01] 文件缺失");
-        Assert.isTrue(fileExist(definitionFile), "[0x02] 文件缺失");
-        Assert.isTrue(fileExist(configFile), "[0x03] 文件缺失");
-
-        // 解析压缩包内的文件
-        Map<Long, SceneProcessExternal> processMap = null;
-        Map<String, ProcessDefinitionExternal> definitionMap = null;
-        Map<String, ConfigExternal> configMap = null;
-        try {
-            processMap = OM.readValue(sceneFile, MAP_TYPE1);
-            processMap = Opt.ofNullable(processMap).orElse(MapUtil.empty());
-            definitionMap = OM.readValue(definitionFile, MAP_TYPE2);
-            definitionMap = Opt.ofNullable(definitionMap).orElse(MapUtil.empty());
-            configMap = OM.readValue(configFile, MAP_TYPE3);
-            configMap = Opt.ofNullable(configMap).orElse(MapUtil.empty());
-        } catch (IOException e) {
-            throw new IllegalArgumentException("[0x01] 文件格式错误");
-        }
-
-        // 将上传文件保存至数据库
-        SceneLoadEntity sceneLoadEntity = new SceneLoadEntity();
-        sceneLoadEntity.setZipBytes(bytes);
-        loadDao.insert(sceneLoadEntity);
-
-        resp.setId(sceneLoadEntity.getId());
-        List<ConnConfResp> configureList = getConnConfRespList(configMap.values());
-        resp.setConfigureList(configureList);
-
-        return resp;
     }
 
     private List<ConnConfResp> getConnConfRespList(Collection<ConfigExternal> configExternals) {
