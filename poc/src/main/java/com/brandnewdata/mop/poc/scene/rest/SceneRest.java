@@ -12,6 +12,7 @@ import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.scene.dto.SceneDTO;
 import com.brandnewdata.mop.poc.scene.dto.SceneProcessDTO;
 import com.brandnewdata.mop.poc.scene.request.ExportReq;
+import com.brandnewdata.mop.poc.scene.response.LoadResp;
 import com.brandnewdata.mop.poc.scene.service.DataExternalService;
 import com.brandnewdata.mop.poc.scene.service.ISceneService;
 import com.dxy.library.json.jackson.JacksonUtil;
@@ -161,16 +162,29 @@ public class SceneRest {
     }
 
     /**
-     * 导入场景
+     * 预备导入场景
      *
      * @param file the file
      * @return result
      */
-    @ApiOperation(value = "导入数据")
-    @PostMapping("/rest/businessScene/load")
-    public Result load(@RequestParam MultipartFile file) {
+    @PostMapping("/rest/businessScene/prepareLoad")
+    public Result<LoadResp> prepareLoad(@RequestParam MultipartFile file) {
+        try {
+            LoadResp resp = dataExternalService.load(file.getBytes());
+            return Result.OK(resp);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-        return Result.OK();
+    /**
+     * 确认导入场景
+     *
+     * @return
+     */
+    @PostMapping("/rest/businessScene/confirmLoad")
+    public Result confirmLoad(@RequestBody LoadResp req) {
+        return Result.ok();
     }
 
 }

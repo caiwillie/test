@@ -90,11 +90,11 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         ProcessDefinitionParseStep2 step2 = step1.replServiceTask(true, connectorManager).replAttr().step2();
 
         if(type == ProcessConstants.PROCESS_TYPE_SCENE) {
-            step2.replSE_scene(connectorManager);
+            step2.replEleSceneSe(connectorManager);
         } else if (type == ProcessConstants.PROCESS_TYPE_TRIGGER) {
-            step2.replSE_trigger(connectorManager);
+            step2.replEleTriggerSe(connectorManager);
         } else if (type == ProcessConstants.PROCESS_TYPE_OPERATE) {
-            step2.replSE_operate();
+            step2.replEleOperateSe();
         } else {
             throw new IllegalArgumentException(ErrorMessage.CHECK_ERROR("触发器类型不支持", null));
         }
@@ -188,7 +188,7 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
 
         Step3Result step3Result = ProcessDefinitionParser
                 .step1(null, null, processDeployEntity.getProcessXml()).replServiceTask(true, connectorManager)
-                .step2().replSE_scene(connectorManager)
+                .step2().replEleSceneSe(connectorManager)
                 .step3().step3Result();
 
         // 解析 xml 后得到响应表达式

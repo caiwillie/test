@@ -10,7 +10,7 @@ import java.util.List;
 public class LoadResp {
 
     /**
-     * 目录路径
+     * id
      */
     private Long id;
 

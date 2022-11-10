@@ -11,14 +11,19 @@ import lombok.Setter;
 public class ConnConfResp {
 
     /**
-     * 连接器名称
+     * 连接器所属组
      */
-    private String connectorName;
+    private String connectorGroup;
 
     /**
      * 连接器id
      */
-    private String connectorType;
+    private String connectorId;
+
+    /**
+     * 连接器名称
+     */
+    private String connectorName;
 
     /**
      * 连接器版本
@@ -26,7 +31,17 @@ public class ConnConfResp {
     private String connectorVersion;
 
     /**
+     * 连接器icon
+     */
+    private String connectorIcon;
+
+    /**
      * 配置名称
+     */
+    private String configureName;
+
+    /**
+     * 配置id
      */
     private String configureId;
 

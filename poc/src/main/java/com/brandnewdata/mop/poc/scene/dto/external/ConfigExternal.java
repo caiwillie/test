@@ -6,10 +6,12 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ConfigExternal {
-    private String connectorType;
-    private String connectorName;
+    private String connectorGroup;
+    private String connectorId;
     private String connectorVersion;
+    private String connectorName;
     private String connectorIcon;
     private String configId;
+    private String configName;
     private String newConfigId;
 }

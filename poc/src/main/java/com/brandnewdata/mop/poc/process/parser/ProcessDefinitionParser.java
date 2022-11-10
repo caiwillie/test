@@ -23,10 +23,7 @@ import org.dom4j.io.XMLWriter;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.brandnewdata.mop.poc.process.parser.constants.AttributeConstants.*;
 import static com.brandnewdata.mop.poc.process.parser.constants.BusinessConstants.*;
@@ -57,7 +54,7 @@ public class ProcessDefinitionParser implements
 
     private ObjectNode responseParams;
 
-    private Map<String, String> configMap = new HashMap<>();
+    private List<String> configs = new ArrayList<>();
 
     private static final ParameterParser INPUT_PARSER = new ParameterParser(
             BRANDNEWDATA_INPUT_QNAME.getQualifiedName(),
@@ -96,8 +93,6 @@ public class ProcessDefinitionParser implements
 
         for (Node node : nodes) {
             Element oldE = (Element) node;
-            Element parent = oldE.getParent();
-            Element ioMapping = getOrCreateIoMapping(parent);
             String type = oldE.attributeValue(TYPE_ATTRIBUTE);
             String configId = oldE.attributeValue(CONFIG_ID_ATTRIBUTE);
             if(StrUtil.isBlank(configId)) {
@@ -105,7 +100,7 @@ public class ProcessDefinitionParser implements
             }
 
             // 存放连接器的配置信息
-            configMap.put(type, configId);
+            configs.add(configId);
         }
 
         return this;
@@ -156,12 +151,12 @@ public class ProcessDefinitionParser implements
         ret.setProcessId(processId);
         ret.setName(name);
         ret.setXml(documentStr);
-        ret.setConfigMap(configMap);
+        ret.setConfigs(configs);
         return ret;
     }
 
     @Override
-    public ProcessDefinitionParseStep2 replSE_trigger(ConnectorManager manager) {
+    public ProcessDefinitionParseStep2 replEleTriggerSe(ConnectorManager manager) {
         // 解析开始事件
         Element startEvent = parseSE();
 
@@ -185,14 +180,14 @@ public class ProcessDefinitionParser implements
     }
 
     @Override
-    public ProcessDefinitionParseStep2 replSE_operate() {
+    public ProcessDefinitionParseStep2 replEleOperateSe() {
         Element startEvent = parseSE();
         replEleSeToNone(startEvent);
         return this;
     }
 
     @Override
-    public ProcessDefinitionParseStep2 replSE_scene(ConnectorManager manager) {
+    public ProcessDefinitionParseStep2 replEleSceneSe(ConnectorManager manager) {
         // 解析开始事件
         Element startEvent = parseSE();
 
@@ -364,7 +359,7 @@ public class ProcessDefinitionParser implements
             if(StrUtil.isBlank(configId)) {
                 continue;
             }
-            String properties = manager.getProperties(configId);
+            String properties = manager.getConfigInfo(configId).getConfigs();
             if(StrUtil.isNotBlank(properties)) {
                 Element newE = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
                 newE.addAttribute(TARGET_ATTRIBUTE, PROPERTIES_PREFIX);
@@ -372,9 +367,6 @@ public class ProcessDefinitionParser implements
                 newE.setParent(ioMapping);
                 ioMapping.content().add(newE);
             }
-
-            // 存放连接器的配置信息
-            configMap.put(type, configId);
         }
 
         return this;
@@ -827,7 +819,7 @@ public class ProcessDefinitionParser implements
                 .step1(trigger.getFullId(), null, xml)
                 .replServiceTask(false, null)
                 .replAttr()
-                .step2().replSE_trigger(manager)
+                .step2().replEleTriggerSe(manager)
                 .step3().step3Result();
 
         // 替换成真实协议

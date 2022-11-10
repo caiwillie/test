@@ -5,11 +5,11 @@ import com.brandnewdata.mop.poc.process.parser.dto.Step2Result;
 
 public interface ProcessDefinitionParseStep2 {
 
-    ProcessDefinitionParseStep2 replSE_trigger(ConnectorManager manager);
+    ProcessDefinitionParseStep2 replEleTriggerSe(ConnectorManager manager);
 
-    ProcessDefinitionParseStep2 replSE_operate();
+    ProcessDefinitionParseStep2 replEleOperateSe();
 
-    ProcessDefinitionParseStep2 replSE_scene(ConnectorManager manager);
+    ProcessDefinitionParseStep2 replEleSceneSe(ConnectorManager manager);
 
     ProcessDefinitionParseStep3 step3();
 

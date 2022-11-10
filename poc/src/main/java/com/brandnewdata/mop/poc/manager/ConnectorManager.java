@@ -8,6 +8,8 @@ import com.brandnewdata.connector.api.IConnectorCommonTriggerProcessConfFeign;
 import com.brandnewdata.connector.api.IConnectorConfFeign;
 import com.brandnewdata.connector.api.ITriggerProtocolFeign;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
+import com.brandnewdata.mop.poc.manager.dto.ConfigInfo;
+import com.brandnewdata.mop.poc.manager.dto.ConnectorBasicInfo;
 import com.brandnewdata.mop.poc.manager.dto.TriggerInfo;
 import com.brandnewdata.mop.poc.process.parser.dto.Step3Result;
 import com.brandnewdata.mop.poc.process.parser.dto.Action;
@@ -34,9 +36,18 @@ public class ConnectorManager {
     @Resource
     private ITriggerProtocolFeign protocolClient;
 
-    public String getProperties(String id) {
-        IConnectorConfFeign.ConnectorConfDTO configInfo = confClient.getConfigInfo(Long.parseLong(id));
-        return configInfo.getConfigs();
+    public ConfigInfo getConfigInfo(String configId) {
+        IConnectorConfFeign.ConnectorConfDTO configInfo = confClient.getConfigInfo(Long.parseLong(configId));
+        if(configInfo == null) return null;
+        ConfigInfo ret = new ConfigInfo();
+        ret.setId(configInfo.getId());
+        ret.setConnectorGroup(configInfo.getConnectorGroup());
+        ret.setConnectorId(configInfo.getConnectorId());
+        ret.setConnectorVersion(configInfo.getConnectorVersion());
+        ret.setConnectorName("连接器");
+        ret.setConfigName(ret.getConfigName());
+        ret.setConfigs(ret.getConfigs());
+        return ret;
     }
 
     public String getTriggerXML(Action trigger) {
@@ -62,6 +73,18 @@ public class ConnectorManager {
         }
 
         return xml;
+    }
+
+    public ConnectorBasicInfo getConnectorBasicInfo(String group, String connectorId, String version) {
+        IConnectorBasicInfoFeign.ConnectorBasicInfoDTO info = basicInfoClient.getInfoById(group, connectorId, version);
+        if(info == null) return null;
+        ConnectorBasicInfo ret = new ConnectorBasicInfo();
+        ret.setConnectorGroup(info.getConnectorGroup());
+        ret.setConnectorId(info.getConnectorId());
+        ret.setConnectorName(info.getConnectorName());
+        ret.setConnectorVersion(info.getConnectorVersion());
+        ret.setConnectorSmallIcon(info.getConnectorSmallIcon());
+        return ret;
     }
 
     @SneakyThrows
