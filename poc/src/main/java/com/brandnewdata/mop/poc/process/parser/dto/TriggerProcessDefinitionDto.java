@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.process.dto.parser;
+package com.brandnewdata.mop.poc.process.parser.dto;
 
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDto;
 import com.fasterxml.jackson.databind.node.ObjectNode;

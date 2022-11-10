@@ -1,6 +1,6 @@
 package com.brandnewdata.mop.poc.process.parser;
 
-import com.brandnewdata.mop.poc.process.dto.parser.Step3Result;
+import com.brandnewdata.mop.poc.process.parser.dto.Step3Result;
 
 public interface ProcessDefinitionParseStep3 {
 

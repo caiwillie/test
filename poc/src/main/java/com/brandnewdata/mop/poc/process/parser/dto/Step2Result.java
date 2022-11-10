@@ -1,9 +1,7 @@
-package com.brandnewdata.mop.poc.process.dto.parser;
+package com.brandnewdata.mop.poc.process.parser.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.Map;
 
 @Getter
 @Setter

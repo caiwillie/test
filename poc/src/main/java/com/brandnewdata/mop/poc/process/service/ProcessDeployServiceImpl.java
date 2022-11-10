@@ -13,7 +13,7 @@ import com.brandnewdata.mop.poc.process.ProcessConstants;
 import com.brandnewdata.mop.poc.process.dao.ProcessDeployDao;
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDto;
 import com.brandnewdata.mop.poc.process.dto.ProcessDeployDto;
-import com.brandnewdata.mop.poc.process.dto.parser.Step3Result;
+import com.brandnewdata.mop.poc.process.parser.dto.Step3Result;
 import com.brandnewdata.mop.poc.process.entity.ProcessDeployEntity;
 import com.brandnewdata.mop.poc.process.parser.FeelUtil;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParseStep1;

@@ -1,7 +1,7 @@
 package com.brandnewdata.mop.poc.process.parser;
 
 import cn.hutool.core.util.StrUtil;
-import com.brandnewdata.mop.poc.process.dto.parser.IOMap;
+import com.brandnewdata.mop.poc.process.parser.dto.IOMap;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
