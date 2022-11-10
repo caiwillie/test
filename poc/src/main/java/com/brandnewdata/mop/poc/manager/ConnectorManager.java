@@ -51,7 +51,7 @@ public class ConnectorManager {
 
     public String getTriggerXML(Action trigger) {
         IConnectorBasicInfoFeign.ConnectorBasicInfoDTO info =
-                basicInfoClient.getInfoById(trigger.getGroupId(), trigger.getConnectorId(), trigger.getVersion());
+                basicInfoClient.getInfoById(trigger.getConnectorGroup(), trigger.getConnectorId(), trigger.getConnectorVersion());
 
         Assert.notNull(info, ErrorMessage.NOT_NULL("触发器"));
 

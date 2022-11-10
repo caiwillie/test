@@ -5,15 +5,15 @@ import lombok.Data;
 
 @Data
 public class Action {
-    private String groupId;
+    private String connectorGroup;
 
     private String connectorId;
 
+    private String connectorVersion;
+
     private String actionId;
 
-    private String version;
-
     public String getFullId() {
-        return StrUtil.format("{}:{}.{}:{}", groupId, connectorId, actionId, version);
+        return StrUtil.format("{}:{}.{}:{}", connectorGroup, connectorId, actionId, connectorVersion);
     }
 }

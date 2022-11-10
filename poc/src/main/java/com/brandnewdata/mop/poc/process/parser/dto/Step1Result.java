@@ -12,5 +12,5 @@ public class Step1Result {
     private String processId;
     private String name;
     private String xml;
-    private List<String> configs;
+    private Map<String, String> configs;
 }

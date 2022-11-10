@@ -1,7 +1,6 @@
 package com.brandnewdata.mop.poc.scene.service;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Opt;
@@ -14,7 +13,9 @@ import com.brandnewdata.mop.poc.manager.dto.ConnectorBasicInfo;
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDto;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParseStep1;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParser;
+import com.brandnewdata.mop.poc.process.parser.dto.Action;
 import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService;
+import com.brandnewdata.mop.poc.process.util.ProcessUtil;
 import com.brandnewdata.mop.poc.scene.dao.SceneLoadDao;
 import com.brandnewdata.mop.poc.scene.dao.SceneProcessDao;
 import com.brandnewdata.mop.poc.scene.dto.external.ConfigExternal;
@@ -98,7 +99,7 @@ public class DataExternalService {
         List<ProcessDefinitionDto> processDefinitionDtoList = processDefinitionService.list(processIds, true);
         // 流程具体定义
         Map<String, ProcessDefinitionExternal> processDefinitionMap = new HashMap<>();
-        Set<String> configs = new HashSet<>();
+        Map<String, String> configs = new HashMap<>();
         for (ProcessDefinitionDto processDefinitionDto : processDefinitionDtoList) {
             ProcessDefinitionExternal external = new ProcessDefinitionExternal();
             String processId = processDefinitionDto.getProcessId();
@@ -113,7 +114,7 @@ public class DataExternalService {
 
             // 解析流程中用到的流程
             ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.step1(processId, name, xml);
-            configs.addAll(Opt.ofNullable(step1.parseConfig().step1Result().getConfigs()).orElse(ListUtil.empty()));
+            configs.putAll(Opt.ofNullable(step1.parseConfig().step1Result().getConfigs()).orElse(MapUtil.empty()));
         }
         fileMap.put(FILENAME__PROCESS_DEFINITION, createTempFile(JacksonUtil.to(processDefinitionMap)));
 
@@ -160,16 +161,17 @@ public class DataExternalService {
         return dir;
     }
 
-    private Map<String, ConfigExternal> getConfigExternalMap(Collection<String> configs) {
+    private Map<String, ConfigExternal> getConfigExternalMap(Map<String, String> configs) {
         Map<String, ConfigExternal> ret = new HashMap<>();
-        for (String configId : configs) {
-            ConfigInfo configInfo = connectorManager.getConfigInfo(configId);
-            if(configInfo == null) {
-                // todo 优化
-                continue;
-            }
-            ConnectorBasicInfo connectorBasicInfo = connectorManager.getConnectorBasicInfo(configInfo.getConnectorGroup(),
-                    configInfo.getConnectorId(), configInfo.getConnectorVersion());
+        for (Map.Entry<String, String> entry : configs.entrySet()) {
+            String configId = entry.getKey();
+            String actionFullId = entry.getValue();
+            // 根据 fullId 解析获取连接器信息
+            Action action = ProcessUtil.parseActionInfo(actionFullId);
+            ConnectorBasicInfo connectorBasicInfo = connectorManager.getConnectorBasicInfo(action.getConnectorGroup(),
+                    action.getConnectorId(), action.getConnectorVersion());
+            Assert.notNull(connectorBasicInfo, "[0x01] 连接器不存在");
+
             ConfigExternal configExternal = new ConfigExternal();
             // 连接器相关
             configExternal.setConnectorGroup(connectorBasicInfo.getConnectorGroup());
@@ -177,8 +179,12 @@ public class DataExternalService {
             configExternal.setConnectorVersion(connectorBasicInfo.getConnectorVersion());
             configExternal.setConnectorName(connectorBasicInfo.getConnectorName());
             configExternal.setConnectorIcon(connectorBasicInfo.getConnectorSmallIcon());
-            configExternal.setConfigName(configInfo.getConfigName());
-            configExternal.setConfigId(String.valueOf(configInfo.getId()));
+
+            configExternal.setConfigId(String.valueOf(configId));
+            ConfigInfo configInfo = connectorManager.getConfigInfo(configId);
+            if(configInfo != null) {
+                configExternal.setConfigName(configInfo.getConfigName());
+            }
         }
         return ret;
     }

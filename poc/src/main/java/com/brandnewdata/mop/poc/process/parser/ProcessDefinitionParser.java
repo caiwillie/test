@@ -54,7 +54,7 @@ public class ProcessDefinitionParser implements
 
     private ObjectNode responseParams;
 
-    private List<String> configs = new ArrayList<>();
+    private Map<String, String> configs = new HashMap<>();
 
     private static final ParameterParser INPUT_PARSER = new ParameterParser(
             BRANDNEWDATA_INPUT_QNAME.getQualifiedName(),
@@ -100,7 +100,7 @@ public class ProcessDefinitionParser implements
             }
 
             // 存放连接器的配置信息
-            configs.add(configId);
+            configs.put(configId, type);
         }
 
         return this;
@@ -199,7 +199,7 @@ public class ProcessDefinitionParser implements
 
         parseTrigger(bndTD);
 
-        if(StrUtil.equals(trigger.getGroupId(), BRANDNEWDATA_DOMAIN)) {
+        if(StrUtil.equals(trigger.getConnectorGroup(), BRANDNEWDATA_DOMAIN)) {
             // 通用触发器
             replEleSceneGseToNse(manager, bndTD);
         } else {
@@ -523,9 +523,9 @@ public class ProcessDefinitionParser implements
         for (Node node : nodes) {
             Element oldE = (Element) node;
             String type = oldE.attributeValue(TYPE_ATTRIBUTE);
-            Action action = parseActionType(type);
+            Action action = ProcessUtil.parseActionInfo(type);
 
-            if(StrUtil.equalsAny(action.getGroupId(), BRANDNEWDATA_DOMAIN)) {
+            if(StrUtil.equalsAny(action.getConnectorGroup(), BRANDNEWDATA_DOMAIN)) {
                 // 通用连接器直接跳过
                continue;
             }
@@ -575,36 +575,6 @@ public class ProcessDefinitionParser implements
             // 修改 xsi:type 为 bpmn:tFormalExpression
             attribute.setValue(BPMN_T_FORMAL_EXPRESSION_QNAME.getQualifiedName());
         }
-    }
-
-    /**
-     * 根据触发器/操作的类型判断 触发器
-     * @param type
-     * @return
-     */
-    private Action parseActionType(String type) {
-        String[] arr = type.split(":");
-        Assert.isTrue(arr.length == 3, ErrorMessage.CHECK_ERROR("触发器或者操作类型错误", type));
-        String groupId = arr[0];
-        Assert.notEmpty(groupId, ErrorMessage.NOT_NULL("开发者"));
-        String version = arr[2];
-        Assert.notEmpty(version, ErrorMessage.NOT_NULL("连接器版本"));
-
-        // 解析 连接器id.操作或触发器id
-        arr = arr[1].split("\\.");
-        Assert.isTrue(arr.length == 2, ErrorMessage.CHECK_ERROR("触发器或者连接器类型错误", type));
-        String connectorId = arr[0];
-        Assert.notEmpty(connectorId, ErrorMessage.NOT_NULL("连接器 id"));
-        String actionId = arr[1];
-        Assert.notEmpty(actionId, ErrorMessage.NOT_NULL("触发器 id"));
-
-        Action ret = new Action();
-        ret.setGroupId(groupId);
-        ret.setConnectorId(connectorId);
-        ret.setActionId(actionId);
-        ret.setVersion(version);
-
-        return ret;
     }
 
     /**
@@ -710,7 +680,7 @@ public class ProcessDefinitionParser implements
      */
     private void parseTrigger(Element bndTD) {
         String type = bndTD.attributeValue(TYPE_ATTRIBUTE);
-        trigger = parseActionType(type);
+        trigger = ProcessUtil.parseActionInfo(type);
     }
 
     /**
