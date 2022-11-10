@@ -164,6 +164,10 @@ public class DataExternalService {
         Map<String, ConfigExternal> ret = new HashMap<>();
         for (String configId : configs) {
             ConfigInfo configInfo = connectorManager.getConfigInfo(configId);
+            if(configInfo == null) {
+                // todo 优化
+                continue;
+            }
             ConnectorBasicInfo connectorBasicInfo = connectorManager.getConnectorBasicInfo(configInfo.getConnectorGroup(),
                     configInfo.getConnectorId(), configInfo.getConnectorVersion());
             ConfigExternal configExternal = new ConfigExternal();
