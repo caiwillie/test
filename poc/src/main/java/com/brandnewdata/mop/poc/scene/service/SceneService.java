@@ -51,6 +51,7 @@ public class SceneService implements ISceneService {
                 com.baomidou.mybatisplus.extension.plugins.pagination.Page.of(pageNumber, pageSize);
         QueryWrapper<SceneEntity> queryWrapper = new QueryWrapper<>();
         if(StrUtil.isNotBlank(name)) queryWrapper.like(SceneEntity.NAME, name); // 设置名称
+        queryWrapper.orderByDesc(SceneEntity.UPDATE_TIME);
         page = sceneDao.selectPage(page, queryWrapper);
         List<SceneEntity> entities = Optional.ofNullable(page.getRecords()).orElse(ListUtil.empty());
 
