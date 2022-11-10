@@ -19,6 +19,7 @@ import com.brandnewdata.mop.poc.process.util.ProcessUtil;
 import com.brandnewdata.mop.poc.scene.dao.SceneLoadDao;
 import com.brandnewdata.mop.poc.scene.dao.SceneProcessDao;
 import com.brandnewdata.mop.poc.scene.dto.SceneDto;
+import com.brandnewdata.mop.poc.scene.dto.external.AllExternal;
 import com.brandnewdata.mop.poc.scene.dto.external.ConfigExternal;
 import com.brandnewdata.mop.poc.scene.dto.external.ProcessDefinitionExternal;
 import com.brandnewdata.mop.poc.scene.dto.external.SceneProcessExternal;
@@ -133,29 +134,7 @@ public class DataExternalService {
 
     public LoadResp prepareLoad(byte[] bytes) {
         LoadResp resp = new LoadResp();
-        File dir = unzip(bytes);
-
-        File sceneFile = new File(dir, FILENAME__SCENE_PROCESS);
-        File definitionFile = new File(dir, FILENAME__PROCESS_DEFINITION);
-        File configFile = new File(dir, FILENAME__CONFIG);
-        Assert.isTrue(fileExist(sceneFile), "[0x01] 文件缺失");
-        Assert.isTrue(fileExist(definitionFile), "[0x02] 文件缺失");
-        Assert.isTrue(fileExist(configFile), "[0x03] 文件缺失");
-
-        // 解析压缩包内的文件
-        Map<Long, SceneProcessExternal> processMap = null;
-        Map<String, ProcessDefinitionExternal> definitionMap = null;
-        Map<String, ConfigExternal> configMap = null;
-        try {
-            processMap = OM.readValue(sceneFile, MAP_TYPE1);
-            processMap = Opt.ofNullable(processMap).orElse(MapUtil.empty());
-            definitionMap = OM.readValue(definitionFile, MAP_TYPE2);
-            definitionMap = Opt.ofNullable(definitionMap).orElse(MapUtil.empty());
-            configMap = OM.readValue(configFile, MAP_TYPE3);
-            configMap = Opt.ofNullable(configMap).orElse(MapUtil.empty());
-        } catch (IOException e) {
-            throw new IllegalArgumentException("[0x01] 文件格式错误");
-        }
+        AllExternal allExternal = getAllExternal(bytes);
 
         // 将上传文件保存至数据库
         SceneLoadEntity sceneLoadEntity = new SceneLoadEntity();
@@ -163,7 +142,7 @@ public class DataExternalService {
         loadDao.insert(sceneLoadEntity);
 
         resp.setId(sceneLoadEntity.getId());
-        List<ConnConfResp> configureList = getConnConfRespList(configMap.values());
+        List<ConnConfResp> configureList = getConnConfRespList(allExternal.getConfigMap().values());
         resp.setConfigureList(configureList);
 
         return resp;
@@ -176,8 +155,9 @@ public class DataExternalService {
         SceneDto sceneDto = new SceneDto();
         sceneDto.setName(sceneName);
         sceneDto = sceneService.save(sceneDto);
-        
+
         // 保存场景下的流程
+        SceneLoadEntity sceneLoadEntity = loadDao.selectById(req.getId());
     }
 
     private static File createTempFile(String content) {
@@ -256,6 +236,42 @@ public class DataExternalService {
             connConfResp.setConfigureName(configExternal.getConfigName());
             ret.add(connConfResp);
         }
+        return ret;
+    }
+
+    private AllExternal getAllExternal(byte[] bytes) {
+        AllExternal ret = new AllExternal();
+        File dir = unzip(bytes);
+
+        File sceneFile = new File(dir, FILENAME__SCENE_PROCESS);
+        File definitionFile = new File(dir, FILENAME__PROCESS_DEFINITION);
+        File configFile = new File(dir, FILENAME__CONFIG);
+        Assert.isTrue(fileExist(sceneFile), "[0x01] 文件缺失");
+        Assert.isTrue(fileExist(definitionFile), "[0x02] 文件缺失");
+        Assert.isTrue(fileExist(configFile), "[0x03] 文件缺失");
+
+        // 解析压缩包内的文件
+        Map<Long, SceneProcessExternal> processMap = null;
+        Map<String, ProcessDefinitionExternal> definitionMap = null;
+        Map<String, ConfigExternal> configMap = null;
+        try {
+            processMap = OM.readValue(sceneFile, MAP_TYPE1);
+            processMap = Opt.ofNullable(processMap).orElse(MapUtil.empty());
+            definitionMap = OM.readValue(definitionFile, MAP_TYPE2);
+            definitionMap = Opt.ofNullable(definitionMap).orElse(MapUtil.empty());
+            configMap = OM.readValue(configFile, MAP_TYPE3);
+            configMap = Opt.ofNullable(configMap).orElse(MapUtil.empty());
+        } catch (IOException e) {
+            throw new IllegalArgumentException("[0x01] 文件格式错误");
+        }
+
+
+        ret.setProcessMap(processMap);
+        ret.setDefinitionMap(definitionMap);
+        ret.setConfigMap(configMap);
+
+        // 删除文件
+        FileUtil.del(dir);
         return ret;
     }
 

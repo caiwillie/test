@@ -183,6 +183,7 @@ public class SceneRest {
      */
     @PostMapping("/rest/businessScene/confirmLoad")
     public Result confirmLoad(@RequestBody LoadResp req) {
+        dataExternalService.confirmLoad(req);
         return Result.ok();
     }
 
