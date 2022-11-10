@@ -6,15 +6,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Step3Result {
+public class Step3Result extends Step2Result {
 
-    private String processId;
-
-    private String name;
-
-    private String xml;
-
-    private TriggerOrOperate trigger;
+    private Action trigger;
 
     private String protocol;
 

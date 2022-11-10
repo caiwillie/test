@@ -17,6 +17,7 @@ import com.brandnewdata.mop.poc.process.dto.parser.Step3Result;
 import com.brandnewdata.mop.poc.process.entity.ProcessDeployEntity;
 import com.brandnewdata.mop.poc.process.parser.FeelUtil;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParseStep1;
+import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParseStep2;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParser;
 import com.brandnewdata.mop.poc.process.util.ProcessUtil;
 import com.dxy.library.json.jackson.JacksonUtil;
@@ -85,21 +86,20 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
 
     @Override
     public ProcessDeployDto deploy(ProcessDefinitionDto dto, int type) {
-        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(dto.getProcessId(), dto.getName(), dto.getXml());
+        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.step1(dto.getProcessId(), dto.getName(), dto.getXml());
+        ProcessDefinitionParseStep2 step2 = step1.replServiceTask(true, connectorManager).replAttr().step2();
 
-        Step3Result step3Result = null;
         if(type == ProcessConstants.PROCESS_TYPE_SCENE) {
-            step3Result = step1.parseConnConfig(connectorManager).replaceStep1()
-                    .replaceSceneStartEvent(connectorManager).step3Result();
+            step2.replSE_scene(connectorManager);
         } else if (type == ProcessConstants.PROCESS_TYPE_TRIGGER) {
-            step3Result = step1.parseConnConfig(connectorManager).replaceStep1()
-                    .replaceTriggerStartEvent(connectorManager).step3Result();
+            step2.replSE_trigger(connectorManager);
         } else if (type == ProcessConstants.PROCESS_TYPE_OPERATE) {
-            step3Result = step1.parseConnConfig(connectorManager).replaceStep1()
-                    .replaceOperateStartEvent().step3Result();
+            step2.replSE_operate();
         } else {
             throw new IllegalArgumentException(ErrorMessage.CHECK_ERROR("触发器类型不支持", null));
         }
+
+        Step3Result step3Result = step2.step3().step3Result();
 
         String xml = dto.getXml(); // xml 需要取原始的数据
         // process id 和 name 需要取解析后的
@@ -187,10 +187,9 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         Assert.notNull(processDeployEntity, ErrorMessage.NOT_NULL("流程 id"), processId);
 
         Step3Result step3Result = ProcessDefinitionParser
-                .newInstance(null, null, processDeployEntity.getProcessXml())
-                .replaceStep1()
-                .replaceSceneStartEvent(connectorManager)
-                .step3Result();
+                .step1(null, null, processDeployEntity.getProcessXml()).replServiceTask(true, connectorManager)
+                .step2().replSE_scene(connectorManager)
+                .step3().step3Result();
 
         // 解析 xml 后得到响应表达式
         ObjectNode responseParams = step3Result.getResponseParams();

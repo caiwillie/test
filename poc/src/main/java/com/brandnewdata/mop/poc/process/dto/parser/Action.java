@@ -4,16 +4,16 @@ import cn.hutool.core.util.StrUtil;
 import lombok.Data;
 
 @Data
-public class TriggerOrOperate {
+public class Action {
     private String groupId;
 
     private String connectorId;
 
-    private String triggerOrOperateId;
+    private String actionId;
 
     private String version;
 
     public String getFullId() {
-        return StrUtil.format("{}:{}.{}:{}", groupId, connectorId, triggerOrOperateId, version);
+        return StrUtil.format("{}:{}.{}:{}", groupId, connectorId, actionId, version);
     }
 }

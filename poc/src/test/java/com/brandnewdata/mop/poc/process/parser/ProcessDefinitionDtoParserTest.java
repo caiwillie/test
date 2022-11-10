@@ -27,7 +27,7 @@ class ProcessDefinitionDtoParserTest {
     @Test
     void testNewInstance() {
         String xml = ResourceUtil.readUtf8Str("test.bpmn.xml");
-        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(null, null, xml);
+        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.step1(null, null, xml);
         step1.step1Result();
         // Assertions.assertEquals(null, result);
     }
@@ -35,8 +35,8 @@ class ProcessDefinitionDtoParserTest {
     @Test
     void testStep1() {
         String xml = ResourceUtil.readUtf8Str("test.bpmn.xml");
-        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(null, null, xml);
-        ProcessDefinitionParseStep2 step2 = step1.replaceStep1();
+        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.step1(null, null, xml);
+        ProcessDefinitionParseStep2 step2 = step1.replServiceTask(false, null).step2();
         step2.step2Result();
     }
 
@@ -48,9 +48,7 @@ class ProcessDefinitionDtoParserTest {
         String json = ResourceUtil.readUtf8Str("trigger.json");
         String triggerFullId = "com.develop:wjx.callback:v1";
         String xml = JSONUtil.parseObj(json).getStr("processEditing");
-        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(triggerFullId, null, xml);
-        TriggerProcessDefinitionDto triggerProcessDefinition = step1.replaceStep1().replaceTriggerStartEvent(manager)
-                .step3Result();
+        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.step1(triggerFullId, null, xml);
         return;
     }
 
@@ -65,9 +63,8 @@ class ProcessDefinitionDtoParserTest {
 
         String xml = ResourceUtil.readUtf8Str("test.bpmn.xml");
 
-        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.newInstance(null, null, xml);
-        TriggerProcessDefinitionDto triggerProcessDefinition = step1.replaceStep1().replaceSceneStartEvent(manager)
-                .step3Result();
+        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.step1(null, null, xml);
+
     }
 }
 

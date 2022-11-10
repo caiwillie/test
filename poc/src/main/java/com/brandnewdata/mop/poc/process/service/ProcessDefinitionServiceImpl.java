@@ -60,7 +60,7 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService {
 
         // 这里主要是校验，并解析 id、name
         Step1Result step1Result = ProcessDefinitionParser
-                .newInstance(dto.getProcessId(), dto.getName(), dto.getXml())
+                .step1(dto.getProcessId(), dto.getName(), dto.getXml())
                 .step1Result();
         String processId = step1Result.getProcessId();
         entity.setId(processId);

@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class TriggerProcessDefinitionDto extends ProcessDefinitionDto {
 
-    private TriggerOrOperate trigger;
+    private Action trigger;
 
     private String protocol;
 
