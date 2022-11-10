@@ -21,6 +21,7 @@ import com.brandnewdata.mop.poc.scene.dao.SceneProcessDao;
 import com.brandnewdata.mop.poc.scene.dto.external.ConfigExternal;
 import com.brandnewdata.mop.poc.scene.dto.external.ProcessDefinitionExternal;
 import com.brandnewdata.mop.poc.scene.dto.external.SceneProcessExternal;
+import com.brandnewdata.mop.poc.scene.entity.SceneLoadEntity;
 import com.brandnewdata.mop.poc.scene.entity.SceneProcessEntity;
 import com.brandnewdata.mop.poc.scene.request.ExportReq;
 import com.brandnewdata.mop.poc.scene.response.ConnConfResp;
@@ -215,7 +216,12 @@ public class DataExternalService {
             throw new IllegalArgumentException("[0x01] 文件格式错误");
         }
 
-        resp.setId(1L);
+        // 将上传文件保存至数据库
+        SceneLoadEntity sceneLoadEntity = new SceneLoadEntity();
+        sceneLoadEntity.setZipBytes(bytes);
+        loadDao.insert(sceneLoadEntity);
+
+        resp.setId(sceneLoadEntity.getId());
         List<ConnConfResp> configureList = getConnConfRespList(configMap.values());
         resp.setConfigureList(configureList);
 
