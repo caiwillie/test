@@ -219,6 +219,7 @@ public class DataExternalService {
             if(configInfo != null) {
                 configExternal.setConfigName(configInfo.getConfigName());
             }
+            ret.put(configId, configExternal);
         }
         return ret;
     }
