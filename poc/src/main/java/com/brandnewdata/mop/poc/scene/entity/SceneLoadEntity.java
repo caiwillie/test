@@ -3,12 +3,11 @@ package com.brandnewdata.mop.poc.scene.entity;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import java.io.Serializable;
+import java.sql.Blob;
+import java.util.Date;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.ibatis.type.BlobTypeHandler;
-
-import java.io.Serializable;
-import java.util.Date;
 
 /**
  * <p>
@@ -16,7 +15,7 @@ import java.util.Date;
  * </p>
  *
  * @author caiwillie
- * @since 2022-11-09
+ * @since 2022-11-10
  */
 @Getter
 @Setter
@@ -27,8 +26,7 @@ public class SceneLoadEntity implements Serializable {
 
     private Long id;
 
-    @TableField(typeHandler = BlobTypeHandler.class)
-    private byte[] zipBytes;
+    private Blob zipBytes;
 
     @TableField(fill = FieldFill.INSERT)
     private String createBy;

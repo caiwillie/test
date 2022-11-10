@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.generator.FastAutoGenerator;
 import com.baomidou.mybatisplus.generator.config.*;
 import com.baomidou.mybatisplus.generator.config.rules.DateType;
 import com.baomidou.mybatisplus.generator.fill.Column;
+import org.apache.ibatis.type.BlobTypeHandler;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,7 +35,8 @@ public class ModelerGen {
 
     public static void main(String[] args) {
 
-        FastAutoGenerator.create(URL, USERNAME, PASSWORD)
+        FastAutoGenerator.create(new DataSourceConfig
+                        .Builder(URL,USERNAME,PASSWORD))
                 // 全局配置
                 .globalConfig((scanner, builder) -> builder
                         .author(StrUtil.isNotBlank(AUTHOR) ? AUTHOR : scanner.apply("请输入作者名称？"))
