@@ -26,7 +26,7 @@ public class SceneLoadEntity implements Serializable {
 
     private Long id;
 
-    private Blob zipBytes;
+    private byte[] zipBytes;
 
     @TableField(fill = FieldFill.INSERT)
     private String createBy;
