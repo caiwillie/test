@@ -175,6 +175,7 @@ public class DataExternalService {
             sceneProcessDto.setName(processDefinitionExternal.getName());
             sceneProcessDto.setXml(processDefinitionExternal.getXml());
             sceneProcessDto.setImgUrl(processDefinitionExternal.getImgUrl());
+            sceneProcessDto.setBusinessSceneId(sceneDto.getId());
             sceneService.saveProcessDefinition(sceneProcessDto);
 
             // 仅为了测试
