@@ -158,6 +158,8 @@ public class SceneRest {
 
         response.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
         ServletUtil.write(response, inputStream, contentType, fileName);
+        // 删除文件
+        FileUtil.del(file);
     }
 
     /**
