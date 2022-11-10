@@ -5,6 +5,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Opt;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ZipUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.manager.ConnectorManager;
@@ -19,6 +20,7 @@ import com.brandnewdata.mop.poc.process.util.ProcessUtil;
 import com.brandnewdata.mop.poc.scene.dao.SceneLoadDao;
 import com.brandnewdata.mop.poc.scene.dao.SceneProcessDao;
 import com.brandnewdata.mop.poc.scene.dto.SceneDto;
+import com.brandnewdata.mop.poc.scene.dto.SceneProcessDto;
 import com.brandnewdata.mop.poc.scene.dto.external.AllExternal;
 import com.brandnewdata.mop.poc.scene.dto.external.ConfigExternal;
 import com.brandnewdata.mop.poc.scene.dto.external.ProcessDefinitionExternal;
@@ -158,6 +160,28 @@ public class DataExternalService {
 
         // 保存场景下的流程
         SceneLoadEntity sceneLoadEntity = loadDao.selectById(req.getId());
+
+        LoadResp resp = new LoadResp();
+        AllExternal allExternal = getAllExternal(sceneLoadEntity.getZipBytes());
+        Map<String, ProcessDefinitionExternal> definitionMap = allExternal.getDefinitionMap();
+        Map<String, ConfigExternal> configMap = allExternal.getConfigMap();
+        int count = 3;
+        for (SceneProcessExternal processExternal : allExternal.getProcessMap().values()) {
+            ProcessDefinitionExternal processDefinitionExternal = definitionMap.get(processExternal.getProcessId());
+
+            SceneProcessDto sceneProcessDto = new SceneProcessDto();
+            // 随机生成新的流程id
+            sceneProcessDto.setProcessId(IdUtil.randomUUID());
+            sceneProcessDto.setName(processDefinitionExternal.getName());
+            sceneProcessDto.setXml(processDefinitionExternal.getXml());
+            sceneProcessDto.setImgUrl(processDefinitionExternal.getImgUrl());
+            sceneService.saveProcessDefinition(sceneProcessDto);
+
+            // 仅为了测试
+            count--;
+            if(count == 0) break;
+        }
+
     }
 
     private static File createTempFile(String content) {
