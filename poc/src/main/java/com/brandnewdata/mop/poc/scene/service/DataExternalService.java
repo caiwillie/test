@@ -18,6 +18,7 @@ import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService;
 import com.brandnewdata.mop.poc.process.util.ProcessUtil;
 import com.brandnewdata.mop.poc.scene.dao.SceneLoadDao;
 import com.brandnewdata.mop.poc.scene.dao.SceneProcessDao;
+import com.brandnewdata.mop.poc.scene.dto.SceneDto;
 import com.brandnewdata.mop.poc.scene.dto.external.ConfigExternal;
 import com.brandnewdata.mop.poc.scene.dto.external.ProcessDefinitionExternal;
 import com.brandnewdata.mop.poc.scene.dto.external.SceneProcessExternal;
@@ -74,6 +75,9 @@ public class DataExternalService {
     @Resource
     private ConnectorManager connectorManager;
 
+    @Resource
+    private ISceneService sceneService;
+
     public File export(ExportReq req) {
         Assert.isTrue(CollUtil.isNotEmpty(req.getProcessIds()), "所选流程不能为空");
         QueryWrapper<SceneProcessEntity> queryWrapper = new QueryWrapper<>();
@@ -127,7 +131,7 @@ public class DataExternalService {
         return zip;
     }
 
-    public LoadResp load(byte[] bytes) {
+    public LoadResp prepareLoad(byte[] bytes) {
         LoadResp resp = new LoadResp();
         File dir = unzip(bytes);
 
@@ -163,6 +167,17 @@ public class DataExternalService {
         resp.setConfigureList(configureList);
 
         return resp;
+    }
+
+    public void confirmLoad(LoadResp req) {
+        String sceneName = req.getSceneName();
+
+        // 保存场景
+        SceneDto sceneDto = new SceneDto();
+        sceneDto.setName(sceneName);
+        sceneDto = sceneService.save(sceneDto);
+        
+        // 保存场景下的流程
     }
 
     private static File createTempFile(String content) {
@@ -255,11 +270,7 @@ public class DataExternalService {
         return unzip;
     }
 
-
     private boolean fileExist(File file) {
         return file.exists() && file.isFile();
     }
-
-
-
 }

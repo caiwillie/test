@@ -9,14 +9,13 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.common.dto.Page;
-import com.brandnewdata.mop.poc.scene.dto.SceneDTO;
-import com.brandnewdata.mop.poc.scene.dto.SceneProcessDTO;
+import com.brandnewdata.mop.poc.scene.dto.SceneDto;
+import com.brandnewdata.mop.poc.scene.dto.SceneProcessDto;
 import com.brandnewdata.mop.poc.scene.request.ExportReq;
 import com.brandnewdata.mop.poc.scene.response.LoadResp;
 import com.brandnewdata.mop.poc.scene.service.DataExternalService;
 import com.brandnewdata.mop.poc.scene.service.ISceneService;
 import com.dxy.library.json.jackson.JacksonUtil;
-import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -54,12 +53,12 @@ public class SceneRest {
      * @return the result
      */
     @GetMapping(value = "/rest/businessScene/page")
-    public Result<Page<SceneDTO>> page(
+    public Result<Page<SceneDto>> page(
             @RequestParam(required = false) String projectId,
             @RequestParam Integer pageNum,
             @RequestParam Integer pageSize,
             @RequestParam(required = false) String name) {
-        Page<SceneDTO> page = service.page(pageNum, pageSize, name);
+        Page<SceneDto> page = service.page(pageNum, pageSize, name);
         return Result.OK(page);
     }
 
@@ -70,9 +69,9 @@ public class SceneRest {
      * @return the result
      */
     @GetMapping(value = "/rest/businessScene/detail")
-    public Result<SceneDTO> detail(
+    public Result<SceneDto> detail(
             @RequestParam Long id) {
-        SceneDTO sceneDTO = service.getOne(id);
+        SceneDto sceneDTO = service.getOne(id);
         Assert.notNull(sceneDTO, "场景 id 不存在");
         return Result.OK(sceneDTO);
     }
@@ -84,7 +83,7 @@ public class SceneRest {
      * @return the result
      */
     @PostMapping(value = "/rest/businessScene/save")
-    public Result<SceneDTO> save(@RequestBody SceneDTO sceneDTO) {
+    public Result<SceneDto> save(@RequestBody SceneDto sceneDTO) {
         sceneDTO = service.save(sceneDTO);
         return Result.OK(sceneDTO);
     }
@@ -96,8 +95,8 @@ public class SceneRest {
      * @return the result
      */
     @PostMapping(value = "/rest/businessScene/saveProcessDefinition")
-    public Result<SceneProcessDTO> saveProcessDefinition(
-            @RequestBody SceneProcessDTO sceneProcessDTO) {
+    public Result<SceneProcessDto> saveProcessDefinition(
+            @RequestBody SceneProcessDto sceneProcessDTO) {
         sceneProcessDTO = service.saveProcessDefinition(sceneProcessDTO);
         return Result.OK(sceneProcessDTO);
     }
@@ -110,7 +109,7 @@ public class SceneRest {
      */
     @PostMapping("/rest/businessScene/deployProcessDefinition")
     public Result deployProcessDefinition (
-            @RequestBody SceneProcessDTO sceneProcessDTO) {
+            @RequestBody SceneProcessDto sceneProcessDTO) {
         service.deploy(sceneProcessDTO);
         return Result.OK();
     }
@@ -122,7 +121,7 @@ public class SceneRest {
      * @return the result
      */
     @PostMapping(value = "/rest/businessScene/deleteProcessDefinition")
-    public Result deleteProcessDefinition(@RequestBody SceneProcessDTO sceneProcessDTO) {
+    public Result deleteProcessDefinition(@RequestBody SceneProcessDto sceneProcessDTO) {
         service.deleteProcessDefinition(sceneProcessDTO);
         return Result.OK();
     }
@@ -134,7 +133,7 @@ public class SceneRest {
      * @return the result
      */
     @PostMapping(value = "/rest/businessScene/delete")
-    public Result delete(@RequestBody SceneDTO sceneDTO) {
+    public Result delete(@RequestBody SceneDto sceneDTO) {
         service.delete(sceneDTO);
         return Result.OK();
     }
@@ -170,7 +169,7 @@ public class SceneRest {
     @PostMapping("/rest/businessScene/prepareLoad")
     public Result<LoadResp> prepareLoad(@RequestParam MultipartFile file) {
         try {
-            LoadResp resp = dataExternalService.load(file.getBytes());
+            LoadResp resp = dataExternalService.prepareLoad(file.getBytes());
             return Result.OK(resp);
         } catch (IOException e) {
             throw new RuntimeException(e);

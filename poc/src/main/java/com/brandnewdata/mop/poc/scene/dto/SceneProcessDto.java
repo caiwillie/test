@@ -6,7 +6,7 @@ import lombok.Data;
  * @author caiwillie
  */
 @Data
-public class SceneProcessDTO {
+public class SceneProcessDto {
     /**
      * id
      */

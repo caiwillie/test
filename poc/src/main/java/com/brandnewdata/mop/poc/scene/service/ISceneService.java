@@ -1,8 +1,8 @@
 package com.brandnewdata.mop.poc.scene.service;
 
 import com.brandnewdata.mop.poc.common.dto.Page;
-import com.brandnewdata.mop.poc.scene.dto.SceneDTO;
-import com.brandnewdata.mop.poc.scene.dto.SceneProcessDTO;
+import com.brandnewdata.mop.poc.scene.dto.SceneDto;
+import com.brandnewdata.mop.poc.scene.dto.SceneProcessDto;
 
 import java.util.List;
 
@@ -11,20 +11,20 @@ import java.util.List;
  */
 public interface ISceneService {
 
-    Page<SceneDTO> page(int pageNumber, int pageSize, String name);
+    Page<SceneDto> page(int pageNumber, int pageSize, String name);
 
-    SceneDTO getOne(Long id);
+    SceneDto getOne(Long id);
 
-    List<SceneDTO> listByIds(List<Long> ids);
+    List<SceneDto> listByIds(List<Long> ids);
 
-    SceneDTO save(SceneDTO sceneDTO);
+    SceneDto save(SceneDto sceneDTO);
 
-    SceneProcessDTO saveProcessDefinition(SceneProcessDTO sceneProcessDTO);
+    SceneProcessDto saveProcessDefinition(SceneProcessDto sceneProcessDTO);
 
-    void deploy(SceneProcessDTO sceneProcessDTO);
+    void deploy(SceneProcessDto sceneProcessDTO);
 
-    void deleteProcessDefinition(SceneProcessDTO sceneProcessDTO);
+    void deleteProcessDefinition(SceneProcessDto sceneProcessDTO);
 
-    void delete(SceneDTO sceneDTO);
+    void delete(SceneDto sceneDTO);
 
 }

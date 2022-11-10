@@ -1,12 +1,14 @@
 package com.brandnewdata.mop.poc.scene.dto;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Data
-public class SceneDTO {
+@Getter
+@Setter
+public class SceneDto {
 
 
     /**
@@ -42,5 +44,5 @@ public class SceneDTO {
     /**
      * 流程定义列表
      */
-    private List<SceneProcessDTO> processDefinitions;
+    private List<SceneProcessDto> processDefinitions;
 }
