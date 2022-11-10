@@ -44,7 +44,6 @@ public class ConnectorManager {
         ret.setConnectorGroup(configInfo.getConnectorGroup());
         ret.setConnectorId(configInfo.getConnectorId());
         ret.setConnectorVersion(configInfo.getConnectorVersion());
-        ret.setConnectorName("连接器");
         ret.setConfigName(ret.getConfigName());
         ret.setConfigs(ret.getConfigs());
         return ret;

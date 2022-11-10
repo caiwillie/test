@@ -27,7 +27,6 @@ import com.brandnewdata.mop.poc.scene.response.LoadResp;
 import com.dxy.library.json.jackson.JacksonUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.MapType;
-import jdk.internal.util.StaticProperty;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -60,8 +59,6 @@ public class DataExternalService {
 
     private static final MapType MAP_TYPE3 =
             OM.getTypeFactory().constructMapType(Map.class, String.class, ConfigExternal.class);
-
-    private static final String TEMP_DIR = StaticProperty.javaIoTmpDir();
 
     @Resource
     private SceneProcessDao sceneProcessDao;
