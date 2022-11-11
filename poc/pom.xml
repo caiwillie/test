@@ -236,10 +236,10 @@
                 <configuration>
                     <mainClass>${start-class}</mainClass>
                     <image>
-                        <name>brandnewdata.com/library/${project.artifactId}:${maven.build.timestamp}</name>
+                        <name>10.101.2.123/g2/${project.artifactId}:${maven.build.timestamp}</name>
+                        <publish>true</publish>
                         <builder>registry.cn-hangzhou.aliyuncs.com/caiwillie/paketobuildpacks_builder:base</builder>
                         <env>
-                            <Haha>haha</Haha>
                         </env>
                         <buildCache>
                             <volume>
@@ -256,6 +256,13 @@
                             <binding>${project.basedir}/../bindings/dependency-mapping:/platform/bindings/dependency-mapping</binding>
                         </bindings>
                     </image>
+                    <docker>
+                        <publishRegistry>
+                            <url>10.101.2.123</url>
+                            <username>admin</username>
+                            <password>brand@2022</password>
+                        </publishRegistry>
+                    </docker>
                 </configuration>
             </plugin>
         </plugins>
