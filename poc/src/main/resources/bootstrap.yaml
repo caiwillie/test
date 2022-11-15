@@ -12,7 +12,7 @@ spring:
   cloud:
     nacos:
       config:
-        server-addr: ${BRANDNEWDATA_NACOS}:8848
+        server-addr: ${BRANDNEWDATA_NACOS:brandnewdata-nacos}:8848
         namespace: ${CONFIG_NAMESPACE:dev}
         group: ${CONFIG_GROUP:DEFAULT_GROUP}
         file-extension: yaml
@@ -25,7 +25,7 @@ spring:
   cloud:
     nacos:
       config:
-        server-addr: ${BRANDNEWDATA_NACOS}:8848
+        server-addr: ${BRANDNEWDATA_NACOS:brandnewdata-nacos}:8848
         namespace: ${CONFIG_NAMESPACE:test}
         group: ${CONFIG_GROUP:DEFAULT_GROUP}
         file-extension: yaml
@@ -38,7 +38,7 @@ spring:
   cloud:
     nacos:
       config:
-        server-addr: ${BRANDNEWDATA_NACOS}:8848
+        server-addr: ${BRANDNEWDATA_NACOS:brandnewdata-nacos}:8848
         namespace: ${CONFIG_NAMESPACE:prod}
         group: ${CONFIG_GROUP:DEFAULT_GROUP}
         file-extension: yaml
