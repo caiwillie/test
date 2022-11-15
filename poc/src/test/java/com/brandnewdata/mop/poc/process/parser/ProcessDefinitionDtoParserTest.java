@@ -3,6 +3,7 @@ package com.brandnewdata.mop.poc.process.parser;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.json.JSONUtil;
 import com.brandnewdata.mop.poc.manager.ConnectorManager;
+import com.brandnewdata.mop.poc.process.parser.dto.Step1Result;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -32,22 +33,18 @@ class ProcessDefinitionDtoParserTest {
 
     @Test
     void allTest() {
-        testNewInstance();
+        ProcessDefinitionParseStep1 step1 = testNewInstance();
+        testStep1(step1);
     }
 
-    void testNewInstance() {
+    ProcessDefinitionParseStep1 testNewInstance() {
         String xml = ResourceUtil.readUtf8Str(RESOURCE);
-        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.step1(null, null, xml);
-        step1.step1Result();
+        return ProcessDefinitionParser.step1(null, null, xml);
         // Assertions.assertEquals(null, result);
     }
 
-    @Test
-    void testStep1() {
-        String xml = ResourceUtil.readUtf8Str("test.bpmn.xml");
-        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.step1(null, null, xml);
-        ProcessDefinitionParseStep2 step2 = step1.replServiceTask(false, null).step2();
-        step2.step2Result();
+    ProcessDefinitionParseStep2 testStep1(ProcessDefinitionParseStep1 step1) {
+         return step1.replAttr().replServiceTask(false, null).step2();
     }
 
     @Test
