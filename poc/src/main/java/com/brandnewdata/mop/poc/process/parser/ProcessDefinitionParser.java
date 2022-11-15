@@ -9,6 +9,7 @@ import cn.hutool.core.lang.Opt;
 import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.manager.ConnectorManager;
+import com.brandnewdata.mop.poc.process.parser.constants.NamespaceConstants;
 import com.brandnewdata.mop.poc.process.parser.constants.StringPool;
 import com.brandnewdata.mop.poc.process.parser.dto.*;
 import com.brandnewdata.mop.poc.process.util.ProcessUtil;
@@ -263,11 +264,16 @@ public class ProcessDefinitionParser implements
         // 转换namespace zeebe2 => zeebe
         replNsZeebe2();
 
+        // 新增 namespace
+        addNs();
+
         // 设置流程名称 和 id
         parseIdName();
 
         // 设置为可执行
         set_exec();
+
+
     }
 
     /**
@@ -309,19 +315,21 @@ public class ProcessDefinitionParser implements
         if(bpmn2 != null) {
             root.remove(bpmn2);
         }
+    }
 
-        // 新增 zeebe namespace
-        addNsZeebe();
+    private void addNs() {
+        addNs(ZEEBE_NAMESPACE);
+        addNs(BRANDNEWDATA_NAMESPACE);
     }
 
     /**
      * 新增 namespace zeebe
      */
-    private void addNsZeebe() {
+    private void addNs(Namespace ns) {
         Element root = document.getRootElement();
-        Namespace namespace = root.getNamespaceForPrefix(ZEEBE_NAMESPACE.getPrefix());
+        Namespace namespace = root.getNamespaceForPrefix(ns.getPrefix());
         if(namespace == null) {
-            root.add(ZEEBE_NAMESPACE);
+            root.add(ns);
         }
     }
 
@@ -331,18 +339,22 @@ public class ProcessDefinitionParser implements
     private void parseIdName() {
         Element bpProcess = getBpProcess();
 
-        if(processId != null) {
-            bpProcess.addAttribute(ID_ATTRIBUTE, ProcessUtil.convertProcessId(processId));
+        if(processId == null) {
+            processId = bpProcess.attributeValue(ID_ATTRIBUTE);
         }
 
-        if(name != null) {
-            bpProcess.addAttribute(NAME_ATTRIBUTE, name);
-        }
-
-        processId = bpProcess.attributeValue(ID_ATTRIBUTE);
-        name = bpProcess.attributeValue(NAME_ATTRIBUTE);
         Assert.notEmpty(processId, ErrorMessage.NOT_NULL("流程 id"));
-        Assert.notEmpty(name, ErrorMessage.NOT_NULL("流程名称"));
+        bpProcess.addAttribute(ID_ATTRIBUTE, ProcessUtil.convertProcessId(processId));
+
+        if(name == null) {
+            name = bpProcess.attributeValue(NAME_ATTRIBUTE);
+        }
+
+        if(name == null) {
+            name = processId;
+        }
+
+        bpProcess.addAttribute(NAME_ATTRIBUTE, name);
     }
 
     /**

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+    <bpmn2:process id="Process_833fa6b5-b004-4579-843a-6d3af29813dd" isExecutable="false">
+        <bpmn2:startEvent id="StartEvent_1" name="开始事件">
+            <bpmn2:outgoing>Flow_13a7p5z</bpmn2:outgoing>
+        </bpmn2:startEvent>
+        <bpmn2:sequenceFlow id="Flow_13a7p5z" sourceRef="StartEvent_1" targetRef="Activity_0c6vxm8" />
+        <bpmn2:serviceTask id="Activity_0c6vxm8" name="请求RPA Worker">
+            <bpmn2:extensionElements>
+                <zeebe:taskDefinition type="com.brandnewdata:rpa.send:1.0.0" />
+                <zeebe:ioMapping>
+                    <zeebe:input source="= inputs" target="inputs" />
+                </zeebe:ioMapping>
+            </bpmn2:extensionElements>
+            <bpmn2:incoming>Flow_13a7p5z</bpmn2:incoming>
+            <bpmn2:outgoing>Flow_1qlih64</bpmn2:outgoing>
+        </bpmn2:serviceTask>
+        <bpmn2:endEvent id="Event_0gzb9g2" name="结束事件">
+            <bpmn2:incoming>Flow_1qlih64</bpmn2:incoming>
+        </bpmn2:endEvent>
+        <bpmn2:sequenceFlow id="Flow_1qlih64" sourceRef="Activity_0c6vxm8" targetRef="Event_0gzb9g2" />
+    </bpmn2:process>
+    <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+        <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_833fa6b5-b004-4579-843a-6d3af29813dd">
+            <bpmndi:BPMNEdge id="Flow_1qlih64_di" bpmnElement="Flow_1qlih64">
+                <di:waypoint x="544" y="234" />
+                <di:waypoint x="544" y="286" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_13a7p5z_di" bpmnElement="Flow_13a7p5z">
+                <di:waypoint x="544" y="134" />
+                <di:waypoint x="544" y="186" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+                <dc:Bounds x="412" y="86" width="263" height="48" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Activity_1ipyk9y_di" bpmnElement="Activity_0c6vxm8">
+                <dc:Bounds x="412" y="186" width="263" height="48" />
+                <bpmndi:BPMNLabel />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Event_0gzb9g2_di" bpmnElement="Event_0gzb9g2">
+                <dc:Bounds x="412" y="286" width="263" height="48" />
+            </bpmndi:BPMNShape>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</bpmn2:definitions>
