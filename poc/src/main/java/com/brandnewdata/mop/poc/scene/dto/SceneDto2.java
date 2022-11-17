@@ -4,12 +4,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
-public class SceneDto {
-
+public class SceneDto2 {
     /**
      * 场景 id
      */
@@ -21,11 +19,6 @@ public class SceneDto {
     private String name;
 
     /**
-     * 图片URL
-     */
-    private String imgUrl;
-
-    /**
      * 创建时间
      */
     private LocalDateTime createTime;
@@ -34,9 +27,4 @@ public class SceneDto {
      * 修改时间
      */
     private LocalDateTime updateTime;
-
-    /**
-     * 流程定义列表
-     */
-    // private List<SceneProcessDto> processDefinitions;
 }

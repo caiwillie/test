@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.operate.cache;
+package com.brandnewdata.mop.poc.process.cache;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
@@ -17,14 +17,14 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class DeployCache {
+public class DeployNoExpCache {
 
     @Resource
     private ProcessDeployDao processDeployDao;
 
     private long lastId = 0;
 
-    private Cache<Long, ProcessDeployDto> cache = CacheBuilder.newBuilder().build();
+    private final Cache<Long, ProcessDeployDto> CACHE = CacheBuilder.newBuilder().build();
 
     @Scheduled(fixedDelay = 1000)
     public void load() {
@@ -57,7 +57,7 @@ public class DeployCache {
                 lastId = lastProcessDeploy.getId();
 
                 for (ProcessDeployDto processDeployDTO : tempList) {
-                    cache.put(processDeployDTO.getId(), processDeployDTO);
+                    CACHE.put(processDeployDTO.getId(), processDeployDTO);
                 }
             }
         } while(CollUtil.isNotEmpty(tempList));
@@ -67,7 +67,7 @@ public class DeployCache {
     }
 
     public Map<Long, ProcessDeployDto> asMap() {
-        return cache.asMap();
+        return CACHE.asMap();
     }
 
 }

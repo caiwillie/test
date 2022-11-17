@@ -16,6 +16,7 @@ import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import com.brandnewdata.mop.poc.scene.dao.SceneDao;
 import com.brandnewdata.mop.poc.scene.dao.SceneProcessDao;
 import com.brandnewdata.mop.poc.scene.dto.SceneDto;
+import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
 import com.brandnewdata.mop.poc.scene.dto.SceneProcessDto;
 import com.brandnewdata.mop.poc.scene.entity.SceneEntity;
 import com.brandnewdata.mop.poc.scene.entity.SceneProcessEntity;
@@ -71,6 +72,16 @@ public class SceneService implements ISceneService {
     @Override
     public List<SceneDto> listByIds(List<Long> ids) {
         return ListUtil.toList(list(ids, false));
+    }
+
+    @Override
+    public List<SceneDto2> listByIdList(List<Long> idList) {
+        if(CollUtil.isEmpty(idList)) return ListUtil.empty();
+
+        QueryWrapper<SceneEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in(SceneEntity.ID, idList);
+        List<SceneEntity> entities = sceneDao.selectList(queryWrapper);
+        return entities.stream().map(this::toDto2).collect(Collectors.toList());
     }
 
     @Override
@@ -229,7 +240,7 @@ public class SceneService implements ISceneService {
                 SceneProcessDto sceneProcessDTO = toDTO(sceneProcessEntity, processDefinitionDTO);
                 sceneProcessDtoList.add(sceneProcessDTO);
             }
-            sceneDTO.setProcessDefinitions(sceneProcessDtoList);
+            // sceneDTO.setProcessDefinitions(sceneProcessDtoList);
         }
 
         return sceneMap.values();
@@ -237,6 +248,15 @@ public class SceneService implements ISceneService {
 
     private SceneDto toDTO(SceneEntity entity) {
         SceneDto dto = new SceneDto();
+        dto.setId(entity.getId());
+        dto.setName(entity.getName());
+        dto.setCreateTime(LocalDateTimeUtil.of(entity.getCreateTime()));
+        dto.setUpdateTime(LocalDateTimeUtil.of(entity.getUpdateTime()));
+        return dto;
+    }
+
+    private SceneDto2 toDto2(SceneEntity entity) {
+        SceneDto2 dto = new SceneDto2();
         dto.setId(entity.getId());
         dto.setName(entity.getName());
         dto.setCreateTime(LocalDateTimeUtil.of(entity.getCreateTime()));

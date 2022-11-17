@@ -11,7 +11,7 @@ import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermsQuery;
-import com.brandnewdata.mop.poc.operate.cache.ProcessCache;
+import com.brandnewdata.mop.poc.process.cache.ProcessLFUCache;
 import com.brandnewdata.mop.poc.operate.dao.EventDao;
 import com.brandnewdata.mop.poc.operate.dao.FlowNodeInstanceDao;
 import com.brandnewdata.mop.poc.operate.dao.IncidentDao;
@@ -53,7 +53,7 @@ public class FlowNodeInstanceService {
     private ListViewDao listViewDao;
 
     @Autowired
-    private ProcessCache processCache;
+    private ProcessLFUCache processLFUCache;
 
     public List<FlowNodeInstanceDTO> list(String processInstanceId) {
         Assert.notNull(processInstanceId);
@@ -312,7 +312,7 @@ public class FlowNodeInstanceService {
     }
 
     private String getProcessName(Long processDefinitionKey) {
-        ProcessEntity processEntity = processCache.getOne(processDefinitionKey);
+        ProcessEntity processEntity = processLFUCache.getOne(processDefinitionKey);
         if(processEntity != null) {
             return processEntity.getName() != null ? processEntity.getName() : processEntity.getBpmnProcessId();
         } else {

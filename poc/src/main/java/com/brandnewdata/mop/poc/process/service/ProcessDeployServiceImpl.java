@@ -1,6 +1,7 @@
 package com.brandnewdata.mop.poc.process.service;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
@@ -10,6 +11,7 @@ import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.manager.ConnectorManager;
 import com.brandnewdata.mop.poc.process.ProcessConstants;
+import com.brandnewdata.mop.poc.process.cache.DeployNoExpCache;
 import com.brandnewdata.mop.poc.process.dao.ProcessDeployDao;
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDto;
 import com.brandnewdata.mop.poc.process.dto.ProcessDeployDto;
@@ -47,6 +49,9 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
 
     @Resource
     private ZeebeClient zeebe;
+
+    @Resource
+    private DeployNoExpCache deployCache;
 
     private ProcessDeployEntity getLatestDeployVersion(String processId) {
         QueryWrapper<ProcessDeployEntity> queryWrapper = new QueryWrapper<>();
@@ -161,10 +166,23 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
     }
 
     @Override
+    public List<ProcessDeployDto> listAll(int type) {
+        List<ProcessDeployDto> ret = new ArrayList<>();
+        for (ProcessDeployDto processDeployDto : deployCache.asMap().values()) {
+            if(processDeployDto.getType() == type) {
+                ret.add(processDeployDto);
+            }
+        }
+        return ret;
+    }
+
+
+    @Override
     public Page<ProcessDeployDto> page(int pageNum, int pageSize) {
         com.baomidou.mybatisplus.extension.plugins.pagination.Page<ProcessDeployEntity> page =
                 com.baomidou.mybatisplus.extension.plugins.pagination.Page.of(pageNum, pageSize);
         QueryWrapper<ProcessDeployEntity> queryWrapper = new QueryWrapper<>();
+        // 查询部署
         page = processDeployDao.selectPage(page, queryWrapper);
         List<ProcessDeployDto> list = new ArrayList<>();
 

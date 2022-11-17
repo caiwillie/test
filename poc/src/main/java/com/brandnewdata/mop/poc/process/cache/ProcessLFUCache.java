@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.operate.cache;
+package com.brandnewdata.mop.poc.process.cache;
 
 import cn.hutool.cache.CacheUtil;
 import cn.hutool.cache.impl.LFUCache;
@@ -17,14 +17,13 @@ import java.util.Optional;
 
 @Slf4j
 @Component
-public class ProcessCache {
+public class ProcessLFUCache {
 
     private static final int CACHE_MAX_SIZE = 1000;
     private static final int MAX_ATTEMPTS = 5;
     private static final long WAIT_TIME = 200L;
 
     private static final LFUCache<Long, ProcessEntity> cache = CacheUtil.newLFUCache(CACHE_MAX_SIZE);
-
 
     @Autowired
     private ProcessDao processDao;

@@ -2,7 +2,7 @@ package com.brandnewdata.mop.poc.operate.service;
 
 import cn.hutool.core.collection.CollUtil;
 import com.brandnewdata.mop.poc.common.dto.Page;
-import com.brandnewdata.mop.poc.operate.cache.DeployCache;
+import com.brandnewdata.mop.poc.process.cache.DeployNoExpCache;
 import com.brandnewdata.mop.poc.operate.dto.GroupDeployDTO;
 import com.brandnewdata.mop.poc.process.dto.ProcessDeployDto;
 import com.brandnewdata.mop.poc.util.PageEnhancedUtil;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class GroupDeployService {
 
     @Autowired
-    private DeployCache cache;
+    private DeployNoExpCache cache;
 
     public Page<GroupDeployDTO> groupDeployPage(int pageNum, int pageSize) {
         // 通过 cache 获取 group deploy map
