@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * 场景监控相关的接口
  */
-@RestController("/rest/scene/operate")
+@RestController
 public class SceneOperateController {
 
     @Resource
@@ -29,7 +29,7 @@ public class SceneOperateController {
      *
      * @return the all scene
      */
-    @GetMapping("/getAllScene")
+    @GetMapping("/rest/scene/operate/getAllScene")
     public Result<List<Scene>> getAllScene() {
         return sceneOperateService.getAllScene();
     }
@@ -40,7 +40,7 @@ public class SceneOperateController {
      * @param filter
      * @return
      */
-    @PostMapping("/statistic")
+    @PostMapping("/rest/scene/operate/statistic")
     public Result<Statistic> statistic(Filter filter) {
         return Result.OK();
     }
@@ -51,7 +51,7 @@ public class SceneOperateController {
      * @param filter
      * @return
      */
-    @PostMapping("/pageProcessInstance")
+    @PostMapping("/rest/scene/operate/pageProcessInstance")
     public Result<Page<ProcessInstance>> pageProcessInstance(Filter filter) {
         return Result.OK();
     }
