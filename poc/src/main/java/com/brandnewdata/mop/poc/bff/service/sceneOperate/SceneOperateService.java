@@ -71,12 +71,8 @@ public class SceneOperateService {
             }
         }));
 
-
-
-
-
-
-        return null;
+        List<Scene> sceneList = getSceneList(sceneSortedList, sceneMap, processDeployMap);
+        return Result.OK(sceneList);
     }
 
     private List<Scene> getSceneList(List<SceneDto2> sceneSortedList,

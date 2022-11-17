@@ -1,12 +1,17 @@
 package com.brandnewdata.mop.poc.bff.controller;
 
 import com.brandnewdata.common.webresult.Result;
+import com.brandnewdata.mop.poc.bff.model.sceneOperate.ProcessInstance;
 import com.brandnewdata.mop.poc.bff.model.sceneOperate.Statistic;
 import com.brandnewdata.mop.poc.bff.model.sceneOperate.condition.Filter;
+import com.brandnewdata.mop.poc.bff.model.sceneOperate.condition.Scene;
+import com.brandnewdata.mop.poc.bff.service.sceneOperate.SceneOperateService;
+import com.brandnewdata.mop.poc.common.dto.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 
@@ -16,15 +21,17 @@ import java.util.List;
 @RestController("/rest/scene/operate")
 public class SceneOperateController {
 
+    @Resource
+    private SceneOperateService sceneOperateService;
+
     /**
      * 获取所有场景-流程-版本
      *
      * @return the all scene
      */
     @GetMapping("/getAllScene")
-    public Result<List<Process>> getAllScene() {
-
-        return Result.OK();
+    public Result<List<Scene>> getAllScene() {
+        return sceneOperateService.getAllScene();
     }
 
     /**
@@ -38,4 +45,14 @@ public class SceneOperateController {
         return Result.OK();
     }
 
+
+    /**
+     * 分页获取流程实例列表
+     * @param filter
+     * @return
+     */
+    @PostMapping("/pageProcessInstance")
+    public Result<Page<ProcessInstance>> pageProcessInstance(Filter filter) {
+        return Result.OK();
+    }
 }
