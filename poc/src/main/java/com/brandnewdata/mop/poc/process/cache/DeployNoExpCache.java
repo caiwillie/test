@@ -50,6 +50,7 @@ public class DeployNoExpCache {
                     processDeployDTO.setCreateTime(LocalDateTimeUtil.of(entity.getCreateTime()));
                     processDeployDTO.setUpdateTime(LocalDateTimeUtil.of(entity.getUpdateTime()));
                     processDeployDTO.setZeebeKey(entity.getZeebeKey());
+                    processDeployDTO.setType(entity.getType());
                     tempList.add(processDeployDTO);
                 }
 

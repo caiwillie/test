@@ -48,16 +48,22 @@ public class SceneOperateService {
         List<SceneDto2> sceneDto2List = sceneService.listByIdList(sceneIdList);
 
         // 根据process id 分组，再根据版本排序
-        Map<String, List<ProcessDeployDto>> processDeployMap = processDeployDtoList.stream().collect(groupingBy(ProcessDeployDto::getProcessId,
-
-                toSortedList(Comparator.comparingInt(ProcessDeployDto::getVersion))));
+        Map<String, List<ProcessDeployDto>> processDeployMap = processDeployDtoList.stream()
+                .collect(groupingBy(ProcessDeployDto::getProcessId,
+                        toSortedList((o1, o2) -> {
+                            int version1 = o1.getVersion();
+                            int version2 = o2.getVersion();
+                            // 倒序
+                            return Integer.compare(version2, version1);
+                        })));
 
         // 根据场景分组，再根据最新版本的更新时间排序
         Map<Long, List<SceneProcessDto2>> sceneMap = sceneProcessDto2List.stream().collect(groupingBy(SceneProcessDto2::getSceneId,
                 toSortedList((o1, o2) -> {
-                    LocalDateTime time1 = processDeployMap.get(o1.getProcessId()).get(0).getUpdateTime();
-                    LocalDateTime time2 = processDeployMap.get(o2.getProcessId()).get(0).getUpdateTime();
-                    return time1.compareTo(time2);
+                    LocalDateTime time1 = processDeployMap.get(o1.getProcessId()).get(0).getCreateTime();
+                    LocalDateTime time2 = processDeployMap.get(o2.getProcessId()).get(0).getCreateTime();
+                    // 倒序
+                    return time2.compareTo(time1);
                 })));
 
 
@@ -67,7 +73,8 @@ public class SceneOperateService {
             public int compare(SceneDto2 o1, SceneDto2 o2) {
                 LocalDateTime time1 = processDeployMap.get(sceneMap.get(o1.getId()).get(0).getProcessId()).get(0).getCreateTime();
                 LocalDateTime time2 = processDeployMap.get(sceneMap.get(o2.getId()).get(0).getProcessId()).get(0).getCreateTime();
-                return time1.compareTo(time2);
+                // 倒序
+                return time2.compareTo(time1);
             }
         }));
 
