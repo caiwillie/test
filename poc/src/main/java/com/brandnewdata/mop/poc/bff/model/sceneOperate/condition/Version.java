@@ -9,7 +9,13 @@ import java.time.LocalDateTime;
 @Setter
 public class Version {
 
+    /**
+     * 版本
+     */
     private int version;
 
+    /**
+     * 创建时间
+     */
     private LocalDateTime createTime;
 }

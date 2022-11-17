@@ -9,10 +9,19 @@ import java.util.List;
 @Setter
 public class Process {
 
+    /**
+     * 流程id
+     */
     private String processId;
 
+    /**
+     * 流程名称
+     */
     private String name;
 
+    /**
+     * 版本列表
+     */
     private List<Integer> versionList;
 
 }
