@@ -27,20 +27,20 @@ public class Statistic {
     /**
      * 场景运行次数排名
      */
-    private Bar executionSceneRanking;
+    private String executionSceneRanking;
 
     /**
      * 场景运行次数趋势
      */
-    private Line executionSceneTendency;
+    private String executionSceneTendency;
 
     /**
      * 触发次数分布图
      */
-    private Pie executionTriggerDis;
+    private String executionTriggerDis;
 
     /**
      * 触发次数趋势图
      */
-    private Line executionTriggerTendency;
+    private String executionTriggerTendency;
 }

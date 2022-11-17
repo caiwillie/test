@@ -22,6 +22,6 @@ public class Process {
     /**
      * 版本列表
      */
-    private List<Integer> versionList;
+    private List<Version> versionList;
 
 }

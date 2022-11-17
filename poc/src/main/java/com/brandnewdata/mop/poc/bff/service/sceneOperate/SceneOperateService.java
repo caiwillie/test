@@ -14,12 +14,11 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import static com.brandnewdata.mop.poc.util.CollectorsUtil.toSortedList;
 import static java.util.stream.Collectors.groupingBy;
 
 @Service
@@ -50,6 +49,7 @@ public class SceneOperateService {
 
         // 根据process id 分组，再根据版本排序
         Map<String, List<ProcessDeployDto>> processDeployMap = processDeployDtoList.stream().collect(groupingBy(ProcessDeployDto::getProcessId,
+
                 toSortedList(Comparator.comparingInt(ProcessDeployDto::getVersion))));
 
         // 根据场景分组，再根据最新版本的更新时间排序
@@ -71,22 +71,34 @@ public class SceneOperateService {
             }
         }));
 
-        for (SceneDto2 sceneDto2 : sceneSortedList) {
-            Scene scene = new Scene();
-            Long id = sceneDto2.getId();
-            scene.setId(id);
-            scene.setName(sceneDto2.getName());
 
 
 
-        }
 
 
         return null;
     }
 
+    private List<Scene> getSceneList(List<SceneDto2> sceneSortedList,
+                                     Map<Long, List<SceneProcessDto2>> sceneMap,
+                                     Map<String, List<ProcessDeployDto>> processDeployMap) {
+        List<Scene> ret = new ArrayList<>();
+        for (SceneDto2 sceneDto2 : sceneSortedList) {
+            Scene scene = new Scene();
+            Long id = sceneDto2.getId();
+            scene.setId(id);
+            scene.setName(sceneDto2.getName());
+            // 添加 processList
+            List<Process> processList = getProcessList(sceneMap.get(id), processDeployMap);
+            scene.setProcessList(processList);
 
-    private List<Process> getProcessList(List<SceneProcessDto2> sceneProcessDto2List, Map<String, List<ProcessDeployDto>> processDeployMap) {
+            ret.add(scene);
+        }
+        return ret;
+    }
+
+    private List<Process> getProcessList(List<SceneProcessDto2> sceneProcessDto2List,
+                                         Map<String, List<ProcessDeployDto>> processDeployMap) {
         List<Process> processList = new ArrayList<>();
         for (SceneProcessDto2 sceneProcessDto2 : sceneProcessDto2List) {
             Process process = new Process();
@@ -95,11 +107,13 @@ public class SceneOperateService {
             String processName = _processDeployDtoList.get(0).getProcessName();
             process.setProcessId(processId);
             process.setName(processName);
+            // 添加versionList
+            List<Version> versionList = getVersionList(processDeployMap.get(processId));
+            process.setVersionList(versionList);
 
-
-
+            processList.add(process);
         }
-        return null;
+        return processList;
     }
 
     private List<Version> getVersionList(List<ProcessDeployDto> processDeployDtoList) {
@@ -112,6 +126,7 @@ public class SceneOperateService {
         }
         return versionList;
     }
+
 
 
 }
