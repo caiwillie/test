@@ -1,12 +1,11 @@
 package com.brandnewdata.mop.poc.operate.service;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import co.elastic.clients.elasticsearch._types.FieldValue;
-import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import co.elastic.clients.elasticsearch._types.query_dsl.TermsQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
+import co.elastic.clients.elasticsearch._types.query_dsl.*;
+import co.elastic.clients.util.ObjectBuilder;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.operate.dao.FlowNodeInstanceDao;
 import com.brandnewdata.mop.poc.operate.dao.ListViewDao;
@@ -207,7 +206,40 @@ public class ProcessInstanceService implements IProcessInstanceService {
 
     @Override
     public Page<ListViewProcessInstanceDto> pageProcessInstanceByZeebeKeyList(List<Long> zeebeKeyList, int pageNum, int pageSize) {
-        return null;
+        if(CollUtil.isEmpty(zeebeKeyList)) return new Page<>(0, ListUtil.empty());
+
+        List<FieldValue> values = zeebeKeyList.stream().map(key -> new FieldValue.Builder().longValue(key).build())
+                .collect(Collectors.toList());
+
+        Query query = new Query.Builder()
+                .bool(new BoolQuery.Builder()
+                        .must(new Query.Builder()
+                                .term(t -> t.field(ListViewTemplate.JOIN_RELATION).value("processInstance"))
+                                .build(), new Query.Builder()
+                                .terms(new TermsQuery.Builder()
+                                        .field(ListViewTemplate.PROCESS_KEY)
+                                        .terms(new TermsQueryField.Builder().value(values).build())
+                                        .build())
+                                .build())
+                        .build())
+                .build();
+
+        List<ProcessInstanceForListViewEntity> processInstanceForListViewEntities = listViewDao.scrollAll(query, ElasticsearchUtil.QueryType.ALL);
+
+        List<ListViewProcessInstanceDto> processInstanceDTOS = processInstanceForListViewEntities.stream().map(entity -> {
+            ListViewProcessInstanceDto dto = new ListViewProcessInstanceDto();
+            dto.from(entity);
+            return dto;
+        }).sorted((o1, o2) -> {
+            LocalDateTime t1 = Optional.ofNullable(o1.getStartDate()).orElse(LocalDateTime.MIN);
+            LocalDateTime t2 = Optional.ofNullable(o2.getStartDate()).orElse(LocalDateTime.MIN);
+            return t2.compareTo(t1);
+        }).collect(Collectors.toList());
+
+        PageEnhancedUtil.setFirstPageNo(1);
+        List<ListViewProcessInstanceDto> records = PageEnhancedUtil.slice(pageNum, pageSize, processInstanceDTOS);
+
+        return new Page<>(processInstanceDTOS.size(), records);
     }
 
 

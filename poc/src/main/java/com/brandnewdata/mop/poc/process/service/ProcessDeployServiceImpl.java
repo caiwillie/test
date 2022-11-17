@@ -15,6 +15,7 @@ import com.brandnewdata.mop.poc.process.cache.DeployNoExpCache;
 import com.brandnewdata.mop.poc.process.dao.ProcessDeployDao;
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDto;
 import com.brandnewdata.mop.poc.process.dto.ProcessDeployDto;
+import com.brandnewdata.mop.poc.process.entity.ProcessDefinitionEntity;
 import com.brandnewdata.mop.poc.process.parser.dto.Step3Result;
 import com.brandnewdata.mop.poc.process.entity.ProcessDeployEntity;
 import com.brandnewdata.mop.poc.process.parser.FeelUtil;
@@ -178,10 +179,12 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
     }
 
     @Override
-    public List<ProcessDeployDto> listByIdList(List<String> idList) {
+    public List<ProcessDeployDto> listByIdList(List<Long> idList) {
         if(CollUtil.isEmpty(idList)) return ListUtil.empty();
         QueryWrapper<ProcessDeployEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.in(ProcessDeployEntity.ID, idList);
+        queryWrapper.select(ProcessDeployEntity.class, tableFieldInfo -> !StrUtil.equalsAny(tableFieldInfo.getColumn(),
+                ProcessDeployEntity.PROCESS_XML, ProcessDeployEntity.ZEEBE_XML));
         List<ProcessDeployEntity> entities = processDeployDao.selectList(queryWrapper);
         return entities.stream().map(this::toDto).collect(Collectors.toList());
     }
