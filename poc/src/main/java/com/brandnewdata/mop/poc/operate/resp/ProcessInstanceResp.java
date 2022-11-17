@@ -1,7 +1,7 @@
 package com.brandnewdata.mop.poc.operate.resp;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
-import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDTO;
+import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -46,7 +46,7 @@ public class ProcessInstanceResp {
     private String state;
 
 
-    public ProcessInstanceResp from(ListViewProcessInstanceDTO dto) {
+    public ProcessInstanceResp from(ListViewProcessInstanceDto dto) {
         this.setProcessId(dto.getBpmnProcessId());
         this.setVersion(dto.getProcessVersion());
         this.setInstanceId(String.valueOf(dto.getId()));

@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class VariableDTO extends OperateZeebeDTO {
+public class VariableDto extends OperateZeebeDto {
 
     private String id;
 
@@ -22,7 +22,7 @@ public class VariableDTO extends OperateZeebeDTO {
 
     private String[] sortValues;
 
-    public VariableDTO fromEntity(VariableEntity entity) {
+    public VariableDto fromEntity(VariableEntity entity) {
         this.setId(entity.getId());
         this.setName(entity.getName());
         this.setPreview(entity.isPreview());

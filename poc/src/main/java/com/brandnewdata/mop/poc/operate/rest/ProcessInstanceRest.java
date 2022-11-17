@@ -3,7 +3,7 @@ package com.brandnewdata.mop.poc.operate.rest;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.operate.dto.FlowNodeStateDTO;
-import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDTO;
+import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.operate.entity.SequenceFlowEntity;
 import com.brandnewdata.mop.poc.operate.resp.FlowNodeStateResp;
 import com.brandnewdata.mop.poc.operate.resp.ProcessInstanceResp;
@@ -43,9 +43,9 @@ public class ProcessInstanceRest {
             @RequestParam Long deployId,
             @RequestParam int pageNum,
             @RequestParam int pageSize) {
-        Page<ListViewProcessInstanceDTO> page = processInstanceService.page(deployId, pageNum, pageSize);
+        Page<ListViewProcessInstanceDto> page = processInstanceService.page(deployId, pageNum, pageSize);
 
-        List<ListViewProcessInstanceDTO> records = page.getRecords();
+        List<ListViewProcessInstanceDto> records = page.getRecords();
         List<ProcessInstanceResp> respList = records.stream().map(dto -> {
             ProcessInstanceResp resp = new ProcessInstanceResp();
             return resp.from(dto);
@@ -63,7 +63,7 @@ public class ProcessInstanceRest {
      */
     @GetMapping("/rest/operate/instance/detail")
     public Result<ProcessInstanceResp> detail(@RequestParam String processInstanceId) {
-        ListViewProcessInstanceDTO dto = processInstanceService.detail(Long.valueOf(processInstanceId));
+        ListViewProcessInstanceDto dto = processInstanceService.detail(Long.valueOf(processInstanceId));
         ProcessInstanceResp resp = new ProcessInstanceResp();
         resp.from(dto);
         return Result.OK(resp);

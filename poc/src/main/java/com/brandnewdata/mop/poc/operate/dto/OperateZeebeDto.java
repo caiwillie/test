@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public abstract class OperateZeebeDTO extends OperateDTO {
+public abstract class OperateZeebeDto extends OperateDto {
 
     private long key;
 

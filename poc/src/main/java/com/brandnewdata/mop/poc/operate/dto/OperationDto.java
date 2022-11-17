@@ -9,7 +9,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class OperationDTO implements FromOneEntity<OperationDTO, OperationEntity> {
+public class OperationDto implements FromOneEntity<OperationDto, OperationEntity> {
 
     private String id;
 
@@ -22,7 +22,7 @@ public class OperationDTO implements FromOneEntity<OperationDTO, OperationEntity
     private String errorMessage;
 
     @Override
-    public OperationDTO from(OperationEntity entity) {
+    public OperationDto from(OperationEntity entity) {
         this.setId(entity.getId());
         this.setType(entity.getType());
         this.setState(entity.getState());

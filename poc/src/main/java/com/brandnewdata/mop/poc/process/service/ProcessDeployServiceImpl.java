@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -74,7 +75,7 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         return Optional.ofNullable(processDeployDao.selectOne(queryWrapper));
     }
 
-    private ProcessDeployDto toDTO(ProcessDeployEntity entity) {
+    private ProcessDeployDto toDto(ProcessDeployEntity entity) {
         if(entity == null) return null; //为空返回
         ProcessDeployDto dto = new ProcessDeployDto();
         dto.setId(entity.getId());
@@ -162,11 +163,11 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
             connectorManager.saveRequestParams(step3Result);
         }
 
-        return toDTO(entity);
+        return toDto(entity);
     }
 
     @Override
-    public List<ProcessDeployDto> listAll(int type) {
+    public List<ProcessDeployDto> listByType(int type) {
         List<ProcessDeployDto> ret = new ArrayList<>();
         for (ProcessDeployDto processDeployDto : deployCache.asMap().values()) {
             if(processDeployDto.getType() == type) {
@@ -174,6 +175,15 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
             }
         }
         return ret;
+    }
+
+    @Override
+    public List<ProcessDeployDto> listByIdList(List<String> idList) {
+        if(CollUtil.isEmpty(idList)) return ListUtil.empty();
+        QueryWrapper<ProcessDeployEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in(ProcessDeployEntity.ID, idList);
+        List<ProcessDeployEntity> entities = processDeployDao.selectList(queryWrapper);
+        return entities.stream().map(this::toDto).collect(Collectors.toList());
     }
 
 
@@ -190,7 +200,7 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
 
         if(CollUtil.isNotEmpty(records)) {
             for (ProcessDeployEntity record : records) {
-                ProcessDeployDto dto = toDTO(record);
+                ProcessDeployDto dto = toDto(record);
                 list.add(dto);
             }
         }
@@ -268,7 +278,7 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
     @Override
     public ProcessDeployDto getOne(long deployId) {
         ProcessDeployEntity entity = processDeployDao.selectById(deployId);
-        return toDTO(entity);
+        return toDto(entity);
     }
 
 }

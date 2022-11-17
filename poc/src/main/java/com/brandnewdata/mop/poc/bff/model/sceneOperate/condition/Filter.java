@@ -20,7 +20,7 @@ public class Filter {
     /**
      * 版本
      */
-    private int version;
+    private Integer version;
 
     /**
      * 开始时间
@@ -31,5 +31,15 @@ public class Filter {
      * 结束时间
      */
     private String endTime;
+
+    /**
+     * 分页页码
+     */
+    private Integer pageNum;
+
+    /**
+     * 分页大小
+     */
+    private Integer pageSize;
 
 }

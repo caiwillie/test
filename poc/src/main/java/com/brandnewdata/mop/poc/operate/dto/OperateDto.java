@@ -5,6 +5,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public abstract class OperateDTO {
+public abstract class OperateDto {
     private String id;
 }

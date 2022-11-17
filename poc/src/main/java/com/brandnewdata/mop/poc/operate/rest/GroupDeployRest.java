@@ -5,7 +5,7 @@ import cn.hutool.core.lang.Assert;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.operate.dto.GroupDeployDTO;
-import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDTO;
+import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.operate.dto.ProcessInstanceStateDto;
 import com.brandnewdata.mop.poc.operate.resp.GroupDeployResp;
 import com.brandnewdata.mop.poc.operate.service.GroupDeployService;
@@ -98,13 +98,13 @@ public class GroupDeployRest {
         List<Long> processDefinitionKeys = deploys.stream().map(ProcessDeployDto::getZeebeKey).collect(Collectors.toList());
 
         // 得到 flat map之后的 process instance list
-        Map<Long, List<ListViewProcessInstanceDTO>> map = processInstanceService.listByProcessDefinitionKeyList(processDefinitionKeys);
-        List<ListViewProcessInstanceDTO> collect = map.values().stream().flatMap(Collection::stream).collect(Collectors.toList());
+        Map<Long, List<ListViewProcessInstanceDto>> map = processInstanceService.listByProcessDefinitionKeyList(processDefinitionKeys);
+        List<ListViewProcessInstanceDto> collect = map.values().stream().flatMap(Collection::stream).collect(Collectors.toList());
 
         // 统计正常和异常的数量
         int activeCount = 0;
         int incidentCount = 0;
-        for (ListViewProcessInstanceDTO processInstanceDTO : collect) {
+        for (ListViewProcessInstanceDto processInstanceDTO : collect) {
             if(processInstanceDTO.getState() == ProcessInstanceStateDto.INCIDENT) {
                 incidentCount++;
             } else {

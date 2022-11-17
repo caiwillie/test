@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Getter
 @Setter
-public class IncidentDTO {
+public class IncidentDto {
 
     public static final String FALLBACK_PROCESS_DEFINITION_NAME = "Unknown process";
 
@@ -32,12 +32,12 @@ public class IncidentDTO {
 
     private LocalDateTime lastOperation;
 
-    private ProcessInstanceReferenceDTO rootCauseInstance;
+    private ProcessInstanceReferenceDto rootCauseInstance;
 
     private DecisionInstanceReferenceDTO rootCauseDecision;
 
 
-    public IncidentDTO fromEntity(IncidentEntity incidentEntity) {
+    public IncidentDto fromEntity(IncidentEntity incidentEntity) {
         this.setId(incidentEntity.getId());
         this.setFlowNodeId(incidentEntity.getFlowNodeId());
         this.setFlowNodeInstanceId(Optional.ofNullable(incidentEntity.getFlowNodeInstanceKey()).map(String::valueOf).orElse(null));

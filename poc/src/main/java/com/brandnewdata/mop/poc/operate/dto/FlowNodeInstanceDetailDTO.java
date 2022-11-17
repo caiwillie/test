@@ -38,6 +38,6 @@ public class FlowNodeInstanceDetailDTO {
     /**
      * 异常信息
      */
-    private IncidentDTO incident;
+    private IncidentDto incident;
 
 }

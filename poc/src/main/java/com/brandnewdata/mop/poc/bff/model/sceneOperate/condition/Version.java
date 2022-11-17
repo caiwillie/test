@@ -10,6 +10,11 @@ import java.time.LocalDateTime;
 public class Version {
 
     /**
+     * 部署id
+     */
+    private Long deployId;
+
+    /**
      * 版本
      */
     private int version;

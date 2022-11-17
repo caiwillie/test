@@ -25,7 +25,16 @@ public class SceneProcessService implements ISceneProcessService{
         QueryWrapper<SceneProcessEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.in(SceneProcessEntity.PROCESS_ID, processIdList);
         List<SceneProcessEntity> entities = sceneProcessDao.selectList(queryWrapper);
-        return Opt.of(entities).orElse(ListUtil.empty()).stream().map(this::toDto).collect(Collectors.toList());
+        return entities.stream().map(this::toDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SceneProcessDto2> listBySceneIdList(List<Long> sceneIdList) {
+        if(CollUtil.isEmpty(sceneIdList)) return ListUtil.empty();
+        QueryWrapper<SceneProcessEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in(SceneProcessEntity.BUSINESS_SCENE_ID, sceneIdList);
+        List<SceneProcessEntity> entities = sceneProcessDao.selectList(queryWrapper);
+        return entities.stream().map(this::toDto).collect(Collectors.toList());
     }
 
 

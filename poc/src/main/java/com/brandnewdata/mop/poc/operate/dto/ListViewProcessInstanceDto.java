@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @Getter
 @Setter
-public class ListViewProcessInstanceDTO extends OperateZeebeDTO {
+public class ListViewProcessInstanceDto extends OperateZeebeDto {
     private String id;
     private Long processId;
     private String processName;
@@ -25,13 +25,13 @@ public class ListViewProcessInstanceDTO extends OperateZeebeDTO {
     private ProcessInstanceStateDto state;
     private String bpmnProcessId;
     private boolean hasActiveOperation = false;
-    private List<OperationDTO> operations = new ArrayList<>();
+    private List<OperationDto> operations = new ArrayList<>();
     private String parentInstanceId;
     private String rootInstanceId;
-    private List<ProcessInstanceReferenceDTO> callHierarchy = new ArrayList<ProcessInstanceReferenceDTO>();
+    private List<ProcessInstanceReferenceDto> callHierarchy = new ArrayList<ProcessInstanceReferenceDto>();
     private String[] sortValues;
 
-    public ListViewProcessInstanceDTO from(ProcessInstanceForListViewEntity entity) {
+    public ListViewProcessInstanceDto from(ProcessInstanceForListViewEntity entity) {
         if (entity == null) {
             return null;
         }

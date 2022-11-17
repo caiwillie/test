@@ -11,6 +11,6 @@ public class FlowNodeInstanceTreeDTO {
 
     private boolean incident;
 
-    private List<FlowNodeInstanceDTO> list;
+    private List<FlowNodeInstanceDto> list;
 
 }

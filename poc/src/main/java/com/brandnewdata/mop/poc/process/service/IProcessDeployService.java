@@ -18,7 +18,9 @@ public interface IProcessDeployService {
      */
     ProcessDeployDto deploy(ProcessDefinitionDto processDefinitionDTO, int type);
 
-    List<ProcessDeployDto> listAll(int type);
+    List<ProcessDeployDto> listByType(int type);
+
+    List<ProcessDeployDto> listByIdList(List<Long> idList);
 
     Page<ProcessDeployDto> page(int pageNum, int pageSize);
 

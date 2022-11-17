@@ -8,4 +8,6 @@ import java.util.List;
 public interface ISceneProcessService {
 
     List<SceneProcessDto2> listByProcessIdList(List<String> processIdList);
+
+    List<SceneProcessDto2> listBySceneIdList(List<Long> sceneIdList);
 }

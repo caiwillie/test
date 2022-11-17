@@ -32,7 +32,7 @@ public class SceneOperateController {
      */
     @GetMapping("/rest/scene/operate/getAllScene")
     public Result<List<Scene>> getAllScene() {
-        return sceneOperateService.getAllScene();
+        return Result.OK(sceneOperateService.getAllScene());
     }
 
     /**
@@ -54,6 +54,7 @@ public class SceneOperateController {
      */
     @PostMapping("/rest/scene/operate/pageProcessInstance")
     public Result<Page<ProcessInstance>> pageProcessInstance(@RequestBody Filter filter) {
-        return Result.OK();
+        Page<ProcessInstance> page = sceneOperateService.pageProcessInstance(filter);
+        return Result.OK(page);
     }
 }
