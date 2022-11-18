@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * 运行监控相关的接口
+ * 流程监控相关的接口
  *
  */
 @RestController
@@ -38,6 +38,7 @@ public class ProcessInstanceRest {
      * @param pageSize 分页大小
      * @return result result
      */
+    @Deprecated
     @GetMapping("/rest/operate/instance/page")
     public Result<Page<ProcessInstanceResp>> page (
             @RequestParam Long deployId,
@@ -61,7 +62,7 @@ public class ProcessInstanceRest {
      * @param processInstanceId 流程实例id
      * @return the result
      */
-    @GetMapping("/rest/operate/instance/detail")
+    @GetMapping("/rest/operate/process/instance/detail")
     public Result<ProcessInstanceResp> detail(@RequestParam String processInstanceId) {
         ListViewProcessInstanceDto dto = processInstanceService.detail(Long.valueOf(processInstanceId));
         ProcessInstanceResp resp = new ProcessInstanceResp();
@@ -75,7 +76,7 @@ public class ProcessInstanceRest {
      * @param processInstanceId 流程实例id
      * @return the result
      */
-    @GetMapping("/rest/operate/instance/sequenceFlows")
+    @GetMapping("/rest/operate/process/instance/sequenceFlows")
     public Result<List<SequenceFlowResp>> sequenceFlows(@RequestParam String processInstanceId) {
         List<SequenceFlowEntity> sequenceFlowEntities = processInstanceService.sequenceFlows(Long.valueOf(processInstanceId));
         List<SequenceFlowResp> records = sequenceFlowEntities.stream().map(e -> {
@@ -91,7 +92,7 @@ public class ProcessInstanceRest {
      * @param processInstanceId 流程实例id
      * @return
      */
-    @GetMapping("/rest/operate/instance/flowNodeStates")
+    @GetMapping("/rest/operate/process/instance/flowNodeStates")
     public Result<List<FlowNodeStateResp>> flowNodeStates(@RequestParam String processInstanceId) {
         List<FlowNodeStateResp> ret = new ArrayList<>();
         Map<String, FlowNodeStateDto> flowNodeStateMap = processInstanceService.getFlowNodeStateMap(Long.valueOf(processInstanceId));

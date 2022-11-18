@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * 运行监控相关的接口
+ * 流程监控相关的接口
  */
 @RestController
 public class VariableRest {
@@ -26,7 +26,7 @@ public class VariableRest {
      * @param scopeId           scope id（通常是flowNodeInstanceId）
      * @return the result
      */
-    @GetMapping("/rest/operate/variable/listByScopeId")
+    @GetMapping("/rest/operate/process/variable/listByScopeId")
     public Result<List<VariableDto>> listByFlowNodeInstance(
             @RequestParam String processInstanceId, @RequestParam String scopeId) {
         List<VariableDto> list = variableService.listByScopeId(processInstanceId, scopeId);

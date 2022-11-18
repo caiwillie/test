@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * 运行监控相关的接口
+ * 流程监控相关的接口
  */
 @RestController
 public class FlowNodeInstanceRest {
@@ -26,7 +26,7 @@ public class FlowNodeInstanceRest {
      * @param processInstanceId 流程实例id
      * @return the result
      */
-    @GetMapping("/rest/operate/flowNodeInstance/list")
+    @GetMapping("/rest/operate/process/flowNodeInstance/list")
     public Result<List<FlowNodeInstanceDto>> list(@RequestParam String processInstanceId) {
         List<FlowNodeInstanceDto> list = service.list(processInstanceId);
         return Result.OK(list);
