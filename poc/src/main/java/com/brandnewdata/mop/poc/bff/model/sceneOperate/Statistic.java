@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.poc.bff.model.sceneOperate;
 
+import com.brandnewdata.mop.poc.bff.model.sceneOperate.charts.ChartOption;
 import lombok.Getter;
 import lombok.Setter;
 import org.icepear.echarts.Bar;
@@ -27,20 +28,20 @@ public class Statistic {
     /**
      * 场景运行次数排名
      */
-    private String executionSceneRanking;
+    private ChartOption executionSceneRanking;
 
     /**
      * 场景运行次数趋势
      */
-    private String executionSceneTendency;
+    private ChartOption executionSceneTendency;
 
     /**
      * 触发次数分布图
      */
-    private String executionTriggerDis;
+    private ChartOption executionTriggerDis;
 
     /**
      * 触发次数趋势图
      */
-    private String executionTriggerTendency;
+    private ChartOption executionTriggerTendency;
 }

@@ -16,7 +16,7 @@ public class IncidentDto {
 
     private String id;
 
-    private ErrorTypeDTO errorType;
+    private ErrorTypeDto errorType;
 
     private String errorMessage;
 
@@ -34,7 +34,7 @@ public class IncidentDto {
 
     private ProcessInstanceReferenceDto rootCauseInstance;
 
-    private DecisionInstanceReferenceDTO rootCauseDecision;
+    private DecisionInstanceReferenceDto rootCauseDecision;
 
 
     public IncidentDto fromEntity(IncidentEntity incidentEntity) {
@@ -42,7 +42,7 @@ public class IncidentDto {
         this.setFlowNodeId(incidentEntity.getFlowNodeId());
         this.setFlowNodeInstanceId(Optional.ofNullable(incidentEntity.getFlowNodeInstanceKey()).map(String::valueOf).orElse(null));
         this.setErrorMessage(incidentEntity.getErrorMessage());
-        this.setErrorType(new ErrorTypeDTO().from(incidentEntity.getErrorType()));
+        this.setErrorType(new ErrorTypeDto().from(incidentEntity.getErrorType()));
         this.setJobId(Optional.ofNullable(incidentEntity.getJobKey()).map(String::valueOf).orElse(null));
         this.setCreationTime(Optional.ofNullable(incidentEntity.getCreationTime()).map(OffsetDateTime::toLocalDateTime).orElse(null));
         return this;

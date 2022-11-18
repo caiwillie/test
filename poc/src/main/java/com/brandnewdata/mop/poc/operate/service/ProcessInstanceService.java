@@ -4,14 +4,15 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
-import co.elastic.clients.util.ObjectBuilder;
 import com.brandnewdata.mop.poc.common.dto.Page;
+import com.brandnewdata.mop.poc.operate.cache.ProcessInstanceNoExpCache;
 import com.brandnewdata.mop.poc.operate.dao.FlowNodeInstanceDao;
 import com.brandnewdata.mop.poc.operate.dao.ListViewDao;
 import com.brandnewdata.mop.poc.operate.dao.SequenceFlowDao;
 import com.brandnewdata.mop.poc.operate.dto.FlowNodeInstanceDto;
-import com.brandnewdata.mop.poc.operate.dto.FlowNodeStateDTO;
+import com.brandnewdata.mop.poc.operate.dto.FlowNodeStateDto;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.operate.entity.FlowNodeInstanceEntity;
 import com.brandnewdata.mop.poc.operate.entity.SequenceFlowEntity;
@@ -48,6 +49,9 @@ public class ProcessInstanceService implements IProcessInstanceService {
 
     @Resource
     private IProcessDeployService deployService;
+
+    @Resource
+    private ProcessInstanceNoExpCache processInstanceNoExpCache;
 
     public Page<ListViewProcessInstanceDto> page(Long deployId, Integer pageNum, Integer pageSize) {
         Assert.notNull(deployId);
@@ -108,8 +112,8 @@ public class ProcessInstanceService implements IProcessInstanceService {
         return sequenceFlowDao.scrollAll(query);
     }
 
-    public Map<String, FlowNodeStateDTO> getFlowNodeStateMap(Long processInstanceId) {
-        Map<String, FlowNodeStateDTO> ret = new HashMap<>();
+    public Map<String, FlowNodeStateDto> getFlowNodeStateMap(Long processInstanceId) {
+        Map<String, FlowNodeStateDto> ret = new HashMap<>();
 
         Query query = new Query.Builder()
                 .term(t -> t.field(FlowNodeInstanceTemplate.PROCESS_INSTANCE_KEY).value(processInstanceId))
@@ -144,16 +148,16 @@ public class ProcessInstanceService implements IProcessInstanceService {
             String flowNodeId = flowNodeInstanceDTO.getFlowNodeId();
             String treePath = flowNodeInstanceDTO.getTreePath();
             boolean incident = flowNodeInstanceDTO.isIncident();
-            FlowNodeStateDTO state = flowNodeInstanceDTO.getState();
+            FlowNodeStateDto state = flowNodeInstanceDTO.getState();
             if (incident) {
-                state = FlowNodeStateDTO.INCIDENT;
+                state = FlowNodeStateDto.INCIDENT;
                 // 将父路径也放入异常路径中（异常冒泡）
                 String[] split = treePath.split("/");
                 for (int i = 1; i <= split.length; i++) {
                     incidentPathSet.add(StringUtils.join(split, '/', 0, i));
                 }
             } else if (incidentPathSet.contains(treePath)) {
-                state = FlowNodeStateDTO.INCIDENT;
+                state = FlowNodeStateDto.INCIDENT;
             }
             ret.put(flowNodeId, state);
         }
@@ -203,9 +207,9 @@ public class ProcessInstanceService implements IProcessInstanceService {
     }
 
 
-
     @Override
-    public Page<ListViewProcessInstanceDto> pageProcessInstanceByZeebeKeyList(List<Long> zeebeKeyList, int pageNum, int pageSize) {
+    public Page<ListViewProcessInstanceDto> pageProcessInstanceByZeebeKeyList(
+            List<Long> zeebeKeyList, int pageNum, int pageSize, Map<String, Object> extra) {
         if(CollUtil.isEmpty(zeebeKeyList)) return new Page<>(0, ListUtil.empty());
 
         List<FieldValue> values = zeebeKeyList.stream().map(key -> new FieldValue.Builder().longValue(key).build())
@@ -226,7 +230,7 @@ public class ProcessInstanceService implements IProcessInstanceService {
 
         List<ProcessInstanceForListViewEntity> processInstanceForListViewEntities = listViewDao.scrollAll(query, ElasticsearchUtil.QueryType.ALL);
 
-        List<ListViewProcessInstanceDto> processInstanceDTOS = processInstanceForListViewEntities.stream().map(entity -> {
+        List<ListViewProcessInstanceDto> processInstanceDtoList = processInstanceForListViewEntities.stream().map(entity -> {
             ListViewProcessInstanceDto dto = new ListViewProcessInstanceDto();
             dto.from(entity);
             return dto;
@@ -237,9 +241,21 @@ public class ProcessInstanceService implements IProcessInstanceService {
         }).collect(Collectors.toList());
 
         PageEnhancedUtil.setFirstPageNo(1);
-        List<ListViewProcessInstanceDto> records = PageEnhancedUtil.slice(pageNum, pageSize, processInstanceDTOS);
+        List<ListViewProcessInstanceDto> records = PageEnhancedUtil.slice(pageNum, pageSize, processInstanceDtoList);
 
-        return new Page<>(processInstanceDTOS.size(), records);
+        Page<ListViewProcessInstanceDto> page = new Page<>(processInstanceDtoList.size(), records);
+        Map<String, Object> extraMap = new HashMap<>();
+        extraMap.put("successCount", 1);
+        extraMap.put("failCount", 1);
+        extraMap.put("activeCount", 1);
+        extraMap.put("cancleCount", 1);
+        page.setExtraMap(extraMap);
+        return page;
+    }
+
+    @Override
+    public List<ListViewProcessInstanceDto> listAll() {
+        return ListUtil.toList(processInstanceNoExpCache.asMap().values());
     }
 
 

@@ -3,7 +3,7 @@ package com.brandnewdata.mop.poc.operate.dto;
 import lombok.Data;
 
 @Data
-public class FlowNodeInstanceDetailDTO {
+public class FlowNodeInstanceDetailDto {
 
     /**
      * 说明当前节点是否重复
@@ -28,7 +28,7 @@ public class FlowNodeInstanceDetailDTO {
     /**
      * 基本信息
      */
-    private FlowNodeInstanceMetaDataDTO metaData;
+    private FlowNodeInstanceMetaDataDto metaData;
 
     /**
      * 异常个数

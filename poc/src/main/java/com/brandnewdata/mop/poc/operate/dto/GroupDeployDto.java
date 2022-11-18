@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class GroupDeployDTO {
+public class GroupDeployDto {
     /**
      * 流程 id
      */

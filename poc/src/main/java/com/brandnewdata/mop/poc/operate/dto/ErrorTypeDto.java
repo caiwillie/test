@@ -6,14 +6,14 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ErrorTypeDTO implements FromOneEntity<ErrorTypeDTO, ErrorType> {
+public class ErrorTypeDto implements FromOneEntity<ErrorTypeDto, ErrorType> {
 
     private String id;
 
     private String name;
 
     @Override
-    public ErrorTypeDTO from(ErrorType entity) {
+    public ErrorTypeDto from(ErrorType entity) {
         this.setId(entity.name());
         this.setName(entity.getTitle());
         return this;

@@ -2,7 +2,7 @@ package com.brandnewdata.mop.poc.operate.dto;
 
 import com.brandnewdata.mop.poc.operate.entity.FlowNodeState;
 
-public enum FlowNodeStateDTO {
+public enum FlowNodeStateDto {
 
     /**
      * 激活
@@ -17,11 +17,11 @@ public enum FlowNodeStateDTO {
     UNKNOWN;
 
 
-    public static FlowNodeStateDTO getState(FlowNodeState state) {
+    public static FlowNodeStateDto getState(FlowNodeState state) {
         if (state == null) {
             return UNSPECIFIED;
         }
-        FlowNodeStateDTO stateDto = FlowNodeStateDTO.valueOf(state.name());
+        FlowNodeStateDto stateDto = FlowNodeStateDto.valueOf(state.name());
         if (stateDto != null) return stateDto;
         return UNKNOWN;
     }

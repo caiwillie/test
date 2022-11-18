@@ -34,7 +34,7 @@ public class FlowNodeInstanceDto extends OperateZeebeDto implements FromOneEntit
      * 节点状态
      * ACTIVE 运行中, INCIDENT 异常, COMPLETED 完成, TERMINATED 取消,
      */
-    private FlowNodeStateDTO state;
+    private FlowNodeStateDto state;
 
     /**
      * 节点类型
@@ -89,7 +89,7 @@ public class FlowNodeInstanceDto extends OperateZeebeDto implements FromOneEntit
         this.setFlowNodeId(entity.getFlowNodeId());
         this.setStartDate(Optional.ofNullable(entity.getStartDate()).map(OffsetDateTime::toLocalDateTime).orElse(null));
         this.setEndDate(Optional.ofNullable(entity.getEndDate()).map(OffsetDateTime::toLocalDateTime).orElse(null));
-        this.setState(FlowNodeStateDTO.getState(entity.getState()));
+        this.setState(FlowNodeStateDto.getState(entity.getState()));
         this.setType(entity.getType());
         this.setIncidentKey(entity.getIncidentKey());
         this.setProcessInstanceKey(entity.getProcessInstanceKey());

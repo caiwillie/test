@@ -7,7 +7,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class FlowNodeInstanceTreeDTO {
+public class FlowNodeInstanceTreeDto {
 
     private boolean incident;
 

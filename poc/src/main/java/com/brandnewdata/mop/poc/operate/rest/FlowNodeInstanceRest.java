@@ -2,7 +2,7 @@ package com.brandnewdata.mop.poc.operate.rest;
 
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.operate.dto.FlowNodeInstanceDto;
-import com.brandnewdata.mop.poc.operate.dto.FlowNodeInstanceDetailDTO;
+import com.brandnewdata.mop.poc.operate.dto.FlowNodeInstanceDetailDto;
 import com.brandnewdata.mop.poc.operate.service.FlowNodeInstanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,9 +40,9 @@ public class FlowNodeInstanceRest {
      * @return the result
      */
     @GetMapping("/rest/operate/flowNodeInstance/detailByFlowNodeInstanceId")
-    public Result<FlowNodeInstanceDetailDTO> detailByFlowNodeInstanceId(
+    public Result<FlowNodeInstanceDetailDto> detailByFlowNodeInstanceId(
             @RequestParam String processInstanceId, @RequestParam String flowNodeInstanceId) {
-        FlowNodeInstanceDetailDTO data = service.detailByFlowNodeInstanceId(processInstanceId, flowNodeInstanceId);
+        FlowNodeInstanceDetailDto data = service.detailByFlowNodeInstanceId(processInstanceId, flowNodeInstanceId);
         return Result.OK(data);
     }
 
@@ -54,9 +54,9 @@ public class FlowNodeInstanceRest {
      * @return the result
      */
     @GetMapping("/rest/operate/flowNodeInstance/detailByFlowNodeId")
-    public Result<FlowNodeInstanceDetailDTO> detailByFlowNodeId(
+    public Result<FlowNodeInstanceDetailDto> detailByFlowNodeId(
             @RequestParam String processInstanceId, @RequestParam String flowNodeId) {
-        FlowNodeInstanceDetailDTO data = service.detailByFlowNodeId(Long.valueOf(processInstanceId), flowNodeId);
+        FlowNodeInstanceDetailDto data = service.detailByFlowNodeId(Long.valueOf(processInstanceId), flowNodeId);
         return Result.OK(data);
     }
 

@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class DecisionInstanceReferenceDTO {
+public class DecisionInstanceReferenceDto {
 
     private String instanceId;
 

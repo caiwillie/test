@@ -5,6 +5,8 @@ import cn.hutool.core.lang.Opt;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.mop.poc.bff.model.sceneOperate.ProcessInstance;
+import com.brandnewdata.mop.poc.bff.model.sceneOperate.Statistic;
+import com.brandnewdata.mop.poc.bff.model.sceneOperate.charts.ChartOption;
 import com.brandnewdata.mop.poc.bff.model.sceneOperate.condition.Filter;
 import com.brandnewdata.mop.poc.bff.model.sceneOperate.condition.Process;
 import com.brandnewdata.mop.poc.bff.model.sceneOperate.condition.Scene;
@@ -27,6 +29,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.brandnewdata.mop.poc.operate.dto.ProcessInstanceStateDto.COMPLETED;
+import static com.brandnewdata.mop.poc.operate.dto.ProcessInstanceStateDto.INCIDENT;
 import static com.brandnewdata.mop.poc.util.CollectorsUtil.toSortedList;
 import static java.util.stream.Collectors.groupingBy;
 
@@ -34,16 +38,12 @@ import static java.util.stream.Collectors.groupingBy;
 public class SceneOperateService {
     @Resource
     private IProcessDeployService processDeployService;
-
     @Resource
     private ISceneProcessService sceneProcessService;
-
     @Resource
     private ISceneService sceneService;
-
     @Resource
     private IProcessInstanceService processInstanceService;
-
 
     public List<Scene> getAllScene() {
         // 获取所有场景的部署流程列表
@@ -97,7 +97,7 @@ public class SceneOperateService {
 
     public Page<ProcessInstance> pageProcessInstance(Filter filter) {
         List<Scene> sceneList = getAllScene();
-        Map<ProcessIdAndVersion, String[]> map = new HashMap<>();
+        Map<ProcessIdAndVersion, String[]> processIdAndVersionMap = new HashMap<>();
         List<Long> deployIdList = new ArrayList<>();
         for (Scene scene : sceneList) {
             if(filter.getSceneId() != null && ! NumberUtil.equals(filter.getSceneId(), scene.getId())) continue;
@@ -106,7 +106,7 @@ public class SceneOperateService {
                 for (Version version : process.getVersionList()) {
                     if(filter.getVersion() != null && !NumberUtil.equals(filter.getVersion(), version.getVersion())) continue;
                     deployIdList.add(version.getDeployId());
-                    map.put(new ProcessIdAndVersion(process.getProcessId(), version.getVersion()),
+                    processIdAndVersionMap.put(new ProcessIdAndVersion(process.getProcessId(), version.getVersion()),
                             new String[]{scene.getName(), process.getName()});
                 }
             }
@@ -117,10 +117,73 @@ public class SceneOperateService {
         List<Long> zeebeKeyList = processDeployDtoList.stream().map(ProcessDeployDto::getZeebeKey).collect(Collectors.toList());
 
         Page<ListViewProcessInstanceDto> listViewProcessInstanceDtoPage =
-                processInstanceService.pageProcessInstanceByZeebeKeyList(zeebeKeyList, filter.getPageNum(), filter.getPageSize());
-        List<ProcessInstance> records = listViewProcessInstanceDtoPage.getRecords().stream().map(r -> toProcessInstance(r, map))
+                processInstanceService.pageProcessInstanceByZeebeKeyList(zeebeKeyList, filter.getPageNum(), filter.getPageSize(), null);
+        List<ProcessInstance> records = listViewProcessInstanceDtoPage.getRecords().stream().map(r -> toProcessInstance(r, processIdAndVersionMap))
                 .collect(Collectors.toList());
-        return new Page<>(listViewProcessInstanceDtoPage.getTotal(), records);
+        Page page = new Page(listViewProcessInstanceDtoPage.getTotal(), records);
+        page.setExtraMap(listViewProcessInstanceDtoPage.getExtraMap());
+        return page;
+    }
+
+    public Statistic statistic(Filter filter) {
+        List<Scene> sceneList = getAllScene();
+        Map<ProcessIdAndVersion, String[]> processIdAndVersionMap = new HashMap<>();
+        for (Scene scene : sceneList) {
+            if(filter.getSceneId() != null && ! NumberUtil.equals(filter.getSceneId(), scene.getId())) continue;
+            for (Process process : scene.getProcessList()) {
+                if (filter.getProcessId() != null && !StrUtil.equals(filter.getProcessId(), process.getProcessId())) continue;
+                for (Version version : process.getVersionList()) {
+                    if(filter.getVersion() != null && !NumberUtil.equals(filter.getVersion(), version.getVersion())) continue;
+                    processIdAndVersionMap.put(new ProcessIdAndVersion(process.getProcessId(), version.getVersion()),
+                            new String[]{scene.getName(), process.getName()});
+                }
+            }
+        }
+
+        // 获取所有场景的部署流程列表
+        List<ProcessDeployDto> processDeployDtoList = processDeployService.listByType(1);
+        // 获取所有流程实例
+        List<ListViewProcessInstanceDto> listViewProcessInstanceDtos = processInstanceService.listAll();
+
+        // 运行次数
+        int executionCount = 0;
+        // 成功次数
+        int successCount = 0;
+        // 失败次数
+        int failCount = 0;
+        // 场景运行次数排名
+        Map<String, int[]> executionSceneRankingDataMap = new HashMap<>();
+        TreeMap<Long, int[]> executionSceneTendencyMap = new TreeMap<>();
+
+        // 场景运行次数排名
+        ChartOption executionSceneRanking = new ChartOption();
+        // 场景运行次数趋势
+        ChartOption executionSceneTendency = new ChartOption();
+        // 触发次数分布图
+        ChartOption executionTriggerDis = new ChartOption();
+
+        for (ListViewProcessInstanceDto dto : listViewProcessInstanceDtos) {
+            String processId = dto.getBpmnProcessId();
+            Integer version = dto.getProcessVersion();
+            String[] names = processIdAndVersionMap.get(new ProcessIdAndVersion(processId, version));
+            if(names == null) continue;
+            String sceneName = names[0];
+            int[] executionSceneRankingData  = executionSceneRankingDataMap.computeIfAbsent(sceneName, key -> new int[]{0, 0});
+            executionCount += 1;
+            if(dto.getState() == COMPLETED) {
+                successCount += 1;
+                executionSceneRankingData[0] += 1;
+            } else if(dto.getState() == INCIDENT) {
+                failCount += 1;
+                executionSceneRankingData[1] += 1;
+            }
+
+            dto.getStartDate().toLocalDate();
+
+            String date = LocalDateTimeUtil.format(dto.getStartDate(), "MM-dd");
+
+        }
+        return null;
     }
 
     @Getter
@@ -202,10 +265,11 @@ public class SceneOperateService {
         return versionList;
     }
 
-    private ProcessInstance toProcessInstance(ListViewProcessInstanceDto listViewProcessInstanceDto, Map<ProcessIdAndVersion, String[]> map) {
+    private ProcessInstance toProcessInstance(ListViewProcessInstanceDto listViewProcessInstanceDto,
+                                              Map<ProcessIdAndVersion, String[]> processIdAndVersionMap) {
         String processId = listViewProcessInstanceDto.getBpmnProcessId();
         Integer version = listViewProcessInstanceDto.getProcessVersion();
-        String[] names = map.get(new ProcessIdAndVersion(processId, version));
+        String[] names = processIdAndVersionMap.get(new ProcessIdAndVersion(processId, version));
 
         ProcessInstance ret = new ProcessInstance();
 
@@ -221,6 +285,7 @@ public class SceneOperateService {
                 .map(LocalDateTimeUtil::formatNormal).orElse(null));
         return ret;
     }
+
 
 
 }

@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.common.dto.Page;
-import com.brandnewdata.mop.poc.operate.dto.GroupDeployDTO;
+import com.brandnewdata.mop.poc.operate.dto.GroupDeployDto;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.operate.dto.ProcessInstanceStateDto;
 import com.brandnewdata.mop.poc.operate.resp.GroupDeployResp;
@@ -67,7 +67,7 @@ public class GroupDeployRest {
             @RequestParam int pageNum,
             @RequestParam int pageSize) {
         // 先获取分页列表
-        Page<GroupDeployDTO> deployPage = groupDeployService.groupDeployPage(pageNum, pageSize);
+        Page<GroupDeployDto> deployPage = groupDeployService.groupDeployPage(pageNum, pageSize);
 
         // 再获取 instance 信息
 
@@ -80,7 +80,7 @@ public class GroupDeployRest {
         return Result.OK(ret);
     }
 
-    private GroupDeployResp toResp(GroupDeployDTO dto) {
+    private GroupDeployResp toResp(GroupDeployDto dto) {
         GroupDeployResp resp = new GroupDeployResp();
         resp.setProcessId(dto.getProcessId());
         resp.setProcessName(dto.getProcessName());

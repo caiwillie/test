@@ -2,7 +2,7 @@ package com.brandnewdata.mop.poc.operate.rest;
 
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.common.dto.Page;
-import com.brandnewdata.mop.poc.operate.dto.FlowNodeStateDTO;
+import com.brandnewdata.mop.poc.operate.dto.FlowNodeStateDto;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.operate.entity.SequenceFlowEntity;
 import com.brandnewdata.mop.poc.operate.resp.FlowNodeStateResp;
@@ -94,10 +94,10 @@ public class ProcessInstanceRest {
     @GetMapping("/rest/operate/instance/flowNodeStates")
     public Result<List<FlowNodeStateResp>> flowNodeStates(@RequestParam String processInstanceId) {
         List<FlowNodeStateResp> ret = new ArrayList<>();
-        Map<String, FlowNodeStateDTO> flowNodeStateMap = processInstanceService.getFlowNodeStateMap(Long.valueOf(processInstanceId));
-        for (Map.Entry<String, FlowNodeStateDTO> entry : flowNodeStateMap.entrySet()) {
+        Map<String, FlowNodeStateDto> flowNodeStateMap = processInstanceService.getFlowNodeStateMap(Long.valueOf(processInstanceId));
+        for (Map.Entry<String, FlowNodeStateDto> entry : flowNodeStateMap.entrySet()) {
             String flowNodeId = entry.getKey();
-            FlowNodeStateDTO state = entry.getValue();
+            FlowNodeStateDto state = entry.getValue();
             FlowNodeStateResp resp = new FlowNodeStateResp();
             resp.setProcessInstanceId(processInstanceId);
             resp.setFlowNodeId(flowNodeId);

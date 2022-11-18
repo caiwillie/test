@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Data
-public class FlowNodeInstanceMetaDataDTO {
+public class FlowNodeInstanceMetaDataDto {
     private String processInstanceId;
     private String flowNodeId;
     private String flowNodeInstanceId;
@@ -30,7 +30,7 @@ public class FlowNodeInstanceMetaDataDTO {
     private OffsetDateTime jobDeadline;
     private Map<String, String> jobCustomHeaders;
 
-    public FlowNodeInstanceMetaDataDTO fromEntity(FlowNodeInstanceEntity flowNodeInstanceEntity, EventEntity eventEntity) {
+    public FlowNodeInstanceMetaDataDto fromEntity(FlowNodeInstanceEntity flowNodeInstanceEntity, EventEntity eventEntity) {
         this.setProcessInstanceId(String.valueOf(flowNodeInstanceEntity.getProcessInstanceKey()));
         this.setFlowNodeInstanceId(flowNodeInstanceEntity.getId());
         this.setFlowNodeId(flowNodeInstanceEntity.getFlowNodeId());
