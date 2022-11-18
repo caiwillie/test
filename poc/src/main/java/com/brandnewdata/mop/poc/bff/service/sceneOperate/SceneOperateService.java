@@ -98,7 +98,7 @@ public class SceneOperateService {
 
     public Page<ProcessInstance> pageProcessInstance(Filter filter) {
         List<Scene> sceneList = getAllScene();
-        Map<ProcessIdAndVersion, String[]> processIdAndVersionMap = new HashMap<>();
+        Map<ProcessIdAndVersion, ProcessDeployInfo> processIdAndVersionMap = new HashMap<>();
         List<Long> deployIdList = new ArrayList<>();
         for (Scene scene : sceneList) {
             if(filter.getSceneId() != null && ! NumberUtil.equals(filter.getSceneId(), scene.getId())) continue;
@@ -107,8 +107,13 @@ public class SceneOperateService {
                 for (Version version : process.getVersionList()) {
                     if(filter.getVersion() != null && !NumberUtil.equals(filter.getVersion(), version.getVersion())) continue;
                     deployIdList.add(version.getDeployId());
-                    processIdAndVersionMap.put(new ProcessIdAndVersion(process.getProcessId(), version.getVersion()),
-                            new String[]{scene.getName(), process.getName()});
+                    ProcessDeployInfo processDeployInfo = new ProcessDeployInfo();
+                    processDeployInfo.setSceneId(scene.getId());
+                    processDeployInfo.setSceneName(scene.getName());
+                    processDeployInfo.setProcessId(process.getProcessId());
+                    processDeployInfo.setProcessName(process.getName());
+                    processDeployInfo.setDeployId(version.getDeployId());
+                    processIdAndVersionMap.put(new ProcessIdAndVersion(process.getProcessId(), version.getVersion()), processDeployInfo);
                 }
             }
         }
@@ -268,6 +273,16 @@ public class SceneOperateService {
         }
     }
 
+    @Getter
+    @Setter
+    private static class ProcessDeployInfo {
+        private Long sceneId;
+        private String sceneName;
+        private String processId;
+        private String processName;
+        private Long deployId;
+    }
+
     private List<Scene> getSceneList(List<SceneDto2> sceneSortedList,
                                      Map<Long, List<SceneProcessDto2>> sceneMap,
                                      Map<String, List<ProcessDeployDto>> processDeployMap) {
@@ -318,17 +333,19 @@ public class SceneOperateService {
     }
 
     private ProcessInstance toProcessInstance(ListViewProcessInstanceDto listViewProcessInstanceDto,
-                                              Map<ProcessIdAndVersion, String[]> processIdAndVersionMap) {
+                                              Map<ProcessIdAndVersion, ProcessDeployInfo> processIdAndVersionMap) {
         String processId = listViewProcessInstanceDto.getBpmnProcessId();
         Integer version = listViewProcessInstanceDto.getProcessVersion();
-        String[] names = processIdAndVersionMap.get(new ProcessIdAndVersion(processId, version));
+        ProcessDeployInfo processDeployInfo = processIdAndVersionMap.get(new ProcessIdAndVersion(processId, version));
 
         ProcessInstance ret = new ProcessInstance();
 
         ret.setInstanceId(listViewProcessInstanceDto.getId());
-        ret.setSceneName(names[0]);
+        ret.setSceneId(processDeployInfo.getSceneId());
+        ret.setSceneName(processDeployInfo.getSceneName());
         ret.setProcessId(processId);
-        ret.setProcessName(names[1]);
+        ret.setProcessName(processDeployInfo.getProcessName());
+        ret.setDeployId(processDeployInfo.getDeployId());
         ret.setVersion(version);
         ret.setState(listViewProcessInstanceDto.getState().name());
         ret.setStartTime(Opt.ofNullable(listViewProcessInstanceDto.getStartDate())
@@ -337,7 +354,4 @@ public class SceneOperateService {
                 .map(LocalDateTimeUtil::formatNormal).orElse(null));
         return ret;
     }
-
-
-
 }

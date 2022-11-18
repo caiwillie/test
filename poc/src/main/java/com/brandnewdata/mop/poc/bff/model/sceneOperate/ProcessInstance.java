@@ -13,9 +13,19 @@ public class ProcessInstance {
     private String instanceId;
 
     /**
+     * 场景id
+     */
+    private Long sceneId;
+
+    /**
      * 场景名称
      */
     private String sceneName;
+
+    /**
+     * 部署id
+     */
+    private Long deployId;
 
     /**
      * 流程 id
