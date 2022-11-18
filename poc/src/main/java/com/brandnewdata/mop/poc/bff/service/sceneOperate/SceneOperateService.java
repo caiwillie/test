@@ -199,7 +199,8 @@ public class SceneOperateService {
         List<Map.Entry<String, int[]>> entries = executionSceneRankingDataMap.entrySet().stream().sorted((o1, o2) -> {
             int sum1 = Arrays.stream(o1.getValue()).sum();
             int sum2 = Arrays.stream(o2.getValue()).sum();
-            return Integer.compare(sum1, sum2);
+            // 倒序
+            return Integer.compare(sum2, sum1);
         }).limit(5).collect(Collectors.toList());
         List<String> categoryList = new ArrayList<>();
         List<Integer> successList = new ArrayList<>();
