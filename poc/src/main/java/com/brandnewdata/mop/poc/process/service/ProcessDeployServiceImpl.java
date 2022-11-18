@@ -55,42 +55,6 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
     @Resource
     private DeployNoExpCache deployCache;
 
-    private ProcessDeployEntity getLatestDeployVersion(String processId) {
-        QueryWrapper<ProcessDeployEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(ProcessDeployEntity.PROCESS_ID, processId);
-        queryWrapper.orderByDesc(ProcessDeployEntity.VERSION);
-        List<ProcessDeployEntity> list = processDeployDao.selectList(queryWrapper);
-
-        if(CollUtil.isEmpty(list)) {
-            return null;
-        } else {
-            return list.get(0);
-        }
-    }
-
-
-    private Optional<ProcessDeployEntity> exist(String processId, int version) {
-        QueryWrapper<ProcessDeployEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(ProcessDeployEntity.PROCESS_ID, processId);
-        queryWrapper.eq(ProcessDeployEntity.VERSION, version);
-        return Optional.ofNullable(processDeployDao.selectOne(queryWrapper));
-    }
-
-    private ProcessDeployDto toDto(ProcessDeployEntity entity) {
-        if(entity == null) return null; //为空返回
-        ProcessDeployDto dto = new ProcessDeployDto();
-        dto.setId(entity.getId());
-        dto.setCreateTime(LocalDateTimeUtil.of(entity.getCreateTime()));
-        dto.setUpdateTime(LocalDateTimeUtil.of(entity.getUpdateTime()));
-        dto.setProcessId(entity.getProcessId());
-        dto.setProcessName(entity.getProcessName());
-        dto.setXml(entity.getProcessXml());
-        dto.setVersion(entity.getVersion());
-        dto.setType(entity.getType());
-        dto.setZeebeKey(entity.getZeebeKey());
-        return dto;
-    }
-
     @Override
     public ProcessDeployDto deploy(ProcessDefinitionDto dto, int type) {
         ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.step1(dto.getProcessId(), dto.getName(), dto.getXml());
@@ -164,7 +128,7 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
             connectorManager.saveRequestParams(step3Result);
         }
 
-        return toDto(entity);
+        return new ProcessDeployDto().from(entity, true);
     }
 
     @Override
@@ -186,9 +150,8 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         queryWrapper.select(ProcessDeployEntity.class, tableFieldInfo -> !StrUtil.equalsAny(tableFieldInfo.getColumn(),
                 ProcessDeployEntity.PROCESS_XML, ProcessDeployEntity.ZEEBE_XML));
         List<ProcessDeployEntity> entities = processDeployDao.selectList(queryWrapper);
-        return entities.stream().map(this::toDto).collect(Collectors.toList());
+        return entities.stream().map(entity -> new ProcessDeployDto().from(entity, false)).collect(Collectors.toList());
     }
-
 
     @Override
     public Page<ProcessDeployDto> page(int pageNum, int pageSize) {
@@ -203,8 +166,7 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
 
         if(CollUtil.isNotEmpty(records)) {
             for (ProcessDeployEntity record : records) {
-                ProcessDeployDto dto = toDto(record);
-                list.add(dto);
+                list.add(new ProcessDeployDto().from(record, false));
             }
         }
 
@@ -281,7 +243,27 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
     @Override
     public ProcessDeployDto getOne(long deployId) {
         ProcessDeployEntity entity = processDeployDao.selectById(deployId);
-        return toDto(entity);
+        return new ProcessDeployDto().from(entity, true);
+    }
+
+    private ProcessDeployEntity getLatestDeployVersion(String processId) {
+        QueryWrapper<ProcessDeployEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(ProcessDeployEntity.PROCESS_ID, processId);
+        queryWrapper.orderByDesc(ProcessDeployEntity.VERSION);
+        List<ProcessDeployEntity> list = processDeployDao.selectList(queryWrapper);
+
+        if(CollUtil.isEmpty(list)) {
+            return null;
+        } else {
+            return list.get(0);
+        }
+    }
+
+    private Optional<ProcessDeployEntity> exist(String processId, int version) {
+        QueryWrapper<ProcessDeployEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(ProcessDeployEntity.PROCESS_ID, processId);
+        queryWrapper.eq(ProcessDeployEntity.VERSION, version);
+        return Optional.ofNullable(processDeployDao.selectOne(queryWrapper));
     }
 
 }

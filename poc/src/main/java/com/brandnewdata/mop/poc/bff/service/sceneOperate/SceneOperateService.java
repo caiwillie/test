@@ -165,7 +165,8 @@ public class SceneOperateService {
         for (ListViewProcessInstanceDto dto : listViewProcessInstanceDtos) {
             String processId = dto.getBpmnProcessId();
             Integer version = dto.getProcessVersion();
-            String[] names = processIdAndVersionMap.get(new ProcessIdAndVersion(processId, version));
+            ProcessIdAndVersion processIdAndVersion = new ProcessIdAndVersion(processId, version);
+            String[] names = processIdAndVersionMap.get(processIdAndVersion);
             if(names == null) continue;
             String sceneName = names[0];
             int[] executionSceneRankingData  = executionSceneRankingDataMap.computeIfAbsent(sceneName, key -> new int[]{0, 0});

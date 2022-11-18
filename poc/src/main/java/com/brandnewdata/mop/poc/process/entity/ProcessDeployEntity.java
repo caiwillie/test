@@ -1,11 +1,14 @@
 package com.brandnewdata.mop.poc.process.entity;
 
-import com.baomidou.mybatisplus.annotation.*;
-import lombok.Getter;
-import lombok.Setter;
-
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * <p>
@@ -13,7 +16,7 @@ import java.util.Date;
  * </p>
  *
  * @author caiwillie
- * @since 2022-08-29
+ * @since 2022-11-18
  */
 @Getter
 @Setter
@@ -45,6 +48,8 @@ public class ProcessDeployEntity implements Serializable {
 
     private String zeebeXml;
 
+    private String trigger;
+
 
     public static final String ID = "id";
 
@@ -65,5 +70,7 @@ public class ProcessDeployEntity implements Serializable {
     public static final String ZEEBE_KEY = "zeebe_key";
 
     public static final String ZEEBE_XML = "zeebe_xml";
+
+    public static final String TRIGGER = "trigger";
 
 }

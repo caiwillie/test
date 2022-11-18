@@ -42,16 +42,7 @@ public class DeployNoExpCache {
             tempList.clear();
             if(CollUtil.isNotEmpty(entities)) {
                 for (ProcessDeployEntity entity : entities) {
-                    ProcessDeployDto processDeployDTO = new ProcessDeployDto();
-                    processDeployDTO.setId(entity.getId());
-                    processDeployDTO.setProcessId(entity.getProcessId());
-                    processDeployDTO.setProcessName(entity.getProcessName());
-                    processDeployDTO.setVersion(entity.getVersion());
-                    processDeployDTO.setCreateTime(LocalDateTimeUtil.of(entity.getCreateTime()));
-                    processDeployDTO.setUpdateTime(LocalDateTimeUtil.of(entity.getUpdateTime()));
-                    processDeployDTO.setZeebeKey(entity.getZeebeKey());
-                    processDeployDTO.setType(entity.getType());
-                    tempList.add(processDeployDTO);
+                    tempList.add(new ProcessDeployDto().from(entity, false));
                 }
 
                 ProcessDeployEntity lastProcessDeploy = entities.get(entities.size() - 1);
