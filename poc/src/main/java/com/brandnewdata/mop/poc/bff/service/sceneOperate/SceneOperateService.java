@@ -7,6 +7,7 @@ import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.mop.poc.bff.model.sceneOperate.ProcessInstance;
 import com.brandnewdata.mop.poc.bff.model.sceneOperate.Statistic;
 import com.brandnewdata.mop.poc.bff.model.sceneOperate.charts.ChartOption;
+import com.brandnewdata.mop.poc.bff.model.sceneOperate.charts.Series;
 import com.brandnewdata.mop.poc.bff.model.sceneOperate.condition.Filter;
 import com.brandnewdata.mop.poc.bff.model.sceneOperate.condition.Process;
 import com.brandnewdata.mop.poc.bff.model.sceneOperate.condition.Scene;
@@ -126,6 +127,7 @@ public class SceneOperateService {
     }
 
     public Statistic statistic(Filter filter) {
+        Statistic ret = new Statistic();
         List<Scene> sceneList = getAllScene();
         Map<ProcessIdAndVersion, String[]> processIdAndVersionMap = new HashMap<>();
         for (Scene scene : sceneList) {
@@ -153,14 +155,7 @@ public class SceneOperateService {
         int failCount = 0;
         // 场景运行次数排名
         Map<String, int[]> executionSceneRankingDataMap = new HashMap<>();
-        TreeMap<Long, int[]> executionSceneTendencyMap = new TreeMap<>();
-
-        // 场景运行次数排名
-        ChartOption executionSceneRanking = new ChartOption();
-        // 场景运行次数趋势
-        ChartOption executionSceneTendency = new ChartOption();
-        // 触发次数分布图
-        ChartOption executionTriggerDis = new ChartOption();
+        TreeMap<String, int[]> executionSceneTendencyMap = new TreeMap<>();
 
         for (ListViewProcessInstanceDto dto : listViewProcessInstanceDtos) {
             String processId = dto.getBpmnProcessId();
@@ -169,21 +164,77 @@ public class SceneOperateService {
             if(names == null) continue;
             String sceneName = names[0];
             int[] executionSceneRankingData  = executionSceneRankingDataMap.computeIfAbsent(sceneName, key -> new int[]{0, 0});
+            String date = LocalDateTimeUtil.format(dto.getStartDate(), "MM-dd");
+            int[] executionSceneTendencyData = executionSceneTendencyMap.computeIfAbsent(date, key -> new int[]{0, 0});
+
             executionCount += 1;
             if(dto.getState() == COMPLETED) {
                 successCount += 1;
                 executionSceneRankingData[0] += 1;
+                executionSceneTendencyData[0] += 1;
             } else if(dto.getState() == INCIDENT) {
                 failCount += 1;
                 executionSceneRankingData[1] += 1;
+                executionSceneTendencyData[1] += 1;
             }
-
-            dto.getStartDate().toLocalDate();
-
-            String date = LocalDateTimeUtil.format(dto.getStartDate(), "MM-dd");
-
         }
-        return null;
+
+        // 场景运行次数趋势
+        ChartOption executionSceneRanking = getExecutionSceneRanking(executionSceneRankingDataMap);
+        // 触发次数分布图
+        ChartOption executionSceneTendency = getExecutionSceneTendency(executionSceneTendencyMap);
+
+        ret.setExecutionCount(executionCount);
+        ret.setSuccessCount(successCount);
+        ret.setFailCount(failCount);
+        ret.setExecutionSceneRanking(executionSceneRanking);
+        ret.setExecutionSceneRanking(executionSceneTendency);
+
+        return ret;
+    }
+
+    private ChartOption getExecutionSceneRanking(Map<String, int[]> executionSceneRankingDataMap) {
+        // 场景运行次数排名
+        ChartOption ret = new ChartOption();
+        List<Map.Entry<String, int[]>> entries = executionSceneRankingDataMap.entrySet().stream().sorted((o1, o2) -> {
+            int sum1 = Arrays.stream(o1.getValue()).sum();
+            int sum2 = Arrays.stream(o2.getValue()).sum();
+            return Integer.compare(sum1, sum2);
+        }).limit(5).collect(Collectors.toList());
+        List<String> categoryList = new ArrayList<>();
+        List<Integer> successList = new ArrayList<>();
+        List<Integer> failList = new ArrayList<>();
+        for (Map.Entry<String, int[]> entry : entries) {
+            categoryList.add(entry.getKey());
+            int[] nums = entry.getValue();
+            successList.add(nums[0]);
+            failList.add(nums[1]);
+        }
+
+        ret.setCategory(categoryList.toArray());
+        Series series1 = new Series("运行成功次数", successList.toArray());
+        Series series2 = new Series("运行失败次数", failList.toArray());
+        ret.setSeries(new Series[]{series1, series2});
+        return ret;
+    }
+
+    private ChartOption getExecutionSceneTendency(TreeMap<String, int[]> executionSceneTendencyMap) {
+        ChartOption ret = new ChartOption();
+        List<String> categoryList = new ArrayList<>();
+        List<Integer> successList = new ArrayList<>();
+        List<Integer> failList = new ArrayList<>();
+        for (Map.Entry<String, int[]> entry : executionSceneTendencyMap.entrySet()) {
+            categoryList.add(entry.getKey());
+            int[] nums = entry.getValue();
+            successList.add(nums[0]);
+            failList.add(nums[1]);
+        }
+
+        ret.setCategory(categoryList.toArray());
+        Series series1 = new Series("运行成功次数", successList.toArray());
+        Series series2 = new Series("运行失败次数", failList.toArray());
+        ret.setSeries(new Series[]{series1, series2});
+        return ret;
     }
 
     @Getter
