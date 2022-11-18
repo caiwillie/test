@@ -188,7 +188,7 @@ public class SceneOperateService {
         ret.setSuccessCount(successCount);
         ret.setFailCount(failCount);
         ret.setExecutionSceneRanking(executionSceneRanking);
-        ret.setExecutionSceneRanking(executionSceneTendency);
+        ret.setExecutionSceneTendency(executionSceneTendency);
 
         return ret;
     }
