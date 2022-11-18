@@ -47,6 +47,7 @@ public class GroupDeployRest {
      * @return result
      * @deprecated
      */
+    @Deprecated
     @GetMapping("/rest/operate/deploy/page")
     public Result<Page<ProcessDeployDto>> page (
             @RequestParam int pageNum,
@@ -62,6 +63,7 @@ public class GroupDeployRest {
      * @param pageSize 分页大小
      * @return
      */
+    @Deprecated
     @GetMapping("/rest/operate/deploy/groupPage")
     public Result<Page<GroupDeployResp>> groupPage (
             @RequestParam int pageNum,
@@ -126,6 +128,7 @@ public class GroupDeployRest {
      * @return the result
      */
     @GetMapping("/rest/operate/deploy/detail")
+    @Deprecated
     public Result<ProcessDeployDto> detail(@RequestParam long id) {
         ProcessDeployDto deploy = deployService.getOne(id);
         Assert.notNull(deploy, "流程部署 {} 不存在", id);

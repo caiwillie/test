@@ -39,7 +39,7 @@ public class ProcessInstanceRest {
      * @return result result
      */
     @Deprecated
-    @GetMapping("/rest/operate/instance/page")
+    @GetMapping("/rest/operate/process/instance/page")
     public Result<Page<ProcessInstanceResp>> page (
             @RequestParam Long deployId,
             @RequestParam int pageNum,
