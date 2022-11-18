@@ -194,6 +194,8 @@ public class SceneOperateService {
         ret.setFailCount(failCount);
         ret.setExecutionSceneRanking(executionSceneRanking);
         ret.setExecutionSceneTendency(executionSceneTendency);
+        ret.setExecutionTriggerDis(new ChartOption());
+        ret.setExecutionTriggerTendency(new ChartOption());
 
         return ret;
     }
