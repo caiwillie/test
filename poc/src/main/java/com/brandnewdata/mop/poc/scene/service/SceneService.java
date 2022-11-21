@@ -215,7 +215,7 @@ public class SceneService implements ISceneService {
 
         for (Map.Entry<Long, SceneDto> entry : sceneMap.entrySet()) {
             Long sceneId = entry.getKey();
-            SceneDto sceneDTO = entry.getValue();
+            SceneDto sceneDto = entry.getValue();
 
             List<ProcessDefinitionDto> tempProcessDefinitionDtos = sceneProcessListMap.get(sceneId);
             if(CollUtil.isEmpty(tempProcessDefinitionDtos)) {
@@ -230,7 +230,7 @@ public class SceneService implements ISceneService {
             });
 
             ProcessDefinitionDto first = tempProcessDefinitionDtos.get(0);
-            sceneDTO.setImgUrl(first.getImgUrl());
+            sceneDto.setImgUrl(first.getImgUrl());
 
             List<SceneProcessDto> sceneProcessDtoList = new ArrayList<>();
             // 如果是带XML，就需要查询出definition
@@ -240,7 +240,7 @@ public class SceneService implements ISceneService {
                 SceneProcessDto sceneProcessDTO = toDTO(sceneProcessEntity, processDefinitionDTO);
                 sceneProcessDtoList.add(sceneProcessDTO);
             }
-            sceneDTO.setProcessDefinitions(sceneProcessDtoList);
+            sceneDto.setProcessDefinitions(sceneProcessDtoList);
         }
 
         return sceneMap.values();
