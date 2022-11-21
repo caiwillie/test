@@ -26,6 +26,7 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
@@ -199,6 +200,7 @@ public class SceneService implements ISceneService {
         if(CollUtil.isEmpty(businessSceneProcessEntities)) {
             // process ids 不能为空
             return sceneMap.values();
+
         }
 
         // 获取 process 和 scene 的映射
