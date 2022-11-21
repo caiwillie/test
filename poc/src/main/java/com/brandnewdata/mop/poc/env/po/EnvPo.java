@@ -35,7 +35,9 @@ public class EnvPo implements Serializable {
 
     private String name;
 
-    private Integer status;
+    private String namespace;
+
+    private String status;
 
     /**
      * 0 sandbox; 1 custom
@@ -54,6 +56,8 @@ public class EnvPo implements Serializable {
     public static final String DEPLOY_TIME = "deploy_time";
 
     public static final String NAME = "name";
+
+    public static final String NAMESPACE = "namespace";
 
     public static final String STATUS = "status";
 

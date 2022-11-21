@@ -11,7 +11,7 @@ import java.util.Date;
 @Getter
 public class EnvDto {
     private Long id;
-    
+
     private Date createTime;
 
     private Date updateTime;
@@ -20,7 +20,9 @@ public class EnvDto {
 
     private String name;
 
-    private Integer status;
+    private String namespace;
+
+    private String status;
 
     private Integer type;
 
