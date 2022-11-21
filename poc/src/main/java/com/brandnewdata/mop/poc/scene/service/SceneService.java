@@ -240,7 +240,7 @@ public class SceneService implements ISceneService {
                 SceneProcessDto sceneProcessDTO = toDTO(sceneProcessEntity, processDefinitionDTO);
                 sceneProcessDtoList.add(sceneProcessDTO);
             }
-            // sceneDTO.setProcessDefinitions(sceneProcessDtoList);
+            sceneDTO.setProcessDefinitions(sceneProcessDtoList);
         }
 
         return sceneMap.values();

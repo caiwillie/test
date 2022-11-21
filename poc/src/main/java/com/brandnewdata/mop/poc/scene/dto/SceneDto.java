@@ -38,5 +38,5 @@ public class SceneDto {
     /**
      * 流程定义列表
      */
-    // private List<SceneProcessDto> processDefinitions;
+    private List<SceneProcessDto> processDefinitions;
 }
