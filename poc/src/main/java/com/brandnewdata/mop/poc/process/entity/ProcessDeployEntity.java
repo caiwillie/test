@@ -16,7 +16,7 @@ import lombok.Setter;
  * </p>
  *
  * @author caiwillie
- * @since 2022-11-18
+ * @since 2022-11-21
  */
 @Getter
 @Setter
@@ -48,7 +48,7 @@ public class ProcessDeployEntity implements Serializable {
 
     private String zeebeXml;
 
-    private String trigger;
+    private String triggerType;
 
 
     public static final String ID = "id";
@@ -71,6 +71,6 @@ public class ProcessDeployEntity implements Serializable {
 
     public static final String ZEEBE_XML = "zeebe_xml";
 
-    public static final String TRIGGER = "trigger";
+    public static final String TRIGGER_TYPE = "trigger_type";
 
 }

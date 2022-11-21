@@ -27,9 +27,7 @@ import lombok.Setter;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Month;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -185,7 +183,7 @@ public class SceneOperateService {
 
             int[] executionSceneTendencyData = executionSceneTendencyMap.computeIfAbsent(date, key -> new int[]{0, 0});
 
-            String trigger = Opt.ofNullable(processDeployDto.getTrigger()).orElse("未知触发器");
+            String trigger = Opt.ofNullable(processDeployDto.getTriggerType()).orElse("未知触发器");
             Integer triggerCount = executionTriggerRankingDataMap.computeIfAbsent(trigger, key -> 0);
 
             executionCount += 1;

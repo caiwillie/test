@@ -55,7 +55,7 @@ public class ProcessDeployDto {
     /**
      * 触发器id
      */
-    private String trigger;
+    private String triggerType;
 
     /**
      * 部署 xml
@@ -78,7 +78,7 @@ public class ProcessDeployDto {
         this.setVersion(entity.getVersion());
         this.setType(entity.getType());
         this.setZeebeKey(entity.getZeebeKey());
-        this.setTrigger(entity.getTrigger());
+        this.setTriggerType(entity.getTriggerType());
         if(withXml) {
             this.setXml(entity.getProcessXml());
             this.setZeebeXml(entity.getZeebeXml());
