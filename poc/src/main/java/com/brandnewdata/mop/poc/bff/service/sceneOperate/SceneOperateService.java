@@ -2,6 +2,7 @@ package com.brandnewdata.mop.poc.bff.service.sceneOperate;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Opt;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.mop.poc.bff.model.sceneOperate.ProcessInstance;
@@ -26,8 +27,11 @@ import lombok.Setter;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.brandnewdata.mop.poc.operate.dto.ProcessInstanceStateDto.COMPLETED;
@@ -149,6 +153,9 @@ public class SceneOperateService {
 
         // 获取所有场景的部署流程列表
         List<ProcessDeployDto> processDeployDtoList = processDeployService.listByType(1);
+        Map<ProcessIdAndVersion, ProcessDeployDto> processIdAndVersionMap2 = processDeployDtoList.stream().collect(
+                Collectors.toMap(dto -> new ProcessIdAndVersion(dto.getProcessId(), dto.getVersion()), Function.identity()));
+
         // 获取所有流程实例
         List<ListViewProcessInstanceDto> listViewProcessInstanceDtos = processInstanceService.listAll();
 
@@ -161,19 +168,32 @@ public class SceneOperateService {
         // 场景运行次数排名
         Map<String, int[]> executionSceneRankingDataMap = new HashMap<>();
         TreeMap<String, int[]> executionSceneTendencyMap = new TreeMap<>();
+        Map<String, Integer> executionTriggerRankingDataMap = new HashMap<>();
+        Map<String, Map<String, Integer>> executionTriggerTendencyDataMap = new TreeMap<>();
 
         for (ListViewProcessInstanceDto dto : listViewProcessInstanceDtos) {
             String processId = dto.getBpmnProcessId();
             Integer version = dto.getProcessVersion();
             ProcessIdAndVersion processIdAndVersion = new ProcessIdAndVersion(processId, version);
+            ProcessDeployDto processDeployDto = processIdAndVersionMap2.get(processIdAndVersion);
             String[] names = processIdAndVersionMap.get(processIdAndVersion);
+            String date = LocalDateTimeUtil.format(dto.getStartDate(), "MM-dd");
+
             if(names == null) continue;
             String sceneName = names[0];
             int[] executionSceneRankingData  = executionSceneRankingDataMap.computeIfAbsent(sceneName, key -> new int[]{0, 0});
-            String date = LocalDateTimeUtil.format(dto.getStartDate(), "MM-dd");
+
             int[] executionSceneTendencyData = executionSceneTendencyMap.computeIfAbsent(date, key -> new int[]{0, 0});
 
+            String trigger = Opt.ofNullable(processDeployDto.getTrigger()).orElse("未知触发器");
+            Integer triggerCount = executionTriggerRankingDataMap.computeIfAbsent(trigger, key -> 0);
+
             executionCount += 1;
+            triggerCount += 1;
+            Map<String, Integer> triggerTendencyDataMap = executionTriggerTendencyDataMap.computeIfAbsent(date, key -> new HashMap<>());
+            Integer triggerTendencyCount = triggerTendencyDataMap.computeIfAbsent(trigger, key -> 0);
+            triggerTendencyCount += 1;
+
             if(dto.getState() == COMPLETED) {
                 successCount += 1;
                 executionSceneRankingData[0] += 1;
@@ -244,6 +264,20 @@ public class SceneOperateService {
         Series series2 = new Series("运行失败次数", failList.toArray());
         ret.setSeries(new Series[]{series1, series2});
         return ret;
+    }
+
+    private List<Map.Entry<String, Integer>> sortedTriggerRanking(Map<String, Integer> triggerRankingDataMap) {
+        List<Map.Entry<String, Integer>> entries = triggerRankingDataMap.entrySet().stream().sorted((o1, o2) -> {
+            Integer num1 = o1.getValue();
+            Integer num2 = o1.getValue();
+            return Integer.compare(num2, num1);
+        }).collect(Collectors.toList());
+        if(entries.size() > 10) {
+            long sum = entries.stream().skip(9).mapToLong(Map.Entry::getValue).sum();
+            entries = entries.stream().limit(9).collect(Collectors.toList());
+            entries.add(MapUtil.entry("其他", (int)sum));
+        }
+        return entries;
     }
 
     @Getter
