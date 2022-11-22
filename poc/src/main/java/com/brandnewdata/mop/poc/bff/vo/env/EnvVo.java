@@ -1,0 +1,73 @@
+package com.brandnewdata.mop.poc.bff.vo.env;
+
+import com.brandnewdata.mop.poc.env.dto.EnvDto;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
+
+@Getter
+@Setter
+public class EnvVo {
+
+    /**
+     * 环境id
+     */
+    private Long id;
+
+    /**
+     * 创建时间
+     */
+    private LocalDateTime createTime;
+
+    /**
+     * 更新时间
+     */
+    private LocalDateTime updateTime;
+
+    /**
+     * 部署时间
+     */
+    private LocalDateTime deployTime;
+
+    /**
+     * 环境名称
+     */
+    private String name;
+
+    /**
+     * 状态
+     */
+    private String status;
+
+    /**
+     * 描述
+     */
+    private String description;
+
+    /**
+     * CPU使用率
+     */
+    private double cpuUsageRate;
+
+    /**
+     * 内存使用率
+     */
+    private double memoryUsageRate;
+
+    /**
+     * 存储使用率
+     */
+    private double storageUsageRate;
+
+    public EnvVo from(EnvDto envDto) {
+        this.setId(envDto.getId());
+        this.setName(envDto.getName());
+        this.setCreateTime(envDto.getCreateTime());
+        this.setUpdateTime(envDto.getUpdateTime());
+        this.setDeployTime(envDto.getDeployTime());
+        this.setStatus(envDto.getStatus());
+        this.setDescription(envDto.getDescription());
+        return this;
+    }
+}

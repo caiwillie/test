@@ -1,11 +1,8 @@
-package com.brandnewdata.mop.poc.bff.model.sceneOperate;
+package com.brandnewdata.mop.poc.bff.vo.operate;
 
-import com.brandnewdata.mop.poc.bff.model.sceneOperate.charts.ChartOption;
+import com.brandnewdata.mop.poc.bff.vo.operate.charts.ChartOption;
 import lombok.Getter;
 import lombok.Setter;
-import org.icepear.echarts.Bar;
-import org.icepear.echarts.Line;
-import org.icepear.echarts.Pie;
 
 @Getter
 @Setter

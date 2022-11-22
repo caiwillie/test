@@ -1,18 +1,18 @@
-package com.brandnewdata.mop.poc.bff.service.sceneOperate;
+package com.brandnewdata.mop.poc.bff.service.operate;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Opt;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
-import com.brandnewdata.mop.poc.bff.model.sceneOperate.ProcessInstance;
-import com.brandnewdata.mop.poc.bff.model.sceneOperate.Statistic;
-import com.brandnewdata.mop.poc.bff.model.sceneOperate.charts.ChartOption;
-import com.brandnewdata.mop.poc.bff.model.sceneOperate.charts.Series;
-import com.brandnewdata.mop.poc.bff.model.sceneOperate.condition.Filter;
-import com.brandnewdata.mop.poc.bff.model.sceneOperate.condition.Process;
-import com.brandnewdata.mop.poc.bff.model.sceneOperate.condition.Scene;
-import com.brandnewdata.mop.poc.bff.model.sceneOperate.condition.Version;
+import com.brandnewdata.mop.poc.bff.vo.operate.ProcessInstance;
+import com.brandnewdata.mop.poc.bff.vo.operate.Statistic;
+import com.brandnewdata.mop.poc.bff.vo.operate.charts.ChartOption;
+import com.brandnewdata.mop.poc.bff.vo.operate.charts.Series;
+import com.brandnewdata.mop.poc.bff.vo.operate.condition.Filter;
+import com.brandnewdata.mop.poc.bff.vo.operate.condition.Process;
+import com.brandnewdata.mop.poc.bff.vo.operate.condition.Scene;
+import com.brandnewdata.mop.poc.bff.vo.operate.condition.Version;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService;

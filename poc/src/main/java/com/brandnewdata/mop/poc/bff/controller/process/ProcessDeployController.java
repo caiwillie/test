@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.bff.controller;
+package com.brandnewdata.mop.poc.bff.controller.process;
 
 import cn.hutool.core.lang.Assert;
 import com.brandnewdata.common.webresult.Result;

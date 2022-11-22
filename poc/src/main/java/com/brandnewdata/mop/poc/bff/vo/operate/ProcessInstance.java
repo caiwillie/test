@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.bff.model.sceneOperate;
+package com.brandnewdata.mop.poc.bff.vo.operate;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -56,5 +56,6 @@ public class ProcessInstance {
      * 结束时间
      */
     private String endTime;
+
 
 }
