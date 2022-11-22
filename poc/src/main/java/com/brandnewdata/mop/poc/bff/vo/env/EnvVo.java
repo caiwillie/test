@@ -48,17 +48,27 @@ public class EnvVo {
     /**
      * CPU使用率
      */
-    private double cpuUsageRate;
+    private Double cpuUsageRate;
 
     /**
      * 内存使用率
      */
-    private double memoryUsageRate;
+    private Double memoryUsageRate;
 
     /**
      * 存储使用率
      */
-    private double storageUsageRate;
+    private Double storageUsageRate;
+
+    /**
+     * 部署场景数
+     */
+    private Integer sceneCount;
+
+    /**
+     * 部署流程数
+     */
+    private Integer processCount;
 
     public EnvVo from(EnvDto envDto) {
         this.setId(envDto.getId());
