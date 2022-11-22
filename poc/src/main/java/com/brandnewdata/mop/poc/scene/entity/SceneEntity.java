@@ -17,7 +17,7 @@ import java.util.Date;
  */
 @Getter
 @Setter
-@TableName("mop_business_scene")
+@TableName("mop_scene")
 public class SceneEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;

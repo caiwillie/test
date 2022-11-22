@@ -1,7 +1,7 @@
 package com.brandnewdata.mop.poc.process.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.brandnewdata.mop.poc.process.entity.ProcessDefinitionEntity;
+import com.brandnewdata.mop.poc.process.po.ProcessDefinitionPo;
 
 /**
  * <p>
@@ -11,6 +11,6 @@ import com.brandnewdata.mop.poc.process.entity.ProcessDefinitionEntity;
  * @author caiwillie
  * @since 2022-07-29
  */
-public interface ProcessDefinitionDao extends BaseMapper<ProcessDefinitionEntity> {
+public interface ProcessDefinitionDao extends BaseMapper<ProcessDefinitionPo> {
 
 }

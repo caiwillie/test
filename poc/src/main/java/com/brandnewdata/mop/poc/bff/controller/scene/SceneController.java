@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.scene.rest;
+package com.brandnewdata.mop.poc.bff.controller.scene;
 
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
@@ -35,7 +35,7 @@ import java.time.LocalDateTime;
  */
 @Slf4j
 @RestController
-public class SceneRest {
+public class SceneController {
 
     @Autowired
     private ISceneService service;

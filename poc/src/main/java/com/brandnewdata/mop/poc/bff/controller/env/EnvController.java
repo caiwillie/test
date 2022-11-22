@@ -4,6 +4,8 @@ import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.bff.service.env.EnvService;
 import com.brandnewdata.mop.poc.bff.vo.env.EnvVo;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -33,4 +35,24 @@ public class EnvController {
         return Result.OK(envVos);
     }
 
+    /**
+     * 新增环境
+     *
+     * @return
+     */
+    @PostMapping("/rest/env/save")
+    public Result<EnvVo> save() {
+        return Result.OK();
+    }
+
+    /**
+     * 停用环境
+     *
+     * @param envId 环境id
+     * @return result
+     */
+    @GetMapping("/rest/env/stop")
+    public Result<EnvVo> stop(@RequestParam Long envId) {
+        return Result.OK();
+    }
 }

@@ -1,7 +1,7 @@
 package com.brandnewdata.mop.poc.process.dto;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
-import com.brandnewdata.mop.poc.process.entity.ProcessDeployEntity;
+import com.brandnewdata.mop.poc.process.po.ProcessDeployPo;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -68,7 +68,7 @@ public class ProcessDeployDto {
     private String zeebeXml;
 
 
-    public ProcessDeployDto from(ProcessDeployEntity entity, boolean withXml) {
+    public ProcessDeployDto from(ProcessDeployPo entity, boolean withXml) {
         if(entity == null) return this; //为空返回
         this.setId(entity.getId());
         this.setCreateTime(LocalDateTimeUtil.of(entity.getCreateTime()));

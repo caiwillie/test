@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.process.entity;
+package com.brandnewdata.mop.poc.process.po;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -20,7 +20,7 @@ import java.util.Date;
 @Getter
 @Setter
 @TableName("mop_process_definition")
-public class ProcessDefinitionEntity implements Serializable {
+public class ProcessDefinitionPo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

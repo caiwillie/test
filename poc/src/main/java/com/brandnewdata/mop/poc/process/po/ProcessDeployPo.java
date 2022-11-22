@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.process.entity;
+package com.brandnewdata.mop.poc.process.po;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -21,7 +21,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @TableName("mop_process_deploy")
-public class ProcessDeployEntity implements Serializable {
+public class ProcessDeployPo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

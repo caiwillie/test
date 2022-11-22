@@ -9,7 +9,7 @@ import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.process.dao.ProcessDefinitionDao;
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDto;
 import com.brandnewdata.mop.poc.process.parser.dto.Step1Result;
-import com.brandnewdata.mop.poc.process.entity.ProcessDefinitionEntity;
+import com.brandnewdata.mop.poc.process.po.ProcessDefinitionPo;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParser;
 import org.springframework.stereotype.Service;
 
@@ -31,17 +31,17 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService {
             return ret;
         }
 
-        QueryWrapper<ProcessDefinitionEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.in(ProcessDefinitionEntity.ID, ids);
+        QueryWrapper<ProcessDefinitionPo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in(ProcessDefinitionPo.ID, ids);
         if(!withXML) {
             // 不需要 xml 的话，就不需要查询xml字段
-            queryWrapper.select(ProcessDefinitionEntity.class,
-                    tableFieldInfo -> !StrUtil.equals(tableFieldInfo.getColumn(), ProcessDefinitionEntity.XML));
+            queryWrapper.select(ProcessDefinitionPo.class,
+                    tableFieldInfo -> !StrUtil.equals(tableFieldInfo.getColumn(), ProcessDefinitionPo.XML));
         }
 
-        List<ProcessDefinitionEntity> entities = processDefinitionDao.selectList(queryWrapper);
+        List<ProcessDefinitionPo> entities = processDefinitionDao.selectList(queryWrapper);
         if(CollUtil.isNotEmpty(entities)) {
-            for (ProcessDefinitionEntity entity : entities) {
+            for (ProcessDefinitionPo entity : entities) {
                 ProcessDefinitionDto dto = toDTO(entity);
                 ret.add(dto);
             }
@@ -54,7 +54,7 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService {
     public ProcessDefinitionDto save(ProcessDefinitionDto dto) {
 
         // dto to entity 逻辑特殊，不提取公共
-        ProcessDefinitionEntity entity = new ProcessDefinitionEntity();
+        ProcessDefinitionPo entity = new ProcessDefinitionPo();
         entity.setImgUrl(dto.getImgUrl());
         entity.setXml(dto.getXml());
 
@@ -66,7 +66,7 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService {
         entity.setId(processId);
         entity.setName(step1Result.getName());
 
-        ProcessDefinitionEntity oldEntity = exist(processId);
+        ProcessDefinitionPo oldEntity = exist(processId);
 
         if(oldEntity != null) {
             processDefinitionDao.updateById(entity);
@@ -80,7 +80,7 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService {
     @Override
     public void delete(ProcessDefinitionDto processDefinitionDTO) {
         String processId = processDefinitionDTO.getProcessId();
-        ProcessDefinitionEntity oldEntity = exist(processId);
+        ProcessDefinitionPo oldEntity = exist(processId);
         Assert.notNull(oldEntity, "流程不存在：{}", processId);
         processDefinitionDao.deleteById(processId);
     }
@@ -88,18 +88,18 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService {
     @Override
     public ProcessDefinitionDto getOne(String processId) {
         Assert.notNull(processId, ErrorMessage.NOT_NULL("流程 id"));
-        ProcessDefinitionEntity entity = exist(processId);
+        ProcessDefinitionPo entity = exist(processId);
         Assert.notNull(entity, "流程id不存在：{}", processId);
         return toDTO(entity);
     }
 
-    private ProcessDefinitionEntity exist(String processId) {
-        QueryWrapper<ProcessDefinitionEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(ProcessDefinitionEntity.ID, processId);
+    private ProcessDefinitionPo exist(String processId) {
+        QueryWrapper<ProcessDefinitionPo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(ProcessDefinitionPo.ID, processId);
         return processDefinitionDao.selectOne(queryWrapper);
     }
 
-    private ProcessDefinitionDto toDTO(ProcessDefinitionEntity entity) {
+    private ProcessDefinitionDto toDTO(ProcessDefinitionPo entity) {
         ProcessDefinitionDto dto = new ProcessDefinitionDto();
         dto.setProcessId(entity.getId());
         dto.setCreateTime(LocalDateTimeUtil.of(entity.getCreateTime()));

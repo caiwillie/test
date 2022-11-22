@@ -2,7 +2,6 @@ package com.brandnewdata.mop.poc.process.service;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
@@ -15,9 +14,8 @@ import com.brandnewdata.mop.poc.process.cache.DeployNoExpCache;
 import com.brandnewdata.mop.poc.process.dao.ProcessDeployDao;
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDto;
 import com.brandnewdata.mop.poc.process.dto.ProcessDeployDto;
-import com.brandnewdata.mop.poc.process.entity.ProcessDefinitionEntity;
 import com.brandnewdata.mop.poc.process.parser.dto.Step3Result;
-import com.brandnewdata.mop.poc.process.entity.ProcessDeployEntity;
+import com.brandnewdata.mop.poc.process.po.ProcessDeployPo;
 import com.brandnewdata.mop.poc.process.parser.FeelUtil;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParseStep1;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParseStep2;
@@ -96,14 +94,14 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         long zeebeKey = process.getProcessDefinitionKey();
         int version = zeebeProcess.get().getVersion();
 
-        Optional<ProcessDeployEntity> exist = exist(processId, version);
-        ProcessDeployEntity entity = null;
+        Optional<ProcessDeployPo> exist = exist(processId, version);
+        ProcessDeployPo entity = null;
         if(exist.isPresent()) {
             // 已发布的流程，但是没有任何实例，如果新发布一个版本，可能会存在把空实例版本替换
             entity = exist.get();
         } else {
             // 版本不存在
-            entity = new ProcessDeployEntity();
+            entity = new ProcessDeployPo();
             entity.setProcessId(processId);
             // 设置版本, 初始版本为1
             entity.setVersion(version);
@@ -145,27 +143,27 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
     @Override
     public List<ProcessDeployDto> listByIdList(List<Long> idList) {
         if(CollUtil.isEmpty(idList)) return ListUtil.empty();
-        QueryWrapper<ProcessDeployEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.in(ProcessDeployEntity.ID, idList);
-        queryWrapper.select(ProcessDeployEntity.class, tableFieldInfo -> !StrUtil.equalsAny(tableFieldInfo.getColumn(),
-                ProcessDeployEntity.PROCESS_XML, ProcessDeployEntity.ZEEBE_XML));
-        List<ProcessDeployEntity> entities = processDeployDao.selectList(queryWrapper);
+        QueryWrapper<ProcessDeployPo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in(ProcessDeployPo.ID, idList);
+        queryWrapper.select(ProcessDeployPo.class, tableFieldInfo -> !StrUtil.equalsAny(tableFieldInfo.getColumn(),
+                ProcessDeployPo.PROCESS_XML, ProcessDeployPo.ZEEBE_XML));
+        List<ProcessDeployPo> entities = processDeployDao.selectList(queryWrapper);
         return entities.stream().map(entity -> new ProcessDeployDto().from(entity, false)).collect(Collectors.toList());
     }
 
     @Override
     public Page<ProcessDeployDto> page(int pageNum, int pageSize) {
-        com.baomidou.mybatisplus.extension.plugins.pagination.Page<ProcessDeployEntity> page =
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<ProcessDeployPo> page =
                 com.baomidou.mybatisplus.extension.plugins.pagination.Page.of(pageNum, pageSize);
-        QueryWrapper<ProcessDeployEntity> queryWrapper = new QueryWrapper<>();
+        QueryWrapper<ProcessDeployPo> queryWrapper = new QueryWrapper<>();
         // 查询部署
         page = processDeployDao.selectPage(page, queryWrapper);
         List<ProcessDeployDto> list = new ArrayList<>();
 
-        List<ProcessDeployEntity> records = page.getRecords();
+        List<ProcessDeployPo> records = page.getRecords();
 
         if(CollUtil.isNotEmpty(records)) {
-            for (ProcessDeployEntity record : records) {
+            for (ProcessDeployPo record : records) {
                 list.add(new ProcessDeployDto().from(record, false));
             }
         }
@@ -176,7 +174,7 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
     @Override
     public Map<String, Object> startWithResult(String processId, Map<String, Object> values) {
 
-        ProcessDeployEntity processDeployEntity = getLatestDeployVersion(processId);
+        ProcessDeployPo processDeployEntity = getLatestDeployVersion(processId);
         Assert.notNull(processDeployEntity, ErrorMessage.NOT_NULL("流程 id"), processId);
 
         Step3Result step3Result = ProcessDefinitionParser
@@ -242,15 +240,15 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
 
     @Override
     public ProcessDeployDto getOne(long deployId) {
-        ProcessDeployEntity entity = processDeployDao.selectById(deployId);
+        ProcessDeployPo entity = processDeployDao.selectById(deployId);
         return new ProcessDeployDto().from(entity, true);
     }
 
-    private ProcessDeployEntity getLatestDeployVersion(String processId) {
-        QueryWrapper<ProcessDeployEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(ProcessDeployEntity.PROCESS_ID, processId);
-        queryWrapper.orderByDesc(ProcessDeployEntity.VERSION);
-        List<ProcessDeployEntity> list = processDeployDao.selectList(queryWrapper);
+    private ProcessDeployPo getLatestDeployVersion(String processId) {
+        QueryWrapper<ProcessDeployPo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(ProcessDeployPo.PROCESS_ID, processId);
+        queryWrapper.orderByDesc(ProcessDeployPo.VERSION);
+        List<ProcessDeployPo> list = processDeployDao.selectList(queryWrapper);
 
         if(CollUtil.isEmpty(list)) {
             return null;
@@ -259,10 +257,10 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         }
     }
 
-    private Optional<ProcessDeployEntity> exist(String processId, int version) {
-        QueryWrapper<ProcessDeployEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(ProcessDeployEntity.PROCESS_ID, processId);
-        queryWrapper.eq(ProcessDeployEntity.VERSION, version);
+    private Optional<ProcessDeployPo> exist(String processId, int version) {
+        QueryWrapper<ProcessDeployPo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(ProcessDeployPo.PROCESS_ID, processId);
+        queryWrapper.eq(ProcessDeployPo.VERSION, version);
         return Optional.ofNullable(processDeployDao.selectOne(queryWrapper));
     }
 
