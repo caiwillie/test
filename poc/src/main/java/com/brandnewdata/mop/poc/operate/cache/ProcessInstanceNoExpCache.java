@@ -7,7 +7,6 @@ import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.operate.entity.listview.ProcessInstanceForListViewEntity;
 import com.brandnewdata.mop.poc.operate.schema.template.ListViewTemplate;
 import com.brandnewdata.mop.poc.operate.util.ElasticsearchUtil;
-import com.brandnewdata.mop.poc.process.dto.ProcessDeployDto;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.springframework.beans.factory.annotation.Autowired;

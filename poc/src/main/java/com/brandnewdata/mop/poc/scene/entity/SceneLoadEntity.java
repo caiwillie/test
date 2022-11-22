@@ -1,12 +1,11 @@
 package com.brandnewdata.mop.poc.scene.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-
-import java.io.Serializable;
-import java.sql.Blob;
-import java.util.Date;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>

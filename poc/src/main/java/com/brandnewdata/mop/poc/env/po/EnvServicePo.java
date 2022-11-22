@@ -3,10 +3,11 @@ package com.brandnewdata.mop.poc.env.po;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
-import java.util.Date;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>

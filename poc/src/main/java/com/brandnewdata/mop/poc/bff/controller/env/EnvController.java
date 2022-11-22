@@ -1,7 +1,7 @@
 package com.brandnewdata.mop.poc.bff.controller.env;
 
 import com.brandnewdata.common.webresult.Result;
-import com.brandnewdata.mop.poc.bff.service.env.EnvService;
+import com.brandnewdata.mop.poc.bff.service.env.EnvBffService;
 import com.brandnewdata.mop.poc.bff.vo.env.EnvVo;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-
 import java.util.List;
 
 
@@ -22,7 +21,7 @@ import java.util.List;
 public class EnvController {
 
     @Resource
-    private EnvService envService;
+    private EnvBffService envBffService;
 
     /**
      * 获取环境列表
@@ -31,7 +30,7 @@ public class EnvController {
      */
     @GetMapping("/rest/env/list")
     public Result<List<EnvVo>> list() {
-        List<EnvVo> envVos = envService.list();
+        List<EnvVo> envVos = envBffService.list();
         return Result.OK(envVos);
     }
 

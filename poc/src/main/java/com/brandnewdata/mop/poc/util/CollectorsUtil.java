@@ -7,8 +7,6 @@ import java.util.TreeSet;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toList;
-
 public class CollectorsUtil {
 
     public static <T> Collector<T,?, List<T>> toSortedList(Comparator<? super T> comparator) {

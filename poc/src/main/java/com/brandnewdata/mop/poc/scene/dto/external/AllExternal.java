@@ -1,8 +1,5 @@
 package com.brandnewdata.mop.poc.scene.dto.external;
 
-import com.brandnewdata.mop.poc.scene.dto.external.ConfigExternal;
-import com.brandnewdata.mop.poc.scene.dto.external.ProcessDefinitionExternal;
-import com.brandnewdata.mop.poc.scene.dto.external.SceneProcessExternal;
 import lombok.Getter;
 import lombok.Setter;
 
