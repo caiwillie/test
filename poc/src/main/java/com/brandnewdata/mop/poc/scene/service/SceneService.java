@@ -18,8 +18,8 @@ import com.brandnewdata.mop.poc.scene.dao.SceneProcessDao;
 import com.brandnewdata.mop.poc.scene.dto.SceneDto;
 import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
 import com.brandnewdata.mop.poc.scene.dto.SceneProcessDto;
-import com.brandnewdata.mop.poc.scene.entity.SceneEntity;
-import com.brandnewdata.mop.poc.scene.entity.SceneProcessEntity;
+import com.brandnewdata.mop.poc.scene.entity.ScenePo;
+import com.brandnewdata.mop.poc.scene.entity.SceneProcessPo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -48,15 +48,15 @@ public class SceneService implements ISceneService {
 
     @Override
     public Page<SceneDto> page(int pageNumber, int pageSize, String name) {
-        com.baomidou.mybatisplus.extension.plugins.pagination.Page<SceneEntity> page =
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<ScenePo> page =
                 com.baomidou.mybatisplus.extension.plugins.pagination.Page.of(pageNumber, pageSize);
-        QueryWrapper<SceneEntity> queryWrapper = new QueryWrapper<>();
-        if(StrUtil.isNotBlank(name)) queryWrapper.like(SceneEntity.NAME, name); // 设置名称
-        queryWrapper.orderByDesc(SceneEntity.UPDATE_TIME);
+        QueryWrapper<ScenePo> queryWrapper = new QueryWrapper<>();
+        if(StrUtil.isNotBlank(name)) queryWrapper.like(ScenePo.NAME, name); // 设置名称
+        queryWrapper.orderByDesc(ScenePo.UPDATE_TIME);
         page = sceneDao.selectPage(page, queryWrapper);
-        List<SceneEntity> entities = Optional.ofNullable(page.getRecords()).orElse(ListUtil.empty());
+        List<ScenePo> entities = Optional.ofNullable(page.getRecords()).orElse(ListUtil.empty());
 
-        List<Long> sceneIdList = entities.stream().map(SceneEntity::getId).collect(Collectors.toList());
+        List<Long> sceneIdList = entities.stream().map(ScenePo::getId).collect(Collectors.toList());
 
         Collection<SceneDto> list = list(sceneIdList, true);
 
@@ -78,17 +78,17 @@ public class SceneService implements ISceneService {
     public List<SceneDto2> listByIdList(List<Long> idList) {
         if(CollUtil.isEmpty(idList)) return ListUtil.empty();
 
-        QueryWrapper<SceneEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.in(SceneEntity.ID, idList);
-        List<SceneEntity> entities = sceneDao.selectList(queryWrapper);
+        QueryWrapper<ScenePo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in(ScenePo.ID, idList);
+        List<ScenePo> entities = sceneDao.selectList(queryWrapper);
         return entities.stream().map(this::toDto2).collect(Collectors.toList());
     }
 
     @Override
     public SceneDto save(SceneDto sceneDTO) {
         Assert.notNull(sceneDTO.getName(), ErrorMessage.NOT_NULL("场景名称"));
-        SceneEntity entity = toEntity(sceneDTO);
-        SceneEntity oldEntity = exist(sceneDTO.getId());
+        ScenePo entity = toEntity(sceneDTO);
+        ScenePo oldEntity = exist(sceneDTO.getId());
         if(oldEntity == null) {
             sceneDao.insert(entity);
         } else {
@@ -101,19 +101,19 @@ public class SceneService implements ISceneService {
     public SceneProcessDto saveProcessDefinition(SceneProcessDto sceneProcessDTO) {
         // 保存完成后，得到 process id
         ProcessDefinitionDto processDefinitionDTO = processDefinitionService.save(toDTO(sceneProcessDTO));
-        SceneProcessEntity sceneProcessEntity =
+        SceneProcessPo sceneProcessPo =
                 getBusinessSceneProcessEntityByProcessId(processDefinitionDTO.getProcessId());
-        if(sceneProcessEntity == null) {
+        if(sceneProcessPo == null) {
             // 不存在则新增
-            sceneProcessEntity = toEntity(sceneProcessDTO);
+            sceneProcessPo = toEntity(sceneProcessDTO);
             // 将解析后的 process id 存入
-            sceneProcessEntity.setProcessId(processDefinitionDTO.getProcessId());
-            sceneProcessDao.insert(sceneProcessEntity);
+            sceneProcessPo.setProcessId(processDefinitionDTO.getProcessId());
+            sceneProcessDao.insert(sceneProcessPo);
         }
 
         // 更新 business scene id
         updateSceneUpdateTime(sceneProcessDTO.getBusinessSceneId());
-        return toDTO(sceneProcessEntity, processDefinitionDTO);
+        return toDTO(sceneProcessPo, processDefinitionDTO);
     }
 
     @Override
@@ -137,10 +137,10 @@ public class SceneService implements ISceneService {
     public void delete(SceneDto sceneDTO) {
         // 先删除绑定的流程
         Long sceneId = sceneDTO.getId();
-        List<SceneProcessEntity> businessSceneProcessEntities = listSceneProcessBySceneId(sceneId);
+        List<SceneProcessPo> businessSceneProcessEntities = listSceneProcessBySceneId(sceneId);
         if(CollUtil.isNotEmpty(businessSceneProcessEntities)) {
-            for (SceneProcessEntity sceneProcessEntity : businessSceneProcessEntities) {
-                SceneProcessDto sceneProcessDTO = toDTO(sceneProcessEntity, null);
+            for (SceneProcessPo sceneProcessPo : businessSceneProcessEntities) {
+                SceneProcessDto sceneProcessDTO = toDTO(sceneProcessPo, null);
                 deleteProcessDefinition(sceneProcessDTO);
             }
         }
@@ -148,20 +148,20 @@ public class SceneService implements ISceneService {
         sceneDao.deleteById(sceneId);
     }
 
-    private List<SceneProcessEntity> listSceneProcessBySceneId(Long sceneId) {
-        QueryWrapper<SceneProcessEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(SceneProcessEntity.BUSINESS_SCENE_ID, sceneId);
+    private List<SceneProcessPo> listSceneProcessBySceneId(Long sceneId) {
+        QueryWrapper<SceneProcessPo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(SceneProcessPo.BUSINESS_SCENE_ID, sceneId);
         return sceneProcessDao.selectList(queryWrapper);
     }
 
-    private SceneEntity exist(Long id) {
+    private ScenePo exist(Long id) {
         if(id == null) return null;
         return sceneDao.selectById(id);
     }
 
     private void updateSceneUpdateTime(Long sceneId) {
-        SceneEntity sceneEntity = sceneDao.selectById(sceneId);
-        sceneDao.updateById(sceneEntity);
+        ScenePo scenePo = sceneDao.selectById(sceneId);
+        sceneDao.updateById(scenePo);
     }
 
     private Collection<SceneDto> list(List<Long> ids, boolean withXML) {
@@ -170,12 +170,12 @@ public class SceneService implements ISceneService {
         if(CollUtil.isEmpty(ids)) {
             return sceneMap.values();
         }
-        QueryWrapper<SceneEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.in(SceneEntity.ID, ids);
+        QueryWrapper<ScenePo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in(ScenePo.ID, ids);
         // 按照修改时间倒序
-        queryWrapper.orderByDesc(SceneEntity.UPDATE_TIME);
+        queryWrapper.orderByDesc(ScenePo.UPDATE_TIME);
 
-        List<SceneEntity> businessSceneEntities = sceneDao.selectList(queryWrapper);
+        List<ScenePo> businessSceneEntities = sceneDao.selectList(queryWrapper);
 
         if(CollUtil.isEmpty(businessSceneEntities)) {
             // sceneIds 不能为空，否则会报错
@@ -183,18 +183,18 @@ public class SceneService implements ISceneService {
         }
 
         List<Long> sceneIds = new ArrayList<>();
-        for (SceneEntity sceneEntity : businessSceneEntities) {
+        for (ScenePo scenePo : businessSceneEntities) {
             // 添加 sceneMap
-            SceneDto sceneDTO = toDTO(sceneEntity);
+            SceneDto sceneDTO = toDTO(scenePo);
             Long id = sceneDTO.getId();
             sceneMap.put(id, sceneDTO);
             sceneIds.add(id);
         }
 
-        QueryWrapper<SceneProcessEntity> queryWrapper2 = new QueryWrapper<>();
-        queryWrapper2.in(SceneProcessEntity.BUSINESS_SCENE_ID, sceneIds);
+        QueryWrapper<SceneProcessPo> queryWrapper2 = new QueryWrapper<>();
+        queryWrapper2.in(SceneProcessPo.BUSINESS_SCENE_ID, sceneIds);
 
-        List<SceneProcessEntity> businessSceneProcessEntities = sceneProcessDao.selectList(queryWrapper2);
+        List<SceneProcessPo> businessSceneProcessEntities = sceneProcessDao.selectList(queryWrapper2);
 
         if(CollUtil.isEmpty(businessSceneProcessEntities)) {
             // process ids 不能为空
@@ -203,8 +203,8 @@ public class SceneService implements ISceneService {
         }
 
         // 获取 process 和 scene 的映射
-        Map<String, SceneProcessEntity> processSceneProcessEntityMap = businessSceneProcessEntities.stream().collect(
-                Collectors.toMap(SceneProcessEntity::getProcessId, Function.identity()));
+        Map<String, SceneProcessPo> processSceneProcessEntityMap = businessSceneProcessEntities.stream().collect(
+                Collectors.toMap(SceneProcessPo::getProcessId, Function.identity()));
 
         List<ProcessDefinitionDto> processDefinitionDtos = processDefinitionService.list(
                 ListUtil.toList(processSceneProcessEntityMap.keySet()), withXML);
@@ -236,9 +236,9 @@ public class SceneService implements ISceneService {
             List<SceneProcessDto> sceneProcessDtoList = new ArrayList<>();
             // 如果是带XML，就需要查询出definition
             for (ProcessDefinitionDto processDefinitionDTO : tempProcessDefinitionDtos) {
-                SceneProcessEntity sceneProcessEntity =
+                SceneProcessPo sceneProcessPo =
                         processSceneProcessEntityMap.get(processDefinitionDTO.getProcessId());
-                SceneProcessDto sceneProcessDTO = toDTO(sceneProcessEntity, processDefinitionDTO);
+                SceneProcessDto sceneProcessDTO = toDTO(sceneProcessPo, processDefinitionDTO);
                 sceneProcessDtoList.add(sceneProcessDTO);
             }
             sceneDto.setProcessDefinitions(sceneProcessDtoList);
@@ -247,7 +247,7 @@ public class SceneService implements ISceneService {
         return sceneMap.values();
     }
 
-    private SceneDto toDTO(SceneEntity entity) {
+    private SceneDto toDTO(ScenePo entity) {
         SceneDto dto = new SceneDto();
         dto.setId(entity.getId());
         dto.setName(entity.getName());
@@ -256,7 +256,7 @@ public class SceneService implements ISceneService {
         return dto;
     }
 
-    private SceneDto2 toDto2(SceneEntity entity) {
+    private SceneDto2 toDto2(ScenePo entity) {
         SceneDto2 dto = new SceneDto2();
         dto.setId(entity.getId());
         dto.setName(entity.getName());
@@ -265,12 +265,12 @@ public class SceneService implements ISceneService {
         return dto;
     }
 
-    private SceneProcessDto toDTO(SceneProcessEntity sceneProcessEntity,
+    private SceneProcessDto toDTO(SceneProcessPo sceneProcessPo,
                                   ProcessDefinitionDto processDefinitionDTO) {
         SceneProcessDto dto = new SceneProcessDto();
-        dto.setId(sceneProcessEntity.getId());
-        dto.setBusinessSceneId(sceneProcessEntity.getBusinessSceneId());
-        dto.setProcessId(sceneProcessEntity.getProcessId());
+        dto.setId(sceneProcessPo.getId());
+        dto.setBusinessSceneId(sceneProcessPo.getBusinessSceneId());
+        dto.setProcessId(sceneProcessPo.getProcessId());
         if(processDefinitionDTO != null) {
             dto.setName(processDefinitionDTO.getName());
             dto.setXml(processDefinitionDTO.getXml());
@@ -279,15 +279,15 @@ public class SceneService implements ISceneService {
         return dto;
     }
 
-    private SceneEntity toEntity(SceneDto sceneDTO) {
-        SceneEntity entity = new SceneEntity();
+    private ScenePo toEntity(SceneDto sceneDTO) {
+        ScenePo entity = new ScenePo();
         entity.setId(sceneDTO.getId());
         entity.setName(sceneDTO.getName());
         return entity;
     }
 
-    private SceneProcessEntity toEntity(SceneProcessDto sceneProcessDTO) {
-        SceneProcessEntity entity = new SceneProcessEntity();
+    private SceneProcessPo toEntity(SceneProcessDto sceneProcessDTO) {
+        SceneProcessPo entity = new SceneProcessPo();
         entity.setId(sceneProcessDTO.getId());
         entity.setBusinessSceneId(sceneProcessDTO.getBusinessSceneId());
         return entity;
@@ -302,9 +302,9 @@ public class SceneService implements ISceneService {
         return dto;
     }
 
-    private SceneProcessEntity getBusinessSceneProcessEntityByProcessId(String processId) {
-        QueryWrapper<SceneProcessEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(SceneProcessEntity.PROCESS_ID, processId);
+    private SceneProcessPo getBusinessSceneProcessEntityByProcessId(String processId) {
+        QueryWrapper<SceneProcessPo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(SceneProcessPo.PROCESS_ID, processId);
         return sceneProcessDao.selectOne(queryWrapper);
     }
 

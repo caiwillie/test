@@ -25,8 +25,8 @@ import com.brandnewdata.mop.poc.scene.dto.external.AllExternal;
 import com.brandnewdata.mop.poc.scene.dto.external.ConfigExternal;
 import com.brandnewdata.mop.poc.scene.dto.external.ProcessDefinitionExternal;
 import com.brandnewdata.mop.poc.scene.dto.external.SceneProcessExternal;
-import com.brandnewdata.mop.poc.scene.entity.SceneLoadEntity;
-import com.brandnewdata.mop.poc.scene.entity.SceneProcessEntity;
+import com.brandnewdata.mop.poc.scene.entity.SceneLoadPo;
+import com.brandnewdata.mop.poc.scene.entity.SceneProcessPo;
 import com.brandnewdata.mop.poc.scene.request.ExportReq;
 import com.brandnewdata.mop.poc.scene.response.ConnConfResp;
 import com.brandnewdata.mop.poc.scene.response.LoadResp;
@@ -83,15 +83,15 @@ public class DataExternalService {
 
     public File export(ExportReq req) {
         Assert.isTrue(CollUtil.isNotEmpty(req.getProcessIds()), "所选流程不能为空");
-        QueryWrapper<SceneProcessEntity> queryWrapper = new QueryWrapper<>();
-        List<SceneProcessEntity> entities = sceneProcessDao.selectList(queryWrapper);
+        QueryWrapper<SceneProcessPo> queryWrapper = new QueryWrapper<>();
+        List<SceneProcessPo> entities = sceneProcessDao.selectList(queryWrapper);
 
         Map<String, File> fileMap = new HashMap<>();
 
         // 场景下的流程
         Map<Long, SceneProcessExternal> sceneProcessMap = new HashMap<>();
         List<String> processIds = new ArrayList<>();
-        for (SceneProcessEntity entity : entities) {
+        for (SceneProcessPo entity : entities) {
             SceneProcessExternal external = new SceneProcessExternal();
             Long id = entity.getId();
             String processId = entity.getProcessId();
@@ -139,11 +139,11 @@ public class DataExternalService {
         AllExternal allExternal = getAllExternal(bytes);
 
         // 将上传文件保存至数据库
-        SceneLoadEntity sceneLoadEntity = new SceneLoadEntity();
-        sceneLoadEntity.setZipBytes(bytes);
-        loadDao.insert(sceneLoadEntity);
+        SceneLoadPo sceneLoadPo = new SceneLoadPo();
+        sceneLoadPo.setZipBytes(bytes);
+        loadDao.insert(sceneLoadPo);
 
-        resp.setId(sceneLoadEntity.getId());
+        resp.setId(sceneLoadPo.getId());
         List<ConnConfResp> configureList = getConnConfRespList(allExternal.getConfigMap().values());
         resp.setConfigureList(configureList);
 
@@ -159,10 +159,10 @@ public class DataExternalService {
         sceneDto = sceneService.save(sceneDto);
 
         // 保存场景下的流程
-        SceneLoadEntity sceneLoadEntity = loadDao.selectById(req.getId());
+        SceneLoadPo sceneLoadPo = loadDao.selectById(req.getId());
 
         LoadResp resp = new LoadResp();
-        AllExternal allExternal = getAllExternal(sceneLoadEntity.getZipBytes());
+        AllExternal allExternal = getAllExternal(sceneLoadPo.getZipBytes());
         Map<String, ProcessDefinitionExternal> definitionMap = allExternal.getDefinitionMap();
         Map<String, ConfigExternal> configMap = allExternal.getConfigMap();
         int count = 3;

@@ -13,43 +13,43 @@ import java.util.Date;
  * </p>
  *
  * @author caiwillie
- * @since 2022-07-21
+ * @since 2022-11-10
  */
 @Getter
 @Setter
-@TableName("mop_scene")
-public class SceneEntity implements Serializable {
+@TableName("mop_scene_load")
+public class SceneLoadPo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    @TableField(fill = FieldFill.INSERT)
-    private Date createTime;
-
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private Date updateTime;
+    private byte[] zipBytes;
 
     @TableField(fill = FieldFill.INSERT)
     private String createBy;
 
+    @TableField(fill = FieldFill.INSERT)
+    private Date createTime;
+
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private String updateBy;
 
-    private String name;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private Date updateTime;
 
 
     public static final String ID = "id";
 
-    public static final String CREATE_TIME = "create_time";
-
-    public static final String UPDATE_TIME = "update_time";
+    public static final String ZIP_BYTES = "zip_bytes";
 
     public static final String CREATE_BY = "create_by";
 
+    public static final String CREATE_TIME = "create_time";
+
     public static final String UPDATE_BY = "update_by";
 
-    public static final String NAME = "name";
+    public static final String UPDATE_TIME = "update_time";
 
 }
