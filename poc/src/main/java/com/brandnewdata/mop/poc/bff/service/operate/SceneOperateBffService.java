@@ -38,7 +38,7 @@ import static com.brandnewdata.mop.poc.util.CollectorsUtil.toSortedList;
 import static java.util.stream.Collectors.groupingBy;
 
 @Service
-public class SceneOperateService {
+public class SceneOperateBffService {
     @Resource
     private IProcessDeployService processDeployService;
     @Resource

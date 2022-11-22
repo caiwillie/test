@@ -1,7 +1,7 @@
 package com.brandnewdata.mop.poc.bff.controller.operate;
 
 import com.brandnewdata.common.webresult.Result;
-import com.brandnewdata.mop.poc.bff.service.operate.SceneOperateService;
+import com.brandnewdata.mop.poc.bff.service.operate.SceneOperateBffService;
 import com.brandnewdata.mop.poc.bff.vo.operate.ProcessInstance;
 import com.brandnewdata.mop.poc.bff.vo.operate.Statistic;
 import com.brandnewdata.mop.poc.bff.vo.operate.condition.Filter;
@@ -23,7 +23,7 @@ import java.util.List;
 public class SceneOperateController {
 
     @Resource
-    private SceneOperateService sceneOperateService;
+    private SceneOperateBffService sceneOperateBffService;
 
     /**
      * 获取所有场景-流程-版本
@@ -32,7 +32,7 @@ public class SceneOperateController {
      */
     @GetMapping("/rest/scene/operate/getAllScene")
     public Result<List<Scene>> getAllScene() {
-        return Result.OK(sceneOperateService.getAllScene());
+        return Result.OK(sceneOperateBffService.getAllScene());
     }
 
     /**
@@ -43,7 +43,7 @@ public class SceneOperateController {
      */
     @PostMapping("/rest/scene/operate/statistic")
     public Result<Statistic> statistic(@RequestBody Filter filter) {
-        Statistic statistic = sceneOperateService.statistic(filter);
+        Statistic statistic = sceneOperateBffService.statistic(filter);
         return Result.OK(statistic);
     }
 
@@ -54,7 +54,7 @@ public class SceneOperateController {
      */
     @PostMapping("/rest/scene/operate/pageProcessInstance")
     public Result<Page<ProcessInstance>> pageProcessInstance(@RequestBody Filter filter) {
-        Page<ProcessInstance> page = sceneOperateService.pageProcessInstance(filter);
+        Page<ProcessInstance> page = sceneOperateBffService.pageProcessInstance(filter);
         return Result.OK(page);
     }
 }
