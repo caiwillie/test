@@ -8,24 +8,21 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.Date;
 
-@Setter
 @Getter
-public class EnvDto {
+@Setter
+public class EnvServiceDto {
     private Long id;
 
     private LocalDateTime createTime;
 
     private LocalDateTime updateTime;
 
-    private LocalDateTime deployTime;
-
     private String name;
 
-    private String namespace;
+    private Long envId;
 
-    private String status;
+    private String clusterIp;
 
-    private Integer type;
+    private String ports;
 
-    private String description;
 }

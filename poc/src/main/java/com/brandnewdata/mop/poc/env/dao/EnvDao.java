@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * </p>
  *
  * @author caiwillie
- * @since 2022-11-21
+ * @since 2022-11-22
  */
 public interface EnvDao extends BaseMapper<EnvPo> {
 
