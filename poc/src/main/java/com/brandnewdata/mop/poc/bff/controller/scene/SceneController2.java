@@ -44,6 +44,28 @@ public class SceneController2 {
     }
 
     /**
+     * 保存场景
+     *
+     * @return
+     */
+    @PostMapping(value = "/rest/scene/save")
+    public Result<SceneVo> save(@RequestBody SceneVo sceneVo) {
+        return Result.OK();
+    }
+
+    /**
+     * 删除场景
+     *
+     * @param sceneVo the scene vo
+     * @return the result
+     */
+    @PostMapping(value = "/rest/scene/delete")
+    public Result<SceneVo> delete(@RequestBody SceneVo sceneVo) {
+        return Result.OK();
+    }
+
+
+    /**
      * 获取场景下的版本列表
      * @param sceneId 场景id
      * @return
@@ -66,15 +88,6 @@ public class SceneController2 {
         return Result.OK(versionProcessVoList);
     }
 
-    /**
-     * 保存场景
-     *
-     * @return
-     */
-    @PostMapping
-    public Result<SceneVo> save(@RequestBody SceneVo sceneVo) {
-        return Result.OK();
-    }
 
     /**
      * 部署新版本
