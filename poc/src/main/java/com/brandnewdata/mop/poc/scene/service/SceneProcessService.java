@@ -5,7 +5,7 @@ import cn.hutool.core.collection.ListUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.scene.dao.SceneProcessDao;
 import com.brandnewdata.mop.poc.scene.dto.SceneProcessDto2;
-import com.brandnewdata.mop.poc.scene.entity.SceneProcessPo;
+import com.brandnewdata.mop.poc.scene.po.SceneProcessPo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

@@ -18,8 +18,8 @@ import com.brandnewdata.mop.poc.scene.dao.SceneProcessDao;
 import com.brandnewdata.mop.poc.scene.dto.SceneDto;
 import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
 import com.brandnewdata.mop.poc.scene.dto.SceneProcessDto;
-import com.brandnewdata.mop.poc.scene.entity.ScenePo;
-import com.brandnewdata.mop.poc.scene.entity.SceneProcessPo;
+import com.brandnewdata.mop.poc.scene.po.ScenePo;
+import com.brandnewdata.mop.poc.scene.po.SceneProcessPo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

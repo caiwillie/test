@@ -1,7 +1,7 @@
 package com.brandnewdata.mop.poc.scene.dao;
 
+import com.brandnewdata.mop.poc.scene.po.ScenePo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.brandnewdata.mop.poc.scene.entity.ScenePo;
 
 /**
  * <p>
@@ -9,7 +9,7 @@ import com.brandnewdata.mop.poc.scene.entity.ScenePo;
  * </p>
  *
  * @author caiwillie
- * @since 2022-07-21
+ * @since 2022-11-23
  */
 public interface SceneDao extends BaseMapper<ScenePo> {
 

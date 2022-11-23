@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.scene.dao.SceneDao;
 import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
-import com.brandnewdata.mop.poc.scene.entity.ScenePo;
+import com.brandnewdata.mop.poc.scene.po.ScenePo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

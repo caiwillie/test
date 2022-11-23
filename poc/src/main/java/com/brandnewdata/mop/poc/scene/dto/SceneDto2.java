@@ -1,7 +1,7 @@
 package com.brandnewdata.mop.poc.scene.dto;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
-import com.brandnewdata.mop.poc.scene.entity.ScenePo;
+import com.brandnewdata.mop.poc.scene.po.ScenePo;
 import lombok.Getter;
 import lombok.Setter;
 
