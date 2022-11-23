@@ -72,7 +72,7 @@ public class SceneService2 implements ISceneService2{
         if(CollUtil.isEmpty(versionIdList)) return MapUtil.empty();
         QueryWrapper<VersionProcessPo> query = new QueryWrapper<>();
         query.in(VersionProcessPo.VERSION_ID, versionIdList);
-        query.groupBy(VersionProcessPo.)
+
         return null;
     }
 
