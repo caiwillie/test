@@ -1,13 +1,11 @@
 package com.brandnewdata.mop.poc.bff.controller.scene;
 
-import cn.hutool.core.lang.Assert;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.bff.service.scene.SceneBffService;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVersionVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.VersionProcessVo;
 import com.brandnewdata.mop.poc.common.dto.Page;
-import com.brandnewdata.mop.poc.scene.dto.SceneDto;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -79,6 +77,39 @@ public class SceneController2 {
     }
 
     /**
+     * 部署新版本
+     *
+     * @param sceneVersionVo the scene version vo
+     * @return the result
+     */
+    @PostMapping(value = "/rest/scene/version/deploy")
+    public Result<SceneVersionVo> versionDeploy(@RequestBody SceneVersionVo sceneVersionVo) {
+        return Result.OK();
+    }
+
+    /**
+     * 停止某个版本
+     *
+     * @param sceneVersionVo the scene version vo
+     * @return the result
+     */
+    @PostMapping(value = "/rest/scene/version/stop")
+    public Result<SceneVersionVo> versionStop(@RequestBody SceneVersionVo sceneVersionVo) {
+        return Result.OK();
+    }
+
+    /**
+     * 恢复某个版本
+     *
+     * @param sceneVersionVo the scene version vo
+     * @return the result
+     */
+    @PostMapping(value = "/rest/scene/version/resume")
+    public Result<SceneVersionVo> versionResume(@RequestBody SceneVersionVo sceneVersionVo) {
+        return Result.OK();
+    }
+
+    /**
      * 拷贝至新版本
      *
      * @param oldVersion the old version
@@ -97,6 +128,17 @@ public class SceneController2 {
      */
     @PostMapping(value = "/rest/scene/version/process/save")
     public Result<VersionProcessVo> processSave(@RequestBody VersionProcessVo versionProcessVo) {
+        return Result.OK();
+    }
+
+    /**
+     * 删除版本下的流程
+     *
+     * @param versionProcessVo the version process vo
+     * @return the result
+     */
+    @PostMapping(value = "/rest/scene/version/process/delete")
+    public Result processDelete(@RequestBody VersionProcessVo versionProcessVo) {
         return Result.OK();
     }
 
