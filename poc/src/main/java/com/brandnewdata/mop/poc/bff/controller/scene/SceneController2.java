@@ -14,6 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * 场景集成相关接口（新）
+ *
+ * @author caiwillie
+ */
 @RestController
 public class SceneController2 {
 
