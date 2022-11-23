@@ -1,5 +1,7 @@
 package com.brandnewdata.mop.poc.scene.dto;
 
+import com.brandnewdata.mop.poc.scene.dao.VersionProcessDao;
+import com.brandnewdata.mop.poc.scene.po.VersionProcessPo;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,4 +26,8 @@ public class VersionProcessDto {
     private String processXml;
 
     private String processImg;
+
+    public VersionProcessDto from(VersionProcessPo po) {
+        return this;
+    }
 }

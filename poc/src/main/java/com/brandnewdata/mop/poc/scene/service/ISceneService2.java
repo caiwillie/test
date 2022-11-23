@@ -22,8 +22,12 @@ public interface ISceneService2 {
 
     SceneVersionDto fetchLatestVersion(Long sceneId);
 
-    List<VersionProcessDto> fetchVersionProcessListByVersionId(Long versionId);
+    Map<Long, List<VersionProcessDto>> fetchVersionProcessListByVersionId(List<Long> versionIdList, boolean simple);
+
+    Map<Long, VersionProcessDto> fetchVersionProcessById(List<Long> idList);
+
     Map<Long, Integer> fetchProcessCountByVersionIdList(List<Long> versionIdList);
+
     Map<Long, VersionProcessDto> fetchLatestProcessByVersionIdList(List<Long> versionIdList);
 
 }
