@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.poc.bff.vo.scene;
 
+import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -39,4 +40,14 @@ public class SceneVersionVo {
      * 状态。1 配置中；2 运行中；3 已完成
      */
     private Integer status;
+
+    public SceneVersionVo from(SceneVersionDto dto) {
+        this.setId(dto.getId());
+        this.setCreateTime(dto.getCreateTime());
+        this.setUpdateTime(dto.getUpdateTime());
+        this.setVersion(dto.getVersion());
+        this.setSceneId(dto.getSceneId());
+        this.setStatus(dto.getStatus());
+        return this;
+    }
 }

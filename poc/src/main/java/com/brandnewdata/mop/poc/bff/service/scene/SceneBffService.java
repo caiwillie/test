@@ -2,7 +2,10 @@ package com.brandnewdata.mop.poc.bff.service.scene;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.lang.Assert;
+import com.brandnewdata.mop.poc.bff.vo.scene.SceneVersionVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVo;
+import com.brandnewdata.mop.poc.bff.vo.scene.VersionProcessVo;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
@@ -63,4 +66,18 @@ public class SceneBffService {
         return new Page<>(page.getTotal(), sceneVos);
     }
 
+    public List<SceneVersionVo> versionList(Long sceneId) {
+        Assert.notNull(sceneId, "场景id不能为空");
+        List<SceneVersionDto> sceneVersionDtoList =
+                sceneVersionService.fetchSceneVersionListBySceneId(ListUtil.of(sceneId)).get(sceneId);
+        return sceneVersionDtoList.stream()
+                .map(dto -> new SceneVersionVo().from(dto)).collect(Collectors.toList());
+    }
+
+    public List<VersionProcessVo> processList(Long versionId) {
+        Assert.notNull(versionId, "版本id不能为空");
+        List<VersionProcessDto> versionProcessDtoList =
+                versionProcessService.fetchVersionProcessListByVersionId(ListUtil.of(versionId), false).get(versionId);
+        return versionProcessDtoList.stream().map(dto -> new VersionProcessVo().from(dto)).collect(Collectors.toList());
+    }
 }
