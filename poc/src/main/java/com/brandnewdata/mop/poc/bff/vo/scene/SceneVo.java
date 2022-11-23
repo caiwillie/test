@@ -1,7 +1,15 @@
 package com.brandnewdata.mop.poc.bff.vo.scene;
 
+import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
+@Accessors(chain = true)
 public class SceneVo {
     /**
      * 场景 id
@@ -28,5 +36,17 @@ public class SceneVo {
      */
     private String imgUrl;
 
+    /**
+     * 流程个数
+     */
+    private Integer processCount;
+
+    public SceneVo from(SceneDto2 dto) {
+        this.setId(dto.getId());
+        this.setCreateTime(dto.getCreateTime());
+        this.setUpdateTime(dto.getUpdateTime());
+        this.setName(dto.getName());
+        return this;
+    }
 
 }

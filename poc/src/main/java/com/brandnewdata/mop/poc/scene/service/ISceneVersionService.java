@@ -3,10 +3,11 @@ package com.brandnewdata.mop.poc.scene.service;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ISceneVersionService {
 
-    SceneVersionDto fetchLatestVersion(Long sceneId);
+    Map<Long, SceneVersionDto> fetchLatestVersion(List<Long> sceneIdList);
 
-    List<SceneVersionDto> fetchSceneVersionListBySceneId(Long sceneId);
+    Map<Long, List<SceneVersionDto>> fetchSceneVersionListBySceneId(List<Long> sceneIdList);
 }

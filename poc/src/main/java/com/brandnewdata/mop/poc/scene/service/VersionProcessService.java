@@ -15,11 +15,13 @@ import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
 import com.brandnewdata.mop.poc.scene.manager.JooqManager;
 import com.brandnewdata.mop.poc.scene.po.SceneVersionPo;
 import com.brandnewdata.mop.poc.scene.po.VersionProcessPo;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Service
 public class VersionProcessService implements IVersionProcessService {
 
     @Resource
