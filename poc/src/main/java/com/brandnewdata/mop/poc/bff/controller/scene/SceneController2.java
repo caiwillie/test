@@ -5,6 +5,7 @@ import com.brandnewdata.mop.poc.bff.service.scene.SceneBffService;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVersionVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.VersionProcessVo;
+import com.brandnewdata.mop.poc.bff.vo.scene.external.ExportQuery;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import org.springframework.web.bind.annotation.*;
 
@@ -62,6 +63,32 @@ public class SceneController2 {
     @PostMapping(value = "/rest/scene/delete")
     public Result<SceneVo> delete(@RequestBody SceneVo sceneVo) {
         return Result.OK();
+    }
+
+    /**
+     * 导出场景
+     *
+     * @param exportQuery the export query
+     */
+    @PostMapping("/rest/scene/export")
+    public void export(@RequestBody ExportQuery exportQuery) {
+        return;
+    }
+
+    /**
+     * 预备导入场景
+     */
+    @PostMapping("/rest/scenne/load/prepare")
+    public void loadPrepare() {
+        return;
+    }
+
+    /**
+     * 确认导入场景
+     */
+    @PostMapping("/rest/scenne/load/confirm")
+    public void loadConfirm() {
+        return;
     }
 
 
