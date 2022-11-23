@@ -1,11 +1,10 @@
 package com.brandnewdata.mop.poc.scene.service;
 
 import com.brandnewdata.mop.poc.common.dto.Page;
-import com.brandnewdata.mop.poc.scene.dto.SceneDto;
-import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
-import com.brandnewdata.mop.poc.scene.dto.SceneProcessDto;
+import com.brandnewdata.mop.poc.scene.dto.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author caiwillie
@@ -21,6 +20,10 @@ public interface ISceneService2 {
      */
     Page<SceneDto2> page(int pageNum, int pageSize, String name);
 
-    String getLatestVersion(Long sceneId);
+    SceneVersionDto fetchLatestVersion(Long sceneId);
+
+    List<VersionProcessDto> fetchVersionProcessListByVersionId(Long versionId);
+    Map<Long, Integer> fetchProcessCountByVersionIdList(List<Long> versionIdList);
+    Map<Long, VersionProcessDto> fetchLatestProcessByVersionIdList(List<Long> versionIdList);
 
 }

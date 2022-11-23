@@ -35,6 +35,12 @@ public class VersionProcessPo implements Serializable {
 
     private String processId;
 
+    private String processName;
+
+    private String processXml;
+
+    private String processImg;
+
 
     public static final String ID = "id";
 
@@ -45,5 +51,11 @@ public class VersionProcessPo implements Serializable {
     public static final String VERSION_ID = "version_id";
 
     public static final String PROCESS_ID = "process_id";
+
+    public static final String PROCESS_NAME = "process_name";
+
+    public static final String PROCESS_XML = "process_xml";
+
+    public static final String PROCESS_IMG = "process_img";
 
 }

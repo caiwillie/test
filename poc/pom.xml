@@ -57,17 +57,16 @@
 
     <dependencies>
 
+        <!-- spring -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
         <!-- https://spring.io/projects/spring-data-jdbc  -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -79,16 +78,9 @@
             <groupId>io.camunda</groupId>
             <artifactId>spring-zeebe-starter</artifactId>
         </dependency>
-
         <dependency>
             <groupId>io.camunda</groupId>
             <artifactId>camunda-operate-client-java</artifactId>
-        </dependency>
-
-        <!-- mybatis plus  -->
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-extension</artifactId>
         </dependency>
 
         <!-- 连接池  -->
@@ -103,26 +95,49 @@
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
 
+        <!-- mybatis plus  -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-extension</artifactId>
+        </dependency>
+
+        <!-- jooq -->
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq</artifactId>
+            <version>3.16.11</version>
+        </dependency>
+
         <!-- nacos -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
         </dependency>
-
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
         </dependency>
-
         <!-- nacos service name为空的问题 https://github.com/alibaba/nacos/issues/5448 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-bootstrap</artifactId>
         </dependency>
 
+        <!-- jackson util -->
         <dependency>
             <groupId>com.github.duanxinyuan</groupId>
             <artifactId>json-jackson</artifactId>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.module/jackson-module-scala -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-scala_2.13</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
 
         <!-- feel -->
@@ -131,50 +146,43 @@
             <artifactId>feel-engine</artifactId>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.module/jackson-module-scala -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-scala_2.13</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
 
         <!--  elasticsearch -->
         <dependency>
             <groupId>co.elastic.clients</groupId>
             <artifactId>elasticsearch-java</artifactId>
-            <version>7.17.5</version>
+            <version>7.17.5</version><exclusions>
+            <exclusion>
+                <artifactId>jakarta.json-api</artifactId>
+                <groupId>jakarta.json</groupId>
+            </exclusion>
+        </exclusions>
         </dependency>
-
+        <!-- elasticsearch中用到的json默认为jakarta.json-api -->
         <dependency>
             <groupId>jakarta.json</groupId>
             <artifactId>jakarta.json-api</artifactId>
             <version>2.0.1</version>
         </dependency>
-
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-client-sniffer</artifactId>
             <version>7.17.5</version>
         </dependency>
 
+        <!-- http proxy -->
         <dependency>
             <groupId>org.mitre.dsmiley.httpproxy</groupId>
             <artifactId>smiley-http-proxy-servlet</artifactId>
             <version>1.12.1</version>
         </dependency>
 
+        <!-- api 导入导出用openapi协议，需要这个来解析 -->
         <dependency>
             <groupId>io.swagger.parser.v3</groupId>
             <artifactId>swagger-parser</artifactId>
             <version>2.1.2</version>
         </dependency>
-
         <!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
         <dependency>
             <groupId>org.yaml</groupId>
@@ -182,28 +190,30 @@
             <version>1.32</version>
         </dependency>
 
-        <!-- dom4j -->
+        <!-- xml解析相关 -->
         <dependency>
             <groupId>org.dom4j</groupId>
             <artifactId>dom4j</artifactId>
         </dependency>
-
         <dependency>
             <groupId>jaxen</groupId>
             <artifactId>jaxen</artifactId>
         </dependency>
 
+        <!-- 图表相关 -->
         <dependency>
             <groupId>org.icepear.echarts</groupId>
             <artifactId>echarts-java</artifactId>
             <version>1.0.7</version>
         </dependency>
 
+        <!-- caiwillie二方包 -->
         <dependency>
             <groupId>com.caiwillie</groupId>
             <artifactId>utils</artifactId>
         </dependency>
 
+        <!-- brandnewdata二方包 -->
         <dependency>
             <groupId>com.brandnewdata</groupId>
             <artifactId>common</artifactId>
