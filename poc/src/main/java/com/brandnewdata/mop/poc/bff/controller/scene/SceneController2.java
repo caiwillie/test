@@ -8,9 +8,7 @@ import com.brandnewdata.mop.poc.bff.vo.scene.SceneVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.VersionProcessVo;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.scene.dto.SceneDto;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -68,6 +66,38 @@ public class SceneController2 {
     public Result<List<VersionProcessVo>> processList(@RequestParam Long versionId) {
         List<VersionProcessVo> versionProcessVoList = sceneBffService.processList(versionId);
         return Result.OK(versionProcessVoList);
+    }
+
+    /**
+     * 保存场景
+     *
+     * @return
+     */
+    @PostMapping
+    public Result<SceneVo> save(@RequestBody SceneVo sceneVo) {
+        return Result.OK();
+    }
+
+    /**
+     * 拷贝至新版本
+     *
+     * @param oldVersion the old version
+     * @return the result
+     */
+    @PostMapping(value = "/rest/scene/version/copyToNew")
+    public Result<SceneVersionVo> versionCopyToNew(@RequestBody SceneVersionVo oldVersion) {
+        return Result.OK();
+    }
+
+    /**
+     * 保存版本下的流程
+     *
+     * @param versionProcessVo the version process vo
+     * @return the result
+     */
+    @PostMapping(value = "/rest/scene/version/process/save")
+    public Result<VersionProcessVo> processSave(@RequestBody VersionProcessVo versionProcessVo) {
+        return Result.OK();
     }
 
 
