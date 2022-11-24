@@ -47,8 +47,8 @@ public class SceneService2 implements ISceneService2{
     @Override
     public SceneDto2 save(SceneDto2 sceneDto) {
         Long sceneId = sceneDto.getId();
-        ScenePo scenePo = getScenePoById(sceneId);
-        if(scenePo == null) {
+        ScenePo scenePo = null;
+        if(sceneId == null) {
             // 新增场景
             scenePo = ScenePoConverter.createFrom(sceneDto);
             sceneDao.insert(scenePo);
@@ -59,8 +59,8 @@ public class SceneService2 implements ISceneService2{
             sceneVersionDto.setVersion(DateUtil.format(scenePo.getCreateTime(), DatePattern.PURE_DATETIME_PATTERN));
             sceneVersionService.save(sceneVersionDto);
 
-
         } else {
+            scenePo = getScenePoById(sceneId);
             ScenePoConverter.updateFrom(sceneDto, scenePo);
             sceneDao.updateById(scenePo);
         }

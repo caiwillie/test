@@ -87,7 +87,7 @@ public class SceneBffService {
     public SceneVo save(SceneVo vo) {
         SceneDto2 dto = SceneDtoConverter.createFrom(vo);
         SceneDto2 ret = sceneService.save(dto);
-        vo.from(dto);
+        vo.from(ret);
         return vo;
     }
 }
