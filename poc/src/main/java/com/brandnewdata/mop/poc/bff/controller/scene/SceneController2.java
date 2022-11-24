@@ -115,6 +115,11 @@ public class SceneController2 {
         return Result.OK(versionProcessVoList);
     }
 
+    @PostMapping(value = "/rest/scene/version/debug")
+    public Result<SceneVersionVo> versionDebug(@RequestBody SceneVersionVo sceneVersionVo) {
+        return Result.OK();
+    }
+
     /**
      * 部署新版本
      *
