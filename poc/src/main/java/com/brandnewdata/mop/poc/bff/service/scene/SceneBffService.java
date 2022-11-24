@@ -4,10 +4,12 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Opt;
+import com.brandnewdata.mop.poc.bff.converter.scene.SceneDtoConverter;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVersionVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.VersionProcessVo;
 import com.brandnewdata.mop.poc.common.dto.Page;
+import com.brandnewdata.mop.poc.scene.dto.SceneDto;
 import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
 import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
@@ -80,5 +82,12 @@ public class SceneBffService {
         List<VersionProcessDto> versionProcessDtoList =
                 versionProcessService.fetchVersionProcessListByVersionId(ListUtil.of(versionId), false).get(versionId);
         return versionProcessDtoList.stream().map(dto -> new VersionProcessVo().from(dto)).collect(Collectors.toList());
+    }
+
+    public SceneVo save(SceneVo vo) {
+        SceneDto2 dto = SceneDtoConverter.createFrom(vo);
+        SceneDto2 ret = sceneService.save(dto);
+        vo.from(dto);
+        return vo;
     }
 }

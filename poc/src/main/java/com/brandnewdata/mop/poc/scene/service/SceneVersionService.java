@@ -5,11 +5,11 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.NumberUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.brandnewdata.mop.poc.bff.vo.operate.condition.Scene;
 import com.brandnewdata.mop.poc.constant.SceneConst;
 import com.brandnewdata.mop.poc.scene.dao.SceneVersionDao;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
 import com.brandnewdata.mop.poc.scene.po.SceneVersionPo;
+import com.brandnewdata.mop.poc.scene.converter.SceneVersionPoConverter;
 import com.brandnewdata.mop.poc.util.CollectorsUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -56,6 +56,13 @@ public class SceneVersionService implements ISceneVersionService {
         return sceneVersionPos.stream().collect(Collectors.groupingBy(SceneVersionPo::getSceneId,
                 Collectors.mapping(po -> new SceneVersionDto().from(po),
                         CollectorsUtil.toSortedList((o1, o2) -> o2.getUpdateTime().compareTo(o1.getUpdateTime())))));
+    }
+
+    @Override
+    public SceneVersionDto save(SceneVersionDto sceneVersionDto) {
+        SceneVersionPo sceneVersionPo = new SceneVersionPoConverter().createFrom(sceneVersionDto);
+        sceneVersionDao.insert(sceneVersionPo);
+        return new SceneVersionDto().from(sceneVersionPo);
     }
 
 }

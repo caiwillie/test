@@ -51,7 +51,8 @@ public class SceneController2 {
      */
     @PostMapping(value = "/rest/scene/save")
     public Result<SceneVo> save(@RequestBody SceneVo sceneVo) {
-        return Result.OK();
+        SceneVo ret = sceneBffService.save(sceneVo);
+        return Result.OK(ret);
     }
 
     /**

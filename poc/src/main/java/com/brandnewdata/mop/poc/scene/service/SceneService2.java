@@ -1,14 +1,17 @@
 package com.brandnewdata.mop.poc.scene.service;
 
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.scene.dao.SceneDao;
 import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
+import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
 import com.brandnewdata.mop.poc.scene.po.ScenePo;
-import com.brandnewdata.mop.poc.scene.po.ScenePoExt;
+import com.brandnewdata.mop.poc.scene.converter.ScenePoConverter;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -21,6 +24,12 @@ public class SceneService2 implements ISceneService2{
 
     @Resource
     private SceneDao sceneDao;
+
+    private final ISceneVersionService sceneVersionService;
+
+    public SceneService2(ISceneVersionService sceneVersionService) {
+        this.sceneVersionService = sceneVersionService;
+    }
 
     @Override
     public Page<SceneDto2> page(int pageNum, int pageSize, String name) {
@@ -40,11 +49,22 @@ public class SceneService2 implements ISceneService2{
         Long sceneId = sceneDto.getId();
         ScenePo scenePo = getScenePoById(sceneId);
         if(scenePo == null) {
-            scenePo = new ScenePoExt().createFrom(sceneDto);
-        } else {
+            // 新增场景
+            scenePo = ScenePoConverter.createFrom(sceneDto);
+            sceneDao.insert(scenePo);
 
+            // 新增初始化版本
+            SceneVersionDto sceneVersionDto = new SceneVersionDto();
+            sceneVersionDto.setSceneId(scenePo.getId());
+            sceneVersionDto.setVersion(DateUtil.format(scenePo.getCreateTime(), DatePattern.PURE_DATETIME_PATTERN));
+            sceneVersionService.save(sceneVersionDto);
+
+
+        } else {
+            ScenePoConverter.updateFrom(sceneDto, scenePo);
+            sceneDao.updateById(scenePo);
         }
-        return null;
+        return new SceneDto2().from(scenePo);
     }
 
     private ScenePo getScenePoById(Long sceneId) {
