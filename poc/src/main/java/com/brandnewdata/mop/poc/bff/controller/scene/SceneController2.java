@@ -91,7 +91,6 @@ public class SceneController2 {
         return;
     }
 
-
     /**
      * 获取场景下的版本列表
      * @param sceneId 场景id
@@ -114,7 +113,6 @@ public class SceneController2 {
         List<VersionProcessVo> versionProcessVoList = sceneBffService.processList(versionId);
         return Result.OK(versionProcessVoList);
     }
-
 
     /**
      * 部署新版本
