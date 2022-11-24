@@ -105,7 +105,7 @@
         <dependency>
             <groupId>org.jooq</groupId>
             <artifactId>jooq</artifactId>
-            <version>3.16.11</version>
+            <version>3.14.11</version>
         </dependency>
 
         <!-- nacos -->
@@ -237,8 +237,6 @@
             <artifactId>application-connector-api</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-
-
 
     </dependencies>
 
