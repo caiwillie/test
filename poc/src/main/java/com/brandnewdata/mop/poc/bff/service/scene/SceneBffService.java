@@ -3,6 +3,7 @@ package com.brandnewdata.mop.poc.bff.service.scene;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.lang.Opt;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVersionVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.VersionProcessVo;
@@ -57,8 +58,8 @@ public class SceneBffService {
         for (SceneDto2 sceneDto : records) {
             SceneVo sceneVo = new SceneVo().from(sceneDto);
             Long versionId = sceneVersionDtoMap.get(sceneVo.getId()).getId();
-            Integer count = countMap.get(versionId);
-            String img = processDtoMap.get(versionId).getProcessImg();
+            Integer count = Opt.ofNullable(countMap.get(versionId)).orElse(0);
+            String img = Opt.ofNullable(processDtoMap.get(versionId)).map(VersionProcessDto::getProcessImg).orElse(null);
             sceneVo.setProcessCount(count);
             sceneVo.setImgUrl(img);
             sceneVos.add(sceneVo);

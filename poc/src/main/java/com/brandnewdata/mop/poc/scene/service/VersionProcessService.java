@@ -6,6 +6,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.log.Log;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.constant.SceneConst;
 import com.brandnewdata.mop.poc.scene.dao.SceneVersionDao;
@@ -15,12 +16,16 @@ import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
 import com.brandnewdata.mop.poc.scene.manager.JooqManager;
 import com.brandnewdata.mop.poc.scene.po.SceneVersionPo;
 import com.brandnewdata.mop.poc.scene.po.VersionProcessPo;
+import com.dxy.library.json.jackson.JacksonUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class VersionProcessService implements IVersionProcessService {
 
@@ -50,7 +55,19 @@ public class VersionProcessService implements IVersionProcessService {
 
     @Override
     public Map<Long, VersionProcessDto> fetchVersionProcessById(List<Long> idList) {
-        return null;
+        if(CollUtil.isEmpty(idList)) return MapUtil.empty();
+        if(idList.stream().filter(Objects::isNull).count() > 0) {
+            log.error("版本id列表不能含有空值。idList：{}", JacksonUtil.to(idList));
+            throw new RuntimeException("版本id列表不能含有空值");
+        }
+
+        QueryWrapper<VersionProcessPo> query = new QueryWrapper<>();
+        query.in(VersionProcessPo.ID, idList);
+
+        List<VersionProcessPo> versionProcessPos = versionProcessDao.selectList(query);
+
+        return versionProcessPos.stream().map(po -> new VersionProcessDto().from(po))
+                .collect(Collectors.toMap(VersionProcessDto::getId, Function.identity()));
     }
 
     @Override
