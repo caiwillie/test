@@ -20,5 +20,6 @@ public interface ISceneService2 {
      */
     Page<SceneDto2> page(int pageNum, int pageSize, String name);
 
+    SceneDto2 save(SceneDto2 sceneDto);
 
 }

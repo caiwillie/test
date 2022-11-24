@@ -44,4 +44,9 @@ public class SceneService2 implements ISceneService2{
         return new Page<>(page.getTotal(), records);
     }
 
+    @Override
+    public SceneDto2 save(SceneDto2 sceneDto) {
+        return null;
+    }
+
 }
