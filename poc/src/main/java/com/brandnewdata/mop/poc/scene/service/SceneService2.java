@@ -14,6 +14,7 @@ import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
 import com.brandnewdata.mop.poc.scene.po.ScenePo;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -46,6 +47,7 @@ public class SceneService2 implements ISceneService2{
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public SceneDto2 save(SceneDto2 sceneDto) {
         Long sceneId = sceneDto.getId();
         ScenePo scenePo = null;
