@@ -69,7 +69,9 @@ public class SceneService2 implements ISceneService2{
 
     private ScenePo getScenePoById(Long sceneId) {
         Assert.notNull(sceneId, "场景id不能为空");
-        return sceneDao.selectById(sceneId);
+        ScenePo scenePo = sceneDao.selectById(sceneId);
+        Assert.notNull(scenePo, "场景id不存在");
+        return scenePo;
     }
 
 }
