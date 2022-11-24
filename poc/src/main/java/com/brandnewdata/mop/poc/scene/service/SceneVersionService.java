@@ -60,7 +60,7 @@ public class SceneVersionService implements ISceneVersionService {
 
     @Override
     public SceneVersionDto save(SceneVersionDto sceneVersionDto) {
-        SceneVersionPo sceneVersionPo = new SceneVersionPoConverter().createFrom(sceneVersionDto);
+        SceneVersionPo sceneVersionPo = SceneVersionPoConverter.createFrom(sceneVersionDto);
         sceneVersionDao.insert(sceneVersionPo);
         return new SceneVersionDto().from(sceneVersionPo);
     }

@@ -7,11 +7,12 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
+import com.brandnewdata.mop.poc.constant.SceneConst;
+import com.brandnewdata.mop.poc.scene.converter.ScenePoConverter;
 import com.brandnewdata.mop.poc.scene.dao.SceneDao;
 import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
 import com.brandnewdata.mop.poc.scene.po.ScenePo;
-import com.brandnewdata.mop.poc.scene.converter.ScenePoConverter;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -57,6 +58,7 @@ public class SceneService2 implements ISceneService2{
             SceneVersionDto sceneVersionDto = new SceneVersionDto();
             sceneVersionDto.setSceneId(scenePo.getId());
             sceneVersionDto.setVersion(DateUtil.format(scenePo.getCreateTime(), DatePattern.PURE_DATETIME_PATTERN));
+            sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__CONFIG);
             sceneVersionService.save(sceneVersionDto);
 
         } else {
