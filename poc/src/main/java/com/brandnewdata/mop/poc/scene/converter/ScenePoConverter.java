@@ -1,6 +1,5 @@
 package com.brandnewdata.mop.poc.scene.converter;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Opt;
 import com.brandnewdata.mop.poc.scene.dto.SceneDto2;

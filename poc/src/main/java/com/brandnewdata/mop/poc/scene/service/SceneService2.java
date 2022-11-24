@@ -8,6 +8,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.constant.SceneConst;
+import com.brandnewdata.mop.poc.scene.converter.SceneDtoConverter;
 import com.brandnewdata.mop.poc.scene.converter.ScenePoConverter;
 import com.brandnewdata.mop.poc.scene.dao.SceneDao;
 import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
@@ -42,7 +43,7 @@ public class SceneService2 implements ISceneService2{
         queryWrapper.orderByDesc(ScenePo.UPDATE_TIME);
         page = sceneDao.selectPage(page, queryWrapper);
         List<ScenePo> scenePoList = Optional.ofNullable(page.getRecords()).orElse(ListUtil.empty());
-        List<SceneDto2> records = scenePoList.stream().map(po -> new SceneDto2().from(po)).collect(Collectors.toList());
+        List<SceneDto2> records = scenePoList.stream().map(SceneDtoConverter::from).collect(Collectors.toList());
         return new Page<>(page.getTotal(), records);
     }
 
@@ -68,7 +69,7 @@ public class SceneService2 implements ISceneService2{
             ScenePoConverter.updateFrom(sceneDto, scenePo);
             sceneDao.updateById(scenePo);
         }
-        return new SceneDto2().from(scenePo);
+        return SceneDtoConverter.from(scenePo);
     }
 
     private ScenePo getScenePoById(Long sceneId) {

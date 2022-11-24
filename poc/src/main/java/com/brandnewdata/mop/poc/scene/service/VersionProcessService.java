@@ -2,19 +2,13 @@ package com.brandnewdata.mop.poc.scene.service;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.log.Log;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.brandnewdata.mop.poc.constant.SceneConst;
-import com.brandnewdata.mop.poc.scene.dao.SceneVersionDao;
+import com.brandnewdata.mop.poc.scene.converter.VersionProcessDtoConverter;
 import com.brandnewdata.mop.poc.scene.dao.VersionProcessDao;
-import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
 import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
 import com.brandnewdata.mop.poc.scene.manager.JooqManager;
-import com.brandnewdata.mop.poc.scene.po.SceneVersionPo;
 import com.brandnewdata.mop.poc.scene.po.VersionProcessPo;
 import com.dxy.library.json.jackson.JacksonUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +44,7 @@ public class VersionProcessService implements IVersionProcessService {
         List<VersionProcessPo> versionProcessPos = versionProcessDao.selectList(query);
 
         return versionProcessPos.stream().collect(Collectors.groupingBy(VersionProcessPo::getVersionId,
-                Collectors.mapping(po -> new VersionProcessDto().from(po), Collectors.toList())));
+                Collectors.mapping(VersionProcessDtoConverter::from, Collectors.toList())));
     }
 
     @Override
@@ -66,7 +60,7 @@ public class VersionProcessService implements IVersionProcessService {
 
         List<VersionProcessPo> versionProcessPos = versionProcessDao.selectList(query);
 
-        return versionProcessPos.stream().map(po -> new VersionProcessDto().from(po))
+        return versionProcessPos.stream().map(VersionProcessDtoConverter::from)
                 .collect(Collectors.toMap(VersionProcessDto::getId, Function.identity()));
     }
 

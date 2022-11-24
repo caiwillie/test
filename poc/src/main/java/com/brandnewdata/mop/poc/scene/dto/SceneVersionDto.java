@@ -1,7 +1,5 @@
 package com.brandnewdata.mop.poc.scene.dto;
 
-import cn.hutool.core.date.LocalDateTimeUtil;
-import com.brandnewdata.mop.poc.scene.po.SceneVersionPo;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,13 +20,5 @@ public class SceneVersionDto {
 
     private Integer status;
 
-    public SceneVersionDto from(SceneVersionPo po) {
-        this.setId(po.getId());
-        this.setCreateTime(LocalDateTimeUtil.of(po.getCreateTime()));
-        this.setUpdateTime(LocalDateTimeUtil.of(po.getUpdateTime()));
-        this.setVersion(po.getVersion());
-        this.setSceneId(po.getSceneId());
-        this.setStatus(po.getStatus());
-        return this;
-    }
+
 }

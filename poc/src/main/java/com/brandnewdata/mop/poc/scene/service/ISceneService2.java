@@ -1,10 +1,7 @@
 package com.brandnewdata.mop.poc.scene.service;
 
 import com.brandnewdata.mop.poc.common.dto.Page;
-import com.brandnewdata.mop.poc.scene.dto.*;
-
-import java.util.List;
-import java.util.Map;
+import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
 
 /**
  * @author caiwillie

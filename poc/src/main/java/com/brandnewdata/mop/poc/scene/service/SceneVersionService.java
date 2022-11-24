@@ -6,10 +6,11 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.NumberUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.constant.SceneConst;
+import com.brandnewdata.mop.poc.scene.converter.SceneVersionDtoConverter;
+import com.brandnewdata.mop.poc.scene.converter.SceneVersionPoConverter;
 import com.brandnewdata.mop.poc.scene.dao.SceneVersionDao;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
 import com.brandnewdata.mop.poc.scene.po.SceneVersionPo;
-import com.brandnewdata.mop.poc.scene.converter.SceneVersionPoConverter;
 import com.brandnewdata.mop.poc.util.CollectorsUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -54,7 +55,7 @@ public class SceneVersionService implements ISceneVersionService {
         query.in(SceneVersionPo.SCENE_ID, sceneIdList);
         List<SceneVersionPo> sceneVersionPos = sceneVersionDao.selectList(query);
         return sceneVersionPos.stream().collect(Collectors.groupingBy(SceneVersionPo::getSceneId,
-                Collectors.mapping(po -> new SceneVersionDto().from(po),
+                Collectors.mapping(SceneVersionDtoConverter::from,
                         CollectorsUtil.toSortedList((o1, o2) -> o2.getUpdateTime().compareTo(o1.getUpdateTime())))));
     }
 
@@ -62,7 +63,7 @@ public class SceneVersionService implements ISceneVersionService {
     public SceneVersionDto save(SceneVersionDto sceneVersionDto) {
         SceneVersionPo sceneVersionPo = SceneVersionPoConverter.createFrom(sceneVersionDto);
         sceneVersionDao.insert(sceneVersionPo);
-        return new SceneVersionDto().from(sceneVersionPo);
+        return SceneVersionDtoConverter.from(sceneVersionPo);
     }
 
 }

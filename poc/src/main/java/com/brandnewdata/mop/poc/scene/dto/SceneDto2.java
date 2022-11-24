@@ -1,7 +1,5 @@
 package com.brandnewdata.mop.poc.scene.dto;
 
-import cn.hutool.core.date.LocalDateTimeUtil;
-import com.brandnewdata.mop.poc.scene.po.ScenePo;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -31,11 +29,5 @@ public class SceneDto2 {
     private LocalDateTime updateTime;
 
 
-    public SceneDto2 from(ScenePo po) {
-        this.setId(po.getId());
-        this.setName(po.getName());
-        this.setCreateTime(LocalDateTimeUtil.of(po.getCreateTime()));
-        this.setUpdateTime(LocalDateTimeUtil.of(po.getUpdateTime()));
-        return this;
-    }
+
 }

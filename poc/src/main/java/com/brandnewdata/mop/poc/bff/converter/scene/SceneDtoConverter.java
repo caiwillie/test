@@ -1,7 +1,6 @@
 package com.brandnewdata.mop.poc.bff.converter.scene;
 
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVo;
-import com.brandnewdata.mop.poc.scene.dto.SceneDto;
 import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
 
 public class SceneDtoConverter {
