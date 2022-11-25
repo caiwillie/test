@@ -173,12 +173,13 @@ public class SceneController2 {
     /**
      * 保存版本下的流程
      *
-     * @param versionProcessVo the version process vo
+     * @param vo the version process vo
      * @return the result
      */
     @PostMapping(value = "/rest/scene/version/process/save")
-    public Result<VersionProcessVo> processSave(@RequestBody VersionProcessVo versionProcessVo) {
-        return Result.OK();
+    public Result<VersionProcessVo> processSave(@RequestBody VersionProcessVo vo) {
+        VersionProcessVo ret = sceneBffService.processSave(vo);
+        return Result.OK(ret);
     }
 
     /**

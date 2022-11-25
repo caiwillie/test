@@ -5,6 +5,7 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Opt;
 import com.brandnewdata.mop.poc.bff.converter.scene.SceneDtoConverter;
+import com.brandnewdata.mop.poc.bff.converter.scene.VersionProcessDtoConverter;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVersionVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.VersionProcessVo;
@@ -86,5 +87,10 @@ public class SceneBffService {
     public SceneVo save(SceneVo vo) {
         SceneDto2 ret = sceneService.save(SceneDtoConverter.createFrom(vo));
         return vo.from(ret);
+    }
+
+    public VersionProcessVo processSave(VersionProcessVo vo) {
+        VersionProcessDto dto = versionProcessService.save(VersionProcessDtoConverter.createFrom(vo));
+        return new VersionProcessVo().from(dto);
     }
 }

@@ -2,6 +2,7 @@ package com.brandnewdata.mop.poc.scene.service;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
@@ -108,7 +109,11 @@ public class VersionProcessService implements IVersionProcessService {
 
     @Override
     public VersionProcessDto save(VersionProcessDto versionProcessDto) {
+        Long versionId = versionProcessDto.getVersionId();
+        Assert.notNull(versionId, "版本id不能为空");
         String processXml = versionProcessDto.getProcessXml();
+        Assert.notNull(processXml, "流程定义不能为空");
+
         BizDeployDto bizDeployDto = new BizDeployDto();
         bizDeployDto.setProcessId(null);
         bizDeployDto.setProcessName(null);
