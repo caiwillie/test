@@ -3,9 +3,7 @@ package com.brandnewdata.mop.poc.echarts;
 import org.icepear.echarts.Line;
 import org.icepear.echarts.Option;
 import org.icepear.echarts.charts.line.LineSeries;
-import org.icepear.echarts.charts.treemap.TreemapSeries;
 import org.icepear.echarts.components.coord.cartesian.CategoryAxis;
-import org.icepear.echarts.origin.util.SeriesOption;
 import org.icepear.echarts.render.Engine;
 import org.junit.jupiter.api.Test;
 
