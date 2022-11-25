@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.process.cache;
+package com.brandnewdata.mop.poc.process.manager;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
@@ -10,21 +10,24 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import io.camunda.zeebe.client.ZeebeClient;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Optional;
 
 @Component
-public class ZeebeClientPool {
+public class ZeebeClientManager {
 
     @Resource
     private IEnvService envService;
 
+    @Value("${brandnewdata.cloud-native.zeebe.zeebe-gateway.port}")
+    private Integer zeebeGatewayPort;
     private final LoadingCache<Long, ZeebeClient> CACHE = CacheBuilder.newBuilder().build(getCacheLoader());
 
     @SneakyThrows
-    public ZeebeClient getByEnv(Long envId) {
+    public ZeebeClient getByEnvId(Long envId) {
         return CACHE.get(envId);
     }
 
@@ -34,23 +37,20 @@ public class ZeebeClientPool {
             public ZeebeClient load(Long key) throws Exception {
                 EnvDto envDto = envService.getOne(key);
                 Assert.notNull(envDto, "环境不存在");
-                Optional<EnvServiceDto> serviceOpt = envService.listEnvService(key).stream().filter(
-                                envServiceDto -> StrUtil.equals(envServiceDto.getName(), "camunda-platform-zeebe-gateway"))
+                Optional<EnvServiceDto> serviceOpt = envService.listEnvService(key).stream()
+                        .filter(envServiceDto -> StrUtil.equals(envServiceDto.getName(), "camunda-platform-zeebe-gateway"))
                         .findFirst();
                 Assert.isTrue(serviceOpt.isPresent(), "【ENV01】获取环境信息有误");
                 EnvServiceDto envServiceDto = serviceOpt.get();
-                String clusterIp = envServiceDto.getClusterIp();
+                String serviceName = envServiceDto.getName();
+                String namespace = envDto.getNamespace();
                 ZeebeClient client = ZeebeClient.newClientBuilder()
-                        .gatewayAddress(StrUtil.format("{}:26500", clusterIp))
+                        .gatewayAddress(StrUtil.format("{}.{}:{}", serviceName, namespace, zeebeGatewayPort))
                         .usePlaintext()
                         .build();
                 return client;
             }
         };
-    }
-
-    public static void main(String[] args) {
-
     }
 
 }

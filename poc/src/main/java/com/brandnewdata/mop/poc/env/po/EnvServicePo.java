@@ -1,8 +1,6 @@
 package com.brandnewdata.mop.poc.env.po;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,6 +22,7 @@ public class EnvServicePo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     @TableField(fill = FieldFill.INSERT)
@@ -38,9 +37,6 @@ public class EnvServicePo implements Serializable {
 
     private String clusterIp;
 
-    private String ports;
-
-
     public static final String ID = "id";
 
     public static final String CREATE_TIME = "create_time";
@@ -52,7 +48,5 @@ public class EnvServicePo implements Serializable {
     public static final String ENV_ID = "env_id";
 
     public static final String CLUSTER_IP = "cluster_ip";
-
-    public static final String PORTS = "ports";
 
 }

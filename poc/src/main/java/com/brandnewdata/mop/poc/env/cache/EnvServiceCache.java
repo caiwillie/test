@@ -47,7 +47,6 @@ public class EnvServiceCache {
         ret.setName(entity.getStr(EnvServicePo.NAME));
         ret.setEnvId(entity.getLong(EnvServicePo.ENV_ID));
         ret.setClusterIp(entity.getStr(EnvServicePo.CLUSTER_IP));
-        ret.setPorts(entity.getStr(EnvServicePo.PORTS));
         return ret;
     }
 
