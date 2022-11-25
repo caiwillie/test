@@ -90,7 +90,7 @@ public class SceneBffService {
     }
 
     public VersionProcessVo processSave(VersionProcessVo vo) {
-        VersionProcessDto dto = versionProcessService.save(VersionProcessDtoConverter.createFrom(vo));
+        VersionProcessDto dto = sceneVersionService.saveProcess(VersionProcessDtoConverter.createFrom(vo));
         return new VersionProcessVo().from(dto);
     }
 }

@@ -7,6 +7,7 @@ import cn.hutool.core.lang.Opt;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.NumberUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.brandnewdata.mop.poc.bff.vo.scene.VersionProcessVo;
 import com.brandnewdata.mop.poc.constant.SceneConst;
 import com.brandnewdata.mop.poc.scene.converter.SceneVersionDtoConverter;
 import com.brandnewdata.mop.poc.scene.converter.SceneVersionPoConverter;
@@ -74,6 +75,20 @@ public class SceneVersionService implements ISceneVersionService {
         SceneVersionPo sceneVersionPo = SceneVersionPoConverter.createFrom(sceneVersionDto);
         sceneVersionDao.insert(sceneVersionPo);
         return SceneVersionDtoConverter.from(sceneVersionPo);
+    }
+
+    @Override
+    public VersionProcessDto saveProcess(VersionProcessDto dto) {
+        Long versionId = dto.getVersionId();
+        Assert.notNull(versionId, "版本id不能为空");
+
+        SceneVersionDto versionDto = fetchById(ListUtil.of(versionId)).get(versionId);
+        Assert.notNull(versionDto, "流程id不存在。id: {}", versionId);
+
+        if(!NumberUtil.equals(versionDto.getStatus(), SceneConst.SCENE_VERSION_STATUS__CONFIG)) {
+            throw new RuntimeException("版本状态异常，只能修改配置中的版本");
+        }
+        return versionProcessService.save(dto);
     }
 
     @Override
