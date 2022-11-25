@@ -54,7 +54,7 @@ public class ProcessGenerator {
                 .packageConfig(builder -> builder
                         .parent("com.brandnewdata.mop.poc")
                         // entity的包名称
-                        .entity("process.entity")
+                        .entity("process.po")
                         // dao层的包名称
                         .mapper("process.dao")
                 )
@@ -66,7 +66,7 @@ public class ProcessGenerator {
 
                         // 实体类的配置
                         .entityBuilder()
-                        .formatFileName("%sEntity") // 修改名称后缀
+                        .formatFileName("%sPo") // 修改名称后缀
                         .enableLombok() // 加上lombok注解
                         .enableColumnConstant() // 加上字段名常量
                         .addTableFills(
