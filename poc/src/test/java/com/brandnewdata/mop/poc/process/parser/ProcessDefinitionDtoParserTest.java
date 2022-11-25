@@ -2,7 +2,7 @@ package com.brandnewdata.mop.poc.process.parser;
 
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.json.JSONUtil;
-import com.brandnewdata.mop.poc.manager.ConnectorManager;
+import com.brandnewdata.mop.poc.process.manager.ConnectorManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;

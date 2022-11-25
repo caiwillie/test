@@ -9,7 +9,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
-import com.brandnewdata.mop.poc.process.ProcessConstants;
+import com.brandnewdata.mop.poc.constant.ProcessConst;
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
@@ -119,7 +119,7 @@ public class SceneService implements ISceneService {
     @Override
     public void deploy(SceneProcessDto sceneProcessDTO) {
         ProcessDefinitionDto processDefinitionDTO = toDTO(sceneProcessDTO);
-        processDeployService.deploy(processDefinitionDTO, ProcessConstants.PROCESS_TYPE_SCENE);
+        processDeployService.deploy(processDefinitionDTO, ProcessConst.PROCESS_TYPE_SCENE);
     }
 
     @Override

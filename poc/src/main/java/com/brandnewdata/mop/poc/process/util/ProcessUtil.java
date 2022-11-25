@@ -1,18 +1,22 @@
 package com.brandnewdata.mop.poc.process.util;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.process.parser.dto.Action;
 
+import java.util.regex.Pattern;
+
 public class ProcessUtil {
 
+    private static final Pattern PROCESS_PATERN = Pattern.compile("[a-zA-Z0-9.:-]+");
+
     public static String convertProcessId(String id) {
-        String result = null;
+        Assert.isTrue(ReUtil.isMatch(PROCESS_PATERN, id), "流程id智能包含大小写英文、数字、-");
         // . 和 :
-        result = StrUtil.replace(id, ".", "_");
-        result = StrUtil.replace(id, ":", "__");
-        return result;
+        id = StrUtil.replace(id, ".", "_");
+        return StrUtil.replace(id, ":", "__");
     }
 
     /**

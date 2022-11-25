@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.manager;
+package com.brandnewdata.mop.poc.process.manager;
 
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
@@ -8,11 +8,11 @@ import com.brandnewdata.connector.api.IConnectorCommonTriggerProcessConfFeign;
 import com.brandnewdata.connector.api.IConnectorConfFeign;
 import com.brandnewdata.connector.api.ITriggerProtocolFeign;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
-import com.brandnewdata.mop.poc.manager.dto.ConfigInfo;
-import com.brandnewdata.mop.poc.manager.dto.ConnectorBasicInfo;
-import com.brandnewdata.mop.poc.manager.dto.TriggerInfo;
+import com.brandnewdata.mop.poc.process.manager.dto.ConfigInfo;
+import com.brandnewdata.mop.poc.process.manager.dto.ConnectorBasicInfo;
+import com.brandnewdata.mop.poc.process.manager.dto.TriggerInfo;
 import com.brandnewdata.mop.poc.process.parser.dto.Action;
-import com.brandnewdata.mop.poc.process.parser.dto.Step3Result;
+import com.brandnewdata.mop.poc.process.parser.dto.Step2Result;
 import com.dxy.library.json.jackson.JacksonUtil;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
@@ -87,14 +87,14 @@ public class ConnectorManager {
     }
 
     @SneakyThrows
-    public void saveRequestParams(Step3Result step3Result) {
+    public void saveRequestParams(Step2Result step2Result) {
         IConnectorCommonTriggerProcessConfFeign.ConnectorCommonTriggerProcessConfParamDTO dto =
                 new IConnectorCommonTriggerProcessConfFeign.ConnectorCommonTriggerProcessConfParamDTO();
-        dto.setProcessId(step3Result.getProcessId());
-        dto.setProcessName(step3Result.getName());
-        dto.setProtocol(step3Result.getProtocol());
-        dto.setConfig(JacksonUtil.to(step3Result.getRequestParams()));
-        dto.setTriggerFullId(step3Result.getTrigger().getFullId());
+        dto.setProcessId(step2Result.getProcessId());
+        dto.setProcessName(step2Result.getName());
+        dto.setProtocol(step2Result.getProtocol());
+        dto.setConfig(JacksonUtil.to(step2Result.getRequestParams()));
+        dto.setTriggerFullId(step2Result.getTrigger().getFullId());
         Integer success = triggerClient.save(dto);
         if(success == null || success != 1) {
             throw new RuntimeException("保存监听配置失败");

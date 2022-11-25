@@ -1,6 +1,6 @@
 package com.brandnewdata.mop.poc.process.parser;
 
-import com.brandnewdata.mop.poc.manager.ConnectorManager;
+import com.brandnewdata.mop.poc.process.manager.ConnectorManager;
 import com.brandnewdata.mop.poc.process.parser.dto.Step1Result;
 
 import java.util.Map;

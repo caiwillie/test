@@ -8,7 +8,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Opt;
 import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
-import com.brandnewdata.mop.poc.manager.ConnectorManager;
+import com.brandnewdata.mop.poc.process.manager.ConnectorManager;
 import com.brandnewdata.mop.poc.process.parser.constants.StringPool;
 import com.brandnewdata.mop.poc.process.parser.dto.*;
 import com.brandnewdata.mop.poc.process.util.ProcessUtil;
@@ -35,7 +35,7 @@ import static com.brandnewdata.mop.poc.process.parser.constants.QNameConstants.*
 
 @Slf4j
 public class ProcessDefinitionParser implements
-        ProcessDefinitionParseStep1, ProcessDefinitionParseStep2, ProcessDefinitionParseStep3 {
+        ProcessDefinitionParseStep1, ProcessDefinitionParseStep2 {
 
     private String oldDocument;
 
@@ -221,24 +221,12 @@ public class ProcessDefinitionParser implements
         return this;
     }
 
-    @Override
-    public ProcessDefinitionParseStep3 step3() {
-        return this;
-    }
 
     @Override
     public Step2Result step2Result() {
         Step1Result step1Result = step1Result();
         Step2Result ret = new Step2Result();
         BeanUtil.copyProperties(step1Result, ret);
-        return ret;
-    }
-
-    @Override
-    public Step3Result step3Result() {
-        Step2Result step2Result = step2Result();
-        Step3Result ret = new Step3Result();
-        BeanUtil.copyProperties(step2Result, ret);
         ret.setProtocol(protocol);
         ret.setTrigger(trigger);
         ret.setRequestParams(requestParams);
@@ -811,12 +799,12 @@ public class ProcessDefinitionParser implements
         String xml = manager.getTriggerXML(trigger);
 
         // 解析自定义触发器内的通用触发器
-        Step3Result step3Result = ProcessDefinitionParser
+        Step2Result step3Result = ProcessDefinitionParser
                 .step1(trigger.getFullId(), null, xml)
                 .replServiceTask(false, null)
                 .replAttr()
                 .step2().replEleTriggerSe(manager)
-                .step3().step3Result();
+                .step2Result();
 
         // 替换成真实协议
         protocol = step3Result.getProtocol();
