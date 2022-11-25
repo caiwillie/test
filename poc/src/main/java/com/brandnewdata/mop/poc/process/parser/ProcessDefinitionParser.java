@@ -333,8 +333,9 @@ public class ProcessDefinitionParser implements
             processId = bpProcess.attributeValue(ID_ATTRIBUTE);
         }
 
-        Assert.notEmpty(processId, ErrorMessage.NOT_NULL("流程 id"));
-        bpProcess.addAttribute(ID_ATTRIBUTE, ProcessUtil.convertProcessId(processId));
+        processId = ProcessUtil.convertProcessId(processId);
+        Assert.notEmpty(processId, "流程配置错误：流程id不能为空");
+        bpProcess.addAttribute(ID_ATTRIBUTE, processId);
 
         if(name == null) {
             name = bpProcess.attributeValue(NAME_ATTRIBUTE);

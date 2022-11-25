@@ -3,9 +3,14 @@ package com.brandnewdata.mop.poc.scene.service;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.brandnewdata.mop.poc.process.dto.BizDeployDto;
+import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionStaticParseDto;
+import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService2;
 import com.brandnewdata.mop.poc.scene.converter.VersionProcessDtoConverter;
+import com.brandnewdata.mop.poc.scene.converter.VersionProcessPoConverter;
 import com.brandnewdata.mop.poc.scene.dao.VersionProcessDao;
 import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
 import com.brandnewdata.mop.poc.scene.manager.JooqManager;
@@ -28,6 +33,12 @@ public class VersionProcessService implements IVersionProcessService {
 
     @Resource
     private VersionProcessDao versionProcessDao;
+
+    private final IProcessDefinitionService2 processDefinitionService;
+
+    public VersionProcessService(IProcessDefinitionService2 processDefinitionService) {
+        this.processDefinitionService = processDefinitionService;
+    }
 
     @Override
     public Map<Long, List<VersionProcessDto>> fetchVersionProcessListByVersionId(List<Long> versionIdList, boolean simple) {
@@ -94,4 +105,37 @@ public class VersionProcessService implements IVersionProcessService {
         Map<Long, VersionProcessDto> versionProcessMap = fetchVersionProcessById(ListUtil.toList(idMap.values()));
         return idMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> versionProcessMap.get(entry.getValue())));
     }
+
+    @Override
+    public VersionProcessDto save(VersionProcessDto versionProcessDto) {
+        String processXml = versionProcessDto.getProcessXml();
+        BizDeployDto bizDeployDto = new BizDeployDto();
+        bizDeployDto.setProcessId(null);
+        bizDeployDto.setProcessName(null);
+        bizDeployDto.setProcessXml(processXml);
+        ProcessDefinitionStaticParseDto processDefinitionStaticParseDto = processDefinitionService.staticParse(bizDeployDto);
+
+        String processId = processDefinitionStaticParseDto.getProcessId();
+        String name = processDefinitionStaticParseDto.getName();
+
+        Long id = versionProcessDto.getId();
+        if(id == null) {
+            // 手动指定
+            versionProcessDto.setId(IdUtil.getSnowflakeNextId());
+            versionProcessDto.setProcessId(processId);
+            versionProcessDto.setProcessName(name);
+            versionProcessDao.insert(VersionProcessPoConverter.createFrom(versionProcessDto));
+        } else {
+            versionProcessDto = fetchVersionProcessById(ListUtil.of(id)).get(id);
+            if(!StrUtil.equals(versionProcessDto.getProcessId(), processId)) {
+                throw new RuntimeException("流程id不能改变");
+            }
+            versionProcessDto.setProcessName(name);
+            versionProcessDao.updateById(VersionProcessPoConverter.createFrom(versionProcessDto));
+        }
+
+        return versionProcessDto;
+    }
+
+
 }

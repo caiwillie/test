@@ -7,14 +7,12 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class ZeebeDeployDto {
-
-    private Long envId;
+public class BizDeployDto {
 
     private String processId;
 
     private String processName;
 
-    private String processZeebeXml;
+    private String processXml;
 
 }

@@ -12,4 +12,9 @@ public interface ISceneVersionService {
     Map<Long, List<SceneVersionDto>> fetchSceneVersionListBySceneId(List<Long> sceneIdList);
 
     SceneVersionDto save(SceneVersionDto sceneVersionDto);
+
+    SceneVersionDto debug(SceneVersionDto sceneVersionDto);
+    Map<Long, Long> countById(List<Long> sceneIdList);
+
+    Map<Long, SceneVersionDto> fetchById(List<Long> id);
 }

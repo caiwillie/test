@@ -37,6 +37,8 @@ public class ProcessReleaseDeployPo implements Serializable {
 
     private Long processZeebeKey;
 
+    private Integer processZeebeVersion;
+
     private String processZeebeXml;
 
 
@@ -51,6 +53,8 @@ public class ProcessReleaseDeployPo implements Serializable {
     public static final String PROCESS_ID = "process_id";
 
     public static final String PROCESS_ZEEBE_KEY = "process_zeebe_key";
+
+    public static final String PROCESS_ZEEBE_VERSION = "process_zeebe_version";
 
     public static final String PROCESS_ZEEBE_XML = "process_zeebe_xml";
 
