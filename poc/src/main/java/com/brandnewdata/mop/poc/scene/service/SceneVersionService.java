@@ -6,6 +6,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Opt;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.bff.vo.scene.VersionProcessVo;
 import com.brandnewdata.mop.poc.constant.SceneConst;
@@ -78,17 +79,21 @@ public class SceneVersionService implements ISceneVersionService {
     }
 
     @Override
-    public VersionProcessDto saveProcess(VersionProcessDto dto) {
+    public VersionProcessDto processSave(VersionProcessDto dto) {
+        Long versionId = dto.getVersionId();
+
+        return versionProcessService.save(dto);
+    }
+
+    @Override
+    public void processDelete(VersionProcessDto dto) {
         Long versionId = dto.getVersionId();
         Assert.notNull(versionId, "版本id不能为空");
 
         SceneVersionDto versionDto = fetchById(ListUtil.of(versionId)).get(versionId);
-        Assert.notNull(versionDto, "流程id不存在。id: {}", versionId);
+        Assert.notNull(versionDto, "版本id不存在。id: {}", versionId);
 
-        if(!NumberUtil.equals(versionDto.getStatus(), SceneConst.SCENE_VERSION_STATUS__CONFIG)) {
-            throw new RuntimeException("版本状态异常，只能修改配置中的版本");
-        }
-        return versionProcessService.save(dto);
+
     }
 
     @Override
@@ -133,5 +138,15 @@ public class SceneVersionService implements ISceneVersionService {
                 .collect(Collectors.toMap(SceneVersionDto::getId, Function.identity()));
     }
 
+    private void checkStatus(Long id, int status) {
+        Assert.notNull(id, "版本id不能为空");
+
+        SceneVersionDto versionDto = fetchById(ListUtil.of(id)).get(id);
+        Assert.notNull(versionDto, "流程id不存在。id: {}", id);
+
+        if(!NumberUtil.equals(versionDto.getStatus(), status)) {
+            throw new RuntimeException(StrUtil.format("版本状态异常，id: {}", id));
+        }
+    }
 
 }

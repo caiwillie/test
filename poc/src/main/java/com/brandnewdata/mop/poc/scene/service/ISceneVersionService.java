@@ -1,7 +1,5 @@
 package com.brandnewdata.mop.poc.scene.service;
 
-import com.brandnewdata.mop.poc.bff.vo.operate.condition.Version;
-import com.brandnewdata.mop.poc.bff.vo.scene.VersionProcessVo;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
 import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
 
@@ -16,7 +14,9 @@ public interface ISceneVersionService {
 
     SceneVersionDto save(SceneVersionDto sceneVersionDto);
 
-    VersionProcessDto saveProcess(VersionProcessDto dto);
+    VersionProcessDto processSave(VersionProcessDto dto);
+
+    void processDelete(VersionProcessDto dto);
 
     SceneVersionDto debug(SceneVersionDto sceneVersionDto);
     Map<Long, Long> countById(List<Long> sceneIdList);
