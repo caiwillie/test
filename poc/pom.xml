@@ -134,6 +134,12 @@
             <artifactId>jackson-module-scala_2.13</artifactId>
             <version>${jackson.version}</version>
         </dependency>
+        <!-- https://github.com/FasterXML/jackson-datatypes-misc  -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-json-org</artifactId>
+            <version>2.13.0</version>
+        </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
@@ -151,12 +157,13 @@
         <dependency>
             <groupId>co.elastic.clients</groupId>
             <artifactId>elasticsearch-java</artifactId>
-            <version>7.17.5</version><exclusions>
-            <exclusion>
-                <artifactId>jakarta.json-api</artifactId>
-                <groupId>jakarta.json</groupId>
-            </exclusion>
-        </exclusions>
+            <version>7.17.5</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>jakarta.json</groupId>
+                    <artifactId>jakarta.json-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- elasticsearch中用到的json默认为jakarta.json-api -->
         <dependency>
