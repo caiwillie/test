@@ -1,7 +1,7 @@
 package com.brandnewdata.mop.poc.operate.service;
 
 class InstanceServiceTest {
-    ProcessInstanceService instanceService = new ProcessInstanceService();
+
 
 }
 

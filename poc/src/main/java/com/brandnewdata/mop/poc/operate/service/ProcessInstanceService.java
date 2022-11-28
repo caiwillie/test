@@ -3,6 +3,7 @@ package com.brandnewdata.mop.poc.operate.service;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
@@ -19,6 +20,7 @@ import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.operate.entity.FlowNodeInstanceEntity;
 import com.brandnewdata.mop.poc.operate.entity.SequenceFlowEntity;
 import com.brandnewdata.mop.poc.operate.entity.listview.ProcessInstanceForListViewEntity;
+import com.brandnewdata.mop.poc.operate.manager.ElasticsearchManager;
 import com.brandnewdata.mop.poc.operate.schema.template.FlowNodeInstanceTemplate;
 import com.brandnewdata.mop.poc.operate.schema.template.ListViewTemplate;
 import com.brandnewdata.mop.poc.operate.schema.template.SequenceFlowTemplate;
@@ -40,8 +42,7 @@ import java.util.stream.Collectors;
 @Service
 public class ProcessInstanceService implements IProcessInstanceService {
 
-    @Autowired
-    private ListViewDao listViewDao;
+    private final ElasticsearchManager elasticsearchManager;
 
     @Autowired
     private SequenceFlowDao sequenceFlowDao;
@@ -54,6 +55,11 @@ public class ProcessInstanceService implements IProcessInstanceService {
 
     @Resource
     private ProcessInstanceNoExpCache processInstanceNoExpCache;
+
+    public ProcessInstanceService(ElasticsearchManager elasticsearchManager) {
+        this.elasticsearchManager = elasticsearchManager;
+    }
+
 
     public Page<ListViewProcessInstanceDto> page(Long deployId, Integer pageNum, Integer pageSize) {
         Assert.notNull(deployId);
@@ -74,6 +80,8 @@ public class ProcessInstanceService implements IProcessInstanceService {
                         .build())
                 .build();
 
+        // todo caiwillie
+        ListViewDao listViewDao = null;
         List<ProcessInstanceForListViewEntity> processInstanceForListViewEntities = listViewDao.scrollAll(query, ElasticsearchUtil.QueryType.ALL);
 
         List<ListViewProcessInstanceDto> processInstanceDTOS = processInstanceForListViewEntities.stream().map(entity -> {
@@ -102,6 +110,9 @@ public class ProcessInstanceService implements IProcessInstanceService {
                                 .build())
                         .build())
                 .build();
+
+        // todo caiwillie
+        ListViewDao listViewDao = null;
         ProcessInstanceForListViewEntity entity = listViewDao.searchOne(query);
         ListViewProcessInstanceDto dto = new ListViewProcessInstanceDto();
         return dto.from(entity);
@@ -193,6 +204,9 @@ public class ProcessInstanceService implements IProcessInstanceService {
                         .build())
                 .build();
 
+
+        // todo caiwillie
+        ListViewDao listViewDao = null;
         List<ProcessInstanceForListViewEntity> entities = listViewDao.scrollAll(query, ElasticsearchUtil.QueryType.ONLY_RUNTIME);
 
         for (ProcessInstanceForListViewEntity entity : entities) {
@@ -209,11 +223,11 @@ public class ProcessInstanceService implements IProcessInstanceService {
     }
 
     @Override
-    public Page<ListViewProcessInstanceDto> pageProcessInstanceByZeebeKey(
+    public Page<ListViewProcessInstanceDto> pageProcessInstanceByZeebeKey(Long envId,
             List<Long> zeebeKeyList, int pageNum, int pageSize, Map<String, Object> extra) {
         if(CollUtil.isEmpty(zeebeKeyList)) return new Page<>(0, ListUtil.empty());
 
-        List<ListViewProcessInstanceDto> processInstanceDtoList = listProcessInstanceByZeebeKey(zeebeKeyList);
+        List<ListViewProcessInstanceDto> processInstanceDtoList = listProcessInstanceByZeebeKey(envId, zeebeKeyList);
 
         PageEnhancedUtil.setFirstPageNo(1);
         List<ListViewProcessInstanceDto> records = PageEnhancedUtil.slice(pageNum, pageSize, processInstanceDtoList);
@@ -229,7 +243,7 @@ public class ProcessInstanceService implements IProcessInstanceService {
     }
 
     @Override
-    public List<ListViewProcessInstanceDto> listProcessInstanceByZeebeKey(List<Long> zeebeKeyList) {
+    public List<ListViewProcessInstanceDto> listProcessInstanceByZeebeKey(Long envId, List<Long> zeebeKeyList) {
         if(CollUtil.isEmpty(zeebeKeyList)) return ListUtil.empty();
 
         List<FieldValue> values = zeebeKeyList.stream().map(key -> new FieldValue.Builder().longValue(key).build())
@@ -248,6 +262,8 @@ public class ProcessInstanceService implements IProcessInstanceService {
                         .build())
                 .build();
 
+        ElasticsearchClient elasticsearchClient = elasticsearchManager.getByEnvId(envId);
+        ListViewDao listViewDao = ListViewDao.getInstance(elasticsearchClient);
         List<ProcessInstanceForListViewEntity> processInstanceForListViewEntities = listViewDao.scrollAll(query, ElasticsearchUtil.QueryType.ALL);
 
         return processInstanceForListViewEntities.stream().map(entity -> {

@@ -131,11 +131,13 @@ public class SceneBffService {
         Assert.notNull(versionId, "版本id不能为空");
         SceneVersionDto sceneVersionDto = sceneVersionService.fetchById(ListUtil.of(versionId)).get(versionId);
         Assert.notNull(sceneVersionDto, "版本不存在。version id：{}", versionId);
-        Assert.isTrue(NumberUtil.equals(sceneVersionDto.getStatus(), SceneConst.SCENE_VERSION_STATUS__DEBUGGING),
-                "版本状态异常。仅处理：调试中");
+        Assert.isTrue(NumberUtil.equals(sceneVersionDto.getStatus(), SceneConst.SCENE_VERSION_STATUS__DEBUGGING)
+                || NumberUtil.equals(sceneVersionDto.getStatus(), SceneConst.SCENE_VERSION_STATUS__CONFIGURING),
+                "版本状态异常。仅支持以下状态：配置中、调试中");
 
         // 获取调试环境
         EnvDto debugEnv = envService.fetchDebugEnv();
+        Long envId = debugEnv.getId();
 
         // 获取该版本下当前的流程定义
         List<VersionProcessDto> versionProcessDtoList =
@@ -146,13 +148,13 @@ public class SceneBffService {
 
         // 获取流程定义
         Map<String, List<ProcessSnapshotDeployDto>> snapshotDeployMap =
-                processDeployService.listSnapshotByProcessIdAndEnvId(debugEnv.getId(), ListUtil.toList(versionProcessDtoMap.keySet()));
+                processDeployService.listSnapshotByProcessIdAndEnvId(envId, ListUtil.toList(versionProcessDtoMap.keySet()));
         Map<Long, ProcessSnapshotDeployDto> processSnapshotDeployDtoMap = snapshotDeployMap.values().stream()
                 .flatMap(Collection::stream).collect(Collectors.toMap(ProcessSnapshotDeployDto::getProcessZeebeKey, Function.identity()));
 
         // 根据流程定义去查询流程实例
         List<ListViewProcessInstanceDto> listViewProcessInstanceDtoList =
-                processInstanceService.listProcessInstanceByZeebeKey(ListUtil.toList(processSnapshotDeployDtoMap.keySet()));
+                processInstanceService.listProcessInstanceByZeebeKey(envId, ListUtil.toList(processSnapshotDeployDtoMap.keySet()));
 
         for (ListViewProcessInstanceDto listViewProcessInstanceDto : listViewProcessInstanceDtoList) {
             DebugProcessInstanceVo vo = DebugProcessInstanceVoConverter.createFrom(listViewProcessInstanceDto);

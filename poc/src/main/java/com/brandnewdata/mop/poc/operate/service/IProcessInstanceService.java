@@ -8,10 +8,10 @@ import java.util.Map;
 
 public interface IProcessInstanceService {
 
-    Page<ListViewProcessInstanceDto> pageProcessInstanceByZeebeKey(
+    Page<ListViewProcessInstanceDto> pageProcessInstanceByZeebeKey(Long envId,
             List<Long> zeebeKeyList, int pageNum, int pageSize, Map<String, Object> extraMap);
 
-    List<ListViewProcessInstanceDto> listProcessInstanceByZeebeKey(List<Long> zeebeKeyList);
+    List<ListViewProcessInstanceDto> listProcessInstanceByZeebeKey(Long envId, List<Long> zeebeKeyList);
 
     List<ListViewProcessInstanceDto> listAll();
 }

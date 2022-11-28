@@ -1,6 +1,8 @@
 package com.brandnewdata.mop.poc.operate.dao;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.map.MapUtil;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
@@ -10,22 +12,28 @@ import com.brandnewdata.mop.poc.operate.entity.listview.ProcessInstanceForListVi
 import com.brandnewdata.mop.poc.operate.schema.template.ListViewTemplate;
 import com.brandnewdata.mop.poc.operate.util.ElasticsearchUtil;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
 
-@Component
-public class ListViewDao extends AbstractDao{
+public class ListViewDao {
+    private static final Map<ElasticsearchClient, ListViewDao> instanceMap = MapUtil.newConcurrentHashMap();
 
-    @Autowired
-    private ListViewTemplate template;
+    private static final ListViewTemplate TEMPLATE = new ListViewTemplate();
+
+    private final ElasticsearchClient client;
+    private ListViewDao(ElasticsearchClient client) {
+        this.client = client;
+    }
+
+    public static ListViewDao getInstance(ElasticsearchClient client) {
+        return instanceMap.computeIfAbsent(client, ListViewDao::new);
+    }
 
     public ProcessInstanceForListViewEntity getOneByParentFlowNodeInstanceId(String parentFlowNodeInstanceId) {
         Assert.notNull(parentFlowNodeInstanceId);
         SearchRequest request = new SearchRequest.Builder()
-                .index(template.getAlias())
+                .index(TEMPLATE.getAlias())
                 .query(new Query.Builder()
                         .term(new TermQuery.Builder()
                                 .field(ListViewTemplate.PARENT_FLOW_NODE_INSTANCE_KEY)
@@ -38,7 +46,7 @@ public class ListViewDao extends AbstractDao{
 
     public ProcessInstanceForListViewEntity searchOne(Query query) {
         SearchRequest searchRequest = new SearchRequest.Builder()
-                .index(template.getAlias())
+                .index(TEMPLATE.getAlias())
                 .query(query)
                 .build();
         return ElasticsearchUtil.searchOne(client, searchRequest, ProcessInstanceForListViewEntity.class);
@@ -46,7 +54,7 @@ public class ListViewDao extends AbstractDao{
 
     public List<ProcessInstanceForListViewEntity> scrollAll(Query query, ElasticsearchUtil.QueryType queryType) {
         SearchRequest request = new SearchRequest.Builder()
-                .index(ElasticsearchUtil.whereToSearch(template, queryType))
+                .index(ElasticsearchUtil.whereToSearch(TEMPLATE, queryType))
                 .query(query)
                 .build();
         return ElasticsearchUtil.scrollAll(client, request, ProcessInstanceForListViewEntity.class);
@@ -55,7 +63,7 @@ public class ListViewDao extends AbstractDao{
     @SneakyThrows
     public SearchResponse<ProcessInstanceForListViewEntity> search(Query query, Map<String, Aggregation> aggs, ElasticsearchUtil.QueryType queryType) {
         SearchRequest request = new SearchRequest.Builder()
-                .index(ElasticsearchUtil.whereToSearch(template, queryType))
+                .index(ElasticsearchUtil.whereToSearch(TEMPLATE, queryType))
                 .query(query)
                 .aggregations(aggs)
                 .build();

@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.IntUnaryOperator;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -96,7 +97,7 @@ public class SceneVersionService implements ISceneVersionService {
     @Override
     public VersionProcessDto saveProcess(VersionProcessDto dto) {
         Long versionId = dto.getVersionId();
-        checkStatus(versionId, SceneConst.SCENE_VERSION_STATUS__CONFIGURING);
+        checkStatus(versionId, new int[] {SceneConst.SCENE_VERSION_STATUS__CONFIGURING});
         return versionProcessService.save(dto);
     }
 
@@ -163,15 +164,24 @@ public class SceneVersionService implements ISceneVersionService {
                 .collect(Collectors.toMap(SceneVersionDto::getId, Function.identity()));
     }
 
-    private void checkStatus(Long id, int status) {
+    private void checkStatus(Long id, int[] statusArr) {
         Assert.notNull(id, "版本id不能为空");
 
         SceneVersionDto versionDto = fetchById(ListUtil.of(id)).get(id);
         Assert.notNull(versionDto, "流程id不存在。id: {}", id);
 
-        if(!NumberUtil.equals(versionDto.getStatus(), status)) {
+        boolean flag = false;
+        for (int status : statusArr) {
+            if(NumberUtil.equals(versionDto.getStatus(), status)) {
+                flag = true;
+                break;
+            }
+        }
+
+        if(!flag) {
             throw new RuntimeException(StrUtil.format("版本状态异常，id: {}", id));
         }
+
     }
 
 }
