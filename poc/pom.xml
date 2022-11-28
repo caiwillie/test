@@ -19,6 +19,7 @@
         <jackson.util.version>1.1.0</jackson.util.version>
         <feel.engine.version>1.14.2</feel.engine.version>
         <maven.build.timestamp.format>yyyyMMdd_HHmmssSSS</maven.build.timestamp.format>
+        <imageTag>10.101.2.123/g2/${project.artifactId}:${maven.build.timestamp}</imageTag>
     </properties>
 
     <dependencyManagement>
@@ -269,7 +270,7 @@
                 <configuration>
                     <mainClass>${start-class}</mainClass>
                     <image>
-                        <name>10.101.2.123/g2/${project.artifactId}:${maven.build.timestamp}</name>
+                        <name>${imageTag}</name>
                         <publish>true</publish>
                         <builder>registry.cn-hangzhou.aliyuncs.com/caiwillie/paketobuildpacks_builder:base</builder>
                         <runImage>registry.cn-hangzhou.aliyuncs.com/caiwillie/paketobuildpacks_run:base-cnb</runImage>
