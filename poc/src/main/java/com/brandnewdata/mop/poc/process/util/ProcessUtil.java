@@ -13,7 +13,7 @@ public class ProcessUtil {
     private static final Pattern PROCESS_PATERN = Pattern.compile("[a-zA-Z0-9.:-]+");
 
     public static String convertProcessId(String id) {
-        Assert.isTrue(ReUtil.isMatch(PROCESS_PATERN, id), "流程id智能包含大小写英文、数字、-");
+        Assert.isTrue(ReUtil.isMatch(PROCESS_PATERN, id), "流程id只能包含大小写英文、数字、-");
         // . 和 :
         id = StrUtil.replace(id, ".", "_");
         return StrUtil.replace(id, ":", "__");
