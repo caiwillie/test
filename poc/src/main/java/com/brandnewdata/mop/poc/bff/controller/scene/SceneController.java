@@ -82,7 +82,7 @@ public class SceneController {
      * @param sceneDTO the business scene
      * @return the result
      */
-    @PostMapping(value = "/rest/businessScene/save")
+    // @PostMapping(value = "/rest/businessScene/save")
     public Result<SceneDto> save(@RequestBody SceneDto sceneDTO) {
         sceneDTO = service.save(sceneDTO);
         return Result.OK(sceneDTO);
@@ -94,7 +94,7 @@ public class SceneController {
      * @param sceneProcessDTO the business scene process definition
      * @return the result
      */
-    @PostMapping(value = "/rest/businessScene/saveProcessDefinition")
+    // @PostMapping(value = "/rest/businessScene/saveProcessDefinition")
     public Result<SceneProcessDto> saveProcessDefinition(
             @RequestBody SceneProcessDto sceneProcessDTO) {
         sceneProcessDTO = service.saveProcessDefinition(sceneProcessDTO);
@@ -107,7 +107,7 @@ public class SceneController {
      * @param sceneProcessDTO the business scene process definition
      * @return the result
      */
-    @PostMapping("/rest/businessScene/deployProcessDefinition")
+    // @PostMapping("/rest/businessScene/deployProcessDefinition")
     public Result deployProcessDefinition (
             @RequestBody SceneProcessDto sceneProcessDTO) {
         service.deploy(sceneProcessDTO);
