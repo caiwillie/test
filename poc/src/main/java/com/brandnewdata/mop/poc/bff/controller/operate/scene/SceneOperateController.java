@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.bff.controller.operate;
+package com.brandnewdata.mop.poc.bff.controller.operate.scene;
 
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.bff.service.operate.SceneOperateBffService;

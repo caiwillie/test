@@ -3,7 +3,7 @@ package com.brandnewdata.mop.poc.process.converter;
 import com.brandnewdata.mop.poc.process.bo.ZeebeDeployBo;
 import com.brandnewdata.mop.poc.process.po.ProcessReleaseDeployPo;
 
-public class ProcessReleaseDeployConverter {
+public class ProcessReleaseDeployPoConverter {
 
     public static ProcessReleaseDeployPo createFrom(ZeebeDeployBo bo) {
         ProcessReleaseDeployPo po = new ProcessReleaseDeployPo();

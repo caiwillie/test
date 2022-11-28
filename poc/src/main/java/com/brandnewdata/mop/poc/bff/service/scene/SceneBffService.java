@@ -90,7 +90,13 @@ public class SceneBffService {
     }
 
     public VersionProcessVo processSave(VersionProcessVo vo) {
-        VersionProcessDto dto = sceneVersionService.processSave(VersionProcessDtoConverter.createFrom(vo));
+        VersionProcessDto dto = sceneVersionService.saveProcess(VersionProcessDtoConverter.createFrom(vo));
         return new VersionProcessVo().from(dto);
+    }
+
+    public SceneVersionVo versionDebug(Long versionId) {
+        Assert.notNull(versionId, "版本id不能为空");
+        SceneVersionDto sceneVersionDto = sceneVersionService.debug(versionId);
+        return new SceneVersionVo().from(sceneVersionDto);
     }
 }

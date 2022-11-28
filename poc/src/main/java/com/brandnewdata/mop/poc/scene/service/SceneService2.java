@@ -61,7 +61,7 @@ public class SceneService2 implements ISceneService2{
             SceneVersionDto sceneVersionDto = new SceneVersionDto();
             sceneVersionDto.setSceneId(scenePo.getId());
             sceneVersionDto.setVersion(DateUtil.format(scenePo.getCreateTime(), DatePattern.PURE_DATETIME_PATTERN));
-            sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__CONFIG);
+            sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__CONFIGURING);
             sceneVersionService.save(sceneVersionDto);
 
         } else {

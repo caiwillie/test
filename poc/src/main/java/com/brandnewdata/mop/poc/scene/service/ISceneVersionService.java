@@ -14,11 +14,15 @@ public interface ISceneVersionService {
 
     SceneVersionDto save(SceneVersionDto sceneVersionDto);
 
-    VersionProcessDto processSave(VersionProcessDto dto);
+    VersionProcessDto saveProcess(VersionProcessDto dto);
 
-    void processDelete(VersionProcessDto dto);
+    void deleteProcess(VersionProcessDto dto);
 
-    SceneVersionDto debug(SceneVersionDto sceneVersionDto);
+    List listDebugProcessInstance(Long id);
+
+    SceneVersionDto debug(Long id);
+
+
     Map<Long, Long> countById(List<Long> sceneIdList);
 
     Map<Long, SceneVersionDto> fetchById(List<Long> id);

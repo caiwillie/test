@@ -8,8 +8,16 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.brandnewdata.mop.poc.bff.vo.scene.VersionProcessVo;
+import com.brandnewdata.mop.poc.constant.EnvConst;
+import com.brandnewdata.mop.poc.constant.ProcessConst;
 import com.brandnewdata.mop.poc.constant.SceneConst;
+import com.brandnewdata.mop.poc.env.dto.EnvDto;
+import com.brandnewdata.mop.poc.env.service.IEnvService;
+import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
+import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService;
+import com.brandnewdata.mop.poc.process.dto.BizDeployDto;
+import com.brandnewdata.mop.poc.process.dto.ProcessSnapshotDeployDto;
+import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
 import com.brandnewdata.mop.poc.scene.converter.SceneVersionDtoConverter;
 import com.brandnewdata.mop.poc.scene.converter.SceneVersionPoConverter;
 import com.brandnewdata.mop.poc.scene.dao.SceneVersionDao;
@@ -32,11 +40,22 @@ public class SceneVersionService implements ISceneVersionService {
     @Resource
     private SceneVersionDao sceneVersionDao;
 
+    private final IEnvService envService;
 
     private final IVersionProcessService versionProcessService;
 
-    public SceneVersionService(IVersionProcessService versionProcessService) {
+    private final IProcessDeployService2 processDeployService;
+
+    private final IProcessInstanceService processInstanceService;
+
+    public SceneVersionService(IEnvService envService,
+                               IVersionProcessService versionProcessService,
+                               IProcessDeployService2 processDeployService,
+                               IProcessInstanceService processInstanceService) {
+        this.envService = envService;
         this.versionProcessService = versionProcessService;
+        this.processDeployService = processDeployService;
+        this.processInstanceService = processInstanceService;
     }
 
     @Override
@@ -79,14 +98,14 @@ public class SceneVersionService implements ISceneVersionService {
     }
 
     @Override
-    public VersionProcessDto processSave(VersionProcessDto dto) {
+    public VersionProcessDto saveProcess(VersionProcessDto dto) {
         Long versionId = dto.getVersionId();
-
+        checkStatus(versionId, SceneConst.SCENE_VERSION_STATUS__CONFIGURING);
         return versionProcessService.save(dto);
     }
 
     @Override
-    public void processDelete(VersionProcessDto dto) {
+    public void deleteProcess(VersionProcessDto dto) {
         Long versionId = dto.getVersionId();
         Assert.notNull(versionId, "版本id不能为空");
 
@@ -97,17 +116,61 @@ public class SceneVersionService implements ISceneVersionService {
     }
 
     @Override
-    public SceneVersionDto debug(SceneVersionDto sceneVersionDto) {
-        Long id = sceneVersionDto.getId();
-        Long count = countById(ListUtil.of(id)).get(id);
-        Assert.isTrue(count == 1, "版本不存在。version id：{}", id);
+    public List listDebugProcessInstance(Long id) {
+        Assert.notNull(id, "版本id不能为空");
+        SceneVersionDto sceneVersionDto = fetchById(ListUtil.of(id)).get(id);
+        Assert.notNull(sceneVersionDto, "版本不存在。version id：{}", id);
+        Assert.isTrue(NumberUtil.equals(sceneVersionDto.getStatus(), SceneConst.SCENE_VERSION_STATUS__DEBUGGING),
+                "版本状态异常。仅处理：调试中");
+
+        // 获取调试环境
+        Optional<EnvDto> debugEnvOpt = envService.listEnv().stream()
+                .filter(envDto -> NumberUtil.equals(envDto.getType(), EnvConst.ENV_TYPE__SANDBOX)).findFirst();
+        Assert.isTrue(debugEnvOpt.isPresent(), "调试环境不存在");
+        Long envId = debugEnvOpt.get().getId();
+
+        // 获取该版本下当前的流程定义
+        List<VersionProcessDto> versionProcessDtoList = versionProcessService.fetchVersionProcessListByVersionId(ListUtil.of(id), true).get(id);
+        if(CollUtil.isEmpty(versionProcessDtoList)) return ListUtil.empty();
+        List<String> processIdList = versionProcessDtoList.stream().map(VersionProcessDto::getProcessId).collect(Collectors.toList());
+
+        // 获取流程定义
+        Map<String, List<ProcessSnapshotDeployDto>> snapshotDeployMap =
+                processDeployService.listSnapshotByProcessIdAndEnvId(envId, processIdList);
+        Map<Long, ProcessSnapshotDeployDto> processSnapshotDeployDtoMap = snapshotDeployMap.values().stream()
+                .flatMap(Collection::stream).collect(Collectors.toMap(ProcessSnapshotDeployDto::getProcessZeebeKey, Function.identity()));
+
+        // 根据流程定义去查询流程实例
+        List<ListViewProcessInstanceDto> listViewProcessInstanceDtoList = processInstanceService.listProcessInstanceByZeebeKey(ListUtil.toList(processSnapshotDeployDtoMap.keySet()));
+
+    }
+
+    @Override
+    public SceneVersionDto debug(Long id) {
+        Assert.notNull(id, "版本id不能为空");
+        SceneVersionDto sceneVersionDto = fetchById(ListUtil.of(id)).get(id);
+        Assert.notNull(sceneVersionDto, "版本不存在。version id：{}", id);
         List<VersionProcessDto> versionProcessDtoList = versionProcessService.fetchVersionProcessListByVersionId(ListUtil.of(id), true).get(id);
         Assert.isTrue(CollUtil.isEmpty(versionProcessDtoList), "该版本下至少需要配置一个流程");
+
+        // 获取调试环境
+        Optional<EnvDto> debugEnvOpt = envService.listEnv().stream()
+                .filter(envDto -> NumberUtil.equals(envDto.getType(), EnvConst.ENV_TYPE__SANDBOX)).findFirst();
+        Assert.isTrue(debugEnvOpt.isPresent(), "调试环境不存在");
+        Long envId = debugEnvOpt.get().getId();
+
         for (VersionProcessDto versionProcessDto : versionProcessDtoList) {
-            versionProcessDto.getProcessId();
+            BizDeployDto deployDto = new BizDeployDto();
+            deployDto.setProcessId(versionProcessDto.getProcessId());
+            deployDto.setProcessName(versionProcessDto.getProcessName());
+            deployDto.setProcessXml(versionProcessDto.getProcessXml());
+            processDeployService.snapshotDeploy(deployDto, envId, ProcessConst.PROCESS_BIZ_TYPE__SCENE);
         }
 
-        return null;
+        // 修改状态
+        sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__DEBUGGING);
+        sceneVersionDao.updateById(SceneVersionPoConverter.createFrom(sceneVersionDto));
+        return sceneVersionDto;
     }
 
     @Override

@@ -2,7 +2,7 @@ package com.brandnewdata.mop.poc.process.service;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.lang.UUID;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
@@ -10,11 +10,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.constant.ProcessConst;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.process.bo.ZeebeDeployBo;
-import com.brandnewdata.mop.poc.process.converter.ProcessReleaseDeployConverter;
-import com.brandnewdata.mop.poc.process.converter.ProcessSnapshotDeployConverter;
+import com.brandnewdata.mop.poc.process.converter.ProcessReleaseDeployPoConverter;
+import com.brandnewdata.mop.poc.process.converter.ProcessSnapshotDeployDtoConverter;
+import com.brandnewdata.mop.poc.process.converter.ProcessSnapshotDeployPoConverter;
 import com.brandnewdata.mop.poc.process.dao.ProcessReleaseDeployDao;
 import com.brandnewdata.mop.poc.process.dao.ProcessSnapshotDeployDao;
 import com.brandnewdata.mop.poc.process.dto.BizDeployDto;
+import com.brandnewdata.mop.poc.process.dto.ProcessSnapshotDeployDto;
 import com.brandnewdata.mop.poc.process.manager.ConnectorManager;
 import com.brandnewdata.mop.poc.process.manager.ZeebeClientManager;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParseStep1;
@@ -31,6 +33,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -65,8 +70,8 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
             // 说明没有更改任何东西，上个版本已经存在
             return;
         }
-        po = ProcessSnapshotDeployConverter.createFrom(bo);
-        ProcessSnapshotDeployConverter.updateFrom(envId, bizDeployDto.getProcessXml(), po);
+        po = ProcessSnapshotDeployPoConverter.createFrom(bo);
+        ProcessSnapshotDeployPoConverter.updateFrom(envId, bizDeployDto.getProcessXml(), po);
         snapshotDeployDao.insert(po);
     }
 
@@ -84,7 +89,7 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
             ZeebeDeployBo bo;
             if(po == null) {
                 bo = zeebeDeploy(bizDeployDto, envId, bizType);
-                po = ProcessReleaseDeployConverter.createFrom(bo);
+                po = ProcessReleaseDeployPoConverter.createFrom(bo);
                 po.setEnvId(envId);
                 releaseDeployDao.insert(po);
             } else {
@@ -95,11 +100,25 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
 
                 if(!NumberUtil.equals(bo.getZeebeKey(), po.getProcessZeebeKey())) {
                     log.warn("release deploy has been modified. process id: {}", bo.getProcessId());
-                    ProcessReleaseDeployConverter.updateFrom(bo, po);
+                    ProcessReleaseDeployPoConverter.updateFrom(bo, po);
                     releaseDeployDao.updateById(po);
                 }
             }
         }
+    }
+
+    @Override
+    public Map<String, List<ProcessSnapshotDeployDto>> listSnapshotByProcessIdAndEnvId(Long envId, List<String> processIdList) {
+        if(CollUtil.isEmpty(processIdList)) return MapUtil.empty();
+        Assert.notNull(envId, "环境id不能为空");
+        Assert.isTrue(CollUtil.hasNull(processIdList), "流程id不能为空");
+
+        QueryWrapper<ProcessSnapshotDeployPo> query = new QueryWrapper<>();
+        query.eq(ProcessSnapshotDeployPo.ENV_ID, envId);
+        query.in(ProcessSnapshotDeployPo.PROCESS_ID, processIdList);
+        List<ProcessSnapshotDeployPo> processSnapshotDeployPoList = snapshotDeployDao.selectList(query);
+        return processSnapshotDeployPoList.stream().map(ProcessSnapshotDeployDtoConverter::createFrom)
+                .collect(Collectors.groupingBy(ProcessSnapshotDeployDto::getProcessId));
     }
 
 

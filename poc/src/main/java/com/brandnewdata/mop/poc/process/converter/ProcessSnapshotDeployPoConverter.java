@@ -3,7 +3,7 @@ package com.brandnewdata.mop.poc.process.converter;
 import com.brandnewdata.mop.poc.process.bo.ZeebeDeployBo;
 import com.brandnewdata.mop.poc.process.po.ProcessSnapshotDeployPo;
 
-public class ProcessSnapshotDeployConverter {
+public class ProcessSnapshotDeployPoConverter {
 
     public static ProcessSnapshotDeployPo createFrom(ZeebeDeployBo bo) {
         ProcessSnapshotDeployPo po = new ProcessSnapshotDeployPo();
