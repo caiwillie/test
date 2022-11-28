@@ -105,7 +105,8 @@ public class SceneBffService {
         Assert.notNull(versionId, "版本id不能为空");
         List<VersionProcessDto> versionProcessDtoList =
                 versionProcessService.fetchVersionProcessListByVersionId(ListUtil.of(versionId), false).get(versionId);
-        return versionProcessDtoList.stream().map(dto -> new VersionProcessVo().from(dto)).collect(Collectors.toList());
+        return Opt.ofNullable(versionProcessDtoList).orElse(ListUtil.empty()).stream()
+                .map(dto -> new VersionProcessVo().from(dto)).collect(Collectors.toList());
     }
 
     public SceneVo save(SceneVo vo) {

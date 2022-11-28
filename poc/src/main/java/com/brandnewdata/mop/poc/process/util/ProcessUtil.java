@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 public class ProcessUtil {
 
-    private static final Pattern PROCESS_PATERN = Pattern.compile("[a-zA-Z0-9.:-]+");
+    private static final Pattern PROCESS_PATERN = Pattern.compile("[a-zA-Z0-9.:-_]+");
 
     public static String convertProcessId(String id) {
         Assert.isTrue(ReUtil.isMatch(PROCESS_PATERN, id), "流程id只能包含大小写英文、数字、-");

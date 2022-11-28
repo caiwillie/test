@@ -44,8 +44,7 @@ public class VersionProcessService implements IVersionProcessService {
     @Override
     public Map<Long, List<VersionProcessDto>> fetchVersionProcessListByVersionId(List<Long> versionIdList, boolean simple) {
         if(CollUtil.isEmpty(versionIdList)) return MapUtil.empty();
-        Map<Long, List<VersionProcessDto>> ret = new HashMap<>();
-
+        
         QueryWrapper<VersionProcessPo> query = new QueryWrapper<>();
         query.in(VersionProcessPo.VERSION_ID, versionIdList);
         if(simple) {
