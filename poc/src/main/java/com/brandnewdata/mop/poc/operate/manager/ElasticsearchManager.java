@@ -64,7 +64,7 @@ public class ElasticsearchManager {
                 EnvDto envDto = envService.fetchOne(key);
                 Assert.notNull(envDto, "环境不存在");
                 Optional<EnvServiceDto> serviceOpt = envService.fetchEnvService(key).stream()
-                        .filter(envServiceDto -> StrUtil.equals(envServiceDto.getName(), "camunda-platform-zeebe-gateway"))
+                        .filter(envServiceDto -> StrUtil.equals(envServiceDto.getName(), "elasticsearch-master"))
                         .findFirst();
 
                 Assert.isTrue(serviceOpt.isPresent(), "环境信息配置有误");

@@ -124,8 +124,9 @@ public class SceneOperateBffService {
 
         List<Long> zeebeKeyList = processDeployDtoList.stream().map(ProcessDeployDto::getZeebeKey).collect(Collectors.toList());
 
+        // todo caiwillie
         Page<ListViewProcessInstanceDto> listViewProcessInstanceDtoPage =
-                processInstanceService.pageProcessInstanceByZeebeKey(zeebeKeyList, filter.getPageNum(), filter.getPageSize(), null);
+                processInstanceService.pageProcessInstanceByZeebeKey(null, zeebeKeyList, filter.getPageNum(), filter.getPageSize(), null);
         List<ProcessInstance> records = listViewProcessInstanceDtoPage.getRecords().stream().map(r -> toProcessInstance(r, processIdAndVersionMap))
                 .collect(Collectors.toList());
         Page page = new Page(listViewProcessInstanceDtoPage.getTotal(), records);
