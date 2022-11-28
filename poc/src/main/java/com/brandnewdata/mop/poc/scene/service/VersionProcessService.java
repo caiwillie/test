@@ -44,7 +44,7 @@ public class VersionProcessService implements IVersionProcessService {
     @Override
     public Map<Long, List<VersionProcessDto>> fetchVersionProcessListByVersionId(List<Long> versionIdList, boolean simple) {
         if(CollUtil.isEmpty(versionIdList)) return MapUtil.empty();
-        
+
         QueryWrapper<VersionProcessPo> query = new QueryWrapper<>();
         query.in(VersionProcessPo.VERSION_ID, versionIdList);
         if(simple) {
@@ -108,10 +108,8 @@ public class VersionProcessService implements IVersionProcessService {
 
     @Override
     public VersionProcessDto save(VersionProcessDto versionProcessDto) {
-
         String processXml = versionProcessDto.getProcessXml();
         Assert.notNull(processXml, "流程定义不能为空");
-
 
         BizDeployDto bizDeployDto = new BizDeployDto();
         bizDeployDto.setProcessId(null);
@@ -130,11 +128,14 @@ public class VersionProcessService implements IVersionProcessService {
             versionProcessDto.setProcessName(name);
             versionProcessDao.insert(VersionProcessPoConverter.createFrom(versionProcessDto));
         } else {
+            VersionProcessDto updateContent = versionProcessDto;
             versionProcessDto = fetchVersionProcessById(ListUtil.of(id)).get(id);
             if(!StrUtil.equals(versionProcessDto.getProcessId(), processId)) {
                 throw new RuntimeException("流程id不能改变");
             }
             versionProcessDto.setProcessName(name);
+            versionProcessDto.setProcessXml(updateContent.getProcessXml());
+            versionProcessDto.setProcessImg(updateContent.getProcessImg());
             versionProcessDao.updateById(VersionProcessPoConverter.createFrom(versionProcessDto));
         }
 
