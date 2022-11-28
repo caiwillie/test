@@ -22,7 +22,7 @@ public class ZeebeClientManager {
     @Resource
     private IEnvService envService;
 
-    @Value("${brandnewdata.cloud-native.zeebe.zeebe-gateway.port}")
+    @Value("${brandnewdata.cloud-native.zeebe.zeebe-gateway.grpc-port}")
     private Integer zeebeGatewayPort;
     private final LoadingCache<Long, ZeebeClient> CACHE = CacheBuilder.newBuilder().build(getCacheLoader());
 
