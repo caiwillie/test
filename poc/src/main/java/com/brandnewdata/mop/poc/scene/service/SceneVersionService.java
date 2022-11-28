@@ -116,48 +116,14 @@ public class SceneVersionService implements ISceneVersionService {
     }
 
     @Override
-    public List listDebugProcessInstance(Long id) {
-        Assert.notNull(id, "版本id不能为空");
-        SceneVersionDto sceneVersionDto = fetchById(ListUtil.of(id)).get(id);
-        Assert.notNull(sceneVersionDto, "版本不存在。version id：{}", id);
-        Assert.isTrue(NumberUtil.equals(sceneVersionDto.getStatus(), SceneConst.SCENE_VERSION_STATUS__DEBUGGING),
-                "版本状态异常。仅处理：调试中");
-
-        // 获取调试环境
-        Optional<EnvDto> debugEnvOpt = envService.listEnv().stream()
-                .filter(envDto -> NumberUtil.equals(envDto.getType(), EnvConst.ENV_TYPE__SANDBOX)).findFirst();
-        Assert.isTrue(debugEnvOpt.isPresent(), "调试环境不存在");
-        Long envId = debugEnvOpt.get().getId();
-
-        // 获取该版本下当前的流程定义
-        List<VersionProcessDto> versionProcessDtoList = versionProcessService.fetchVersionProcessListByVersionId(ListUtil.of(id), true).get(id);
-        if(CollUtil.isEmpty(versionProcessDtoList)) return ListUtil.empty();
-        List<String> processIdList = versionProcessDtoList.stream().map(VersionProcessDto::getProcessId).collect(Collectors.toList());
-
-        // 获取流程定义
-        Map<String, List<ProcessSnapshotDeployDto>> snapshotDeployMap =
-                processDeployService.listSnapshotByProcessIdAndEnvId(envId, processIdList);
-        Map<Long, ProcessSnapshotDeployDto> processSnapshotDeployDtoMap = snapshotDeployMap.values().stream()
-                .flatMap(Collection::stream).collect(Collectors.toMap(ProcessSnapshotDeployDto::getProcessZeebeKey, Function.identity()));
-
-        // 根据流程定义去查询流程实例
-        List<ListViewProcessInstanceDto> listViewProcessInstanceDtoList = processInstanceService.listProcessInstanceByZeebeKey(ListUtil.toList(processSnapshotDeployDtoMap.keySet()));
-
-    }
-
-    @Override
-    public SceneVersionDto debug(Long id) {
+    public SceneVersionDto debug(Long id, Long envId) {
         Assert.notNull(id, "版本id不能为空");
         SceneVersionDto sceneVersionDto = fetchById(ListUtil.of(id)).get(id);
         Assert.notNull(sceneVersionDto, "版本不存在。version id：{}", id);
         List<VersionProcessDto> versionProcessDtoList = versionProcessService.fetchVersionProcessListByVersionId(ListUtil.of(id), true).get(id);
         Assert.isTrue(CollUtil.isEmpty(versionProcessDtoList), "该版本下至少需要配置一个流程");
 
-        // 获取调试环境
-        Optional<EnvDto> debugEnvOpt = envService.listEnv().stream()
-                .filter(envDto -> NumberUtil.equals(envDto.getType(), EnvConst.ENV_TYPE__SANDBOX)).findFirst();
-        Assert.isTrue(debugEnvOpt.isPresent(), "调试环境不存在");
-        Long envId = debugEnvOpt.get().getId();
+        Assert.notNull(envId, "环境id不能为空");
 
         for (VersionProcessDto versionProcessDto : versionProcessDtoList) {
             BizDeployDto deployDto = new BizDeployDto();

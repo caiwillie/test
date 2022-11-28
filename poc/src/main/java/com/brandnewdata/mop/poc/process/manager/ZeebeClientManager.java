@@ -35,9 +35,9 @@ public class ZeebeClientManager {
         return new CacheLoader<Long, ZeebeClient>() {
             @Override
             public ZeebeClient load(Long key) throws Exception {
-                EnvDto envDto = envService.getOne(key);
+                EnvDto envDto = envService.fetchOne(key);
                 Assert.notNull(envDto, "环境不存在");
-                Optional<EnvServiceDto> serviceOpt = envService.listEnvService(key).stream()
+                Optional<EnvServiceDto> serviceOpt = envService.fetchEnvService(key).stream()
                         .filter(envServiceDto -> StrUtil.equals(envServiceDto.getName(), "camunda-platform-zeebe-gateway"))
                         .findFirst();
                 Assert.isTrue(serviceOpt.isPresent(), "【ENV01】获取环境信息有误");

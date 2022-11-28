@@ -2,6 +2,7 @@ package com.brandnewdata.mop.poc.bff.controller.scene;
 
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.bff.service.scene.SceneBffService;
+import com.brandnewdata.mop.poc.bff.vo.scene.DebugProcessInstanceVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVersionVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.VersionProcessVo;
@@ -132,8 +133,8 @@ public class SceneController2 {
      * @param versionId
      */
     @GetMapping(value = "/rest/scene/version/debug/processInstance/list")
-    public void listProcessInstance(@RequestParam Long versionId) {
-
+    public List<DebugProcessInstanceVo> listProcessInstance(@RequestParam Long versionId) {
+        return null;
     }
 
     /**

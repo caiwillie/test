@@ -4,12 +4,22 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Opt;
+import cn.hutool.core.util.NumberUtil;
+import com.brandnewdata.mop.poc.bff.converter.scene.DebugProcessInstanceVoConverter;
 import com.brandnewdata.mop.poc.bff.converter.scene.SceneDtoConverter;
 import com.brandnewdata.mop.poc.bff.converter.scene.VersionProcessDtoConverter;
+import com.brandnewdata.mop.poc.bff.vo.scene.DebugProcessInstanceVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVersionVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.VersionProcessVo;
 import com.brandnewdata.mop.poc.common.dto.Page;
+import com.brandnewdata.mop.poc.constant.SceneConst;
+import com.brandnewdata.mop.poc.env.dto.EnvDto;
+import com.brandnewdata.mop.poc.env.service.IEnvService;
+import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
+import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService;
+import com.brandnewdata.mop.poc.process.dto.ProcessSnapshotDeployDto;
+import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
 import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
 import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
@@ -19,8 +29,10 @@ import com.brandnewdata.mop.poc.scene.service.IVersionProcessService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,12 +44,24 @@ public class SceneBffService {
 
     private final IVersionProcessService versionProcessService;
 
+    private final IEnvService envService;
+
+    private final IProcessDeployService2 processDeployService;
+
+    private final IProcessInstanceService processInstanceService;
+
     public SceneBffService(ISceneService2 sceneService,
                            ISceneVersionService sceneVersionService,
-                           IVersionProcessService versionProcessService) {
+                           IVersionProcessService versionProcessService,
+                           IEnvService envService,
+                           IProcessDeployService2 processDeployService,
+                           IProcessInstanceService processInstanceService) {
         this.sceneService = sceneService;
         this.sceneVersionService = sceneVersionService;
         this.versionProcessService = versionProcessService;
+        this.envService = envService;
+        this.processDeployService = processDeployService;
+        this.processInstanceService = processInstanceService;
     }
 
     public Page<SceneVo> page(Integer pageNum, Integer pageSize, String name) {
@@ -96,7 +120,50 @@ public class SceneBffService {
 
     public SceneVersionVo versionDebug(Long versionId) {
         Assert.notNull(versionId, "版本id不能为空");
-        SceneVersionDto sceneVersionDto = sceneVersionService.debug(versionId);
+        EnvDto debugEnv = envService.fetchDebugEnv();
+        SceneVersionDto sceneVersionDto = sceneVersionService.debug(versionId, debugEnv.getId());
         return new SceneVersionVo().from(sceneVersionDto);
+    }
+
+    public List<DebugProcessInstanceVo> listDebugProcessInstance(Long versionId) {
+        List<DebugProcessInstanceVo> ret = new ArrayList<>();
+        Assert.notNull(versionId, "版本id不能为空");
+        SceneVersionDto sceneVersionDto = sceneVersionService.fetchById(ListUtil.of(versionId)).get(versionId);
+        Assert.notNull(sceneVersionDto, "版本不存在。version id：{}", versionId);
+        Assert.isTrue(NumberUtil.equals(sceneVersionDto.getStatus(), SceneConst.SCENE_VERSION_STATUS__DEBUGGING),
+                "版本状态异常。仅处理：调试中");
+
+        // 获取调试环境
+        EnvDto debugEnv = envService.fetchDebugEnv();
+
+        // 获取该版本下当前的流程定义
+        List<VersionProcessDto> versionProcessDtoList =
+                versionProcessService.fetchVersionProcessListByVersionId(ListUtil.of(versionId), true).get(versionId);
+        if(CollUtil.isEmpty(versionProcessDtoList)) return ListUtil.empty();
+        Map<String, VersionProcessDto> versionProcessDtoMap =
+                versionProcessDtoList.stream().collect(Collectors.toMap(VersionProcessDto::getProcessId, Function.identity()));
+
+        // 获取流程定义
+        Map<String, List<ProcessSnapshotDeployDto>> snapshotDeployMap =
+                processDeployService.listSnapshotByProcessIdAndEnvId(debugEnv.getId(), ListUtil.toList(versionProcessDtoMap.keySet()));
+        Map<Long, ProcessSnapshotDeployDto> processSnapshotDeployDtoMap = snapshotDeployMap.values().stream()
+                .flatMap(Collection::stream).collect(Collectors.toMap(ProcessSnapshotDeployDto::getProcessZeebeKey, Function.identity()));
+
+        // 根据流程定义去查询流程实例
+        List<ListViewProcessInstanceDto> listViewProcessInstanceDtoList =
+                processInstanceService.listProcessInstanceByZeebeKey(ListUtil.toList(processSnapshotDeployDtoMap.keySet()));
+
+        for (ListViewProcessInstanceDto listViewProcessInstanceDto : listViewProcessInstanceDtoList) {
+            DebugProcessInstanceVo vo = DebugProcessInstanceVoConverter.createFrom(listViewProcessInstanceDto);
+            Long zeebeKey = listViewProcessInstanceDto.getProcessId();
+            String processId = listViewProcessInstanceDto.getBpmnProcessId();
+            ProcessSnapshotDeployDto processSnapshotDeployDto = processSnapshotDeployDtoMap.get(zeebeKey);
+            VersionProcessDto versionProcessDto = versionProcessDtoMap.get(processId);
+            DebugProcessInstanceVoConverter.updateFrom(vo, processSnapshotDeployDto);
+            DebugProcessInstanceVoConverter.updateFrom(vo, versionProcessDto);
+            ret.add(vo);
+        }
+
+        return ret;
     }
 }

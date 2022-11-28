@@ -3,6 +3,8 @@ package com.brandnewdata.mop.poc.bff.vo.scene;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 public class DebugProcessInstanceVo {
@@ -35,11 +37,11 @@ public class DebugProcessInstanceVo {
     /**
      * 开始时间
      */
-    private String startTime;
+    private LocalDateTime startTime;
 
     /**
      * 结束时间
      */
-    private String endTime;
+    private LocalDateTime endTime;
 
 }

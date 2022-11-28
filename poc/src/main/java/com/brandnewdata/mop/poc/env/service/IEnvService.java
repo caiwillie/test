@@ -7,13 +7,13 @@ import java.util.List;
 
 public interface IEnvService {
 
-    EnvDto getOne(Long envId);
+    EnvDto fetchOne(Long envId);
 
-    List<EnvDto> listEnv();
+    List<EnvDto> fetchEnvList();
 
-    List<EnvServiceDto> listEnvService(Long envId);
+    List<EnvServiceDto> fetchEnvService(Long envId);
 
-
+    EnvDto fetchDebugEnv();
 
 
 }

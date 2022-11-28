@@ -15,7 +15,7 @@ public class EnvBffService {
     private EnvService service;
 
     public List<EnvVo> list() {
-        return service.listEnv().stream().map(envDto -> new EnvVo().from(envDto)).collect(Collectors.toList());
+        return service.fetchEnvList().stream().map(envDto -> new EnvVo().from(envDto)).collect(Collectors.toList());
     }
 
 }
