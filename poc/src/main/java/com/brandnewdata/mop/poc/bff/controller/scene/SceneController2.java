@@ -133,8 +133,9 @@ public class SceneController2 {
      * @param versionId
      */
     @GetMapping(value = "/rest/scene/version/debug/processInstance/list")
-    public List<DebugProcessInstanceVo> listProcessInstance(@RequestParam Long versionId) {
-        return null;
+    public Result<List<DebugProcessInstanceVo>> listProcessInstance(@RequestParam Long versionId) {
+        List<DebugProcessInstanceVo> ret = sceneBffService.listDebugProcessInstance(versionId);
+        return Result.OK(ret);
     }
 
     /**
