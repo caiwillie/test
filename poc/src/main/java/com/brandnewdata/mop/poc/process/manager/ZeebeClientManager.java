@@ -13,6 +13,7 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.Optional;
 
 @Component
@@ -20,17 +21,19 @@ public class ZeebeClientManager {
 
     private final IEnvService envService;
 
-    @Value("${brandnewdata.cloud-native.zeebe.zeebe-gateway.grpc-port}")
-    private Integer zeebeGatewayPort;
-    private final LoadingCache<Long, ZeebeClient> CACHE = CacheBuilder.newBuilder().build(getCacheLoader());
+    private final Integer grpcPort;
+    private final LoadingCache<Long, ZeebeClient> cache;
 
-    public ZeebeClientManager(IEnvService envService) {
+    public ZeebeClientManager(IEnvService envService,
+                              @Value("${brandnewdata.cloud-native.zeebe.zeebe-gateway.grpc-port}") Integer grpcPort) {
         this.envService = envService;
+        this.grpcPort = grpcPort;
+        this.cache = CacheBuilder.newBuilder().build(getCacheLoader());
     }
 
     @SneakyThrows
     public ZeebeClient getByEnvId(Long envId) {
-        return CACHE.get(envId);
+        return cache.get(envId);
     }
 
     private CacheLoader<Long, ZeebeClient> getCacheLoader() {
@@ -42,12 +45,12 @@ public class ZeebeClientManager {
                 Optional<EnvServiceDto> serviceOpt = envService.fetchEnvService(key).stream()
                         .filter(envServiceDto -> StrUtil.equals(envServiceDto.getName(), "camunda-platform-zeebe-gateway"))
                         .findFirst();
-                Assert.isTrue(serviceOpt.isPresent(), "【ENV01】获取环境信息有误");
+                Assert.isTrue(serviceOpt.isPresent(), "环境信息配置有误");
                 EnvServiceDto envServiceDto = serviceOpt.get();
                 String serviceName = envServiceDto.getName();
                 String namespace = envDto.getNamespace();
                 ZeebeClient client = ZeebeClient.newClientBuilder()
-                        .gatewayAddress(StrUtil.format("{}.{}:{}", serviceName, namespace, zeebeGatewayPort))
+                        .gatewayAddress(StrUtil.format("{}.{}:{}", serviceName, namespace, grpcPort))
                         .usePlaintext()
                         .build();
                 return client;

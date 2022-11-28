@@ -119,21 +119,24 @@ public class SceneController2 {
     /**
      * 调试版本
      *
-     * @param versionId 版本id
      * @return the result
      */
-    @GetMapping(value = "/rest/scene/version/debug")
-    public Result<SceneVersionVo> versionDebug(@RequestParam Long versionId) {
-        SceneVersionVo ret = sceneBffService.versionDebug(versionId);
+    @PostMapping(value = "/rest/scene/version/debug")
+    public Result<SceneVersionVo> versionDebug(@RequestBody SceneVersionVo vo) {
+        SceneVersionVo ret = sceneBffService.versionDebug(vo.getId());
         return Result.OK(ret);
     }
 
     /**
      * 调试版本的流程实例列表
+     *
      * @param versionId 版本id
+     * @param processId 筛选项：流程id
+     * @return the result
      */
     @GetMapping(value = "/rest/scene/version/debug/processInstance/list")
-    public Result<List<DebugProcessInstanceVo>> listProcessInstance(@RequestParam Long versionId) {
+    public Result<List<DebugProcessInstanceVo>> listProcessInstance(@RequestParam Long versionId,
+                                                                    @RequestParam(required = false) String processId) {
         List<DebugProcessInstanceVo> ret = sceneBffService.listDebugProcessInstance(versionId);
         return Result.OK(ret);
     }

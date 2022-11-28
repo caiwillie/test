@@ -18,13 +18,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 
-@Configuration
 public class ElasticSearchConfiguration {
-    @Bean
+
     public ElasticsearchClient restClientTransport(
             @Value("${brandnewdata.elasticsearch.uris}") String[] uris) {
 
-        // 支持jdk8
+       /* // 支持jdk8
         ObjectMapper objectMapper = JsonMapper.builder() // or different mapper for other format
                 // .addModule(new JavaTimeModule())
                 // and possibly other configuration, modules, then:
@@ -47,29 +46,10 @@ public class ElasticSearchConfiguration {
 
         // And create the API client
 
-        return new ElasticsearchClient(transport);
+        return new ElasticsearchClient(transport);*/
+        return null;
     }
 
-    private HttpHost createHttpHost(String uri) {
-        try {
-            return createHttpHost(URI.create(uri));
-        }
-        catch (IllegalArgumentException ex) {
-            return HttpHost.create(uri);
-        }
-    }
 
-    private HttpHost createHttpHost(URI uri) {
-        if (!StringUtils.hasLength(uri.getUserInfo())) {
-            return HttpHost.create(uri.toString());
-        }
-        try {
-            return HttpHost.create(new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), uri.getPath(),
-                    uri.getQuery(), uri.getFragment()).toString());
-        }
-        catch (URISyntaxException ex) {
-            throw new IllegalStateException(ex);
-        }
-    }
 
 }
