@@ -13,18 +13,20 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.util.Optional;
 
 @Component
 public class ZeebeClientManager {
 
-    @Resource
-    private IEnvService envService;
+    private final IEnvService envService;
 
     @Value("${brandnewdata.cloud-native.zeebe.zeebe-gateway.grpc-port}")
     private Integer zeebeGatewayPort;
     private final LoadingCache<Long, ZeebeClient> CACHE = CacheBuilder.newBuilder().build(getCacheLoader());
+
+    public ZeebeClientManager(IEnvService envService) {
+        this.envService = envService;
+    }
 
     @SneakyThrows
     public ZeebeClient getByEnvId(Long envId) {
