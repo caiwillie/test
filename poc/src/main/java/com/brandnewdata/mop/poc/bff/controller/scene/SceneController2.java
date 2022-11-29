@@ -200,8 +200,15 @@ public class SceneController2 {
         return Result.OK();
     }
 
+    /**
+     * 调试版本下的流程
+     *
+     * @param vo the vo
+     * @return the result
+     */
     @PostMapping(value = "/rest/scene/version/process/debug")
     public Result processDebug(@RequestBody VersionProcessVo vo) {
+        sceneBffService.processDebug(vo);
         return Result.OK();
     }
 
