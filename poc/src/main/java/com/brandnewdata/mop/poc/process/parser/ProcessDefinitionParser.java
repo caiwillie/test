@@ -284,6 +284,10 @@ public class ProcessDefinitionParser implements
      * 替换 namespace zeebe2 => namespace
      */
     private void replNsZeebe2() {
+        Namespace namespace = document.getRootElement().getNamespaceForPrefix(BPMN2.getPrefix());
+        // bpmn2 namespace 不存在，就直接返回
+        if(namespace == null) return;
+
         XPath path = DocumentHelper.createXPath(StrUtil.join(StringPool.SLASH,
                 StringPool.SLASH,
                 BPMN2_ALL_QNAME));
@@ -579,6 +583,9 @@ public class ProcessDefinitionParser implements
      * 替换 xsi:type = "bpmn:tFormalExpression"
      */
     private void replAttrXt() {
+        Namespace bpmn2Namespace = document.getRootElement().getNamespaceForPrefix(BPMN2.getPrefix());
+        if(bpmn2Namespace == null) return;
+
         XPath path = DocumentHelper.createXPath(StrUtil.format("//*[@{}='{}']",
                 XSI_TYPE_QNAME.getQualifiedName(), BPMN2_T_FORMAL_EXPRESSION_QNAME.getQualifiedName()));
         List<Node> nodes = path.selectNodes(document);

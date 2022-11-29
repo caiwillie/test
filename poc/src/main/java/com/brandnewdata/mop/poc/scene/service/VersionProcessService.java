@@ -112,8 +112,8 @@ public class VersionProcessService implements IVersionProcessService {
         Assert.notNull(processXml, "流程定义不能为空");
 
         BizDeployDto bizDeployDto = new BizDeployDto();
-        bizDeployDto.setProcessId(null);
-        bizDeployDto.setProcessName(null);
+        bizDeployDto.setProcessId(versionProcessDto.getProcessId());
+        bizDeployDto.setProcessName(versionProcessDto.getProcessName());
         bizDeployDto.setProcessXml(processXml);
         ProcessDefinitionStaticParseDto processDefinitionStaticParseDto = processDefinitionService.staticParse(bizDeployDto);
 

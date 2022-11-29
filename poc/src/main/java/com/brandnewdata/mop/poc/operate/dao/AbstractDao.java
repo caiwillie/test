@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class AbstractDao {
 
-    @Autowired
+    // @Autowired
     protected ElasticsearchClient client;
 
 }

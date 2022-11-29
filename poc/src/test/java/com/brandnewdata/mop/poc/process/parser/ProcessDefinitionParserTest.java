@@ -3,6 +3,7 @@ package com.brandnewdata.mop.poc.process.parser;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.json.JSONUtil;
 import com.brandnewdata.mop.poc.process.manager.ConnectorManager;
+import com.brandnewdata.mop.poc.process.parser.dto.Step1Result;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -12,7 +13,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 
 
-class ProcessDefinitionDtoParserTest {
+class ProcessDefinitionParserTest {
 
     @Mock
     private ConnectorManager manager;
@@ -71,6 +72,18 @@ class ProcessDefinitionDtoParserTest {
 
         ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.step1(null, null, xml);
 
+    }
+
+
+    /**
+     * 测试标准的bpmn流程
+     */
+    @Test
+    void testParseOriginalXml() {
+        String xml = ResourceUtil.readUtf8Str("process/empty_process.xml");
+        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.step1(null, null, xml);
+        Step1Result step1Result = step1.step1Result();
+        return;
     }
 }
 

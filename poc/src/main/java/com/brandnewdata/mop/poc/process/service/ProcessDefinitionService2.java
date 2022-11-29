@@ -18,7 +18,7 @@ public class ProcessDefinitionService2 implements IProcessDefinitionService2{
         Step1Result step1Result = step1.replServiceTask(true, null).replAttr().step1Result();
         ProcessDefinitionStaticParseDto ret = new ProcessDefinitionStaticParseDto();
         ret.setProcessId(step1Result.getProcessId());
-        ret.setName(step1Result.getProcessId());
+        ret.setName(step1Result.getName());
         ret.setConfigs(step1Result.getConfigs());
         return ret;
     }

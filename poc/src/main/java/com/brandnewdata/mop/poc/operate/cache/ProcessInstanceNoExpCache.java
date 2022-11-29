@@ -19,12 +19,12 @@ import java.util.Map;
 @Component
 public class ProcessInstanceNoExpCache {
 
-    @Autowired
+/*    @Autowired*/
     private ListViewDao listViewDao;
 
     private final Cache<String, ListViewProcessInstanceDto> CACHE = CacheBuilder.newBuilder().build();
 
-    @Scheduled(fixedDelay = 60000)
+    // @Scheduled(fixedDelay = 60000)
     public void load() {
         Query query = new Query.Builder()
                 .bool(new BoolQuery.Builder()
