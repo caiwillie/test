@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.function.Function;
-import java.util.function.IntUnaryOperator;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -97,7 +96,7 @@ public class SceneVersionService implements ISceneVersionService {
     @Override
     public VersionProcessDto saveProcess(VersionProcessDto dto) {
         Long versionId = dto.getVersionId();
-        checkStatus(versionId, new int[] {SceneConst.SCENE_VERSION_STATUS__CONFIGURING});
+        getAndCheckStatus(versionId, new int[] {SceneConst.SCENE_VERSION_STATUS__CONFIGURING});
         return versionProcessService.save(dto);
     }
 
@@ -138,6 +137,39 @@ public class SceneVersionService implements ISceneVersionService {
     }
 
     @Override
+    public SceneVersionDto stop(Long id) {
+        SceneVersionDto sceneVersionDto = getAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__RUNNING});
+
+        // 修改状态
+        sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__STOPPED);
+        sceneVersionDao.updateById(SceneVersionPoConverter.createFrom(sceneVersionDto));
+        return sceneVersionDto;
+    }
+
+    @Override
+    public SceneVersionDto resume(Long id, List<Long> envList) {
+        SceneVersionDto sceneVersionDto = getAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__STOPPED});
+        Assert.notEmpty(envList, "环境列表不能为空");
+
+        // 修改状态
+        sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__RUNNING);
+        sceneVersionDao.updateById(SceneVersionPoConverter.createFrom(sceneVersionDto));
+        return sceneVersionDto;
+    }
+
+    @Override
+    public SceneVersionDto deploy(Long id, List<Long> envList) {
+        // 配置中，和调试中均可以进行发布
+        SceneVersionDto sceneVersionDto = getAndCheckStatus(id,
+                new int[]{SceneConst.SCENE_VERSION_STATUS__CONFIGURING, SceneConst.SCENE_VERSION_STATUS__DEBUGGING});
+        Assert.notEmpty(envList, "环境列表不能为空");
+
+        sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__RUNNING);
+        sceneVersionDao.updateById(SceneVersionPoConverter.createFrom(sceneVersionDto));
+        return sceneVersionDto;
+    }
+
+    @Override
     public Map<Long, Long> countById(List<Long> idList) {
         if(CollUtil.isEmpty(idList)) return MapUtil.empty();
         Assert.isTrue(idList.stream().filter(Objects::isNull).count() == 0, "版本id不能为空");
@@ -165,7 +197,7 @@ public class SceneVersionService implements ISceneVersionService {
                 .collect(Collectors.toMap(SceneVersionDto::getId, Function.identity()));
     }
 
-    private void checkStatus(Long id, int[] statusArr) {
+    private SceneVersionDto getAndCheckStatus(Long id, int[] statusArr) {
         Assert.notNull(id, "版本id不能为空");
 
         SceneVersionDto versionDto = fetchById(ListUtil.of(id)).get(id);
@@ -181,6 +213,8 @@ public class SceneVersionService implements ISceneVersionService {
 
         if(!flag) {
             throw new RuntimeException(StrUtil.format("版本状态异常，id: {}", id));
+        } else {
+            return versionDto;
         }
 
     }

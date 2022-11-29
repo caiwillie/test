@@ -19,7 +19,13 @@ public interface ISceneVersionService {
     void deleteProcess(VersionProcessDto dto);
 
     SceneVersionDto debug(Long id, Long envId);
-    
+
+    SceneVersionDto stop(Long id);
+
+    SceneVersionDto resume(Long id, List<Long> envList);
+
+    SceneVersionDto deploy(Long id, List<Long> envList);
+
     Map<Long, Long> countById(List<Long> sceneIdList);
 
     Map<Long, SceneVersionDto> fetchById(List<Long> id);

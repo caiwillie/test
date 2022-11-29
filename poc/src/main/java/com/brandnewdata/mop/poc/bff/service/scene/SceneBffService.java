@@ -7,6 +7,7 @@ import cn.hutool.core.lang.Opt;
 import cn.hutool.core.util.NumberUtil;
 import com.brandnewdata.mop.poc.bff.converter.scene.DebugProcessInstanceVoConverter;
 import com.brandnewdata.mop.poc.bff.converter.scene.SceneDtoConverter;
+import com.brandnewdata.mop.poc.bff.converter.scene.SceneVersionVoConverter;
 import com.brandnewdata.mop.poc.bff.converter.scene.VersionProcessDtoConverter;
 import com.brandnewdata.mop.poc.bff.vo.scene.DebugProcessInstanceVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVersionVo;
@@ -95,7 +96,7 @@ public class SceneBffService {
         List<SceneVersionDto> sceneVersionDtoList =
                 sceneVersionService.fetchSceneVersionListBySceneId(ListUtil.of(sceneId)).get(sceneId);
         return sceneVersionDtoList.stream()
-                .map(dto -> new SceneVersionVo().from(dto)).collect(Collectors.toList());
+                .map(SceneVersionVoConverter::createFrom).collect(Collectors.toList());
     }
 
     public List<VersionProcessVo> processList(Long versionId) {
@@ -120,7 +121,12 @@ public class SceneBffService {
         Assert.notNull(versionId, "版本id不能为空");
         EnvDto debugEnv = envService.fetchDebugEnv();
         SceneVersionDto sceneVersionDto = sceneVersionService.debug(versionId, debugEnv.getId());
-        return new SceneVersionVo().from(sceneVersionDto);
+        return SceneVersionVoConverter.createFrom(sceneVersionDto);
+    }
+
+    public SceneVersionVo versionDeploy(Long versionId, List<Long> envIdList) {
+        SceneVersionDto sceneVersionDto = sceneVersionService.deploy(versionId, envIdList);
+        return SceneVersionVoConverter.createFrom(sceneVersionDto);
     }
 
     public Page<DebugProcessInstanceVo> listDebugProcessInstance(Integer pageNum, Integer pageSize, Long versionId) {

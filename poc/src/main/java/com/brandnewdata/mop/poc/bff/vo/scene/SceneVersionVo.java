@@ -1,11 +1,13 @@
 package com.brandnewdata.mop.poc.bff.vo.scene;
 
+import com.brandnewdata.mop.poc.bff.vo.env.EnvVo;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -41,13 +43,8 @@ public class SceneVersionVo {
      */
     private Integer status;
 
-    public SceneVersionVo from(SceneVersionDto dto) {
-        this.setId(dto.getId());
-        this.setCreateTime(dto.getCreateTime());
-        this.setUpdateTime(dto.getUpdateTime());
-        this.setVersion(dto.getVersion());
-        this.setSceneId(dto.getSceneId());
-        this.setStatus(dto.getStatus());
-        return this;
-    }
+    /**
+     * 关联的环境列表
+     */
+    private List<EnvVo> envList;
 }
