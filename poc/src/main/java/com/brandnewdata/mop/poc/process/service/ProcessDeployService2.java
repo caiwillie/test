@@ -117,7 +117,7 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
     public Map<String, List<ProcessSnapshotDeployDto>> listSnapshotByProcessIdAndEnvId(Long envId, List<String> processIdList) {
         if(CollUtil.isEmpty(processIdList)) return MapUtil.empty();
         Assert.notNull(envId, "环境id不能为空");
-        Assert.isTrue(CollUtil.hasNull(processIdList), "流程id不能为空");
+        Assert.isFalse(CollUtil.hasNull(processIdList), "流程id不能为空");
 
         QueryWrapper<ProcessSnapshotDeployPo> query = new QueryWrapper<>();
         query.eq(ProcessSnapshotDeployPo.ENV_ID, envId);
@@ -172,7 +172,6 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
         Assert.notNull(bizType, "环境类型不能为空");
 
         String processId = bizDeployDto.getProcessId();
-        String expression = parseResponseExpression(bizDeployDto);
 
         ZeebeClient zeebeClient = zeebeClientManager.getByEnvId(envId);
 

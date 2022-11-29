@@ -44,6 +44,6 @@ public class ListViewTemplate extends AbstractTemplateDescriptor implements Proc
 
     @Override
     public String getVersion() {
-        return "1.3.0";
+        return "8.1.0";
     }
 }
