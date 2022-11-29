@@ -117,8 +117,9 @@ public class SceneVersionService implements ISceneVersionService {
         Assert.notNull(id, "版本id不能为空");
         SceneVersionDto sceneVersionDto = fetchById(ListUtil.of(id)).get(id);
         Assert.notNull(sceneVersionDto, "版本不存在。version id：{}", id);
-        List<VersionProcessDto> versionProcessDtoList = versionProcessService.fetchVersionProcessListByVersionId(ListUtil.of(id), true).get(id);
-        Assert.isTrue(CollUtil.isEmpty(versionProcessDtoList), "该版本下至少需要配置一个流程");
+        List<VersionProcessDto> versionProcessDtoList =
+                versionProcessService.fetchVersionProcessListByVersionId(ListUtil.of(id), false).get(id);
+        Assert.isTrue(CollUtil.isNotEmpty(versionProcessDtoList), "该版本下至少需要配置一个流程");
 
         Assert.notNull(envId, "环境id不能为空");
 
