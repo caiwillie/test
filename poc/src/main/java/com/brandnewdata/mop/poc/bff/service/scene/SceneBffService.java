@@ -16,6 +16,7 @@ import com.brandnewdata.mop.poc.env.dto.EnvDto;
 import com.brandnewdata.mop.poc.env.service.IEnvService;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService;
+import com.brandnewdata.mop.poc.process.dto.BizDeployDto;
 import com.brandnewdata.mop.poc.process.dto.ProcessSnapshotDeployDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
 import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
@@ -115,20 +116,7 @@ public class SceneBffService {
     }
 
     public void processDebug(VersionProcessVo vo) {
-        Long versionId = vo.getVersionId();
-        Assert.notNull(versionId, "流程版本id不能为空");
-        SceneVersionDto sceneVersionDto = sceneVersionService.fetchById(ListUtil.of(versionId)).get(versionId);
-        Assert.notNull(sceneVersionDto, "版本不存在。version id：{}", versionId);
-        Assert.isTrue(NumberUtil.equals(sceneVersionDto.getStatus(), SceneConst.SCENE_VERSION_STATUS__DEBUGGING)
-                        || NumberUtil.equals(sceneVersionDto.getStatus(), SceneConst.SCENE_VERSION_STATUS__CONFIGURING),
-                "版本状态异常。仅支持以下状态：调试中");
-
-        Long id = vo.getId();
-        Assert.notNull(id, "流程不能为空");
-        // 查询流程
-        VersionProcessDto versionProcessDto = versionProcessService.fetchVersionProcessById(ListUtil.of(id)).get(id);
-
-        // processDeployService.startAsync();
+        sceneVersionService.processDebug(VersionProcessDtoConverter.createFrom(vo), vo.getVariables());
     }
 
     public SceneVersionVo versionDebug(Long versionId) {

@@ -18,6 +18,8 @@ public interface ISceneVersionService {
 
     void deleteProcess(VersionProcessDto dto);
 
+    void processDebug(VersionProcessDto dto, Map<String, Object> variables);
+
     SceneVersionDto debug(Long id, Long envId);
 
     SceneVersionDto stop(Long id);

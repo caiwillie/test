@@ -10,6 +10,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.constant.ProcessConst;
 import com.brandnewdata.mop.poc.constant.SceneConst;
+import com.brandnewdata.mop.poc.env.dto.EnvDto;
 import com.brandnewdata.mop.poc.env.service.IEnvService;
 import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService;
 import com.brandnewdata.mop.poc.process.dto.BizDeployDto;
@@ -109,6 +110,36 @@ public class SceneVersionService implements ISceneVersionService {
         Assert.notNull(versionDto, "版本id不存在。id: {}", versionId);
 
 
+    }
+
+    @Override
+    public void processDebug(VersionProcessDto dto, Map<String, Object> variables) {
+        Long versionId = dto.getVersionId();
+        Assert.notNull(versionId, "流程版本id不能为空");
+        SceneVersionDto sceneVersionDto = fetchById(ListUtil.of(versionId)).get(versionId);
+        Assert.notNull(sceneVersionDto, "版本不存在。version id：{}", versionId);
+        Assert.isTrue(NumberUtil.equals(sceneVersionDto.getStatus(), SceneConst.SCENE_VERSION_STATUS__DEBUGGING)
+                        || NumberUtil.equals(sceneVersionDto.getStatus(), SceneConst.SCENE_VERSION_STATUS__CONFIGURING),
+                "版本状态异常。仅支持以下状态：调试中");
+
+        // 查询流程
+        Long id = dto.getId();
+        Assert.notNull(id, "流程不能为空");
+        VersionProcessDto versionProcessDto = versionProcessService.fetchVersionProcessById(ListUtil.of(id)).get(id);
+        Assert.notNull(versionProcessDto, "流程不存在: {}", id);
+
+        // 查询调试环境
+        EnvDto envDto = envService.fetchDebugEnv();
+        Assert.notNull(envDto, "调试环境不存在");
+        Long envId = envDto.getId();
+
+        BizDeployDto bizDeployDto = new BizDeployDto();
+        bizDeployDto.setProcessId(versionProcessDto.getProcessId());
+        bizDeployDto.setProcessName(versionProcessDto.getProcessName());
+        bizDeployDto.setProcessXml(versionProcessDto.getProcessXml());
+
+        processDeployService.startAsync(bizDeployDto, Opt.ofNullable(variables).orElse(MapUtil.empty()),
+                envId, ProcessConst.PROCESS_BIZ_TYPE__SCENE);
     }
 
     @Override

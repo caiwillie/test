@@ -1,6 +1,5 @@
 package com.brandnewdata.mop.poc.bff.vo.scene;
 
-import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -29,5 +28,5 @@ public class VersionProcessVo {
 
     private String processImg;
 
-    private Map<String, Object> variableMap;
+    private Map<String, Object> variables;
 }
