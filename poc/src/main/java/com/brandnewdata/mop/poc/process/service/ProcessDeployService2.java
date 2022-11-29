@@ -43,6 +43,7 @@ import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -114,9 +115,9 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
     }
 
     @Override
-    public Map<String, List<ProcessSnapshotDeployDto>> listSnapshotByProcessIdAndEnvId(Long envId, List<String> processIdList) {
-        if(CollUtil.isEmpty(processIdList)) return MapUtil.empty();
+    public Map<String, List<ProcessSnapshotDeployDto>> listSnapshotByEnvIdAndProcessId(Long envId, List<String> processIdList) {
         Assert.notNull(envId, "环境id不能为空");
+        if(CollUtil.isEmpty(processIdList)) return MapUtil.empty();
         Assert.isFalse(CollUtil.hasNull(processIdList), "流程id不能为空");
 
         QueryWrapper<ProcessSnapshotDeployPo> query = new QueryWrapper<>();
@@ -125,6 +126,18 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
         List<ProcessSnapshotDeployPo> processSnapshotDeployPoList = snapshotDeployDao.selectList(query);
         return processSnapshotDeployPoList.stream().map(ProcessSnapshotDeployDtoConverter::createFrom)
                 .collect(Collectors.groupingBy(ProcessSnapshotDeployDto::getProcessId));
+    }
+
+    @Override
+    public Map<Long, ProcessSnapshotDeployDto> listSnapshotById(List<Long> idList) {
+        if(CollUtil.isEmpty(idList)) return MapUtil.empty();
+        Assert.isFalse(CollUtil.hasNull(idList), "快照部署id不能为空");
+
+        QueryWrapper<ProcessSnapshotDeployPo> query = new QueryWrapper<>();
+        query.in(ProcessSnapshotDeployPo.ID, idList);
+        List<ProcessSnapshotDeployPo> processSnapshotDeployPoList = snapshotDeployDao.selectList(query);
+        return processSnapshotDeployPoList.stream().map(ProcessSnapshotDeployDtoConverter::createFrom)
+                .collect(Collectors.toMap(ProcessSnapshotDeployDto::getId, Function.identity()));
     }
 
     @Override

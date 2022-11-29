@@ -12,7 +12,9 @@ public interface IProcessDeployService2 {
 
     void releaseDeploy(BizDeployDto bizDeployDto, List<Long> envIdList, String bizType);
 
-    Map<String, List<ProcessSnapshotDeployDto>> listSnapshotByProcessIdAndEnvId(Long envId, List<String> processIdList);
+    Map<String, List<ProcessSnapshotDeployDto>> listSnapshotByEnvIdAndProcessId(Long envId, List<String> processIdList);
+
+    Map<Long, ProcessSnapshotDeployDto> listSnapshotById(List<Long> idList);
 
     Map<String, Object> startSync(BizDeployDto bizDeployDto, Map<String, Object> values, Long envId, String bizType);
 

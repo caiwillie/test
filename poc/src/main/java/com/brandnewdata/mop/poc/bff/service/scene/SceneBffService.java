@@ -5,7 +5,9 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Opt;
 import cn.hutool.core.util.NumberUtil;
+import com.brandnewdata.mop.poc.bff.converter.process.ProcessDefinitionVoConverter;
 import com.brandnewdata.mop.poc.bff.converter.scene.*;
+import com.brandnewdata.mop.poc.bff.vo.process.ProcessDefinitionVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.DebugProcessInstanceVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVersionVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVo;
@@ -16,8 +18,8 @@ import com.brandnewdata.mop.poc.env.dto.EnvDto;
 import com.brandnewdata.mop.poc.env.service.IEnvService;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService;
-import com.brandnewdata.mop.poc.process.dto.BizDeployDto;
 import com.brandnewdata.mop.poc.process.dto.ProcessSnapshotDeployDto;
+import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService2;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
 import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
@@ -46,18 +48,22 @@ public class SceneBffService {
 
     private final IProcessInstanceService processInstanceService;
 
+    private final IProcessDefinitionService2 processDefinitionService;
+
     public SceneBffService(ISceneService2 sceneService,
                            ISceneVersionService sceneVersionService,
                            IVersionProcessService versionProcessService,
                            IEnvService envService,
                            IProcessDeployService2 processDeployService,
-                           IProcessInstanceService processInstanceService) {
+                           IProcessInstanceService processInstanceService,
+                           IProcessDefinitionService2 processDefinitionService) {
         this.sceneService = sceneService;
         this.sceneVersionService = sceneVersionService;
         this.versionProcessService = versionProcessService;
         this.envService = envService;
         this.processDeployService = processDeployService;
         this.processInstanceService = processInstanceService;
+        this.processDefinitionService = processDefinitionService;
     }
 
     public Page<SceneVo> page(Integer pageNum, Integer pageSize, String name) {
@@ -162,7 +168,7 @@ public class SceneBffService {
 
         // 获取流程定义
         Map<String, List<ProcessSnapshotDeployDto>> snapshotDeployMap =
-                processDeployService.listSnapshotByProcessIdAndEnvId(envId, ListUtil.toList(versionProcessDtoMap.keySet()));
+                processDeployService.listSnapshotByEnvIdAndProcessId(envId, ListUtil.toList(versionProcessDtoMap.keySet()));
         Map<Long, ProcessSnapshotDeployDto> processSnapshotDeployDtoMap = snapshotDeployMap.values().stream()
                 .flatMap(Collection::stream).collect(Collectors.toMap(ProcessSnapshotDeployDto::getProcessZeebeKey, Function.identity()));
 
@@ -184,5 +190,21 @@ public class SceneBffService {
         }
 
         return new Page<>(page.getTotal(), vos);
+    }
+
+    public ProcessDefinitionVo definitionDebugProcessInstance(DebugProcessInstanceVo vo) {
+        String processName = vo.getProcessName();
+
+        // 获取部署
+        Long snapshotDeployId = vo.getSnapshotDeployId();
+        Assert.notNull(snapshotDeployId, "部署id不能为空");
+        ProcessSnapshotDeployDto processSnapshotDeployDto =
+                processDeployService.listSnapshotById(ListUtil.of(snapshotDeployId)).get(snapshotDeployId);
+        Assert.notNull(processSnapshotDeployDto, "部署id不存在: {}", snapshotDeployId);
+
+        // 获取流程定义
+        return ProcessDefinitionVoConverter.createFrom(processSnapshotDeployDto.getProcessId(),
+                processName, processSnapshotDeployDto.getProcessXml());
+
     }
 }

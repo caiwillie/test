@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Opt;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.bff.service.scene.SceneBffService;
 import com.brandnewdata.mop.poc.bff.vo.env.EnvVo;
+import com.brandnewdata.mop.poc.bff.vo.process.ProcessDefinitionVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.DebugProcessInstanceVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVersionVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVo;
@@ -146,6 +147,12 @@ public class SceneController2 {
                                                                     @RequestParam Long versionId,
                                                                     @RequestParam(required = false) String processId) {
         Page<DebugProcessInstanceVo> ret = sceneBffService.listDebugProcessInstance(pageNum, pageSize, versionId);
+        return Result.OK(ret);
+    }
+
+    @PostMapping(value = "/rest/scene/version/debug/processInstance/definition")
+    public Result<ProcessDefinitionVo> definitionDebugProcessInstance(@RequestBody DebugProcessInstanceVo vo) {
+        ProcessDefinitionVo ret = sceneBffService.definitionDebugProcessInstance(vo);
         return Result.OK(ret);
     }
 
