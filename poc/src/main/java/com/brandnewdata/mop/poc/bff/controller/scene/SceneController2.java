@@ -1,7 +1,10 @@
 package com.brandnewdata.mop.poc.bff.controller.scene;
 
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.lang.Opt;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.bff.service.scene.SceneBffService;
+import com.brandnewdata.mop.poc.bff.vo.env.EnvVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.DebugProcessInstanceVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVersionVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVo;
@@ -11,6 +14,7 @@ import com.brandnewdata.mop.poc.common.dto.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 场景集成相关接口（新）
@@ -151,7 +155,10 @@ public class SceneController2 {
      */
     @PostMapping(value = "/rest/scene/version/deploy")
     public Result<SceneVersionVo> versionDeploy(@RequestBody SceneVersionVo sceneVersionVo) {
-        return Result.OK();
+        List<Long> envIdList = Opt.ofNullable(sceneVersionVo.getEnvList()).orElse(ListUtil.empty())
+                .stream().map(EnvVo::getId).collect(Collectors.toList());
+        SceneVersionVo ret = sceneBffService.versionDeploy(sceneVersionVo.getId(), envIdList, sceneVersionVo.getVersion());
+        return Result.OK(ret);
     }
 
     /**
@@ -162,7 +169,8 @@ public class SceneController2 {
      */
     @PostMapping(value = "/rest/scene/version/stop")
     public Result<SceneVersionVo> versionStop(@RequestBody SceneVersionVo sceneVersionVo) {
-        return Result.OK();
+        SceneVersionVo ret = sceneBffService.versionStop(sceneVersionVo.getId());
+        return Result.OK(ret);
     }
 
     /**
@@ -173,7 +181,10 @@ public class SceneController2 {
      */
     @PostMapping(value = "/rest/scene/version/resume")
     public Result<SceneVersionVo> versionResume(@RequestBody SceneVersionVo sceneVersionVo) {
-        return Result.OK();
+        List<Long> envIdList = Opt.ofNullable(sceneVersionVo.getEnvList()).orElse(ListUtil.empty())
+                .stream().map(EnvVo::getId).collect(Collectors.toList());
+        SceneVersionVo ret = sceneBffService.versionResume(sceneVersionVo.getId(), envIdList);
+        return Result.OK(ret);
     }
 
     /**

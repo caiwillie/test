@@ -158,11 +158,13 @@ public class SceneVersionService implements ISceneVersionService {
     }
 
     @Override
-    public SceneVersionDto deploy(Long id, List<Long> envList) {
+    public SceneVersionDto deploy(Long id, List<Long> envList, String version) {
         // 配置中，和调试中均可以进行发布
         SceneVersionDto sceneVersionDto = getAndCheckStatus(id,
                 new int[]{SceneConst.SCENE_VERSION_STATUS__CONFIGURING, SceneConst.SCENE_VERSION_STATUS__DEBUGGING});
         Assert.notEmpty(envList, "环境列表不能为空");
+        Assert.notNull(version, "版本不能为空");
+        Assert.isFalse(StrUtil.equals(sceneVersionDto.getVersion(), version), "请修改为正式版本号");
 
         sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__RUNNING);
         sceneVersionDao.updateById(SceneVersionPoConverter.createFrom(sceneVersionDto));

@@ -124,9 +124,19 @@ public class SceneBffService {
         return SceneVersionVoConverter.createFrom(sceneVersionDto);
     }
 
-    public SceneVersionVo versionDeploy(Long versionId, List<Long> envIdList) {
-        SceneVersionDto sceneVersionDto = sceneVersionService.deploy(versionId, envIdList);
+    public SceneVersionVo versionDeploy(Long versionId, List<Long> envIdList, String version) {
+        SceneVersionDto sceneVersionDto = sceneVersionService.deploy(versionId, envIdList, version);
         return SceneVersionVoConverter.createFrom(sceneVersionDto);
+    }
+
+    public SceneVersionVo versionStop(Long versionId) {
+        SceneVersionDto sceneVersionDto = sceneVersionService.stop(versionId);
+        return SceneVersionVoConverter.createFrom(sceneVersionDto);
+    }
+
+    public SceneVersionVo versionResume(Long versionId, List<Long> envIdList) {
+        SceneVersionDto dto = sceneVersionService.resume(versionId, envIdList);
+        return SceneVersionVoConverter.createFrom(dto);
     }
 
     public Page<DebugProcessInstanceVo> listDebugProcessInstance(Integer pageNum, Integer pageSize, Long versionId) {
