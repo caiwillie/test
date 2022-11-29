@@ -28,10 +28,7 @@ import com.brandnewdata.mop.poc.scene.service.ISceneVersionService;
 import com.brandnewdata.mop.poc.scene.service.IVersionProcessService;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -126,8 +123,7 @@ public class SceneBffService {
         return new SceneVersionVo().from(sceneVersionDto);
     }
 
-    public List<DebugProcessInstanceVo> listDebugProcessInstance(Long versionId) {
-        List<DebugProcessInstanceVo> ret = new ArrayList<>();
+    public Page<DebugProcessInstanceVo> listDebugProcessInstance(Integer pageNum, Integer pageSize, Long versionId) {
         Assert.notNull(versionId, "版本id不能为空");
         SceneVersionDto sceneVersionDto = sceneVersionService.fetchById(ListUtil.of(versionId)).get(versionId);
         Assert.notNull(sceneVersionDto, "版本不存在。version id：{}", versionId);
@@ -153,10 +149,12 @@ public class SceneBffService {
                 .flatMap(Collection::stream).collect(Collectors.toMap(ProcessSnapshotDeployDto::getProcessZeebeKey, Function.identity()));
 
         // 根据流程定义去查询流程实例
-        List<ListViewProcessInstanceDto> listViewProcessInstanceDtoList =
-                processInstanceService.listProcessInstanceByZeebeKey(envId, ListUtil.toList(processSnapshotDeployDtoMap.keySet()));
+        Page<ListViewProcessInstanceDto> page =
+                processInstanceService.pageProcessInstanceByZeebeKey(
+                        envId, ListUtil.toList(processSnapshotDeployDtoMap.keySet()), pageNum, pageSize, new HashMap<>());
 
-        for (ListViewProcessInstanceDto listViewProcessInstanceDto : listViewProcessInstanceDtoList) {
+        List<DebugProcessInstanceVo> vos = new ArrayList<>();
+        for (ListViewProcessInstanceDto listViewProcessInstanceDto : page.getRecords()) {
             DebugProcessInstanceVo vo = DebugProcessInstanceVoConverter.createFrom(listViewProcessInstanceDto);
             Long zeebeKey = listViewProcessInstanceDto.getProcessId();
             String processId = listViewProcessInstanceDto.getBpmnProcessId();
@@ -164,9 +162,9 @@ public class SceneBffService {
             VersionProcessDto versionProcessDto = versionProcessDtoMap.get(processId);
             DebugProcessInstanceVoConverter.updateFrom(vo, processSnapshotDeployDto);
             DebugProcessInstanceVoConverter.updateFrom(vo, versionProcessDto);
-            ret.add(vo);
+            vos.add(vo);
         }
 
-        return ret;
+        return new Page<>(page.getTotal(), vos);
     }
 }

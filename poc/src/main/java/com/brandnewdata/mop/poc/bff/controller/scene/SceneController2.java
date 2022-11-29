@@ -135,9 +135,11 @@ public class SceneController2 {
      * @return the result
      */
     @GetMapping(value = "/rest/scene/version/debug/processInstance/list")
-    public Result<List<DebugProcessInstanceVo>> listProcessInstance(@RequestParam Long versionId,
+    public Result<Page<DebugProcessInstanceVo>> listProcessInstance(@RequestParam Integer pageNum,
+                                                                    @RequestParam Integer pageSize,
+                                                                    @RequestParam Long versionId,
                                                                     @RequestParam(required = false) String processId) {
-        List<DebugProcessInstanceVo> ret = sceneBffService.listDebugProcessInstance(versionId);
+        Page<DebugProcessInstanceVo> ret = sceneBffService.listDebugProcessInstance(pageNum, pageSize, versionId);
         return Result.OK(ret);
     }
 
