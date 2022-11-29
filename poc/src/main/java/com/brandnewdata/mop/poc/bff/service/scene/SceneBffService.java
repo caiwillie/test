@@ -138,7 +138,7 @@ public class SceneBffService {
         // 获取该版本下当前的流程定义
         List<VersionProcessDto> versionProcessDtoList =
                 versionProcessService.fetchVersionProcessListByVersionId(ListUtil.of(versionId), true).get(versionId);
-        if(CollUtil.isEmpty(versionProcessDtoList)) return ListUtil.empty();
+        if(CollUtil.isEmpty(versionProcessDtoList)) return new Page<>(0, ListUtil.empty());
         Map<String, VersionProcessDto> versionProcessDtoMap =
                 versionProcessDtoList.stream().collect(Collectors.toMap(VersionProcessDto::getProcessId, Function.identity()));
 
