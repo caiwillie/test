@@ -119,11 +119,7 @@ public class ProcessDefinitionParser implements
 
     @Override
     public ProcessDefinitionParseStep1 replServiceTask(boolean replConfig, ConnectorManager manager) {
-        // todo 单独处理
-        clearServiceTask();
-
         // 下面的顺序很重要，从内到外
-
         if(replConfig && manager != null) {
             // 要求替换连接配置，并且 manager 不为空
             replEle_Config(manager);
@@ -136,6 +132,11 @@ public class ProcessDefinitionParser implements
         replEleBndTdInBndSt();
 
         replEleConntoZbCa();
+
+        // ==============================
+
+        // 清除 service task 的多余属性
+        clearServiceTask();
 
         return this;
     }
@@ -811,7 +812,8 @@ public class ProcessDefinitionParser implements
                 .step1(trigger.getFullId(), null, xml)
                 .replServiceTask(false, null)
                 .replAttr()
-                .step2().replEleTriggerSe(manager)
+                .step2()
+                .replEleTriggerSe(manager)
                 .step2Result();
 
         // 替换成真实协议

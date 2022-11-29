@@ -5,10 +5,7 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Opt;
 import cn.hutool.core.util.NumberUtil;
-import com.brandnewdata.mop.poc.bff.converter.scene.DebugProcessInstanceVoConverter;
-import com.brandnewdata.mop.poc.bff.converter.scene.SceneDtoConverter;
-import com.brandnewdata.mop.poc.bff.converter.scene.SceneVersionVoConverter;
-import com.brandnewdata.mop.poc.bff.converter.scene.VersionProcessDtoConverter;
+import com.brandnewdata.mop.poc.bff.converter.scene.*;
 import com.brandnewdata.mop.poc.bff.vo.scene.DebugProcessInstanceVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVersionVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVo;
@@ -104,7 +101,7 @@ public class SceneBffService {
         List<VersionProcessDto> versionProcessDtoList =
                 versionProcessService.fetchVersionProcessListByVersionId(ListUtil.of(versionId), false).get(versionId);
         return Opt.ofNullable(versionProcessDtoList).orElse(ListUtil.empty()).stream()
-                .map(dto -> new VersionProcessVo().from(dto)).collect(Collectors.toList());
+                .map(VersionProcessVoConverter::createFrom).collect(Collectors.toList());
     }
 
     public SceneVo save(SceneVo vo) {
@@ -114,7 +111,24 @@ public class SceneBffService {
 
     public VersionProcessVo processSave(VersionProcessVo vo) {
         VersionProcessDto dto = sceneVersionService.saveProcess(VersionProcessDtoConverter.createFrom(vo));
-        return new VersionProcessVo().from(dto);
+        return VersionProcessVoConverter.createFrom(dto);
+    }
+
+    public void processDebug(VersionProcessVo vo) {
+        Long versionId = vo.getVersionId();
+        Assert.notNull(versionId, "流程版本id不能为空");
+        SceneVersionDto sceneVersionDto = sceneVersionService.fetchById(ListUtil.of(versionId)).get(versionId);
+        Assert.notNull(sceneVersionDto, "版本不存在。version id：{}", versionId);
+        Assert.isTrue(NumberUtil.equals(sceneVersionDto.getStatus(), SceneConst.SCENE_VERSION_STATUS__DEBUGGING)
+                        || NumberUtil.equals(sceneVersionDto.getStatus(), SceneConst.SCENE_VERSION_STATUS__CONFIGURING),
+                "版本状态异常。仅支持以下状态：调试中");
+
+        Long id = vo.getId();
+        Assert.notNull(id, "流程不能为空");
+        // 查询流程
+        VersionProcessDto versionProcessDto = versionProcessService.fetchVersionProcessById(ListUtil.of(id)).get(id);
+
+        // processDeployService.startAsync();
     }
 
     public SceneVersionVo versionDebug(Long versionId) {

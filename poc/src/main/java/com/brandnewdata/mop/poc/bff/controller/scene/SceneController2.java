@@ -131,6 +131,8 @@ public class SceneController2 {
         return Result.OK(ret);
     }
 
+
+
     /**
      * 调试版本的流程实例列表
      *
@@ -195,6 +197,11 @@ public class SceneController2 {
      */
     @PostMapping(value = "/rest/scene/version/copyToNew")
     public Result<SceneVersionVo> versionCopyToNew(@RequestBody SceneVersionVo oldVersion) {
+        return Result.OK();
+    }
+
+    @PostMapping(value = "/rest/scene/version/process/debug")
+    public Result processDebug(@RequestBody VersionProcessVo vo) {
         return Result.OK();
     }
 

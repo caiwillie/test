@@ -2,6 +2,7 @@ package com.brandnewdata.mop.poc.process.service;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.lang.Opt;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.NumberUtil;
@@ -19,6 +20,7 @@ import com.brandnewdata.mop.poc.process.dto.BizDeployDto;
 import com.brandnewdata.mop.poc.process.dto.ProcessSnapshotDeployDto;
 import com.brandnewdata.mop.poc.process.manager.ConnectorManager;
 import com.brandnewdata.mop.poc.process.manager.ZeebeClientManager;
+import com.brandnewdata.mop.poc.process.parser.FeelUtil;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParseStep1;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParseStep2;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParser;
@@ -26,14 +28,21 @@ import com.brandnewdata.mop.poc.process.parser.dto.Step1Result;
 import com.brandnewdata.mop.poc.process.parser.dto.Step2Result;
 import com.brandnewdata.mop.poc.process.po.ProcessReleaseDeployPo;
 import com.brandnewdata.mop.poc.process.po.ProcessSnapshotDeployPo;
+import com.brandnewdata.mop.poc.process.util.ProcessUtil;
+import com.dxy.library.json.jackson.JacksonUtil;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.camunda.zeebe.client.ZeebeClient;
+import io.camunda.zeebe.client.api.ZeebeFuture;
 import io.camunda.zeebe.client.api.response.DeploymentEvent;
 import io.camunda.zeebe.client.api.response.Process;
+import io.camunda.zeebe.client.api.response.ProcessInstanceResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -42,19 +51,17 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
 
     private final ZeebeClientManager zeebeClientManager;
 
-    private final ProcessSnapshotDeployDao snapshotDeployDao;
+    @Resource
+    private ProcessSnapshotDeployDao snapshotDeployDao;
 
-    private final ProcessReleaseDeployDao releaseDeployDao;
+    @Resource
+    private ProcessReleaseDeployDao releaseDeployDao;
 
     private final ConnectorManager connectorManager;
 
     public ProcessDeployService2(ZeebeClientManager zeebeClientManager,
-                                 ProcessSnapshotDeployDao snapshotDeployDao,
-                                 ProcessReleaseDeployDao releaseDeployDao,
                                  ConnectorManager connectorManager) {
         this.zeebeClientManager = zeebeClientManager;
-        this.snapshotDeployDao = snapshotDeployDao;
-        this.releaseDeployDao = releaseDeployDao;
         this.connectorManager = connectorManager;
     }
 
@@ -119,6 +126,86 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
         return processSnapshotDeployPoList.stream().map(ProcessSnapshotDeployDtoConverter::createFrom)
                 .collect(Collectors.groupingBy(ProcessSnapshotDeployDto::getProcessId));
     }
+
+    @Override
+    public Map<String, Object> startSync(BizDeployDto bizDeployDto, Map<String, Object> values, Long envId, String bizType) {
+        Assert.notNull(envId, "环境id不能为空");
+        Assert.notNull(bizType, "环境类型不能为空");
+
+        String processId = bizDeployDto.getProcessId();
+        String expression = parseResponseExpression(bizDeployDto);
+
+        ZeebeClient zeebeClient = zeebeClientManager.getByEnvId(envId);
+
+        ProcessInstanceResult result = zeebeClient.newCreateInstanceCommand()
+                .bpmnProcessId(ProcessUtil.convertProcessId(processId)) // 使用处理过的 processId
+                .latestVersion()
+                .variables(Opt.ofNullable(values).orElse(MapUtil.empty()))
+                .withResult()
+                .send()
+                .join();
+
+        Map<String, Object> resultVariables = result.getVariablesAsMap();
+        log.info("start process result variables: {}", JacksonUtil.to(resultVariables));
+
+        Object response = null;
+        if(StrUtil.isNotBlank(expression)) {
+            response = FeelUtil.evalExpression(expression, resultVariables);
+        } else {
+            // 如果表达式为空就返回特定字段的内容
+            response = resultVariables;
+        }
+
+        log.info("start process synchronously: {}, response expression eval: {}", processId, JacksonUtil.to(response));
+
+        if(response == null) {
+            return null;
+        } else {
+            // 转换成string，再反序列化成map
+            return JacksonUtil.fromMap(JacksonUtil.to(response));
+        }
+    }
+
+    @Override
+    public void startAsync(BizDeployDto bizDeployDto, Map<String, Object> values, Long envId, String bizType) {
+        Assert.notNull(envId, "环境id不能为空");
+        Assert.notNull(bizType, "环境类型不能为空");
+
+        String processId = bizDeployDto.getProcessId();
+        String expression = parseResponseExpression(bizDeployDto);
+
+        ZeebeClient zeebeClient = zeebeClientManager.getByEnvId(envId);
+
+        zeebeClient.newCreateInstanceCommand()
+                .bpmnProcessId(ProcessUtil.convertProcessId(processId)) // 使用处理过的 processId
+                .latestVersion()
+                .variables(Opt.ofNullable(values).orElse(MapUtil.empty()))
+                .withResult()
+                .send();
+
+        log.info("start process asynchronously: {}", processId);
+    }
+
+    private String parseResponseExpression(BizDeployDto bizDeployDto) {
+        String processId = bizDeployDto.getProcessId();
+        Step2Result step2Result = ProcessDefinitionParser
+                .step1(processId, bizDeployDto.getProcessName(), bizDeployDto.getProcessXml())
+                .step2().replEleSceneSe(connectorManager).step2Result();
+
+        // 解析 xml 后得到响应表达式
+        ObjectNode responseParams = step2Result.getResponseParams();
+
+        String expression = "";
+        if(responseParams != null) {
+            // todo caiwillie 还要验证一下
+            expression = JacksonUtil.to(responseParams);
+        }
+
+        log.info("parse process: {}, response expression: {}", processId, expression);
+
+        return expression;
+    }
+
 
     private ZeebeDeployBo zeebeDeploy(BizDeployDto bizDeployDto, Long envId, String bizType) {
         Assert.notNull(envId, "环境id不能为空");

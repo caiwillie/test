@@ -14,4 +14,8 @@ public interface IProcessDeployService2 {
 
     Map<String, List<ProcessSnapshotDeployDto>> listSnapshotByProcessIdAndEnvId(Long envId, List<String> processIdList);
 
+    Map<String, Object> startSync(BizDeployDto bizDeployDto, Map<String, Object> values, Long envId, String bizType);
+
+    void startAsync(BizDeployDto bizDeployDto, Map<String, Object> values, Long envId, String bizType);
+
 }

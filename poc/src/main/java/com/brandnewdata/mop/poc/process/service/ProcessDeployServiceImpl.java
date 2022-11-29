@@ -179,7 +179,8 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
 
         Step2Result step2Result = ProcessDefinitionParser
                 .step1(null, null, processDeployEntity.getProcessXml()).replServiceTask(true, connectorManager)
-                .step2().replEleSceneSe(connectorManager)
+                .step2()
+                .replEleSceneSe(connectorManager)
                 .step2Result();
 
         // 解析 xml 后得到响应表达式

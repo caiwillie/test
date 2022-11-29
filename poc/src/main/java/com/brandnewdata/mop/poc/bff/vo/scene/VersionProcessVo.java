@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -28,15 +29,5 @@ public class VersionProcessVo {
 
     private String processImg;
 
-    public VersionProcessVo from(VersionProcessDto dto) {
-        this.setId(dto.getId());
-        this.setCreateTime(dto.getCreateTime());
-        this.setUpdateTime(dto.getUpdateTime());
-        this.setVersionId(dto.getVersionId());
-        this.setProcessId(dto.getProcessId());
-        this.setProcessName(dto.getProcessName());
-        this.setProcessXml(dto.getProcessXml());
-        this.setProcessImg(dto.getProcessImg());
-        return this;
-    }
+    private Map<String, Object> variableMap;
 }
