@@ -6,7 +6,7 @@ import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import java.util.List;
 import java.util.Map;
 
-public interface IProcessInstanceService {
+public interface IProcessInstanceService2 {
 
     Page<ListViewProcessInstanceDto> pageProcessInstanceByZeebeKey(
             Long envId,
@@ -18,6 +18,4 @@ public interface IProcessInstanceService {
     List<ListViewProcessInstanceDto> listProcessInstanceByZeebeKey(
             Long envId,
             List<Long> zeebeKeyList);
-
-    List<ListViewProcessInstanceDto> listAll();
 }

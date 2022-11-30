@@ -17,7 +17,7 @@ import com.brandnewdata.mop.poc.constant.SceneConst;
 import com.brandnewdata.mop.poc.env.dto.EnvDto;
 import com.brandnewdata.mop.poc.env.service.IEnvService;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
-import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService;
+import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService2;
 import com.brandnewdata.mop.poc.process.dto.ProcessSnapshotDeployDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService2;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
@@ -46,7 +46,7 @@ public class SceneBffService {
 
     private final IProcessDeployService2 processDeployService;
 
-    private final IProcessInstanceService processInstanceService;
+    private final IProcessInstanceService2 processInstanceService;
 
     private final IProcessDefinitionService2 processDefinitionService;
 
@@ -55,7 +55,7 @@ public class SceneBffService {
                            IVersionProcessService versionProcessService,
                            IEnvService envService,
                            IProcessDeployService2 processDeployService,
-                           IProcessInstanceService processInstanceService,
+                           IProcessInstanceService2 processInstanceService,
                            IProcessDefinitionService2 processDefinitionService) {
         this.sceneService = sceneService;
         this.sceneVersionService = sceneVersionService;

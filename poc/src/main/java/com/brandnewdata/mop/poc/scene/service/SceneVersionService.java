@@ -12,7 +12,7 @@ import com.brandnewdata.mop.poc.constant.ProcessConst;
 import com.brandnewdata.mop.poc.constant.SceneConst;
 import com.brandnewdata.mop.poc.env.dto.EnvDto;
 import com.brandnewdata.mop.poc.env.service.IEnvService;
-import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService;
+import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService2;
 import com.brandnewdata.mop.poc.process.dto.BizDeployDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
 import com.brandnewdata.mop.poc.scene.converter.SceneVersionDtoConverter;
@@ -43,12 +43,12 @@ public class SceneVersionService implements ISceneVersionService {
 
     private final IProcessDeployService2 processDeployService;
 
-    private final IProcessInstanceService processInstanceService;
+    private final IProcessInstanceService2 processInstanceService;
 
     public SceneVersionService(IEnvService envService,
                                IVersionProcessService versionProcessService,
                                IProcessDeployService2 processDeployService,
-                               IProcessInstanceService processInstanceService) {
+                               IProcessInstanceService2 processInstanceService) {
         this.envService = envService;
         this.versionProcessService = versionProcessService;
         this.processDeployService = processDeployService;

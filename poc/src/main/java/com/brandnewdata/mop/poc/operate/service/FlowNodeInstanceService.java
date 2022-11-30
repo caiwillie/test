@@ -52,9 +52,6 @@ public class FlowNodeInstanceService {
     // @Autowired
     private ListViewDao listViewDao;
 
-    @Autowired
-    private ProcessLFUCache processLFUCache;
-
     public List<FlowNodeInstanceDto> list(String processInstanceId) {
         Assert.notNull(processInstanceId);
 
@@ -301,7 +298,8 @@ public class FlowNodeInstanceService {
             ProcessInstanceReferenceDto rootCauseInstance = new ProcessInstanceReferenceDto();
             rootCauseInstance.setInstanceId(String.valueOf(incidentEntity.getProcessInstanceKey()));
             rootCauseInstance.setProcessDefinitionId(String.valueOf(incidentEntity.getProcessDefinitionKey()));
-            rootCauseInstance.setProcessDefinitionName(getProcessName(incidentEntity.getProcessDefinitionKey()));
+            // todo
+            // rootCauseInstance.setProcessDefinitionName(getProcessName(incidentEntity.getProcessDefinitionKey()));
             incidentDto.setRootCauseInstance(rootCauseInstance);
         }
 
@@ -311,7 +309,8 @@ public class FlowNodeInstanceService {
         return ret;
     }
 
-    private String getProcessName(Long processDefinitionKey) {
+/*
+private String getProcessName(Long processDefinitionKey) {
         ProcessEntity processEntity = processLFUCache.getOne(processDefinitionKey);
         if(processEntity != null) {
             return processEntity.getName() != null ? processEntity.getName() : processEntity.getBpmnProcessId();
@@ -319,6 +318,7 @@ public class FlowNodeInstanceService {
             return FALLBACK_PROCESS_DEFINITION_NAME;
         }
     }
+*/
 
     private Map<String, IncidentDataHolder> collectFlowNodeDataForPropagatedIncidents(
             List<IncidentEntity> incidents, Long processInstanceId, String currentTreePath) {

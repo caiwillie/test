@@ -15,7 +15,7 @@ import com.brandnewdata.mop.poc.bff.vo.scene.operate.condition.Scene;
 import com.brandnewdata.mop.poc.bff.vo.scene.operate.condition.Version;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
-import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService;
+import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService2;
 import com.brandnewdata.mop.poc.process.dto.ProcessDeployDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
@@ -46,7 +46,7 @@ public class SceneOperateBffService {
     @Resource
     private ISceneService sceneService;
     @Resource
-    private IProcessInstanceService processInstanceService;
+    private IProcessInstanceService2 processInstanceService;
 
     public List<Scene> getAllScene() {
         // 获取所有场景的部署流程列表
