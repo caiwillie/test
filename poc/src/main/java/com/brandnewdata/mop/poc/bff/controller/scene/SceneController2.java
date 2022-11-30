@@ -104,7 +104,7 @@ public class SceneController2 {
      * @return
      */
     @GetMapping(value = "/rest/scene/version/list")
-    public Result<List<SceneVersionVo>> versionList(@RequestParam Long sceneId) {
+    public Result<List<SceneVersionVo>> listVersion(@RequestParam Long sceneId) {
         List<SceneVersionVo> sceneVersionVoList = sceneBffService.versionList(sceneId);
         return Result.OK(sceneVersionVoList);
     }
@@ -116,7 +116,7 @@ public class SceneController2 {
      * @return the result
      */
     @GetMapping(value = "/rest/scene/version/process/list")
-    public Result<List<VersionProcessVo>> processList(@RequestParam Long versionId) {
+    public Result<List<VersionProcessVo>> listProcess(@RequestParam Long versionId) {
         List<VersionProcessVo> versionProcessVoList = sceneBffService.processList(versionId);
         return Result.OK(versionProcessVoList);
     }
@@ -127,11 +127,22 @@ public class SceneController2 {
      * @return the result
      */
     @PostMapping(value = "/rest/scene/version/debug")
-    public Result<SceneVersionVo> versionDebug(@RequestBody SceneVersionVo vo) {
-        SceneVersionVo ret = sceneBffService.versionDebug(vo.getId());
+    public Result<SceneVersionVo> debugVersion(@RequestBody SceneVersionVo vo) {
+        SceneVersionVo ret = sceneBffService.debugVersion(vo.getId());
         return Result.OK(ret);
     }
 
+    /**
+     * 停止调试
+     *
+     * @param vo
+     * @return
+     */
+    @PostMapping(value = "/rest/scene/version/debug/stop")
+    public Result<SceneVersionVo> stopDebugVersion(@RequestBody SceneVersionVo vo) {
+        SceneVersionVo ret = sceneBffService.stopDebugVersion(vo.getId());
+        return Result.OK(ret);
+    }
 
 
     /**
@@ -169,10 +180,10 @@ public class SceneController2 {
      * @return the result
      */
     @PostMapping(value = "/rest/scene/version/deploy")
-    public Result<SceneVersionVo> versionDeploy(@RequestBody SceneVersionVo sceneVersionVo) {
+    public Result<SceneVersionVo> deployVersion(@RequestBody SceneVersionVo sceneVersionVo) {
         List<Long> envIdList = Opt.ofNullable(sceneVersionVo.getEnvList()).orElse(ListUtil.empty())
                 .stream().map(EnvVo::getId).collect(Collectors.toList());
-        SceneVersionVo ret = sceneBffService.versionDeploy(sceneVersionVo.getId(), envIdList, sceneVersionVo.getVersion());
+        SceneVersionVo ret = sceneBffService.deployVersion(sceneVersionVo.getId(), envIdList, sceneVersionVo.getVersion());
         return Result.OK(ret);
     }
 

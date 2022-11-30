@@ -22,6 +22,8 @@ public interface ISceneVersionService {
 
     SceneVersionDto debug(Long id, Long envId);
 
+    SceneVersionDto stopDebug(Long id, Long envId);
+
     SceneVersionDto stop(Long id);
 
     SceneVersionDto resume(Long id, List<Long> envList);

@@ -125,14 +125,23 @@ public class SceneBffService {
         sceneVersionService.processDebug(VersionProcessDtoConverter.createFrom(vo), vo.getVariables());
     }
 
-    public SceneVersionVo versionDebug(Long versionId) {
+    public SceneVersionVo debugVersion(Long versionId) {
         Assert.notNull(versionId, "版本id不能为空");
         EnvDto debugEnv = envService.fetchDebugEnv();
         SceneVersionDto sceneVersionDto = sceneVersionService.debug(versionId, debugEnv.getId());
         return SceneVersionVoConverter.createFrom(sceneVersionDto);
     }
 
-    public SceneVersionVo versionDeploy(Long versionId, List<Long> envIdList, String version) {
+    public SceneVersionVo stopDebugVersion(Long versionId) {
+        Assert.notNull(versionId, "版本id不能为空");
+        EnvDto debugEnv = envService.fetchDebugEnv();
+        SceneVersionDto sceneVersionDto = sceneVersionService.stopDebug(versionId, debugEnv.getId());
+        return SceneVersionVoConverter.createFrom(sceneVersionDto);
+    }
+
+
+
+    public SceneVersionVo deployVersion(Long versionId, List<Long> envIdList, String version) {
         SceneVersionDto sceneVersionDto = sceneVersionService.deploy(versionId, envIdList, version);
         return SceneVersionVoConverter.createFrom(sceneVersionDto);
     }
