@@ -15,7 +15,7 @@ public class VariableDao {
 
     private static final VariableTemplate TEMPLATE = new VariableTemplate();
 
-    private static final Map<ElasticsearchClient, VariableDao> instanceMap = MapUtil.newConcurrentHashMap();
+    private static final Map<ElasticsearchClient, VariableDao> INSTANCE_MAP = MapUtil.newConcurrentHashMap();
 
     private final ElasticsearchClient client;
 
@@ -24,7 +24,7 @@ public class VariableDao {
     }
 
     public static VariableDao getInstance(ElasticsearchClient client) {
-        return instanceMap.computeIfAbsent(client, VariableDao::new);
+        return INSTANCE_MAP.computeIfAbsent(client, VariableDao::new);
     }
 
     public List<VariableEntity> list(Query query) {

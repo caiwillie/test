@@ -19,7 +19,7 @@ import java.util.Map;
 public class ListViewDao {
     private static final ListViewTemplate TEMPLATE = new ListViewTemplate();
 
-    private static final Map<ElasticsearchClient, ListViewDao> instanceMap = MapUtil.newConcurrentHashMap();
+    private static final Map<ElasticsearchClient, ListViewDao> INSTANCE_MAP = MapUtil.newConcurrentHashMap();
 
     private final ElasticsearchClient client;
 
@@ -28,7 +28,7 @@ public class ListViewDao {
     }
 
     public static ListViewDao getInstance(ElasticsearchClient client) {
-        return instanceMap.computeIfAbsent(client, ListViewDao::new);
+        return INSTANCE_MAP.computeIfAbsent(client, ListViewDao::new);
     }
 
     public ProcessInstanceForListViewEntity getOneByParentFlowNodeInstanceId(String parentFlowNodeInstanceId) {

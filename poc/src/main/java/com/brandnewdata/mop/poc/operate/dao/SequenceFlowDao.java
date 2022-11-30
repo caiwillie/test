@@ -1,24 +1,35 @@
 package com.brandnewdata.mop.poc.operate.dao;
 
+import cn.hutool.core.map.MapUtil;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import com.brandnewdata.mop.poc.operate.entity.SequenceFlowEntity;
 import com.brandnewdata.mop.poc.operate.schema.template.SequenceFlowTemplate;
 import com.brandnewdata.mop.poc.operate.util.ElasticsearchUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
-@Component
-public class SequenceFlowDao extends AbstractDao {
+public class SequenceFlowDao {
+    private static final SequenceFlowTemplate TEMPLATE = new SequenceFlowTemplate();
 
-    @Autowired
-    private SequenceFlowTemplate template;
+    private static final Map<ElasticsearchClient, SequenceFlowDao> INSTANCE_MAP = MapUtil.newConcurrentHashMap();
+
+    private final ElasticsearchClient client;
+
+    private SequenceFlowDao(ElasticsearchClient client) {
+        this.client = client;
+    }
+
+    public static SequenceFlowDao getInstance(ElasticsearchClient client) {
+        return INSTANCE_MAP.computeIfAbsent(client, SequenceFlowDao::new);
+    }
 
     public List<SequenceFlowEntity> scrollAll(Query query) {
         SearchRequest request = new SearchRequest.Builder()
-                .index(template.getAlias())
+                .index(TEMPLATE.getAlias())
                 .query(query)
                 .build();
         return ElasticsearchUtil.scrollAll(client, request, SequenceFlowEntity.class);

@@ -9,7 +9,6 @@ import co.elastic.clients.elasticsearch.core.SearchRequest;
 import com.brandnewdata.mop.poc.operate.entity.IncidentEntity;
 import com.brandnewdata.mop.poc.operate.schema.template.IncidentTemplate;
 import com.brandnewdata.mop.poc.operate.util.ElasticsearchUtil;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
@@ -17,7 +16,7 @@ import java.util.Map;
 public class IncidentDao {
     private static final IncidentTemplate TEMPLATE = new IncidentTemplate();
 
-    private static final Map<ElasticsearchClient, IncidentDao> instanceMap = MapUtil.newConcurrentHashMap();
+    private static final Map<ElasticsearchClient, IncidentDao> INSTANCE_MAP = MapUtil.newConcurrentHashMap();
 
     private final ElasticsearchClient client;
 
@@ -26,7 +25,7 @@ public class IncidentDao {
     }
 
     public static IncidentDao getInstance(ElasticsearchClient client) {
-        return instanceMap.computeIfAbsent(client, IncidentDao::new);
+        return INSTANCE_MAP.computeIfAbsent(client, IncidentDao::new);
     }
 
     public List<IncidentEntity> listByTreePath(String treePath) {
