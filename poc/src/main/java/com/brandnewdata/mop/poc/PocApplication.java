@@ -2,7 +2,6 @@ package com.brandnewdata.mop.poc;
 
 import com.brandnewdata.common.annotation.EnableGlobalExceptionHandler;
 import com.brandnewdata.common.annotation.EnableRequestInterceptorComponent;
-import io.camunda.zeebe.spring.client.EnableZeebeClient;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration;
@@ -14,7 +13,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication(exclude = ElasticsearchRestClientAutoConfiguration.class)
 @ServletComponentScan
-@EnableZeebeClient // 开启zeebe https://github.com/camunda-community-hub/spring-zeebe/
 @RefreshScope // 开启配置中心自动刷新 https://nacos.io/zh-cn/docs/quick-start-spring-cloud.html
 @EnableDiscoveryClient // 开启注册发现 https://nacos.io/zh-cn/docs/quick-start-spring-cloud.html
 @EnableFeignClients(basePackages = {"com.brandnewdata.connector.api"})
