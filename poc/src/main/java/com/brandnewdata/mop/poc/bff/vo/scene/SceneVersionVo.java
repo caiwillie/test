@@ -1,7 +1,6 @@
 package com.brandnewdata.mop.poc.bff.vo.scene;
 
 import com.brandnewdata.mop.poc.bff.vo.env.EnvVo;
-import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;

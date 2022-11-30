@@ -1,14 +1,11 @@
 package com.brandnewdata.mop.poc.bff.service.process;
 
-import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.bff.converter.operate.SequenceFlowVoConverter;
 import com.brandnewdata.mop.poc.bff.vo.operate.process.FlowNodeStateVo;
 import com.brandnewdata.mop.poc.bff.vo.operate.process.SequenceFlowVo;
 import com.brandnewdata.mop.poc.bff.vo.operate.process.VariableVo;
 import com.brandnewdata.mop.poc.operate.dto.FlowNodeStateDto;
 import com.brandnewdata.mop.poc.operate.dto.SequenceFlowDto;
-import com.brandnewdata.mop.poc.operate.entity.SequenceFlowEntity;
-import com.brandnewdata.mop.poc.operate.resp.SequenceFlowResp;
 import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService2;
 import org.springframework.stereotype.Service;
 

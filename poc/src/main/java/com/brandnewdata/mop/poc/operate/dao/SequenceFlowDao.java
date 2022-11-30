@@ -7,7 +7,6 @@ import co.elastic.clients.elasticsearch.core.SearchRequest;
 import com.brandnewdata.mop.poc.operate.entity.SequenceFlowEntity;
 import com.brandnewdata.mop.poc.operate.schema.template.SequenceFlowTemplate;
 import com.brandnewdata.mop.poc.operate.util.ElasticsearchUtil;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;

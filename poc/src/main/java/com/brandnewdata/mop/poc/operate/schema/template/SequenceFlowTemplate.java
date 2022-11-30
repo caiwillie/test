@@ -1,7 +1,5 @@
 package com.brandnewdata.mop.poc.operate.schema.template;
 
-import org.springframework.stereotype.Component;
-
 public class SequenceFlowTemplate extends AbstractTemplateDescriptor {
     public static final String INDEX_NAME = "sequence-flow";
     public static final String ID = "id";

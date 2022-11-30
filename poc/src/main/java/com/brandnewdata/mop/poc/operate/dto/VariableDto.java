@@ -1,6 +1,5 @@
 package com.brandnewdata.mop.poc.operate.dto;
 
-import com.brandnewdata.mop.poc.operate.entity.VariableEntity;
 import lombok.Getter;
 import lombok.Setter;
 

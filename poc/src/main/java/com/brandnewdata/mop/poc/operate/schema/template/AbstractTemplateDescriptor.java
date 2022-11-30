@@ -1,7 +1,5 @@
 package com.brandnewdata.mop.poc.operate.schema.template;
 
-import org.springframework.stereotype.Component;
-
 public abstract class AbstractTemplateDescriptor implements TemplateDescriptor {
 
     private static final String INDEX_PREFIX = "operate";

@@ -8,7 +8,6 @@ import com.brandnewdata.mop.poc.operate.entity.EventEntity;
 import com.brandnewdata.mop.poc.operate.schema.template.EventTemplate;
 import com.brandnewdata.mop.poc.operate.util.ElasticsearchUtil;
 import lombok.SneakyThrows;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
