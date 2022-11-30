@@ -3,7 +3,7 @@ ALTER TABLE `mop_scene_version`DROP COLUMN `env_list`;
 
 -- 新增表 mop_scene_release_deploy
 CREATE TABLE `mop_scene_release_deploy` (
-`id` bigint(20) NOT NULL AUTO_INCREMENT,
+`id` bigint(20) NOT NULL,
 `create_time` datetime DEFAULT NULL,
 `update_time` datetime DEFAULT NULL,
 `scene_id` bigint(20) DEFAULT NULL,
