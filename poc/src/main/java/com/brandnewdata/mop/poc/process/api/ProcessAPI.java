@@ -16,7 +16,7 @@ import java.util.Optional;
 @RestController
 public class ProcessAPI implements IProcessAPI {
 
-    @Resource
+    // @Resource
     private ZeebeClient zeebeClient;
 
     @Override
