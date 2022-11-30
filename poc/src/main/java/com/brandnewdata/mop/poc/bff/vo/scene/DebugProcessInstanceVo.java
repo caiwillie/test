@@ -20,6 +20,11 @@ public class DebugProcessInstanceVo {
     private Long snapshotDeployId;
 
     /**
+     * 环境id
+     */
+    private Long envId;
+
+    /**
      * 流程 id
      */
     private String processId;

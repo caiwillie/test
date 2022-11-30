@@ -17,11 +17,12 @@ import java.util.List;
 import java.util.Map;
 
 public class ListViewDao {
-    private static final Map<ElasticsearchClient, ListViewDao> instanceMap = MapUtil.newConcurrentHashMap();
-
     private static final ListViewTemplate TEMPLATE = new ListViewTemplate();
 
+    private static final Map<ElasticsearchClient, ListViewDao> instanceMap = MapUtil.newConcurrentHashMap();
+
     private final ElasticsearchClient client;
+
     private ListViewDao(ElasticsearchClient client) {
         this.client = client;
     }

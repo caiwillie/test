@@ -24,5 +24,6 @@ public class DebugProcessInstanceVoConverter {
 
     public static void updateFrom(DebugProcessInstanceVo vo, ProcessSnapshotDeployDto dto) {
         vo.setSnapshotDeployId(dto.getId());
+        vo.setEnvId(dto.getEnvId());
     }
 }

@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.bff.vo.operate.condition;
+package com.brandnewdata.mop.poc.bff.vo.scene.operate.condition;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -2,7 +2,7 @@ package com.brandnewdata.mop.poc.operate.schema.template;
 
 import org.springframework.stereotype.Component;
 
-@Component
+
 public class IncidentTemplate extends AbstractTemplateDescriptor implements ProcessInstanceDependant {
 
     public static final String INDEX_NAME = "incident";

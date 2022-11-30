@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.operate.rest;
+package com.brandnewdata.mop.poc.bff.controller.operate;
 
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.operate.dto.VariableDto;

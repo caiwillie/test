@@ -1,5 +1,7 @@
 package com.brandnewdata.mop.poc.operate.dao;
 
+import cn.hutool.core.map.MapUtil;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.ConstantScoreQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
@@ -7,20 +9,29 @@ import co.elastic.clients.elasticsearch.core.SearchRequest;
 import com.brandnewdata.mop.poc.operate.entity.IncidentEntity;
 import com.brandnewdata.mop.poc.operate.schema.template.IncidentTemplate;
 import com.brandnewdata.mop.poc.operate.util.ElasticsearchUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
-@Component
-public class IncidentDao extends AbstractDao {
+public class IncidentDao {
+    private static final IncidentTemplate TEMPLATE = new IncidentTemplate();
 
-    @Autowired
-    private IncidentTemplate template;
+    private static final Map<ElasticsearchClient, IncidentDao> instanceMap = MapUtil.newConcurrentHashMap();
+
+    private final ElasticsearchClient client;
+
+    private IncidentDao(ElasticsearchClient client) {
+        this.client = client;
+    }
+
+    public static IncidentDao getInstance(ElasticsearchClient client) {
+        return instanceMap.computeIfAbsent(client, IncidentDao::new);
+    }
 
     public List<IncidentEntity> listByTreePath(String treePath) {
         SearchRequest searchRequest = new SearchRequest.Builder()
-                .index(template.getAlias())
+                .index(TEMPLATE.getAlias())
                 .query(new Query.Builder()
                         .constantScore(new ConstantScoreQuery.Builder()
                                 .filter(new Query.Builder()

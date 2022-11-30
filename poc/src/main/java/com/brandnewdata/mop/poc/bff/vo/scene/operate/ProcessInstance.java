@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.bff.vo.operate;
+package com.brandnewdata.mop.poc.bff.vo.scene.operate;
 
 import lombok.Getter;
 import lombok.Setter;

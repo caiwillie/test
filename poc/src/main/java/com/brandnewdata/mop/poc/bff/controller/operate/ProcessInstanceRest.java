@@ -1,7 +1,6 @@
-package com.brandnewdata.mop.poc.operate.rest;
+package com.brandnewdata.mop.poc.bff.controller.operate;
 
 import com.brandnewdata.common.webresult.Result;
-import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.operate.dto.FlowNodeStateDto;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.operate.entity.SequenceFlowEntity;
@@ -29,32 +28,6 @@ public class ProcessInstanceRest {
 
     @Resource
     private ProcessInstanceService processInstanceService;
-
-    /**
-     * 获取流程实例分页列表
-     *
-     * @param deployId 部署id
-     * @param pageNum  分页页码
-     * @param pageSize 分页大小
-     * @return result result
-     */
-    @Deprecated
-    @GetMapping("/rest/operate/process/instance/page")
-    public Result<Page<ProcessInstanceResp>> page (
-            @RequestParam Long deployId,
-            @RequestParam int pageNum,
-            @RequestParam int pageSize) {
-        Page<ListViewProcessInstanceDto> page = processInstanceService.page(deployId, pageNum, pageSize);
-
-        List<ListViewProcessInstanceDto> records = page.getRecords();
-        List<ProcessInstanceResp> respList = records.stream().map(dto -> {
-            ProcessInstanceResp resp = new ProcessInstanceResp();
-            return resp.from(dto);
-        }).collect(Collectors.toList());
-
-        return Result.OK(new Page<>(page.getTotal(), respList));
-    }
-
 
     /**
      * 获取流程实例的详情

@@ -2,7 +2,6 @@ package com.brandnewdata.mop.poc.operate.schema.template;
 
 import org.springframework.stereotype.Component;
 
-@Component
 public class VariableTemplate extends AbstractTemplateDescriptor implements ProcessInstanceDependant {
     public static final String INDEX_NAME = "variable";
     public static final String ID = "id";

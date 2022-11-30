@@ -150,6 +150,12 @@ public class SceneController2 {
         return Result.OK(ret);
     }
 
+    /**
+     * 获取调试记录所关联的流程定义
+     *
+     * @param vo the vo
+     * @return the result
+     */
     @PostMapping(value = "/rest/scene/version/debug/processInstance/definition")
     public Result<ProcessDefinitionVo> definitionDebugProcessInstance(@RequestBody DebugProcessInstanceVo vo) {
         ProcessDefinitionVo ret = sceneBffService.definitionDebugProcessInstance(vo);
