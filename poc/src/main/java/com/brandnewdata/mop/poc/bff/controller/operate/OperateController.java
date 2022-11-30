@@ -27,18 +27,6 @@ public class OperateController {
     }
 
     /**
-     * 获取流程实例的详情
-     *
-     * @param envId             环境id
-     * @param processInstanceId 流程实例id
-     * @return the result
-     */
-    @GetMapping("/rest/operate/process/processInstance/detail")
-    public Result<ProcessInstanceVo> detailProcessInstance(@RequestParam Long envId, @RequestParam String processInstanceId) {
-        return null;
-    }
-
-    /**
      * 获取流程实例的轨迹连线
      *
      * @param envId             环境id
