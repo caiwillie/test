@@ -47,7 +47,6 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
     @Resource
     private ConnectorManager connectorManager;
 
-    @Resource
     private ZeebeClient zeebe;
 
     @Resource
