@@ -29,12 +29,12 @@ public class OperateController {
     /**
      * 获取流程实例的详情
      *
-     * @param processInstanceId 流程实例id
      * @param envId             环境id
+     * @param processInstanceId 流程实例id
      * @return the result
      */
-    // @GetMapping("/rest/operate/process/processInstance/detail")
-    public Result<ProcessInstanceVo> detailProcessInstance(@RequestParam String processInstanceId, @RequestParam Long envId) {
+    @GetMapping("/rest/operate/process/processInstance/detail")
+    public Result<ProcessInstanceVo> detailProcessInstance(@RequestParam Long envId, @RequestParam String processInstanceId) {
         return null;
     }
 
