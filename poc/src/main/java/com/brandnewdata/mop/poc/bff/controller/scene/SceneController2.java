@@ -214,7 +214,7 @@ public class SceneController2 {
     }
 
     /**
-     * 调试版本下的流程
+     * 触发新的调试
      *
      * @param vo the vo
      * @return the result
