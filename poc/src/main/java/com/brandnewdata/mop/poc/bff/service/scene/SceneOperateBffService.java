@@ -5,10 +5,10 @@ import cn.hutool.core.lang.Opt;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
-import com.brandnewdata.mop.poc.bff.vo.scene.operate.ProcessInstance;
 import com.brandnewdata.mop.poc.bff.vo.operate.Statistic;
 import com.brandnewdata.mop.poc.bff.vo.operate.charts.ChartOption;
 import com.brandnewdata.mop.poc.bff.vo.operate.charts.Series;
+import com.brandnewdata.mop.poc.bff.vo.scene.operate.ProcessInstance;
 import com.brandnewdata.mop.poc.bff.vo.scene.operate.condition.Filter;
 import com.brandnewdata.mop.poc.bff.vo.scene.operate.condition.Process;
 import com.brandnewdata.mop.poc.bff.vo.scene.operate.condition.Scene;
@@ -155,8 +155,9 @@ public class SceneOperateBffService {
         Map<ProcessIdAndVersion, ProcessDeployDto> processIdAndVersionMap2 = processDeployDtoList.stream().collect(
                 Collectors.toMap(dto -> new ProcessIdAndVersion(dto.getProcessId(), dto.getVersion()), Function.identity()));
 
-        // 获取所有流程实例
-        List<ListViewProcessInstanceDto> listViewProcessInstanceDtos = processInstanceService.listAll();
+        // todo 获取所有流程实例
+        // List<ListViewProcessInstanceDto> listViewProcessInstanceDtos = processInstanceService.listAll();
+        List<ListViewProcessInstanceDto> listViewProcessInstanceDtos = new ArrayList<>();
 
         // 运行次数
         int executionCount = 0;

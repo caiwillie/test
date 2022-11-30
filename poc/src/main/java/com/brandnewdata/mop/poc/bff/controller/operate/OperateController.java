@@ -7,10 +7,6 @@ import com.brandnewdata.mop.poc.bff.vo.operate.process.SequenceFlowVo;
 import com.brandnewdata.mop.poc.bff.vo.operate.process.VariableVo;
 import com.brandnewdata.mop.poc.operate.dto.FlowNodeInstanceDto;
 import com.brandnewdata.mop.poc.operate.dto.FlowNodeInstanceTreeNodeDto;
-import com.brandnewdata.mop.poc.operate.dto.VariableDto;
-import com.brandnewdata.mop.poc.operate.service.FlowNodeInstanceService;
-import com.brandnewdata.mop.poc.operate.service.ProcessInstanceService;
-import com.brandnewdata.mop.poc.operate.service.VariableService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -79,7 +75,7 @@ public class OperateController {
             @RequestParam Long envId,
             @RequestParam String processInstanceId,
             @RequestParam String scopeId) {
-        List<VariableDto> list = variableService.listByScopeId(processInstanceId, scopeId);
+
         return null;
     }
 
@@ -94,8 +90,8 @@ public class OperateController {
     public Result<List<FlowNodeInstanceTreeNodeDto>> listFlowNodeInstance(
             @RequestParam Long envId,
             @RequestParam String processInstanceId) {
-        List<FlowNodeInstanceTreeNodeDto> list = service.list(processInstanceId);
-        return Result.OK(list);
+
+        return Result.OK();
     }
 
     /**
@@ -109,8 +105,8 @@ public class OperateController {
     public Result<FlowNodeInstanceDto> detailFlowNodeInstanceById(
             @RequestParam Long envId,
             @RequestParam String flowNodeInstanceId) {
-        FlowNodeInstanceDto data = service.detailByFlowNodeInstanceId(processInstanceId, flowNodeInstanceId);
-        return Result.OK(data);
+
+        return Result.OK();
     }
 
     /**
@@ -126,7 +122,7 @@ public class OperateController {
             @RequestParam Long envId,
             @RequestParam String processInstanceId,
             @RequestParam String flowNodeId) {
-        FlowNodeInstanceDto data = service.detailByFlowNodeId(Long.valueOf(processInstanceId), flowNodeId);
-        return Result.OK(data);
+
+        return Result.OK();
     }
 }
