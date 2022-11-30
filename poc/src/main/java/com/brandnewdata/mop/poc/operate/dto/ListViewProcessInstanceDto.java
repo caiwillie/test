@@ -1,6 +1,6 @@
 package com.brandnewdata.mop.poc.operate.dto;
 
-import com.brandnewdata.mop.poc.operate.entity.listview.ProcessInstanceForListViewEntity;
+import com.brandnewdata.mop.poc.operate.po.listview.ProcessInstanceForListViewPo;
 import com.brandnewdata.mop.poc.operate.util.TreePathUtil;
 import io.camunda.operate.dto.ProcessInstanceState;
 import lombok.Getter;
@@ -31,7 +31,7 @@ public class ListViewProcessInstanceDto extends OperateZeebeDto {
     private List<ProcessInstanceReferenceDto> callHierarchy = new ArrayList<ProcessInstanceReferenceDto>();
     private String[] sortValues;
 
-    public ListViewProcessInstanceDto from(ProcessInstanceForListViewEntity entity) {
+    public ListViewProcessInstanceDto from(ProcessInstanceForListViewPo entity) {
         if (entity == null) {
             return null;
         }

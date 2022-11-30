@@ -1,15 +1,15 @@
 package com.brandnewdata.mop.poc.operate.dto;
 
 
-import com.brandnewdata.mop.poc.operate.entity.OperationEntity;
-import com.brandnewdata.mop.poc.operate.entity.OperationState;
-import com.brandnewdata.mop.poc.operate.entity.OperationType;
+import com.brandnewdata.mop.poc.operate.po.OperationPo;
+import com.brandnewdata.mop.poc.operate.po.OperationState;
+import com.brandnewdata.mop.poc.operate.po.OperationType;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class OperationDto implements FromOneEntity<OperationDto, OperationEntity> {
+public class OperationDto implements FromOneEntity<OperationDto, OperationPo> {
 
     private String id;
 
@@ -22,7 +22,7 @@ public class OperationDto implements FromOneEntity<OperationDto, OperationEntity
     private String errorMessage;
 
     @Override
-    public OperationDto from(OperationEntity entity) {
+    public OperationDto from(OperationPo entity) {
         this.setId(entity.getId());
         this.setType(entity.getType());
         this.setState(entity.getState());

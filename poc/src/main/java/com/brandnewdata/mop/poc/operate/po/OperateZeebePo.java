@@ -1,6 +1,6 @@
-package com.brandnewdata.mop.poc.operate.entity;
+package com.brandnewdata.mop.poc.operate.po;
 
-public abstract class OperateZeebeEntity<T extends OperateZeebeEntity<T>> extends OperateEntity<T> {
+public abstract class OperateZeebePo<T extends OperateZeebePo<T>> extends OperatePo<T> {
     private long key;
     private int partitionId;
 

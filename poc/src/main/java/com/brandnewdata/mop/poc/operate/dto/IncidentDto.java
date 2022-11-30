@@ -1,6 +1,6 @@
 package com.brandnewdata.mop.poc.operate.dto;
 
-import com.brandnewdata.mop.poc.operate.entity.IncidentEntity;
+import com.brandnewdata.mop.poc.operate.po.IncidentPo;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -37,14 +37,14 @@ public class IncidentDto {
     private DecisionInstanceReferenceDto rootCauseDecision;
 
 
-    public IncidentDto fromEntity(IncidentEntity incidentEntity) {
-        this.setId(incidentEntity.getId());
-        this.setFlowNodeId(incidentEntity.getFlowNodeId());
-        this.setFlowNodeInstanceId(Optional.ofNullable(incidentEntity.getFlowNodeInstanceKey()).map(String::valueOf).orElse(null));
-        this.setErrorMessage(incidentEntity.getErrorMessage());
-        this.setErrorType(new ErrorTypeDto().from(incidentEntity.getErrorType()));
-        this.setJobId(Optional.ofNullable(incidentEntity.getJobKey()).map(String::valueOf).orElse(null));
-        this.setCreationTime(Optional.ofNullable(incidentEntity.getCreationTime()).map(OffsetDateTime::toLocalDateTime).orElse(null));
+    public IncidentDto fromEntity(IncidentPo incidentPo) {
+        this.setId(incidentPo.getId());
+        this.setFlowNodeId(incidentPo.getFlowNodeId());
+        this.setFlowNodeInstanceId(Optional.ofNullable(incidentPo.getFlowNodeInstanceKey()).map(String::valueOf).orElse(null));
+        this.setErrorMessage(incidentPo.getErrorMessage());
+        this.setErrorType(new ErrorTypeDto().from(incidentPo.getErrorType()));
+        this.setJobId(Optional.ofNullable(incidentPo.getJobKey()).map(String::valueOf).orElse(null));
+        this.setCreationTime(Optional.ofNullable(incidentPo.getCreationTime()).map(OffsetDateTime::toLocalDateTime).orElse(null));
         return this;
     }
 

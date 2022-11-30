@@ -1,6 +1,6 @@
 package com.brandnewdata.mop.poc.operate.dto;
 
-import com.brandnewdata.mop.poc.operate.entity.ErrorType;
+import com.brandnewdata.mop.poc.operate.po.ErrorType;
 import lombok.Getter;
 import lombok.Setter;
 

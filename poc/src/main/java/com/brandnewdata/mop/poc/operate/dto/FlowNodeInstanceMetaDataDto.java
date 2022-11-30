@@ -1,9 +1,9 @@
 package com.brandnewdata.mop.poc.operate.dto;
 
-import com.brandnewdata.mop.poc.operate.entity.EventEntity;
-import com.brandnewdata.mop.poc.operate.entity.EventMetadataEntity;
-import com.brandnewdata.mop.poc.operate.entity.FlowNodeInstanceEntity;
-import com.brandnewdata.mop.poc.operate.entity.FlowNodeType;
+import com.brandnewdata.mop.poc.operate.po.EventMetadataPo;
+import com.brandnewdata.mop.poc.operate.po.EventPo;
+import com.brandnewdata.mop.poc.operate.po.FlowNodeInstancePo;
+import com.brandnewdata.mop.poc.operate.po.FlowNodeType;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -30,21 +30,21 @@ public class FlowNodeInstanceMetaDataDto {
     private OffsetDateTime jobDeadline;
     private Map<String, String> jobCustomHeaders;
 
-    public FlowNodeInstanceMetaDataDto fromEntity(FlowNodeInstanceEntity flowNodeInstanceEntity, EventEntity eventEntity) {
-        this.setProcessInstanceId(String.valueOf(flowNodeInstanceEntity.getProcessInstanceKey()));
-        this.setFlowNodeInstanceId(flowNodeInstanceEntity.getId());
-        this.setFlowNodeId(flowNodeInstanceEntity.getFlowNodeId());
-        this.setFlowNodeType(flowNodeInstanceEntity.getType());
-        this.setStartDate(Optional.ofNullable(flowNodeInstanceEntity.getStartDate()).map(OffsetDateTime::toLocalDateTime).orElse(null));
-        this.setEndDate(Optional.ofNullable(flowNodeInstanceEntity.getEndDate()).map(OffsetDateTime::toLocalDateTime).orElse(null));
+    public FlowNodeInstanceMetaDataDto fromEntity(FlowNodeInstancePo flowNodeInstancePo, EventPo eventEntity) {
+        this.setProcessInstanceId(String.valueOf(flowNodeInstancePo.getProcessInstanceKey()));
+        this.setFlowNodeInstanceId(flowNodeInstancePo.getId());
+        this.setFlowNodeId(flowNodeInstancePo.getFlowNodeId());
+        this.setFlowNodeType(flowNodeInstancePo.getType());
+        this.setStartDate(Optional.ofNullable(flowNodeInstancePo.getStartDate()).map(OffsetDateTime::toLocalDateTime).orElse(null));
+        this.setEndDate(Optional.ofNullable(flowNodeInstancePo.getEndDate()).map(OffsetDateTime::toLocalDateTime).orElse(null));
 
-        EventMetadataEntity eventMetadataEntity = eventEntity.getMetadata();
-        if (eventMetadataEntity == null) return this;
-        this.setJobCustomHeaders(eventMetadataEntity.getJobCustomHeaders());
-        this.setJobDeadline(eventMetadataEntity.getJobDeadline());
-        this.setJobRetries(eventMetadataEntity.getJobRetries());
-        this.setJobType(eventMetadataEntity.getJobType());
-        this.setJobWorker(eventMetadataEntity.getJobWorker());
+        EventMetadataPo eventMetadataPo = eventEntity.getMetadata();
+        if (eventMetadataPo == null) return this;
+        this.setJobCustomHeaders(eventMetadataPo.getJobCustomHeaders());
+        this.setJobDeadline(eventMetadataPo.getJobDeadline());
+        this.setJobRetries(eventMetadataPo.getJobRetries());
+        this.setJobType(eventMetadataPo.getJobType());
+        this.setJobWorker(eventMetadataPo.getJobWorker());
         return this;
     }
 }

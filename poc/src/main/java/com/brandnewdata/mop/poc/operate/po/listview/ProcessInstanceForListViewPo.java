@@ -1,6 +1,6 @@
-package com.brandnewdata.mop.poc.operate.entity.listview;
+package com.brandnewdata.mop.poc.operate.po.listview;
 
-import com.brandnewdata.mop.poc.operate.entity.OperateZeebeEntity;
+import com.brandnewdata.mop.poc.operate.po.OperateZeebePo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.camunda.operate.dto.ProcessInstanceState;
 import lombok.Getter;
@@ -11,7 +11,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class ProcessInstanceForListViewEntity extends OperateZeebeEntity<ProcessInstanceForListViewEntity> {
+public class ProcessInstanceForListViewPo extends OperateZeebePo<ProcessInstanceForListViewPo> {
     private Long processDefinitionKey;
     private String processName;
     private Integer processVersion;

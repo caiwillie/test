@@ -1,6 +1,6 @@
 package com.brandnewdata.mop.poc.operate.dto;
 
-import com.brandnewdata.mop.poc.operate.entity.FlowNodeState;
+import com.brandnewdata.mop.poc.operate.po.FlowNodeState;
 
 public enum FlowNodeStateDto {
 

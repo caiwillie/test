@@ -1,6 +1,6 @@
-package com.brandnewdata.mop.poc.operate.entity;
+package com.brandnewdata.mop.poc.operate.po;
 
-public abstract class OperateEntity<T extends OperateEntity<T>> {
+public abstract class OperatePo<T extends OperatePo<T>> {
 
     private String id;
 

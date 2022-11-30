@@ -1,11 +1,11 @@
-package com.brandnewdata.mop.poc.operate.entity;
+package com.brandnewdata.mop.poc.operate.po;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class ProcessEntity extends OperateZeebeEntity<ProcessEntity> {
+public class ProcessPo extends OperateZeebePo<ProcessPo> {
 
     private String name;
 

@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.operate.entity;
+package com.brandnewdata.mop.poc.operate.po;
 
 public enum OperationState {
     SCHEDULED,

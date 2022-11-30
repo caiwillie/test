@@ -6,7 +6,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.ConstantScoreQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
-import com.brandnewdata.mop.poc.operate.entity.IncidentEntity;
+import com.brandnewdata.mop.poc.operate.po.IncidentPo;
 import com.brandnewdata.mop.poc.operate.schema.template.IncidentTemplate;
 import com.brandnewdata.mop.poc.operate.util.ElasticsearchUtil;
 
@@ -28,7 +28,7 @@ public class IncidentDao {
         return INSTANCE_MAP.computeIfAbsent(client, IncidentDao::new);
     }
 
-    public List<IncidentEntity> listByTreePath(String treePath) {
+    public List<IncidentPo> listByTreePath(String treePath) {
         SearchRequest searchRequest = new SearchRequest.Builder()
                 .index(TEMPLATE.getAlias())
                 .query(new Query.Builder()
@@ -44,7 +44,7 @@ public class IncidentDao {
                                 .build())
                         .build())
                 .build();
-        return ElasticsearchUtil.scrollAll(client, searchRequest, IncidentEntity.class);
+        return ElasticsearchUtil.scrollAll(client, searchRequest, IncidentPo.class);
     }
 
 }

@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.operate.entity.listview;
+package com.brandnewdata.mop.poc.operate.po.listview;
 
 import lombok.Getter;
 import lombok.Setter;

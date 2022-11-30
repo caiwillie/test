@@ -8,7 +8,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
-import com.brandnewdata.mop.poc.operate.entity.listview.ProcessInstanceForListViewEntity;
+import com.brandnewdata.mop.poc.operate.po.listview.ProcessInstanceForListViewPo;
 import com.brandnewdata.mop.poc.operate.schema.template.ListViewTemplate;
 import com.brandnewdata.mop.poc.operate.util.ElasticsearchUtil;
 import lombok.SneakyThrows;
@@ -31,7 +31,7 @@ public class ListViewDao {
         return INSTANCE_MAP.computeIfAbsent(client, ListViewDao::new);
     }
 
-    public ProcessInstanceForListViewEntity getOneByParentFlowNodeInstanceId(String parentFlowNodeInstanceId) {
+    public ProcessInstanceForListViewPo getOneByParentFlowNodeInstanceId(String parentFlowNodeInstanceId) {
         Assert.notNull(parentFlowNodeInstanceId);
         SearchRequest request = new SearchRequest.Builder()
                 .index(TEMPLATE.getAlias())
@@ -42,34 +42,34 @@ public class ListViewDao {
                                 .build())
                         .build())
                 .build();
-        return ElasticsearchUtil.searchOne(client, request, ProcessInstanceForListViewEntity.class);
+        return ElasticsearchUtil.searchOne(client, request, ProcessInstanceForListViewPo.class);
     }
 
-    public ProcessInstanceForListViewEntity searchOne(Query query) {
+    public ProcessInstanceForListViewPo searchOne(Query query) {
         SearchRequest searchRequest = new SearchRequest.Builder()
                 .index(TEMPLATE.getAlias())
                 .query(query)
                 .build();
-        return ElasticsearchUtil.searchOne(client, searchRequest, ProcessInstanceForListViewEntity.class);
+        return ElasticsearchUtil.searchOne(client, searchRequest, ProcessInstanceForListViewPo.class);
     }
 
-    public List<ProcessInstanceForListViewEntity> scrollAll(Query query, ElasticsearchUtil.QueryType queryType) {
+    public List<ProcessInstanceForListViewPo> scrollAll(Query query, ElasticsearchUtil.QueryType queryType) {
         SearchRequest request = new SearchRequest.Builder()
                 .index(ElasticsearchUtil.whereToSearch(TEMPLATE, queryType))
                 .query(query)
                 .build();
-        return ElasticsearchUtil.scrollAll(client, request, ProcessInstanceForListViewEntity.class);
+        return ElasticsearchUtil.scrollAll(client, request, ProcessInstanceForListViewPo.class);
     }
 
     @SneakyThrows
-    public SearchResponse<ProcessInstanceForListViewEntity> search(Query query, Map<String, Aggregation> aggs, ElasticsearchUtil.QueryType queryType) {
+    public SearchResponse<ProcessInstanceForListViewPo> search(Query query, Map<String, Aggregation> aggs, ElasticsearchUtil.QueryType queryType) {
         SearchRequest request = new SearchRequest.Builder()
                 .index(ElasticsearchUtil.whereToSearch(TEMPLATE, queryType))
                 .query(query)
                 .aggregations(aggs)
                 .build();
 
-        SearchResponse<ProcessInstanceForListViewEntity> response = client.search(request, ProcessInstanceForListViewEntity.class);
+        SearchResponse<ProcessInstanceForListViewPo> response = client.search(request, ProcessInstanceForListViewPo.class);
         return response;
     }
 

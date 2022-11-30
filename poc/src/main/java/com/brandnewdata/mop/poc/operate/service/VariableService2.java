@@ -7,8 +7,8 @@ import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import com.brandnewdata.mop.poc.operate.converter.VariableDtoConverter;
 import com.brandnewdata.mop.poc.operate.dao.VariableDao;
 import com.brandnewdata.mop.poc.operate.dto.VariableDto;
-import com.brandnewdata.mop.poc.operate.entity.VariableEntity;
 import com.brandnewdata.mop.poc.operate.manager.DaoManager;
+import com.brandnewdata.mop.poc.operate.po.VariablePo;
 import com.brandnewdata.mop.poc.operate.schema.template.VariableTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -43,7 +43,7 @@ public class VariableService2 implements IVariableService2 {
         log.debug(query.toString());
 
         VariableDao variableDao = daoManager.getVariableDaoByEnvId(envId);
-        List<VariableEntity> entities = variableDao.list(query);
+        List<VariablePo> entities = variableDao.list(query);
 
         List<VariableDto> variableDtoList = entities.stream().map(VariableDtoConverter::createFrom).collect(Collectors.toList());
 

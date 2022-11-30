@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.operate.entity;
+package com.brandnewdata.mop.poc.operate.po;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +8,7 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class EventMetadataEntity {
+public class EventMetadataPo {
     private String jobType;
     private Integer jobRetries;
     private String jobWorker;

@@ -4,7 +4,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import com.brandnewdata.mop.poc.operate.dao.ListViewDao;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
-import com.brandnewdata.mop.poc.operate.entity.listview.ProcessInstanceForListViewEntity;
+import com.brandnewdata.mop.poc.operate.po.listview.ProcessInstanceForListViewPo;
 import com.brandnewdata.mop.poc.operate.schema.template.ListViewTemplate;
 import com.brandnewdata.mop.poc.operate.util.ElasticsearchUtil;
 import com.google.common.cache.Cache;
@@ -32,7 +32,7 @@ public class ProcessInstanceNoExpCache {
                         .build())
                 .build();
 
-        List<ProcessInstanceForListViewEntity> entities = listViewDao.scrollAll(query, ElasticsearchUtil.QueryType.ALL);
+        List<ProcessInstanceForListViewPo> entities = listViewDao.scrollAll(query, ElasticsearchUtil.QueryType.ALL);
 
         entities.stream().map(entity -> {
             ListViewProcessInstanceDto dto = new ListViewProcessInstanceDto();

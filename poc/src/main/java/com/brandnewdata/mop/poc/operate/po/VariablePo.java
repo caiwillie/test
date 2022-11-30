@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.operate.entity;
+package com.brandnewdata.mop.poc.operate.po;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class VariableEntity extends OperateZeebeEntity<VariableEntity> {
+public class VariablePo extends OperateZeebePo<VariablePo> {
     private String name;
     private String value;
     private String fullValue;

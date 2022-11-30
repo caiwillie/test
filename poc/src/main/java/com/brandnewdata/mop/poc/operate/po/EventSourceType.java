@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.operate.entity;
+package com.brandnewdata.mop.poc.operate.po;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

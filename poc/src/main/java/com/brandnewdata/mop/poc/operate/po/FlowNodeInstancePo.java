@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.operate.entity;
+package com.brandnewdata.mop.poc.operate.po;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
@@ -10,7 +10,7 @@ import java.time.OffsetDateTime;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class FlowNodeInstanceEntity extends OperateZeebeEntity<FlowNodeInstanceEntity> {
+public class FlowNodeInstancePo extends OperateZeebePo<FlowNodeInstancePo> {
 
     private String flowNodeId;
     private OffsetDateTime startDate;

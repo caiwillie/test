@@ -1,7 +1,7 @@
 package com.brandnewdata.mop.poc.operate.dto;
 
-import com.brandnewdata.mop.poc.operate.entity.FlowNodeInstanceEntity;
-import com.brandnewdata.mop.poc.operate.entity.FlowNodeType;
+import com.brandnewdata.mop.poc.operate.po.FlowNodeInstancePo;
+import com.brandnewdata.mop.poc.operate.po.FlowNodeType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Getter
 @Setter
-public class FlowNodeInstanceTreeNodeDto extends OperateZeebeDto implements FromOneEntity<FlowNodeInstanceTreeNodeDto, FlowNodeInstanceEntity> {
+public class FlowNodeInstanceTreeNodeDto extends OperateZeebeDto implements FromOneEntity<FlowNodeInstanceTreeNodeDto, FlowNodeInstancePo> {
 
 
     /**
@@ -84,7 +84,7 @@ public class FlowNodeInstanceTreeNodeDto extends OperateZeebeDto implements From
     private List<FlowNodeInstanceTreeNodeDto> children;
 
     @Override
-    public FlowNodeInstanceTreeNodeDto from(FlowNodeInstanceEntity entity) {
+    public FlowNodeInstanceTreeNodeDto from(FlowNodeInstancePo entity) {
         this.setId(entity.getId());
         this.setFlowNodeId(entity.getFlowNodeId());
         this.setStartDate(Optional.ofNullable(entity.getStartDate()).map(OffsetDateTime::toLocalDateTime).orElse(null));

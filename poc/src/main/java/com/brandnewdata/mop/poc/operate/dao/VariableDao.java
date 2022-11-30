@@ -4,7 +4,7 @@ import cn.hutool.core.map.MapUtil;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
-import com.brandnewdata.mop.poc.operate.entity.VariableEntity;
+import com.brandnewdata.mop.poc.operate.po.VariablePo;
 import com.brandnewdata.mop.poc.operate.schema.template.VariableTemplate;
 import com.brandnewdata.mop.poc.operate.util.ElasticsearchUtil;
 
@@ -27,12 +27,12 @@ public class VariableDao {
         return INSTANCE_MAP.computeIfAbsent(client, VariableDao::new);
     }
 
-    public List<VariableEntity> list(Query query) {
+    public List<VariablePo> list(Query query) {
         SearchRequest request = new SearchRequest.Builder()
                 .index(TEMPLATE.getAlias())
                 .query(query)
                 .build();
-        return ElasticsearchUtil.scrollAll(client, request, VariableEntity.class);
+        return ElasticsearchUtil.scrollAll(client, request, VariablePo.class);
     }
 
 }

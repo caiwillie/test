@@ -16,10 +16,10 @@ import com.brandnewdata.mop.poc.operate.dto.FlowNodeInstanceTreeNodeDto;
 import com.brandnewdata.mop.poc.operate.dto.FlowNodeStateDto;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.operate.dto.SequenceFlowDto;
-import com.brandnewdata.mop.poc.operate.entity.FlowNodeInstanceEntity;
-import com.brandnewdata.mop.poc.operate.entity.SequenceFlowEntity;
-import com.brandnewdata.mop.poc.operate.entity.listview.ProcessInstanceForListViewEntity;
 import com.brandnewdata.mop.poc.operate.manager.DaoManager;
+import com.brandnewdata.mop.poc.operate.po.FlowNodeInstancePo;
+import com.brandnewdata.mop.poc.operate.po.SequenceFlowPo;
+import com.brandnewdata.mop.poc.operate.po.listview.ProcessInstanceForListViewPo;
 import com.brandnewdata.mop.poc.operate.schema.template.FlowNodeInstanceTemplate;
 import com.brandnewdata.mop.poc.operate.schema.template.ListViewTemplate;
 import com.brandnewdata.mop.poc.operate.schema.template.SequenceFlowTemplate;
@@ -82,7 +82,7 @@ public class ProcessInstanceService2 implements IProcessInstanceService2 {
                 .build();
 
         ListViewDao listViewDao = daoManager.getListViewDaoByEnvId(envId);
-        List<ProcessInstanceForListViewEntity> processInstanceForListViewEntities = listViewDao.scrollAll(query, ElasticsearchUtil.QueryType.ALL);
+        List<ProcessInstanceForListViewPo> processInstanceForListViewEntities = listViewDao.scrollAll(query, ElasticsearchUtil.QueryType.ALL);
 
         return processInstanceForListViewEntities.stream().map(entity -> {
             ListViewProcessInstanceDto dto = new ListViewProcessInstanceDto();
@@ -111,7 +111,7 @@ public class ProcessInstanceService2 implements IProcessInstanceService2 {
 
         ListViewDao listViewDao = daoManager.getListViewDaoByEnvId(envId);
 
-        ProcessInstanceForListViewEntity entity = listViewDao.searchOne(query);
+        ProcessInstanceForListViewPo entity = listViewDao.searchOne(query);
         ListViewProcessInstanceDto dto = new ListViewProcessInstanceDto();
         return dto.from(entity);
     }
@@ -123,7 +123,7 @@ public class ProcessInstanceService2 implements IProcessInstanceService2 {
                 .build();
 
         SequenceFlowDao sequenceFlowDao = daoManager.getSequenceFlowDaoByEnvId(envId);
-        List<SequenceFlowEntity> entities = sequenceFlowDao.scrollAll(query);
+        List<SequenceFlowPo> entities = sequenceFlowDao.scrollAll(query);
         return entities.stream().map(SequenceFlowDtoConverter::createFrom).collect(Collectors.toList());
     }
 
@@ -136,7 +136,7 @@ public class ProcessInstanceService2 implements IProcessInstanceService2 {
         Query query = new Query.Builder()
                 .term(t -> t.field(FlowNodeInstanceTemplate.PROCESS_INSTANCE_KEY).value(processInstanceId))
                 .build();
-        List<FlowNodeInstanceEntity> entities = flowNodeInstanceDao.list(query, ElasticsearchUtil.QueryType.ALL);
+        List<FlowNodeInstancePo> entities = flowNodeInstanceDao.list(query, ElasticsearchUtil.QueryType.ALL);
 
         List<FlowNodeInstanceTreeNodeDto> flowNodeInstanceTreeNodeDTOS = entities.stream().map(entity -> {
             FlowNodeInstanceTreeNodeDto dto = new FlowNodeInstanceTreeNodeDto();

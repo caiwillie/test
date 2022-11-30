@@ -5,7 +5,7 @@ import cn.hutool.core.map.MapUtil;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
-import com.brandnewdata.mop.poc.operate.entity.FlowNodeInstanceEntity;
+import com.brandnewdata.mop.poc.operate.po.FlowNodeInstancePo;
 import com.brandnewdata.mop.poc.operate.schema.template.FlowNodeInstanceTemplate;
 import com.brandnewdata.mop.poc.operate.util.ElasticsearchUtil;
 
@@ -27,23 +27,23 @@ public class FlowNodeInstanceDao {
         return INSTANCE_MAP.computeIfAbsent(client, FlowNodeInstanceDao::new);
     }
 
-    public List<FlowNodeInstanceEntity> list(String processInstanceId) {
+    public List<FlowNodeInstancePo> list(String processInstanceId) {
         SearchRequest searchRequest = new SearchRequest.Builder()
                 .index(TEMPLATE.getAlias())
                 .query(new Query.Builder()
                         .term(t -> t.field(FlowNodeInstanceTemplate.PROCESS_INSTANCE_KEY).value(processInstanceId))
                         .build())
                 .build();
-        return ElasticsearchUtil.scrollAll(client, searchRequest, FlowNodeInstanceEntity.class);
+        return ElasticsearchUtil.scrollAll(client, searchRequest, FlowNodeInstancePo.class);
     }
 
-    public List<FlowNodeInstanceEntity> list(Query query, ElasticsearchUtil.QueryType queryType) {
+    public List<FlowNodeInstancePo> list(Query query, ElasticsearchUtil.QueryType queryType) {
         Assert.notNull(query);
         SearchRequest searchRequest = new SearchRequest.Builder()
                 .index(ElasticsearchUtil.whereToSearch(TEMPLATE, queryType))
                 .query(query)
                 .build();
-        return ElasticsearchUtil.scrollAll(client, searchRequest, FlowNodeInstanceEntity.class);
+        return ElasticsearchUtil.scrollAll(client, searchRequest, FlowNodeInstancePo.class);
     }
 
     public void getFlowNodeMetadata() {
@@ -54,7 +54,7 @@ public class FlowNodeInstanceDao {
 
     }
 
-    public FlowNodeInstanceEntity searchOne(String flowNodeInstanceId) {
+    public FlowNodeInstancePo searchOne(String flowNodeInstanceId) {
         Query query = new Query.Builder()
                 .term(t -> t.field(FlowNodeInstanceTemplate.ID).value(flowNodeInstanceId))
                 .build();
@@ -64,7 +64,7 @@ public class FlowNodeInstanceDao {
                 .query(query)
                 .build();
         
-        return ElasticsearchUtil.searchOne(client, request, FlowNodeInstanceEntity.class);
+        return ElasticsearchUtil.searchOne(client, request, FlowNodeInstancePo.class);
     }
 
 }

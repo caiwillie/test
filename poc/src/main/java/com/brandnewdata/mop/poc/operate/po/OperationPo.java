@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.operate.entity;
+package com.brandnewdata.mop.poc.operate.po;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,7 +7,7 @@ import java.time.OffsetDateTime;
 
 @Getter
 @Setter
-public class OperationEntity extends OperateZeebeEntity<OperationEntity> {
+public class OperationPo extends OperateZeebePo<OperationPo> {
     private Long processInstanceKey;
     private Long incidentKey;
     private Long scopeKey;

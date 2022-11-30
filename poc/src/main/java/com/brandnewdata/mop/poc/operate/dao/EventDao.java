@@ -4,7 +4,7 @@ import cn.hutool.core.map.MapUtil;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
-import com.brandnewdata.mop.poc.operate.entity.EventEntity;
+import com.brandnewdata.mop.poc.operate.po.EventPo;
 import com.brandnewdata.mop.poc.operate.schema.template.EventTemplate;
 import com.brandnewdata.mop.poc.operate.util.ElasticsearchUtil;
 import lombok.SneakyThrows;
@@ -27,7 +27,7 @@ public class EventDao {
     }
 
     @SneakyThrows
-    public EventEntity getOne(String flowNodeInstanceId) {
+    public EventPo getOne(String flowNodeInstanceId) {
         SearchRequest searchRequest = new SearchRequest.Builder()
                 .index(TEMPLATE.getAlias())
                 .query(new Query.Builder()
@@ -36,7 +36,7 @@ public class EventDao {
                 )
                 .build();
 
-        return ElasticsearchUtil.searchOne(client, searchRequest, EventEntity.class);
+        return ElasticsearchUtil.searchOne(client, searchRequest, EventPo.class);
     }
 
 }
