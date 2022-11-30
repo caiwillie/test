@@ -45,11 +45,12 @@ public class OperateController {
      * @param processInstanceId 流程实例id
      * @return the result
      */
-    @GetMapping("/rest/operate/process/sequenceFlows/list")
+    @GetMapping("/rest/operate/process/sequenceFlow/list")
     public Result<List<SequenceFlowVo>> listSequenceFlows(
             @RequestParam Long envId,
             @RequestParam String processInstanceId) {
-        return null;
+        List<SequenceFlowVo> ret = operateBffService.listSequenceFlows(envId, processInstanceId);
+        return Result.OK(ret);
     }
 
     /**
@@ -59,11 +60,12 @@ public class OperateController {
      * @param processInstanceId 流程实例id
      * @return result
      */
-    @GetMapping("/rest/operate/process/flowNodeStates/list")
+    @GetMapping("/rest/operate/process/flowNodeState/list")
     public Result<List<FlowNodeStateVo>> listFlowNodeStates(
             @RequestParam Long envId,
             @RequestParam String processInstanceId) {
-        return null;
+        List<FlowNodeStateVo> ret = operateBffService.listFlowNodeStates(envId, processInstanceId);
+        return Result.OK(ret);
     }
 
     /**
@@ -79,8 +81,8 @@ public class OperateController {
             @RequestParam Long envId,
             @RequestParam String processInstanceId,
             @RequestParam String scopeId) {
-
-        return null;
+        List<VariableVo> ret = operateBffService.listVariable(envId, processInstanceId, scopeId);
+        return Result.OK(ret);
     }
 
     /**
@@ -94,8 +96,8 @@ public class OperateController {
     public Result<List<FlowNodeInstanceTreeNodeDto>> listFlowNodeInstance(
             @RequestParam Long envId,
             @RequestParam String processInstanceId) {
-
-        return Result.OK();
+        List<FlowNodeInstanceTreeNodeDto> ret = operateBffService.listFlowNodeInstance(envId, processInstanceId);
+        return Result.OK(ret);
     }
 
     /**
@@ -109,8 +111,8 @@ public class OperateController {
     public Result<FlowNodeInstanceDto> detailFlowNodeInstanceById(
             @RequestParam Long envId,
             @RequestParam String flowNodeInstanceId) {
-
-        return Result.OK();
+        FlowNodeInstanceDto ret = operateBffService.detailFlowNodeInstanceById(envId, flowNodeInstanceId);
+        return Result.OK(ret);
     }
 
     /**
@@ -126,7 +128,7 @@ public class OperateController {
             @RequestParam Long envId,
             @RequestParam String processInstanceId,
             @RequestParam String flowNodeId) {
-
-        return Result.OK();
+        FlowNodeInstanceDto ret = operateBffService.detailFlowNodeInstanceByFlowNodeId(envId, processInstanceId, flowNodeId);
+        return Result.OK(ret);
     }
 }
