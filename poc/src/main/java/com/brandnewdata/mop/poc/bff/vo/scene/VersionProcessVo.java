@@ -12,7 +12,7 @@ import java.util.Map;
 @Accessors(chain = true)
 public class VersionProcessVo {
 
-    private Long id;
+    private String id;
 
     private LocalDateTime createTime;
 

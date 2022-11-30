@@ -1,3 +1,4 @@
+/*
 package com.brandnewdata.mop.poc.operate.service;
 
 import cn.hutool.core.lang.Assert;
@@ -6,9 +7,11 @@ import com.brandnewdata.mop.poc.operate.dto.IncidentDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+*/
 /**
  * @author caiwillie
- */
+ *//*
+
 @Service
 public class IncidentService {
     @Autowired
@@ -24,3 +27,4 @@ public class IncidentService {
     }
 
 }
+*/

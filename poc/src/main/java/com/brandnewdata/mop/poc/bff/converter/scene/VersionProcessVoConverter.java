@@ -7,7 +7,7 @@ public class VersionProcessVoConverter {
 
     public static VersionProcessVo createFrom(VersionProcessDto dto) {
         VersionProcessVo vo = new VersionProcessVo();
-        vo.setId(dto.getId());
+        vo.setId(String.valueOf(dto.getId()));
         vo.setCreateTime(dto.getCreateTime());
         vo.setUpdateTime(dto.getUpdateTime());
         vo.setVersionId(dto.getVersionId());
