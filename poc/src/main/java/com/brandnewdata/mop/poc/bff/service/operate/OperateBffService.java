@@ -34,10 +34,6 @@ public class OperateBffService {
         this.flowNodeInstanceService = flowNodeInstanceService;
     }
 
-    public void detailProcessInstance() {
-
-    }
-
     public List<SequenceFlowVo> listSequenceFlows(Long envId, String processInstanceId) {
         List<SequenceFlowDto> sequenceFlowDtoList = processInstanceService.sequenceFlows(envId, Long.valueOf(processInstanceId));
         return sequenceFlowDtoList.stream().sorted(Comparator.comparing(SequenceFlowDto::getActivityId))
