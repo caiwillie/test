@@ -1,7 +1,9 @@
 package com.brandnewdata.mop.poc.operate.service;
 
 import com.brandnewdata.mop.poc.common.dto.Page;
+import com.brandnewdata.mop.poc.operate.dto.FlowNodeStateDto;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
+import com.brandnewdata.mop.poc.operate.dto.SequenceFlowDto;
 
 import java.util.List;
 import java.util.Map;
@@ -18,4 +20,10 @@ public interface IProcessInstanceService2 {
     List<ListViewProcessInstanceDto> listProcessInstanceByZeebeKey(
             Long envId,
             List<Long> zeebeKeyList);
+
+    ListViewProcessInstanceDto detailProcessInstance(Long envId, Long processInstanceId);
+
+    List<SequenceFlowDto> sequenceFlows(Long envId, Long processInstanceId);
+
+    Map<String, FlowNodeStateDto> getFlowNodeStateMap(Long envId, Long processInstanceId);
 }

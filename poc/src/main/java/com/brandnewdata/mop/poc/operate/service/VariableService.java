@@ -1,3 +1,4 @@
+/*
 package com.brandnewdata.mop.poc.operate.service;
 
 import cn.hutool.core.collection.CollUtil;
@@ -61,3 +62,4 @@ public class VariableService {
     }
 
 }
+*/

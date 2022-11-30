@@ -1,9 +1,8 @@
+/*
 package com.brandnewdata.mop.poc.operate.service;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
@@ -14,7 +13,7 @@ import com.brandnewdata.mop.poc.operate.cache.ProcessInstanceNoExpCache;
 import com.brandnewdata.mop.poc.operate.dao.FlowNodeInstanceDao;
 import com.brandnewdata.mop.poc.operate.dao.ListViewDao;
 import com.brandnewdata.mop.poc.operate.dao.SequenceFlowDao;
-import com.brandnewdata.mop.poc.operate.dto.FlowNodeInstanceDto;
+import com.brandnewdata.mop.poc.operate.dto.FlowNodeInstanceTreeNodeDto;
 import com.brandnewdata.mop.poc.operate.dto.FlowNodeStateDto;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.operate.entity.FlowNodeInstanceEntity;
@@ -100,6 +99,7 @@ public class ProcessInstanceService {
         return new Page<>(processInstanceDTOS.size(), records);
     }
 
+
     public ListViewProcessInstanceDto detail(Long processInstanceId) {
         Query query = new Query.Builder()
                 .bool(new BoolQuery.Builder()
@@ -118,6 +118,7 @@ public class ProcessInstanceService {
         return dto.from(entity);
     }
 
+
     public List<SequenceFlowEntity> sequenceFlows(Long processInstanceId) {
         Query query = new Query.Builder()
                 .term(t -> t.field(SequenceFlowTemplate.PROCESS_INSTANCE_KEY).value(processInstanceId))
@@ -133,8 +134,8 @@ public class ProcessInstanceService {
                 .build();
         List<FlowNodeInstanceEntity> entities = flowNodeInstanceDao.list(query, ElasticsearchUtil.QueryType.ALL);
 
-        List<FlowNodeInstanceDto> flowNodeInstanceDTOS = entities.stream().map(entity -> {
-            FlowNodeInstanceDto dto = new FlowNodeInstanceDto();
+        List<FlowNodeInstanceTreeNodeDto> flowNodeInstanceTreeNodeDTOS = entities.stream().map(entity -> {
+            FlowNodeInstanceTreeNodeDto dto = new FlowNodeInstanceTreeNodeDto();
             return dto.from(entity);
         }).sorted((o1, o2) -> {
             int compare = 0;
@@ -156,12 +157,12 @@ public class ProcessInstanceService {
         }).collect(Collectors.toList());
 
         Set<String> incidentPathSet = new HashSet<>();
-        for (FlowNodeInstanceDto flowNodeInstanceDTO : flowNodeInstanceDTOS) {
+        for (FlowNodeInstanceTreeNodeDto flowNodeInstanceTreeNodeDTO : flowNodeInstanceTreeNodeDTOS) {
             // level 从高往低遍历
-            String flowNodeId = flowNodeInstanceDTO.getFlowNodeId();
-            String treePath = flowNodeInstanceDTO.getTreePath();
-            boolean incident = flowNodeInstanceDTO.isIncident();
-            FlowNodeStateDto state = flowNodeInstanceDTO.getState();
+            String flowNodeId = flowNodeInstanceTreeNodeDTO.getFlowNodeId();
+            String treePath = flowNodeInstanceTreeNodeDTO.getTreePath();
+            boolean incident = flowNodeInstanceTreeNodeDTO.isIncident();
+            FlowNodeStateDto state = flowNodeInstanceTreeNodeDTO.getState();
             if (incident) {
                 state = FlowNodeStateDto.INCIDENT;
                 // 将父路径也放入异常路径中（异常冒泡）
@@ -222,7 +223,5 @@ public class ProcessInstanceService {
         return ret;
     }
 
-
-
-
 }
+*/

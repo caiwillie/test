@@ -1,8 +1,8 @@
 package com.brandnewdata.mop.poc.bff.controller.operate;
 
 import com.brandnewdata.common.webresult.Result;
-import com.brandnewdata.mop.poc.operate.dto.FlowNodeInstanceDetailDto;
 import com.brandnewdata.mop.poc.operate.dto.FlowNodeInstanceDto;
+import com.brandnewdata.mop.poc.operate.dto.FlowNodeInstanceTreeNodeDto;
 import com.brandnewdata.mop.poc.operate.service.FlowNodeInstanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,8 +27,8 @@ public class FlowNodeInstanceRest {
      * @return the result
      */
     @GetMapping("/rest/operate/process/flowNodeInstance/list")
-    public Result<List<FlowNodeInstanceDto>> list(@RequestParam String processInstanceId) {
-        List<FlowNodeInstanceDto> list = service.list(processInstanceId);
+    public Result<List<FlowNodeInstanceTreeNodeDto>> list(@RequestParam String processInstanceId) {
+        List<FlowNodeInstanceTreeNodeDto> list = service.list(processInstanceId);
         return Result.OK(list);
     }
 
@@ -40,9 +40,9 @@ public class FlowNodeInstanceRest {
      * @return the result
      */
     @GetMapping("/rest/operate/flowNodeInstance/detailByFlowNodeInstanceId")
-    public Result<FlowNodeInstanceDetailDto> detailByFlowNodeInstanceId(
+    public Result<FlowNodeInstanceDto> detailByFlowNodeInstanceId(
             @RequestParam String processInstanceId, @RequestParam String flowNodeInstanceId) {
-        FlowNodeInstanceDetailDto data = service.detailByFlowNodeInstanceId(processInstanceId, flowNodeInstanceId);
+        FlowNodeInstanceDto data = service.detailByFlowNodeInstanceId(processInstanceId, flowNodeInstanceId);
         return Result.OK(data);
     }
 
@@ -54,9 +54,9 @@ public class FlowNodeInstanceRest {
      * @return the result
      */
     @GetMapping("/rest/operate/flowNodeInstance/detailByFlowNodeId")
-    public Result<FlowNodeInstanceDetailDto> detailByFlowNodeId(
+    public Result<FlowNodeInstanceDto> detailByFlowNodeId(
             @RequestParam String processInstanceId, @RequestParam String flowNodeId) {
-        FlowNodeInstanceDetailDto data = service.detailByFlowNodeId(Long.valueOf(processInstanceId), flowNodeId);
+        FlowNodeInstanceDto data = service.detailByFlowNodeId(Long.valueOf(processInstanceId), flowNodeId);
         return Result.OK(data);
     }
 

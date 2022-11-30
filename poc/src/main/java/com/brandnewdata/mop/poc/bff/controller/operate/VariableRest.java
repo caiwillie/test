@@ -1,3 +1,4 @@
+/*
 package com.brandnewdata.mop.poc.bff.controller.operate;
 
 import com.brandnewdata.common.webresult.Result;
@@ -10,22 +11,26 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+*/
 /**
  * 流程监控相关的接口
- */
+ *//*
+
 @RestController
 public class VariableRest {
 
     @Autowired
     private VariableService variableService;
 
-    /**
+    */
+/**
      * 获取流程变量列表（根据scopeId）
      *
      * @param processInstanceId 流程实例id
      * @param scopeId           scope id（通常是flowNodeInstanceId）
      * @return the result
-     */
+     *//*
+
     @GetMapping("/rest/operate/process/variable/listByScopeId")
     public Result<List<VariableDto>> listByFlowNodeInstance(
             @RequestParam String processInstanceId, @RequestParam String scopeId) {
@@ -34,3 +39,4 @@ public class VariableRest {
     }
 
 }
+*/

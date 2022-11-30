@@ -21,12 +21,4 @@ public class VariableDto extends OperateZeebeDto {
     private boolean isFirst = false;
 
     private String[] sortValues;
-
-    public VariableDto fromEntity(VariableEntity entity) {
-        this.setId(entity.getId());
-        this.setName(entity.getName());
-        this.setPreview(entity.isPreview());
-        this.setValue(entity.getValue());
-        return this;
-    }
 }

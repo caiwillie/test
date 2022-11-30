@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface IVariableService2 {
 
-    List<VariableDto> listByScopeId(String processInstanceId, String scopeId, Long envId);
+    List<VariableDto> listByScopeId(Long envId, String processInstanceId, String scopeId);
 }

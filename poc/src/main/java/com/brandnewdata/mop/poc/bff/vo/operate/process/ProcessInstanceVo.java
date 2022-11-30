@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class InstanceVo {
+public class ProcessInstanceVo {
     /**
      * 流程 id
      */

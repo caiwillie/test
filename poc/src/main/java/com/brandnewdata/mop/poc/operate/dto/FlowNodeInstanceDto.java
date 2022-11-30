@@ -1,104 +1,43 @@
 package com.brandnewdata.mop.poc.operate.dto;
 
-import com.brandnewdata.mop.poc.operate.entity.FlowNodeInstanceEntity;
-import com.brandnewdata.mop.poc.operate.entity.FlowNodeType;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Optional;
-
-@Getter
-@Setter
-public class FlowNodeInstanceDto extends OperateZeebeDto implements FromOneEntity<FlowNodeInstanceDto, FlowNodeInstanceEntity> {
-
+@Data
+public class FlowNodeInstanceDto {
 
     /**
-     * 节点id
+     * 说明当前节点是否重复
+     */
+    private boolean repeated;
+
+    /**
+     * 当前节点的flowNodeId
      */
     private String flowNodeId;
 
     /**
-     * 开始时间
+     * 当前节点的flowNodeType
      */
-    private LocalDateTime startDate;
+    private String flowNodeType;
 
     /**
-     * 结束时间
+     * 当前节点重复运行的实例数
      */
-    private LocalDateTime endDate;
+    private Integer instanceCount;
 
     /**
-     * 节点状态
-     * ACTIVE 运行中, INCIDENT 异常, COMPLETED 完成, TERMINATED 取消,
+     * 基本信息
      */
-    private FlowNodeStateDto state;
+    private FlowNodeInstanceMetaDataDto metaData;
 
     /**
-     * 节点类型
-     * PROCESS,
-     * SUB_PROCESS,
-     * EVENT_SUB_PROCESS,
-     * START_EVENT,
-     * INTERMEDIATE_CATCH_EVENT,
-     * INTERMEDIATE_THROW_EVENT,
-     * BOUNDARY_EVENT,
-     * END_EVENT,
-     * SERVICE_TASK,
-     * RECEIVE_TASK,
-     * USER_TASK,
-     * MANUAL_TASK,
-     * EXCLUSIVE_GATEWAY,
-     * PARALLEL_GATEWAY,
-     * EVENT_BASED_GATEWAY,
-     * SEQUENCE_FLOW,
-     * MULTI_INSTANCE_BODY,
-     * CALL_ACTIVITY,
-     * BUSINESS_RULE_TASK,
-     * SCRIPT_TASK,
-     * SEND_TASK,
+     * 异常个数
      */
-    private FlowNodeType type;
-
+    private Integer incidentCount;
 
     /**
-     * 异常id
+     * 异常信息
      */
-    private Long incidentKey;
-
-    /**
-     * 流程实例id
-     */
-    private Long processInstanceKey;
-
-    private String treePath;
-
-    private int level;
-
-    private Long position;
-
-    private boolean incident;
-
-    private List<FlowNodeInstanceDto> children;
-
-    @Override
-    public FlowNodeInstanceDto from(FlowNodeInstanceEntity entity) {
-        this.setId(entity.getId());
-        this.setFlowNodeId(entity.getFlowNodeId());
-        this.setStartDate(Optional.ofNullable(entity.getStartDate()).map(OffsetDateTime::toLocalDateTime).orElse(null));
-        this.setEndDate(Optional.ofNullable(entity.getEndDate()).map(OffsetDateTime::toLocalDateTime).orElse(null));
-        this.setState(FlowNodeStateDto.getState(entity.getState()));
-        this.setType(entity.getType());
-        this.setIncidentKey(entity.getIncidentKey());
-        this.setProcessInstanceKey(entity.getProcessInstanceKey());
-        this.setTreePath(entity.getTreePath());
-        this.setLevel(entity.getLevel());
-        this.setPosition(entity.getPosition());
-        this.setIncident(entity.isIncident());
-        return this;
-    }
-
+    private IncidentDto incident;
 
 }

@@ -1,3 +1,4 @@
+/*
 package com.brandnewdata.mop.poc.bff.controller.operate;
 
 import com.brandnewdata.common.webresult.Result;
@@ -19,22 +20,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+*/
 /**
  * 流程监控相关的接口
  *
- */
+ *//*
+
 @RestController
 public class ProcessInstanceRest {
 
     @Resource
     private ProcessInstanceService processInstanceService;
 
-    /**
+    */
+/**
      * 获取流程实例的详情
      *
      * @param processInstanceId 流程实例id
      * @return the result
-     */
+     *//*
+
     @GetMapping("/rest/operate/process/instance/detail")
     public Result<ProcessInstanceResp> detail(@RequestParam String processInstanceId) {
         ListViewProcessInstanceDto dto = processInstanceService.detail(Long.valueOf(processInstanceId));
@@ -43,12 +48,14 @@ public class ProcessInstanceRest {
         return Result.OK(resp);
     }
 
-    /**
+    */
+/**
      * 获取流程实例的轨迹连线
      *
      * @param processInstanceId 流程实例id
      * @return the result
-     */
+     *//*
+
     @GetMapping("/rest/operate/process/instance/sequenceFlows")
     public Result<List<SequenceFlowResp>> sequenceFlows(@RequestParam String processInstanceId) {
         List<SequenceFlowEntity> sequenceFlowEntities = processInstanceService.sequenceFlows(Long.valueOf(processInstanceId));
@@ -59,12 +66,14 @@ public class ProcessInstanceRest {
         return Result.OK(records);
     }
 
-    /**
+    */
+/**
      * 获取流程实例的节点状态
      *
      * @param processInstanceId 流程实例id
      * @return
-     */
+     *//*
+
     @GetMapping("/rest/operate/process/instance/flowNodeStates")
     public Result<List<FlowNodeStateResp>> flowNodeStates(@RequestParam String processInstanceId) {
         List<FlowNodeStateResp> ret = new ArrayList<>();
@@ -81,3 +90,4 @@ public class ProcessInstanceRest {
         return Result.OK(ret);
     }
 }
+*/
