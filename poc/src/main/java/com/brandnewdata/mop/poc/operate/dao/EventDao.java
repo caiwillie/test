@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-
 public class EventDao {
     private static final EventTemplate TEMPLATE = new EventTemplate();
 
