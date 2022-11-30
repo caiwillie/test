@@ -77,11 +77,7 @@
         <!-- zeebe -->
         <dependency>
             <groupId>io.camunda</groupId>
-            <artifactId>spring-zeebe-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.camunda</groupId>
-            <artifactId>camunda-operate-client-java</artifactId>
+            <artifactId>zeebe-client-java</artifactId>
         </dependency>
 
         <!-- 连接池  -->
