@@ -169,7 +169,7 @@ public class SceneVersionService implements ISceneVersionService {
 
     @Override
     public SceneVersionDto stop(Long id) {
-        SceneVersionDto sceneVersionDto = getAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__RUNNING});
+        SceneVersionDto sceneVersionDto = getAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__DEBUGGING});
 
         // 修改状态
         sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__STOPPED);
