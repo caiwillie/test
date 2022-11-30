@@ -69,7 +69,7 @@ public class FlowNodeInstanceService2 implements IFlowNodeInstanceService2 {
     }
 
     @Override
-    public FlowNodeInstanceDto detailByFlowNodeInstanceId(Long envId, String flowNodeInstanceId) {
+    public FlowNodeInstanceDto detailById(Long envId, String flowNodeInstanceId) {
         Assert.notNull(flowNodeInstanceId, "节点实例id不能为空");
 
         FlowNodeInstanceDao flowNodeInstanceDao = daoManager.getFlowNodeInstanceDaoByEnvId(envId);

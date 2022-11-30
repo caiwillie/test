@@ -9,7 +9,7 @@ public interface IFlowNodeInstanceService2 {
 
     List<FlowNodeInstanceTreeNodeDto> list(Long envId, String processInstanceId);
 
-    FlowNodeInstanceDto detailByFlowNodeInstanceId(Long envId, String flowNodeInstanceId);
+    FlowNodeInstanceDto detailById(Long envId, String flowNodeInstanceId);
 
     FlowNodeInstanceDto detailByFlowNodeId(Long envId, Long processInstanceId, String flowNodeId);
 }

@@ -1,12 +1,14 @@
-package com.brandnewdata.mop.poc.bff.service.process;
+package com.brandnewdata.mop.poc.bff.service.operate;
 
 import com.brandnewdata.mop.poc.bff.converter.operate.SequenceFlowVoConverter;
+import com.brandnewdata.mop.poc.bff.converter.operate.VariableVoConverter;
 import com.brandnewdata.mop.poc.bff.vo.operate.process.FlowNodeStateVo;
 import com.brandnewdata.mop.poc.bff.vo.operate.process.SequenceFlowVo;
 import com.brandnewdata.mop.poc.bff.vo.operate.process.VariableVo;
-import com.brandnewdata.mop.poc.operate.dto.FlowNodeStateDto;
-import com.brandnewdata.mop.poc.operate.dto.SequenceFlowDto;
+import com.brandnewdata.mop.poc.operate.dto.*;
+import com.brandnewdata.mop.poc.operate.service.IFlowNodeInstanceService2;
 import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService2;
+import com.brandnewdata.mop.poc.operate.service.IVariableService2;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,8 +22,16 @@ public class OperateBffService {
 
     private final IProcessInstanceService2 processInstanceService;
 
-    public OperateBffService(IProcessInstanceService2 processInstanceService) {
+    private final IVariableService2 variableService;
+
+    private final IFlowNodeInstanceService2 flowNodeInstanceService;
+
+    public OperateBffService(IProcessInstanceService2 processInstanceService,
+                             IVariableService2 variableService,
+                             IFlowNodeInstanceService2 flowNodeInstanceService) {
         this.processInstanceService = processInstanceService;
+        this.variableService = variableService;
+        this.flowNodeInstanceService = flowNodeInstanceService;
     }
 
     public void detailProcessInstance() {
@@ -53,19 +63,20 @@ public class OperateBffService {
     public List<VariableVo> listVariable(Long envId,
                                          String processInstanceId,
                                          String scopeId) {
-        return null;
+        List<VariableDto> variableDtoList = variableService.listByScopeId(envId, processInstanceId, scopeId);
+        return variableDtoList.stream().map(VariableVoConverter::createFrom).collect(Collectors.toList());
     }
 
-    public List listFlowNodeInstance(Long envId, String processInstanceId) {
-        return null;
+    public List<FlowNodeInstanceTreeNodeDto> listFlowNodeInstance(Long envId, String processInstanceId) {
+        return flowNodeInstanceService.list(envId, processInstanceId);
     }
 
-    public void detailFlowNodeInstanceById(Long envId, String flowNodeInstanceId) {
-        return;
+    public FlowNodeInstanceDto detailFlowNodeInstanceById(Long envId, String flowNodeInstanceId) {
+        return flowNodeInstanceService.detailById(envId, flowNodeInstanceId);
     }
 
-    public void detailFlowNodeInstanceByFlowNodeId(Long envId, String processInstanceId, String flowNodeId) {
-        return;
+    public FlowNodeInstanceDto detailFlowNodeInstanceByFlowNodeId(Long envId, String processInstanceId, String flowNodeId) {
+        return flowNodeInstanceService.detailByFlowNodeId(envId, Long.valueOf(processInstanceId), flowNodeId);
     }
 
 }
