@@ -7,7 +7,9 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class SendMessageReq {
+public class SendMessageDto {
+
+    private Long envId;
 
     private String messageName;
 

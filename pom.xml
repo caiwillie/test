@@ -169,6 +169,12 @@
                 <type>pom</type>
             </dependency>
 
+            <dependency>
+                <groupId>io.camunda</groupId>
+                <artifactId>spring-zeebe-starter</artifactId>
+                <version>${zeebe.version}</version>
+            </dependency>
+
 
             <dependency>
                 <groupId>com.google.protobuf</groupId>

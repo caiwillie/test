@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SendMessageResp {
+public class MessageDto {
 
     private Long messageKey;
 }

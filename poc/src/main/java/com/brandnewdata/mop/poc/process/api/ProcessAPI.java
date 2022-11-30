@@ -4,23 +4,23 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.api.process.IProcessAPI;
-import com.brandnewdata.mop.api.process.SendMessageReq;
-import com.brandnewdata.mop.api.process.SendMessageResp;
+import com.brandnewdata.mop.api.process.SendMessageDto;
+import com.brandnewdata.mop.api.process.MessageDto;
 import io.camunda.zeebe.client.ZeebeClient;
 import io.camunda.zeebe.client.api.response.PublishMessageResponse;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
 import java.util.Optional;
 
 @RestController
 public class ProcessAPI implements IProcessAPI {
 
+    // todo caiwillie
     // @Resource
     private ZeebeClient zeebeClient;
 
     @Override
-    public Result<SendMessageResp> sendMessage(SendMessageReq req) {
+    public Result<MessageDto> sendMessage(SendMessageDto req) {
         String messageName = req.getMessageName();
         Assert.notNull(messageName);
 
@@ -30,13 +30,13 @@ public class ProcessAPI implements IProcessAPI {
                 .variables(Optional.ofNullable(req.getVariables()).orElse(MapUtil.empty()))
                 .send()
                 .join();
-        SendMessageResp resp = toResp(response);
+        MessageDto resp = toResp(response);
         return Result.OK(resp);
     }
 
 
-    public SendMessageResp toResp(PublishMessageResponse response) {
-        SendMessageResp resp = new SendMessageResp();
+    public MessageDto toResp(PublishMessageResponse response) {
+        MessageDto resp = new MessageDto();
         resp.setMessageKey(response.getMessageKey());
         return resp;
     }
