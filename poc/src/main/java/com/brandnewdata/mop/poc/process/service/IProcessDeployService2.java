@@ -22,6 +22,6 @@ public interface IProcessDeployService2 {
 
     Map<String, Object> startSync(BizDeployDto bizDeployDto, Map<String, Object> values, Long envId, String bizType);
 
-    void startAsync(BizDeployDto bizDeployDto, Map<String, Object> values, Long envId, String bizType);
+    void startAsync(String processId, Map<String, Object> values, Long envId);
 
 }

@@ -160,7 +160,7 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
         Assert.notNull(bizType, "环境类型不能为空");
 
         String processId = bizDeployDto.getProcessId();
-        String expression = parseResponseExpression(bizDeployDto);
+        String expression = parseResponseExpression(bizDeployDto, bizType);
 
         ZeebeClient zeebeClient = zeebeClientManager.getByEnvId(envId);
 
@@ -194,11 +194,8 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
     }
 
     @Override
-    public void startAsync(BizDeployDto bizDeployDto, Map<String, Object> values, Long envId, String bizType) {
+    public void startAsync(String processId, Map<String, Object> values, Long envId) {
         Assert.notNull(envId, "环境id不能为空");
-        Assert.notNull(bizType, "环境类型不能为空");
-
-        String processId = bizDeployDto.getProcessId();
 
         ZeebeClient zeebeClient = zeebeClientManager.getByEnvId(envId);
 
@@ -212,7 +209,7 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
         log.info("start process asynchronously: {}", processId);
     }
 
-    private String parseResponseExpression(BizDeployDto bizDeployDto) {
+    private String parseResponseExpression(BizDeployDto bizDeployDto, String bizType) {
         String processId = bizDeployDto.getProcessId();
         Step2Result step2Result = ProcessDefinitionParser
                 .step1(processId, bizDeployDto.getProcessName(), bizDeployDto.getProcessXml())

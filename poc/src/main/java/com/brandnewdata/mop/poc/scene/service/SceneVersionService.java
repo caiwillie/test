@@ -133,13 +133,7 @@ public class SceneVersionService implements ISceneVersionService {
         Assert.notNull(envDto, "调试环境不存在");
         Long envId = envDto.getId();
 
-        BizDeployDto bizDeployDto = new BizDeployDto();
-        bizDeployDto.setProcessId(versionProcessDto.getProcessId());
-        bizDeployDto.setProcessName(versionProcessDto.getProcessName());
-        bizDeployDto.setProcessXml(versionProcessDto.getProcessXml());
-
-        processDeployService.startAsync(bizDeployDto, Opt.ofNullable(variables).orElse(MapUtil.empty()),
-                envId, ProcessConst.PROCESS_BIZ_TYPE__SCENE);
+        processDeployService.startAsync(versionProcessDto.getProcessId(), Opt.ofNullable(variables).orElse(MapUtil.empty()), envId);
     }
 
     @Override
