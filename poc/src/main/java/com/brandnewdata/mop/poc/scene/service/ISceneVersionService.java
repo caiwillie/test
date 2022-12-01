@@ -26,11 +26,11 @@ public interface ISceneVersionService {
 
     SceneVersionDto stop(Long id);
 
-    SceneVersionDto resume(Long id, List<Long> envList);
+    SceneVersionDto resume(Long id, List<Long> envIdList);
 
-    SceneVersionDto deploy(Long id, List<Long> envList, String version);
+    SceneVersionDto deploy(Long id, List<Long> envIdList, String version);
 
     Map<Long, Long> countById(List<Long> sceneIdList);
 
-    Map<Long, SceneVersionDto> fetchById(List<Long> id);
+    Map<Long, SceneVersionDto> fetchById(List<Long> idList);
 }

@@ -147,6 +147,8 @@ public class SceneVersionService implements ISceneVersionService {
         Assert.notNull(id, "版本id不能为空");
         SceneVersionDto sceneVersionDto = fetchById(ListUtil.of(id)).get(id);
         Assert.notNull(sceneVersionDto, "版本不存在。version id：{}", id);
+
+        // 获取版本下的流程
         List<VersionProcessDto> versionProcessDtoList =
                 versionProcessService.fetchVersionProcessListByVersionId(ListUtil.of(id), false).get(id);
         Assert.isTrue(CollUtil.isNotEmpty(versionProcessDtoList), "该版本下至少需要配置一个流程");
@@ -188,9 +190,9 @@ public class SceneVersionService implements ISceneVersionService {
     }
 
     @Override
-    public SceneVersionDto resume(Long id, List<Long> envList) {
+    public SceneVersionDto resume(Long id, List<Long> envIdList) {
         SceneVersionDto sceneVersionDto = getAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__STOPPED});
-        Assert.notEmpty(envList, "环境列表不能为空");
+        Assert.notEmpty(envIdList, "环境列表不能为空");
 
         // 修改状态
         sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__RUNNING);
@@ -199,14 +201,29 @@ public class SceneVersionService implements ISceneVersionService {
     }
 
     @Override
-    public SceneVersionDto deploy(Long id, List<Long> envList, String version) {
+    public SceneVersionDto deploy(Long id, List<Long> envIdList, String version) {
         // 配置中，和调试中均可以进行发布
         SceneVersionDto sceneVersionDto = getAndCheckStatus(id,
                 new int[]{SceneConst.SCENE_VERSION_STATUS__CONFIGURING, SceneConst.SCENE_VERSION_STATUS__DEBUGGING});
-        Assert.notEmpty(envList, "环境列表不能为空");
+        Assert.notEmpty(envIdList, "环境列表不能为空");
         Assert.notNull(version, "版本不能为空");
         Assert.isFalse(StrUtil.equals(sceneVersionDto.getVersion(), version), "请修改为正式版本号");
 
+        // 查询版本下的流程
+        List<VersionProcessDto> versionProcessDtoList =
+                versionProcessService.fetchVersionProcessListByVersionId(ListUtil.of(id), false).get(id);
+        Assert.isTrue(CollUtil.isNotEmpty(versionProcessDtoList), "该版本下至少需要配置一个流程");
+
+        // 发布到zeebe
+        for (VersionProcessDto versionProcessDto : versionProcessDtoList) {
+            BizDeployDto deployDto = new BizDeployDto();
+            deployDto.setProcessId(versionProcessDto.getProcessId());
+            deployDto.setProcessName(versionProcessDto.getProcessName());
+            deployDto.setProcessXml(versionProcessDto.getProcessXml());
+            processDeployService.releaseDeploy(deployDto, envIdList, ProcessConst.PROCESS_BIZ_TYPE__SCENE);
+        }
+
+        //todo caiwillie 上报保存配置
         sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__RUNNING);
         sceneVersionDao.updateById(SceneVersionPoConverter.createFrom(sceneVersionDto));
         return sceneVersionDto;
