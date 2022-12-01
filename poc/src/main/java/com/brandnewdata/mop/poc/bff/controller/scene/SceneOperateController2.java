@@ -54,7 +54,7 @@ public class SceneOperateController2 {
      * @return
      */
     @PostMapping("/rest/scene/operate/statistic")
-    public Result<Statistic> statistic(@RequestBody Filter filter) {
+    public Result<Statistic> statistic(@RequestBody SceneDeployFilter filter) {
         return Result.OK();
     }
 }
