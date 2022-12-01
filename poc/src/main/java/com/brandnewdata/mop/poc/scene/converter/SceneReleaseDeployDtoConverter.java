@@ -3,6 +3,8 @@ package com.brandnewdata.mop.poc.scene.converter;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Opt;
 import com.brandnewdata.mop.poc.scene.dto.SceneReleaseDeployDto;
+import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
+import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
 import com.brandnewdata.mop.poc.scene.po.SceneReleaseDeployPo;
 
 public class SceneReleaseDeployDtoConverter {
@@ -35,5 +37,16 @@ private Long sceneId;
         dto.setProcessName(po.getProcessName());
         dto.setEnvId(po.getEnvId());
         return dto;
+    }
+
+    public static void updateFrom(SceneReleaseDeployDto sceneReleaseDeployDto, VersionProcessDto dto) {
+        sceneReleaseDeployDto.setProcessId(dto.getProcessId());
+        sceneReleaseDeployDto.setProcessName(dto.getProcessName());
+    }
+
+    public static void updateFrom(SceneReleaseDeployDto sceneReleaseDeployDto, SceneVersionDto dto) {
+        sceneReleaseDeployDto.setSceneId(dto.getSceneId());
+        sceneReleaseDeployDto.setVersionId(dto.getId());
+        sceneReleaseDeployDto.setVersionName(dto.getVersion());
     }
 }

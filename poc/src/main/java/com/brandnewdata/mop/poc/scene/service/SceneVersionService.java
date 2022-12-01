@@ -19,6 +19,7 @@ import com.brandnewdata.mop.poc.scene.converter.SceneReleaseDeployDtoConverter;
 import com.brandnewdata.mop.poc.scene.converter.SceneVersionDtoConverter;
 import com.brandnewdata.mop.poc.scene.converter.SceneVersionPoConverter;
 import com.brandnewdata.mop.poc.scene.dao.SceneVersionDao;
+import com.brandnewdata.mop.poc.scene.dto.SceneReleaseDeployDto;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
 import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
 import com.brandnewdata.mop.poc.scene.po.SceneVersionPo;
@@ -227,10 +228,17 @@ public class SceneVersionService implements ISceneVersionService {
 
         //todo caiwillie 上报保存配置
 
+        // 保存到场景列表
         for (VersionProcessDto versionProcessDto : versionProcessDtoList) {
-            SceneReleaseDeployDtoConverter.createFrom()
+            for (Long envId : envIdList) {
+                SceneReleaseDeployDto sceneReleaseDeployDto = new SceneReleaseDeployDto();
+                SceneReleaseDeployDtoConverter.updateFrom(sceneReleaseDeployDto, versionProcessDto);
+                SceneReleaseDeployDtoConverter.updateFrom(sceneReleaseDeployDto, sceneVersionDto);
+                sceneReleaseDeployDto.setSceneName(sceneName);
+                sceneReleaseDeployDto.setEnvId(envId);
+                sceneReleaseDeployService.save(sceneReleaseDeployDto);
+            }
         }
-
 
         // 更新状态
         sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__RUNNING);
