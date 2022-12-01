@@ -46,4 +46,9 @@ public class SceneVersionVo {
      * 关联的环境列表
      */
     private List<EnvVo> envList;
+
+    /**
+     * 描述
+     */
+    private String description;
 }

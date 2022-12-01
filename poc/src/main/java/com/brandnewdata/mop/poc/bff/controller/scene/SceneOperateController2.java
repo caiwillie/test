@@ -6,7 +6,6 @@ import com.brandnewdata.mop.poc.bff.vo.operate.Statistic;
 import com.brandnewdata.mop.poc.bff.vo.process.ProcessDefinitionVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.operate.OperateProcessInstanceVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.operate.SceneDeployFilter;
-import com.brandnewdata.mop.poc.bff.vo.scene.operate.condition.Filter;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

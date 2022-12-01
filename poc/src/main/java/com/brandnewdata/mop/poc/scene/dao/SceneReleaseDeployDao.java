@@ -1,7 +1,7 @@
 package com.brandnewdata.mop.poc.scene.dao;
 
-import com.brandnewdata.mop.poc.scene.po.SceneReleaseDeployPo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.brandnewdata.mop.poc.scene.po.SceneReleaseDeployPo;
 
 /**
  * <p>

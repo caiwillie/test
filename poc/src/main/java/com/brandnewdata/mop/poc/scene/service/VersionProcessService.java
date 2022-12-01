@@ -16,12 +16,14 @@ import com.brandnewdata.mop.poc.scene.dao.VersionProcessDao;
 import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
 import com.brandnewdata.mop.poc.scene.manager.JooqManager;
 import com.brandnewdata.mop.poc.scene.po.VersionProcessPo;
-import com.dxy.library.json.jackson.JacksonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 

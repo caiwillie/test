@@ -3,7 +3,6 @@ package com.brandnewdata.mop.poc.bff.converter.scene;
 import com.brandnewdata.mop.poc.bff.vo.scene.operate.OperateProcessInstanceVo;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.process.dto.ProcessReleaseDeployDto;
-import com.brandnewdata.mop.poc.process.po.ProcessReleaseDeployPo;
 import com.brandnewdata.mop.poc.scene.dto.SceneReleaseDeployDto;
 
 public class OperateProcessInstanceVoConverter {
