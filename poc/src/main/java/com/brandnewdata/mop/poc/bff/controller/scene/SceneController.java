@@ -1,3 +1,4 @@
+/*
 package com.brandnewdata.mop.poc.bff.controller.scene;
 
 import cn.hutool.core.date.DatePattern;
@@ -28,11 +29,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 
+*/
 /**
  * 业务场景集成相关的接口
  *
  * @author caiwillie
- */
+ *//*
+
 @Slf4j
 @RestController
 public class SceneController {
@@ -43,7 +46,8 @@ public class SceneController {
     @Resource
     private DataExternalService dataExternalService;
 
-    /**
+    */
+/**
      * 分页列表
      *
      * @param projectId 项目id
@@ -51,7 +55,8 @@ public class SceneController {
      * @param pageSize  分页大小
      * @param name      名称（模糊搜索）
      * @return the result
-     */
+     *//*
+
     @GetMapping(value = "/rest/businessScene/page")
     public Result<Page<SceneDto>> page(
             @RequestParam(required = false) String projectId,
@@ -62,12 +67,14 @@ public class SceneController {
         return Result.OK(page);
     }
 
-    /**
+    */
+/**
      * 详情
      *
      * @param id 场景 id
      * @return the result
-     */
+     *//*
+
     @GetMapping(value = "/rest/businessScene/detail")
     public Result<SceneDto> detail(
             @RequestParam Long id) {
@@ -76,24 +83,28 @@ public class SceneController {
         return Result.OK(sceneDTO);
     }
 
-    /**
+    */
+/**
      * 保存业务场景
      *
      * @param sceneDTO the business scene
      * @return the result
-     */
+     *//*
+
     // @PostMapping(value = "/rest/businessScene/save")
     public Result<SceneDto> save(@RequestBody SceneDto sceneDTO) {
         sceneDTO = service.save(sceneDTO);
         return Result.OK(sceneDTO);
     }
 
-    /**
+    */
+/**
      * 保存业务场景下的流程
      *
      * @param sceneProcessDTO the business scene process definition
      * @return the result
-     */
+     *//*
+
     // @PostMapping(value = "/rest/businessScene/saveProcessDefinition")
     public Result<SceneProcessDto> saveProcessDefinition(
             @RequestBody SceneProcessDto sceneProcessDTO) {
@@ -101,12 +112,14 @@ public class SceneController {
         return Result.OK(sceneProcessDTO);
     }
 
-    /**
+    */
+/**
      * 部署业务场景下的流程
      *
      * @param sceneProcessDTO the business scene process definition
      * @return the result
-     */
+     *//*
+
     // @PostMapping("/rest/businessScene/deployProcessDefinition")
     public Result deployProcessDefinition (
             @RequestBody SceneProcessDto sceneProcessDTO) {
@@ -114,37 +127,43 @@ public class SceneController {
         return Result.OK();
     }
 
-    /**
+    */
+/**
      * 删除业务场景下的流程
      *
      * @param sceneProcessDTO the business scene process dto
      * @return the result
-     */
+     *//*
+
     @PostMapping(value = "/rest/businessScene/deleteProcessDefinition")
     public Result deleteProcessDefinition(@RequestBody SceneProcessDto sceneProcessDTO) {
         service.deleteProcessDefinition(sceneProcessDTO);
         return Result.OK();
     }
 
-    /**
+    */
+/**
      * 删除业务场景
      *
      * @param sceneDTO the business scene dto
      * @return the result
-     */
+     *//*
+
     @PostMapping(value = "/rest/businessScene/delete")
     public Result delete(@RequestBody SceneDto sceneDTO) {
         service.delete(sceneDTO);
         return Result.OK();
     }
 
-    /**
+    */
+/**
      * 导出场景
      *
      * @param response the response
      * @param req      the req
      * @throws IOException the io exception
-     */
+     *//*
+
     @PostMapping("/rest/businessScene/export")
     public void export(HttpServletResponse response, @RequestBody ExportReq req) {
         log.info("path: /rest/businessScene/export, req: {}", JacksonUtil.to(req));
@@ -162,12 +181,14 @@ public class SceneController {
         FileUtil.del(file);
     }
 
-    /**
+    */
+/**
      * 预备导入场景
      *
      * @param file the file
      * @return result
-     */
+     *//*
+
     @PostMapping("/rest/businessScene/prepareLoad")
     public Result<LoadResp> prepareLoad(@RequestParam MultipartFile file) {
         try {
@@ -178,11 +199,13 @@ public class SceneController {
         }
     }
 
-    /**
+    */
+/**
      * 确认导入场景
      *
      * @return
-     */
+     *//*
+
     @PostMapping("/rest/businessScene/confirmLoad")
     public Result confirmLoad(@RequestBody LoadResp req) {
         dataExternalService.confirmLoad(req);
@@ -190,3 +213,4 @@ public class SceneController {
     }
 
 }
+*/
