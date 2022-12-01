@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.poc.bff.controller.scene;
 
+import cn.hutool.core.collection.ListUtil;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.bff.service.scene.SceneOperateBffService2;
 import com.brandnewdata.mop.poc.bff.vo.operate.Statistic;
@@ -35,7 +36,7 @@ public class SceneOperateController2 {
      */
     @PostMapping("/rest/scene/operate/processInstance/page")
     public Result<Page<OperateProcessInstanceVo>> pageProcessInstance(@RequestBody SceneDeployFilter filter) {
-        return null;
+        return Result.OK(new Page<>(0, ListUtil.empty()));
     }
 
     /**
@@ -45,6 +46,6 @@ public class SceneOperateController2 {
      */
     @PostMapping("/rest/scene/operate/processInstance/definition")
     public Result<ProcessDefinitionVo> definitionProcessInstance(@RequestBody OperateProcessInstanceVo vo) {
-        return null;
+        return Result.OK();
     }
 }
