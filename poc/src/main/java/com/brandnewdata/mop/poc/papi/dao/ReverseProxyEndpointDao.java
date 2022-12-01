@@ -1,7 +1,7 @@
 package com.brandnewdata.mop.poc.papi.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.brandnewdata.mop.poc.papi.entity.ReverseProxyEndpointEntity;
+import com.brandnewdata.mop.poc.papi.po.ReverseProxyEndpointPo;
 
 /**
  * <p>
@@ -11,6 +11,6 @@ import com.brandnewdata.mop.poc.papi.entity.ReverseProxyEndpointEntity;
  * @author caiwillie
  * @since 2022-10-11
  */
-public interface ReverseProxyEndpointDao extends BaseMapper<ReverseProxyEndpointEntity> {
+public interface ReverseProxyEndpointDao extends BaseMapper<ReverseProxyEndpointPo> {
 
 }

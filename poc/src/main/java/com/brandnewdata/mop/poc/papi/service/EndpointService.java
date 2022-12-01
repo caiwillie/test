@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.papi.dao.ReverseProxyEndpointDao;
 import com.brandnewdata.mop.poc.papi.dto.Endpoint;
-import com.brandnewdata.mop.poc.papi.entity.ReverseProxyEndpointEntity;
+import com.brandnewdata.mop.poc.papi.po.ReverseProxyEndpointPo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -26,17 +26,17 @@ public class EndpointService {
     private ReverseProxyEndpointDao endpointDao;
 
     public Endpoint save(Endpoint endpoint) {
-        ReverseProxyEndpointEntity entity = toEntity(endpoint);
+        ReverseProxyEndpointPo entity = toEntity(endpoint);
         Long id = entity.getId();
         if(id == null) {
             // endpoint 的唯一性校验
-            ReverseProxyEndpointEntity exist = exist(entity.getProxyId(), entity.getLocation());
+            ReverseProxyEndpointPo exist = exist(entity.getProxyId(), entity.getLocation());
             Assert.isNull(exist, "路径 {} 已存在", endpoint.getLocation());
 
             endpointDao.insert(entity);
             endpoint.setId(entity.getId());
         } else {
-            ReverseProxyEndpointEntity oldEntity = endpointDao.selectById(id);
+            ReverseProxyEndpointPo oldEntity = endpointDao.selectById(id);
 
             // 将新对象的值拷贝到旧对象，排除掉 proxyId
             BeanUtil.copyProperties(entity, oldEntity, "proxyId");
@@ -45,25 +45,25 @@ public class EndpointService {
         return endpoint;
     }
 
-    private ReverseProxyEndpointEntity exist(Long proxyId, String location) {
-        QueryWrapper<ReverseProxyEndpointEntity> query = new QueryWrapper<>();
-        query.eq(ReverseProxyEndpointEntity.PROXY_ID, proxyId);
-        query.eq(ReverseProxyEndpointEntity.LOCATION, location);
+    private ReverseProxyEndpointPo exist(Long proxyId, String location) {
+        QueryWrapper<ReverseProxyEndpointPo> query = new QueryWrapper<>();
+        query.eq(ReverseProxyEndpointPo.PROXY_ID, proxyId);
+        query.eq(ReverseProxyEndpointPo.LOCATION, location);
         return endpointDao.selectOne(query);
     }
 
     public Endpoint getOne(long id) {
-        ReverseProxyEndpointEntity entity = endpointDao.selectById(id);
+        ReverseProxyEndpointPo entity = endpointDao.selectById(id);
         return Optional.ofNullable(entity).map(this::toDTO).orElse(null);
     }
 
     public Page<Endpoint> page(Long proxyId, int pageNum, int pageSize) {
         Assert.isTrue(pageNum > 0);
         Assert.isTrue(pageSize > 0);
-        com.baomidou.mybatisplus.extension.plugins.pagination.Page<ReverseProxyEndpointEntity> page =
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<ReverseProxyEndpointPo> page =
                 new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(pageNum, pageSize);
-        QueryWrapper<ReverseProxyEndpointEntity> queryWrapper = new QueryWrapper<>();
-        if(proxyId != null) queryWrapper.eq(ReverseProxyEndpointEntity.PROXY_ID, proxyId);
+        QueryWrapper<ReverseProxyEndpointPo> queryWrapper = new QueryWrapper<>();
+        if(proxyId != null) queryWrapper.eq(ReverseProxyEndpointPo.PROXY_ID, proxyId);
         page = endpointDao.selectPage(page, queryWrapper);
         List<Endpoint> records = Optional.ofNullable(page.getRecords()).orElse(ListUtil.empty())
                 .stream().map(this::toDTO).collect(Collectors.toList());
@@ -82,16 +82,16 @@ public class EndpointService {
         if(CollUtil.isEmpty(proxyIdList)) {
             return ListUtil.empty();
         }
-        QueryWrapper<ReverseProxyEndpointEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.in(ReverseProxyEndpointEntity.PROXY_ID, proxyIdList);
-        List<ReverseProxyEndpointEntity> list = endpointDao.selectList(queryWrapper);
+        QueryWrapper<ReverseProxyEndpointPo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in(ReverseProxyEndpointPo.PROXY_ID, proxyIdList);
+        List<ReverseProxyEndpointPo> list = endpointDao.selectList(queryWrapper);
         List<Endpoint> ret = list.stream().map(this::toDTO).collect(Collectors.toList());
         return ret;
     }
 
-    private ReverseProxyEndpointEntity toEntity(Endpoint dto) {
+    private ReverseProxyEndpointPo toEntity(Endpoint dto) {
         Assert.notNull(dto);
-        ReverseProxyEndpointEntity entity = new ReverseProxyEndpointEntity();
+        ReverseProxyEndpointPo entity = new ReverseProxyEndpointPo();
         entity.setId(dto.getId());
         entity.setProxyId(dto.getProxyId());
         entity.setLocation(dto.getLocation());
@@ -102,7 +102,7 @@ public class EndpointService {
         return entity;
     }
 
-    private Endpoint toDTO(ReverseProxyEndpointEntity entity) {
+    private Endpoint toDTO(ReverseProxyEndpointPo entity) {
         Assert.notNull(entity);
         Endpoint dto = new Endpoint();
         dto.setId(entity.getId());

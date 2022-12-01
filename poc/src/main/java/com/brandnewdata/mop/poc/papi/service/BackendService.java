@@ -8,8 +8,8 @@ import com.brandnewdata.mop.poc.papi.dao.ReverseProxyEndpointDao;
 import com.brandnewdata.mop.poc.papi.dto.Backend;
 import com.brandnewdata.mop.poc.papi.dto.ForwardConfig;
 import com.brandnewdata.mop.poc.papi.dto.ProcessConfig;
-import com.brandnewdata.mop.poc.papi.entity.ReverseProxyEndpointEntity;
-import com.brandnewdata.mop.poc.papi.entity.ReverseProxyEntity;
+import com.brandnewdata.mop.poc.papi.po.ReverseProxyEndpointPo;
+import com.brandnewdata.mop.poc.papi.po.ReverseProxyPo;
 import com.dxy.library.json.jackson.JacksonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,9 +35,9 @@ public class BackendService {
         // 解析domain，获取正则表达式中的第一个括号中的内容
         domain = ReUtil.getGroup1(domainRegEx, domain);
 
-        QueryWrapper<ReverseProxyEntity> queryWrapper1 = new QueryWrapper<>();
-        queryWrapper1.eq(ReverseProxyEntity.DOMAIN, domain);
-        ReverseProxyEntity proxy = proxyDao.selectOne(queryWrapper1);
+        QueryWrapper<ReverseProxyPo> queryWrapper1 = new QueryWrapper<>();
+        queryWrapper1.eq(ReverseProxyPo.DOMAIN, domain);
+        ReverseProxyPo proxy = proxyDao.selectOne(queryWrapper1);
 
         // 没找到就直接返回 null
         if(proxy == null) {
@@ -45,17 +45,17 @@ public class BackendService {
         }
 
         Long proxyId = proxy.getId();
-        QueryWrapper<ReverseProxyEndpointEntity> queryWrapper2 = new QueryWrapper<>();
-        queryWrapper2.eq(ReverseProxyEndpointEntity.PROXY_ID, proxyId);
-        queryWrapper2.eq(ReverseProxyEndpointEntity.LOCATION, uri);
+        QueryWrapper<ReverseProxyEndpointPo> queryWrapper2 = new QueryWrapper<>();
+        queryWrapper2.eq(ReverseProxyEndpointPo.PROXY_ID, proxyId);
+        queryWrapper2.eq(ReverseProxyEndpointPo.LOCATION, uri);
 
-        List<ReverseProxyEndpointEntity> endpointList = proxyEndpointDao.selectList(queryWrapper2);
+        List<ReverseProxyEndpointPo> endpointList = proxyEndpointDao.selectList(queryWrapper2);
 
         // endpoint list 为空就直接返回
         if(CollUtil.isEmpty(endpointList)) return null;
 
         //取第一个
-        ReverseProxyEndpointEntity endpoint = endpointList.get(0);
+        ReverseProxyEndpointPo endpoint = endpointList.get(0);
 
         Integer backendType = endpoint.getBackendType();
         String backendConfig = endpoint.getBackendConfig();

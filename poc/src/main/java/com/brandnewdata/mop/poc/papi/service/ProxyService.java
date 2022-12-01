@@ -16,7 +16,7 @@ import com.brandnewdata.mop.poc.papi.dto.APIDefinition;
 import com.brandnewdata.mop.poc.papi.dto.Endpoint;
 import com.brandnewdata.mop.poc.papi.dto.ImportDTO;
 import com.brandnewdata.mop.poc.papi.dto.Proxy;
-import com.brandnewdata.mop.poc.papi.entity.ReverseProxyEntity;
+import com.brandnewdata.mop.poc.papi.po.ReverseProxyPo;
 import com.brandnewdata.mop.poc.papi.req.ImportFromFileReq;
 import com.brandnewdata.mop.poc.papi.resp.ApiResp;
 import com.brandnewdata.mop.poc.papi.resp.VersionSpecifiedResp;
@@ -54,7 +54,7 @@ public class ProxyService {
 
     public Proxy save(Proxy proxy) {
 
-        ReverseProxyEntity entity = toEntity(proxy);
+        ReverseProxyPo entity = toEntity(proxy);
         Long id = entity.getId();
         if(id == null) {
             String name = entity.getName();
@@ -63,7 +63,7 @@ public class ProxyService {
             Assert.notNull(version, "API 版本不能为空");
 
             // 判断 名称和版本 是否唯一
-            ReverseProxyEntity exist = exist(name, version);
+            ReverseProxyPo exist = exist(name, version);
             Assert.isNull(exist, "版本 {} 已存在", name, version);
 
             String domain = DigestUtil.md5Hex(StrUtil.format("{}:{}", name, version));
@@ -78,7 +78,7 @@ public class ProxyService {
         } else {
             Assert.notNull(entity.getProtocol(), "协议不能为空");
 
-            ReverseProxyEntity oldEntity = proxyDao.selectById(id);
+            ReverseProxyPo oldEntity = proxyDao.selectById(id);
             // 将新对象的值拷贝到旧对象，只能修改 protocol，tag, description
             oldEntity.setProtocol(entity.getProtocol());
             oldEntity.setTag(entity.getTag());
@@ -88,16 +88,16 @@ public class ProxyService {
         return toDTO(entity);
     }
 
-    private ReverseProxyEntity exist(String name, String version) {
-        QueryWrapper<ReverseProxyEntity> query = new QueryWrapper<>();
-        query.eq(ReverseProxyEntity.NAME, name);
-        query.eq(ReverseProxyEntity.VERSION, version);
+    private ReverseProxyPo exist(String name, String version) {
+        QueryWrapper<ReverseProxyPo> query = new QueryWrapper<>();
+        query.eq(ReverseProxyPo.NAME, name);
+        query.eq(ReverseProxyPo.VERSION, version);
         return proxyDao.selectOne(query);
     }
 
     public Proxy getOne(long id) {
         Assert.notNull(id, "proxy id 不能为空");
-        ReverseProxyEntity entity = proxyDao.selectById(id);
+        ReverseProxyPo entity = proxyDao.selectById(id);
         Assert.notNull(entity, "id 不存在");
         return toDTO(entity);
     }
@@ -105,9 +105,9 @@ public class ProxyService {
     public Page<Proxy> page(int pageNum, int pageSize) {
         Assert.isTrue(pageNum > 0);
         Assert.isTrue(pageSize > 0);
-        com.baomidou.mybatisplus.extension.plugins.pagination.Page<ReverseProxyEntity> page =
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<ReverseProxyPo> page =
                 new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(pageNum, pageSize);
-        QueryWrapper<ReverseProxyEntity> queryWrapper = new QueryWrapper<>();
+        QueryWrapper<ReverseProxyPo> queryWrapper = new QueryWrapper<>();
         page = proxyDao.selectPage(page, queryWrapper);
         List<Proxy> records = Optional.ofNullable(page.getRecords()).orElse(ListUtil.empty())
                 .stream().map(this::toDTO).collect(Collectors.toList());
@@ -115,42 +115,42 @@ public class ProxyService {
     }
 
     public Page<ApiResp> pageV2(int pageNum, int pageSize, String name, String tags) {
-        QueryWrapper<ReverseProxyEntity> queryWrapper = new QueryWrapper<>();
+        QueryWrapper<ReverseProxyPo> queryWrapper = new QueryWrapper<>();
         if(StrUtil.isNotBlank(name)) {
-            queryWrapper.like(ReverseProxyEntity.NAME, name);
+            queryWrapper.like(ReverseProxyPo.NAME, name);
         }
 
         if(StrUtil.isNotBlank(tags)) {
             String[] tagArr = tags.split(",");
-            queryWrapper.in(ReverseProxyEntity.TAG, tagArr);
+            queryWrapper.in(ReverseProxyPo.TAG, tagArr);
         }
 
-        List<ReverseProxyEntity> entities = proxyDao.selectList(queryWrapper);
-        Map<String, List<ReverseProxyEntity>> nameMap = new HashMap<>();
+        List<ReverseProxyPo> entities = proxyDao.selectList(queryWrapper);
+        Map<String, List<ReverseProxyPo>> nameMap = new HashMap<>();
         if(CollUtil.isEmpty(entities)) {
             return new Page<>(0, ListUtil.empty());
         }
 
-        for (ReverseProxyEntity entity : entities) {
-            List<ReverseProxyEntity> list = nameMap.computeIfAbsent(entity.getName(), key -> new ArrayList<>());
+        for (ReverseProxyPo entity : entities) {
+            List<ReverseProxyPo> list = nameMap.computeIfAbsent(entity.getName(), key -> new ArrayList<>());
             list.add(entity);
         }
 
         // 对nameMap进行排序
-        List<Map.Entry<String, List<ReverseProxyEntity>>> sortedList = nameMap.entrySet().stream().sorted((o1, o2) -> {
-            List<ReverseProxyEntity> list1 = o1.getValue();
+        List<Map.Entry<String, List<ReverseProxyPo>>> sortedList = nameMap.entrySet().stream().sorted((o1, o2) -> {
+            List<ReverseProxyPo> list1 = o1.getValue();
             list1.sort(VERSION_COMPARATOR);
-            List<ReverseProxyEntity> list2 = o2.getValue();
+            List<ReverseProxyPo> list2 = o2.getValue();
             list2.sort(VERSION_COMPARATOR);
             Date date1 = Optional.ofNullable(list1.get(0).getUpdateTime()).orElse(DateUtil.date(0));
             Date date2 = Optional.ofNullable(list2.get(0).getUpdateTime()).orElse(DateUtil.date(0));
             return -DateUtil.compare(date1, date2);
         }).collect(Collectors.toList());
 
-        List<Map.Entry<String, List<ReverseProxyEntity>>> slice = PageEnhancedUtil.slice(pageNum, pageSize, sortedList);
+        List<Map.Entry<String, List<ReverseProxyPo>>> slice = PageEnhancedUtil.slice(pageNum, pageSize, sortedList);
 
         // flat map 获取分页获得到的所有api列表
-        List<Long> apiIdList = slice.stream().flatMap(entry -> entry.getValue().stream().map(ReverseProxyEntity::getId))
+        List<Long> apiIdList = slice.stream().flatMap(entry -> entry.getValue().stream().map(ReverseProxyPo::getId))
                 .collect(Collectors.toList());
         List<Endpoint> endpoints = endpointService.listByProxyIdList(apiIdList);
 
@@ -159,9 +159,9 @@ public class ProxyService {
 
         // 组装成 api resp
         List<ApiResp> records = new ArrayList<>();
-        for (Map.Entry<String, List<ReverseProxyEntity>> entry : slice) {
+        for (Map.Entry<String, List<ReverseProxyPo>> entry : slice) {
             String apiName = entry.getKey();
-            List<ReverseProxyEntity> list = entry.getValue();
+            List<ReverseProxyPo> list = entry.getValue();
             List<VersionSpecifiedResp> versions = list.stream().map(entity -> {
                 VersionSpecifiedResp versionSpecifiedResp = new VersionSpecifiedResp();
                 Long apiId = entity.getId();
@@ -199,7 +199,7 @@ public class ProxyService {
         Assert.isTrue(state != null
                 && (state == ProxyConstants.STATE_STOP || state == ProxyConstants.STATE_RUNNING),
                 "状态不能为空，且只能是 停止或运行");
-        ReverseProxyEntity oldEntity = proxyDao.selectById(id);
+        ReverseProxyPo oldEntity = proxyDao.selectById(id);
         oldEntity.setState(state);
         proxyDao.updateById(oldEntity);
     }
@@ -290,10 +290,10 @@ public class ProxyService {
         return ret;
     }
 
-    private static class VersionComparator implements Comparator<ReverseProxyEntity> {
+    private static class VersionComparator implements Comparator<ReverseProxyPo> {
 
         @Override
-        public int compare(ReverseProxyEntity o1, ReverseProxyEntity o2) {
+        public int compare(ReverseProxyPo o1, ReverseProxyPo o2) {
             Date date1 = Optional.ofNullable(o1.getUpdateTime()).orElse(DateUtil.date(0));
             Date date2 = Optional.ofNullable(o2.getUpdateTime()).orElse(DateUtil.date(0));
             // 倒序就取反
@@ -301,7 +301,7 @@ public class ProxyService {
         }
     }
 
-    private Proxy toDTO(ReverseProxyEntity entity) {
+    private Proxy toDTO(ReverseProxyPo entity) {
         if(entity == null) return null;
         Proxy proxy = new Proxy();
         proxy.setId(entity.getId());
@@ -316,9 +316,9 @@ public class ProxyService {
         return proxy;
     }
 
-    private ReverseProxyEntity toEntity(Proxy proxy) {
+    private ReverseProxyPo toEntity(Proxy proxy) {
         Assert.notNull(proxy);
-        ReverseProxyEntity entity = new ReverseProxyEntity();
+        ReverseProxyPo entity = new ReverseProxyPo();
         entity.setId(proxy.getId());
         entity.setName(proxy.getName());
         entity.setProtocol(proxy.getProtocol());

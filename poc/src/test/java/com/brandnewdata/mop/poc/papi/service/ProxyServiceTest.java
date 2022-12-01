@@ -3,7 +3,7 @@ package com.brandnewdata.mop.poc.papi.service;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
 import com.brandnewdata.mop.poc.papi.dao.ReverseProxyDao;
-import com.brandnewdata.mop.poc.papi.entity.ReverseProxyEntity;
+import com.brandnewdata.mop.poc.papi.po.ReverseProxyPo;
 import com.brandnewdata.mop.poc.papi.req.ImportFromFileReq;
 import com.dxy.library.json.jackson.JacksonUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,23 +41,23 @@ class ProxyServiceTest {
         proxyService.pageV2(1, 10, null, null);
     }
 
-    private List<ReverseProxyEntity> testPageV2Data1() {
-        ReverseProxyEntity entity1 = new ReverseProxyEntity();
+    private List<ReverseProxyPo> testPageV2Data1() {
+        ReverseProxyPo entity1 = new ReverseProxyPo();
         entity1.setUpdateTime(DateUtil.parseDateTime("2022-09-20 00:00:00"));
         entity1.setName("a");
         entity1.setVersion("1.0.0");
 
-        ReverseProxyEntity entity2 = new ReverseProxyEntity();
+        ReverseProxyPo entity2 = new ReverseProxyPo();
         entity2.setUpdateTime(DateUtil.parseDateTime("2022-09-20 01:00:00"));
         entity2.setName("a");
         entity2.setVersion("2.0.0");
 
-        ReverseProxyEntity entity3 = new ReverseProxyEntity();
+        ReverseProxyPo entity3 = new ReverseProxyPo();
         entity3.setUpdateTime(DateUtil.parseDateTime("2022-09-21 00:00:00"));
         entity3.setName("b");
         entity3.setVersion("1.0.0");
 
-        ReverseProxyEntity entity4 = new ReverseProxyEntity();
+        ReverseProxyPo entity4 = new ReverseProxyPo();
         entity4.setUpdateTime(DateUtil.parseDateTime("2022-09-21 01:00:00"));
         entity4.setName("b");
         entity4.setVersion("2.0.0");

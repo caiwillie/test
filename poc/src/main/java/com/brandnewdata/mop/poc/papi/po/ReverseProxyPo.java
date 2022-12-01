@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.papi.entity;
+package com.brandnewdata.mop.poc.papi.po;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Getter;
@@ -13,12 +13,12 @@ import java.util.Date;
  * </p>
  *
  * @author caiwillie
- * @since 2022-10-11
+ * @since 2022-09-26
  */
 @Getter
 @Setter
-@TableName("mop_reverse_proxy_endpoint")
-public class ReverseProxyEndpointEntity implements Serializable {
+@TableName("mop_reverse_proxy")
+public class ReverseProxyPo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -31,17 +31,23 @@ public class ReverseProxyEndpointEntity implements Serializable {
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
 
-    private Long proxyId;
+    private String name;
 
-    private String location;
+    private Integer protocol;
+
+    private String version;
 
     private String description;
 
-    private Integer backendType;
-
-    private String backendConfig;
+    private String domain;
 
     private String tag;
+
+    /**
+     * 状态：1 停止，2 运行
+     */
+    private Integer state;
+
 
     public static final String ID = "id";
 
@@ -49,16 +55,18 @@ public class ReverseProxyEndpointEntity implements Serializable {
 
     public static final String UPDATE_TIME = "update_time";
 
-    public static final String PROXY_ID = "proxy_id";
+    public static final String NAME = "name";
 
-    public static final String LOCATION = "location";
+    public static final String PROTOCOL = "protocol";
+
+    public static final String VERSION = "version";
 
     public static final String DESCRIPTION = "description";
 
-    public static final String BACKEND_TYPE = "backend_type";
-
-    public static final String BACKEND_CONFIG = "backend_config";
+    public static final String DOMAIN = "domain";
 
     public static final String TAG = "tag";
+
+    public static final String STATE = "state";
 
 }
