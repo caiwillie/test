@@ -40,7 +40,7 @@ public class SceneOperateController2 {
     }
 
     /**
-     * 获取流程实例关联的流程定义
+     * 获取流程实例所关联的流程定义
      * @param vo
      * @return
      */

@@ -26,7 +26,7 @@ public class SceneOperateController {
     private SceneOperateBffService sceneOperateBffService;
 
     /**
-     * 获取所有场景-流程-版本
+     * 获取所有场景-流程-版本（废弃）
      *
      * @return the all scene
      */
@@ -36,7 +36,7 @@ public class SceneOperateController {
     }
 
     /**
-     * 分页获取流程实例列表
+     * 分页获取流程实例列表（废弃）
      * @param filter
      * @return
      */

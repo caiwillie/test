@@ -20,7 +20,7 @@ public class ProcessDeployController {
     private IProcessDeployService deployService;
 
     /**
-     * 获取流程部署的详情
+     * 获取流程部署的详情（废弃）
      *
      * @param id 部署 id
      * @return the result
