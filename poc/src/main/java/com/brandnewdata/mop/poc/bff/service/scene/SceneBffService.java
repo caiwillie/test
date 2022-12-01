@@ -152,7 +152,10 @@ public class SceneBffService {
 
 
     public SceneVersionVo deployVersion(Long versionId, List<Long> envIdList, String version) {
-        SceneVersionDto sceneVersionDto = sceneVersionService.deploy(versionId, envIdList, version);
+        // 查询 scene name 传递给下层服务
+        Long sceneId = sceneVersionService.fetchById(ListUtil.of(versionId)).get(versionId).getSceneId();
+        String sceneName = sceneService.fetchById(ListUtil.of(sceneId)).get(sceneId).getName();
+        SceneVersionDto sceneVersionDto = sceneVersionService.deploy(versionId, sceneName, envIdList, version);
         return SceneVersionVoConverter.createFrom(sceneVersionDto);
     }
 

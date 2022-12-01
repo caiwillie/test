@@ -1,9 +1,11 @@
 package com.brandnewdata.mop.poc.scene.service;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
@@ -19,7 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,7 +47,7 @@ public class SceneService2 implements ISceneService2{
         queryWrapper.orderByDesc(ScenePo.UPDATE_TIME);
         page = sceneDao.selectPage(page, queryWrapper);
         List<ScenePo> scenePoList = Optional.ofNullable(page.getRecords()).orElse(ListUtil.empty());
-        List<SceneDto2> records = scenePoList.stream().map(SceneDtoConverter::from).collect(Collectors.toList());
+        List<SceneDto2> records = scenePoList.stream().map(SceneDtoConverter::createFrom).collect(Collectors.toList());
         return new Page<>(page.getTotal(), records);
     }
 
@@ -69,7 +73,19 @@ public class SceneService2 implements ISceneService2{
             ScenePoConverter.updateFrom(sceneDto, scenePo);
             sceneDao.updateById(scenePo);
         }
-        return SceneDtoConverter.from(scenePo);
+        return SceneDtoConverter.createFrom(scenePo);
+    }
+
+    @Override
+    public Map<Long, SceneDto2> fetchById(List<Long> idList) {
+        if(CollUtil.isEmpty(idList)) return MapUtil.empty();
+        Assert.isFalse(CollUtil.hasNull(idList), "场景id不能包含空值");
+
+        QueryWrapper<ScenePo> query = new QueryWrapper<>();
+        query.in(ScenePo.ID, idList);
+
+        return sceneDao.selectList(query).stream().map(SceneDtoConverter::createFrom)
+                .collect(Collectors.toMap(SceneDto2::getId, Function.identity()));
     }
 
     private ScenePo getScenePoById(Long sceneId) {

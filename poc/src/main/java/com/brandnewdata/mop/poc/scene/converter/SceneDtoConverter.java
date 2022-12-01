@@ -6,7 +6,7 @@ import com.brandnewdata.mop.poc.scene.po.ScenePo;
 
 public class SceneDtoConverter {
 
-    public static SceneDto2 from(ScenePo po) {
+    public static SceneDto2 createFrom(ScenePo po) {
         SceneDto2 dto = new SceneDto2();
         dto.setId(po.getId());
         dto.setName(po.getName());

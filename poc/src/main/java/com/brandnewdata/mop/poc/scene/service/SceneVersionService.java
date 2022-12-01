@@ -15,6 +15,7 @@ import com.brandnewdata.mop.poc.env.service.IEnvService;
 import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService2;
 import com.brandnewdata.mop.poc.process.dto.BizDeployDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
+import com.brandnewdata.mop.poc.scene.converter.SceneReleaseDeployDtoConverter;
 import com.brandnewdata.mop.poc.scene.converter.SceneVersionDtoConverter;
 import com.brandnewdata.mop.poc.scene.converter.SceneVersionPoConverter;
 import com.brandnewdata.mop.poc.scene.dao.SceneVersionDao;
@@ -45,14 +46,18 @@ public class SceneVersionService implements ISceneVersionService {
 
     private final IProcessInstanceService2 processInstanceService;
 
+    private final ISceneReleaseDeployService sceneReleaseDeployService;
+
     public SceneVersionService(IEnvService envService,
                                IVersionProcessService versionProcessService,
                                IProcessDeployService2 processDeployService,
-                               IProcessInstanceService2 processInstanceService) {
+                               IProcessInstanceService2 processInstanceService,
+                               ISceneReleaseDeployService sceneReleaseDeployService) {
         this.envService = envService;
         this.versionProcessService = versionProcessService;
         this.processDeployService = processDeployService;
         this.processInstanceService = processInstanceService;
+        this.sceneReleaseDeployService = sceneReleaseDeployService;
     }
 
     @Override
@@ -195,13 +200,16 @@ public class SceneVersionService implements ISceneVersionService {
     }
 
     @Override
-    public SceneVersionDto deploy(Long id, List<Long> envIdList, String version) {
+    public SceneVersionDto deploy(Long id, String sceneName, List<Long> envIdList, String version) {
         // 配置中，和调试中均可以进行发布
         SceneVersionDto sceneVersionDto = getAndCheckStatus(id,
                 new int[]{SceneConst.SCENE_VERSION_STATUS__CONFIGURING, SceneConst.SCENE_VERSION_STATUS__DEBUGGING});
         Assert.notEmpty(envIdList, "环境列表不能为空");
         Assert.notNull(version, "版本不能为空");
         Assert.isFalse(StrUtil.equals(sceneVersionDto.getVersion(), version), "请修改为正式版本号");
+
+        // 查询场景
+        sceneVersionDto.getSceneId();
 
         // 查询版本下的流程
         List<VersionProcessDto> versionProcessDtoList =
@@ -218,6 +226,13 @@ public class SceneVersionService implements ISceneVersionService {
         }
 
         //todo caiwillie 上报保存配置
+
+        for (VersionProcessDto versionProcessDto : versionProcessDtoList) {
+            SceneReleaseDeployDtoConverter.createFrom()
+        }
+
+
+        // 更新状态
         sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__RUNNING);
         sceneVersionDao.updateById(SceneVersionPoConverter.createFrom(sceneVersionDto));
         return sceneVersionDto;

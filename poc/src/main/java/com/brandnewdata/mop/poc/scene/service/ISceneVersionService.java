@@ -28,7 +28,7 @@ public interface ISceneVersionService {
 
     SceneVersionDto resume(Long id, List<Long> envIdList);
 
-    SceneVersionDto deploy(Long id, List<Long> envIdList, String version);
+    SceneVersionDto deploy(Long id, String sceneName, List<Long> envIdList, String version);
 
     Map<Long, Long> countById(List<Long> sceneIdList);
 
