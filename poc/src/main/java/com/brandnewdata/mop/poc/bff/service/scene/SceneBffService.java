@@ -12,6 +12,9 @@ import com.brandnewdata.mop.poc.bff.vo.scene.DebugProcessInstanceVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVersionVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.VersionProcessVo;
+import com.brandnewdata.mop.poc.bff.vo.scene.operate.SceneDeployVo;
+import com.brandnewdata.mop.poc.bff.vo.scene.operate.SceneVersionDeployVo;
+import com.brandnewdata.mop.poc.bff.vo.scene.operate.VersionProcessDeployVo;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.constant.SceneConst;
 import com.brandnewdata.mop.poc.env.dto.EnvDto;
@@ -22,13 +25,16 @@ import com.brandnewdata.mop.poc.process.dto.ProcessSnapshotDeployDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService2;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
 import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
+import com.brandnewdata.mop.poc.scene.dto.SceneReleaseDeployDto;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
 import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
+import com.brandnewdata.mop.poc.scene.service.ISceneReleaseDeployService;
 import com.brandnewdata.mop.poc.scene.service.ISceneService2;
 import com.brandnewdata.mop.poc.scene.service.ISceneVersionService;
 import com.brandnewdata.mop.poc.scene.service.IVersionProcessService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -50,13 +56,16 @@ public class SceneBffService {
 
     private final IProcessDefinitionService2 processDefinitionService;
 
+    private final ISceneReleaseDeployService sceneReleaseDeployService;
+
     public SceneBffService(ISceneService2 sceneService,
                            ISceneVersionService sceneVersionService,
                            IVersionProcessService versionProcessService,
                            IEnvService envService,
                            IProcessDeployService2 processDeployService,
                            IProcessInstanceService2 processInstanceService,
-                           IProcessDefinitionService2 processDefinitionService) {
+                           IProcessDefinitionService2 processDefinitionService,
+                           ISceneReleaseDeployService sceneReleaseDeployService) {
         this.sceneService = sceneService;
         this.sceneVersionService = sceneVersionService;
         this.versionProcessService = versionProcessService;
@@ -64,6 +73,7 @@ public class SceneBffService {
         this.processDeployService = processDeployService;
         this.processInstanceService = processInstanceService;
         this.processDefinitionService = processDefinitionService;
+        this.sceneReleaseDeployService = sceneReleaseDeployService;
     }
 
     public Page<SceneVo> page(Integer pageNum, Integer pageSize, String name) {
@@ -215,5 +225,80 @@ public class SceneBffService {
         return ProcessDefinitionVoConverter.createFrom(processSnapshotDeployDto.getProcessId(),
                 processName, processSnapshotDeployDto.getProcessXml());
 
+    }
+
+    public List<SceneDeployVo> listSceneDeploy(Long envId) {
+        Assert.notNull(envId, "环境id不能为空");
+        List<SceneReleaseDeployDto> sceneReleaseDeployDtoList = sceneReleaseDeployService.fetchByEnvId(envId);
+
+        CollUtil.sort(sceneReleaseDeployDtoList, (o1, o2) -> {
+            LocalDateTime time1 = o1.getUpdateTime();
+            LocalDateTime time2 = o2.getUpdateTime();
+
+            // 首先比较更新时间
+            int result = time2.compareTo(time1);
+            if(result != 0) return result;
+
+            // 相等就比较id
+            return o2.getId().compareTo(o1.getId());
+        });
+
+        //
+        Map<Long, SceneDeployVo> sceneDeployVoMap = new LinkedHashMap<>();
+        Map<Long, LinkedHashMap<Long, SceneVersionDeployVo>> sceneVersionDeployVoMapMap = new HashMap<>();
+        Map<Long, LinkedHashMap<String, VersionProcessDeployVo>> versionProcessDeployVoMapMap = new HashMap<>();
+        for (SceneReleaseDeployDto sceneReleaseDeployDto : sceneReleaseDeployDtoList) {
+            Long sceneId = sceneReleaseDeployDto.getSceneId();
+            String sceneName = sceneReleaseDeployDto.getSceneName();
+            Long versionId = sceneReleaseDeployDto.getVersionId();
+            String versionName = sceneReleaseDeployDto.getVersionName();
+            String processId = sceneReleaseDeployDto.getProcessId();
+            String processName = sceneReleaseDeployDto.getProcessName();
+
+            if(!sceneDeployVoMap.containsKey(sceneId)) {
+                SceneDeployVo sceneDeployVo = new SceneDeployVo();
+                sceneDeployVo.setSceneId(sceneId);
+                sceneDeployVo.setSceneName(sceneName);
+                sceneDeployVoMap.put(sceneId, sceneDeployVo);
+            }
+
+            Map<Long, SceneVersionDeployVo> sceneVersionDeployVoMap =
+                    sceneVersionDeployVoMapMap.computeIfAbsent(sceneId, key -> new LinkedHashMap<>());
+
+            if(!sceneVersionDeployVoMap.containsKey(versionId)) {
+                SceneVersionDeployVo sceneVersionDeployVo = new SceneVersionDeployVo();
+                sceneVersionDeployVo.setVersionId(versionId);
+                sceneVersionDeployVo.setVersionName(versionName);
+                sceneVersionDeployVoMap.put(versionId, sceneVersionDeployVo);
+            }
+
+            Map<String, VersionProcessDeployVo> versionProcessDeployVoMap =
+                    versionProcessDeployVoMapMap.computeIfAbsent(versionId, key -> new LinkedHashMap<>());
+
+            if(!versionProcessDeployVoMap.containsKey(processId)) {
+                VersionProcessDeployVo versionProcessDeployVo = new VersionProcessDeployVo();
+                versionProcessDeployVo.setProcessId(processId);
+                versionProcessDeployVo.setProcessName(processName);
+                versionProcessDeployVoMap.put(processId, versionProcessDeployVo);
+            }
+        }
+
+        // 关联版本下的流程
+        for (LinkedHashMap<Long, SceneVersionDeployVo> sceneVersionDeployVoMap : sceneVersionDeployVoMapMap.values()) {
+            for (SceneVersionDeployVo sceneVersionDeployVo : sceneVersionDeployVoMap.values()) {
+                Long versionId = sceneVersionDeployVo.getVersionId();
+                List<VersionProcessDeployVo> versionProcessDeployVoList =
+                        ListUtil.toList(versionProcessDeployVoMapMap.get(versionId).values());
+                sceneVersionDeployVo.setProcessList(versionProcessDeployVoList);
+            }
+        }
+
+        for (SceneDeployVo sceneDeployVo : sceneDeployVoMap.values()) {
+            List<SceneVersionDeployVo> sceneVersionDeployVoList =
+                    ListUtil.toList(sceneVersionDeployVoMapMap.get(sceneDeployVo.getSceneId()).values());
+            sceneDeployVo.setVersionList(sceneVersionDeployVoList);
+        }
+
+        return ListUtil.toList(sceneDeployVoMap.values());
     }
 }

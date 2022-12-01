@@ -8,11 +8,13 @@ import com.brandnewdata.mop.poc.scene.converter.SceneReleaseDeployPoConverter;
 import com.brandnewdata.mop.poc.scene.dao.SceneReleaseDeployDao;
 import com.brandnewdata.mop.poc.scene.dto.SceneReleaseDeployDto;
 import com.brandnewdata.mop.poc.scene.po.SceneReleaseDeployPo;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class SceneReleaseDeployService implements ISceneReleaseDeployService {
 
     @Resource

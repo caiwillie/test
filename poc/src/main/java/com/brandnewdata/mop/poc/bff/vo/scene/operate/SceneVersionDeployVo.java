@@ -7,12 +7,12 @@ import java.util.List;
 
 @Getter
 @Setter
-public class SceneVersionDeploy {
+public class SceneVersionDeployVo {
 
     /**
      * 版本id
      */
-    private String versionId;
+    private Long versionId;
 
     /**
      * 版本名称
@@ -22,5 +22,5 @@ public class SceneVersionDeploy {
     /**
      * 创建时间
      */
-    private List<VersionProcessDeploy> processList;
+    private List<VersionProcessDeployVo> processList;
 }

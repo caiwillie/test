@@ -11,6 +11,7 @@ import com.brandnewdata.mop.poc.bff.vo.scene.SceneVersionVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.VersionProcessVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.external.ExportQuery;
+import com.brandnewdata.mop.poc.bff.vo.scene.operate.SceneDeployVo;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import org.springframework.web.bind.annotation.*;
 
@@ -259,5 +260,15 @@ public class SceneController2 {
         return Result.OK();
     }
 
+
+    /**
+     * 获取所有场景-流程-版本
+     *
+     * @return the all scene
+     */
+    @GetMapping("/rest/scene/operate/sceneDeploy/list")
+    public Result<List<SceneDeployVo>> getAllScene(@RequestParam Long envId) {
+        return Result.OK(sceneBffService.listSceneDeploy(envId));
+    }
 
 }

@@ -7,7 +7,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class SceneDeploy {
+public class SceneDeployVo {
     /**
      * 场景 id
      */
@@ -21,6 +21,6 @@ public class SceneDeploy {
     /**
      * 版本列表
      */
-    private List<SceneVersionDeploy> versionList;
+    private List<SceneVersionDeployVo> versionList;
 
 }
