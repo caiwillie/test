@@ -7,10 +7,11 @@ import java.util.Map;
 
 public interface IVersionProcessService {
 
-
     Map<Long, List<VersionProcessDto>> fetchVersionProcessListByVersionId(List<Long> versionIdList, boolean simple);
 
     Map<Long, VersionProcessDto> fetchVersionProcessById(List<Long> idList);
+
+    Map<String, VersionProcessDto> fetchVersionProcessByProcessId(List<String> processIdList);
 
     Map<Long, Integer> fetchVersionProcessCountByVersionIdList(List<Long> versionIdList);
 

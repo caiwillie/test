@@ -61,10 +61,7 @@ public class VersionProcessService implements IVersionProcessService {
     @Override
     public Map<Long, VersionProcessDto> fetchVersionProcessById(List<Long> idList) {
         if(CollUtil.isEmpty(idList)) return MapUtil.empty();
-        if(idList.stream().filter(Objects::isNull).count() > 0) {
-            log.error("版本id列表不能含有空值。idList：{}", JacksonUtil.to(idList));
-            throw new RuntimeException("版本id列表不能含有空值");
-        }
+        Assert.isFalse(CollUtil.hasNull(idList), "版本id列表不能含有空值");
 
         QueryWrapper<VersionProcessPo> query = new QueryWrapper<>();
         query.in(VersionProcessPo.ID, idList);
@@ -73,6 +70,19 @@ public class VersionProcessService implements IVersionProcessService {
 
         return versionProcessPos.stream().map(VersionProcessDtoConverter::from)
                 .collect(Collectors.toMap(VersionProcessDto::getId, Function.identity()));
+    }
+
+    @Override
+    public Map<String, VersionProcessDto> fetchVersionProcessByProcessId(List<String> processIdList) {
+        if(CollUtil.isEmpty(processIdList)) return MapUtil.empty();
+        Assert.isFalse(CollUtil.hasNull(processIdList), "流程id列表不能含有空值");
+
+        QueryWrapper<VersionProcessPo> query = new QueryWrapper<>();
+        query.in(VersionProcessPo.PROCESS_ID, processIdList);
+
+        List<VersionProcessPo> versionProcessPos = versionProcessDao.selectList(query);
+        return versionProcessPos.stream().map(VersionProcessDtoConverter::from)
+                .collect(Collectors.toMap(VersionProcessDto::getProcessId, Function.identity()));
     }
 
     @Override

@@ -11,12 +11,14 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.constant.ProcessConst;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.process.bo.ZeebeDeployBo;
+import com.brandnewdata.mop.poc.process.converter.ProcessReleaseDeployDtoConverter;
 import com.brandnewdata.mop.poc.process.converter.ProcessReleaseDeployPoConverter;
 import com.brandnewdata.mop.poc.process.converter.ProcessSnapshotDeployDtoConverter;
 import com.brandnewdata.mop.poc.process.converter.ProcessSnapshotDeployPoConverter;
 import com.brandnewdata.mop.poc.process.dao.ProcessReleaseDeployDao;
 import com.brandnewdata.mop.poc.process.dao.ProcessSnapshotDeployDao;
 import com.brandnewdata.mop.poc.process.dto.BizDeployDto;
+import com.brandnewdata.mop.poc.process.dto.ProcessReleaseDeployDto;
 import com.brandnewdata.mop.poc.process.dto.ProcessSnapshotDeployDto;
 import com.brandnewdata.mop.poc.process.manager.ConnectorManager;
 import com.brandnewdata.mop.poc.process.manager.ZeebeClientManager;
@@ -136,6 +138,20 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
         List<ProcessSnapshotDeployPo> processSnapshotDeployPoList = snapshotDeployDao.selectList(query);
         return processSnapshotDeployPoList.stream().map(ProcessSnapshotDeployDtoConverter::createFrom)
                 .collect(Collectors.toMap(ProcessSnapshotDeployDto::getId, Function.identity()));
+    }
+
+    @Override
+    public Map<String, ProcessReleaseDeployDto> fetchReleaseByEnvIdAndProcessId(Long envId, List<String> processIdList) {
+        Assert.notNull(envId, "环境id不能为空");
+        if(CollUtil.isEmpty(processIdList)) return MapUtil.empty();
+        Assert.isFalse(CollUtil.hasNull(processIdList), "流程id不能为空");
+
+        QueryWrapper<ProcessReleaseDeployPo> query = new QueryWrapper<>();
+        query.eq(ProcessReleaseDeployPo.ENV_ID, envId);
+        query.in(ProcessReleaseDeployPo.PROCESS_ID, processIdList);
+        List<ProcessReleaseDeployPo> processReleaseDeployPoList = releaseDeployDao.selectList(query);
+        return processReleaseDeployPoList.stream().map(ProcessReleaseDeployDtoConverter::createFrom)
+                .collect(Collectors.toMap(ProcessReleaseDeployDto::getProcessId, Function.identity()));
     }
 
     @Override

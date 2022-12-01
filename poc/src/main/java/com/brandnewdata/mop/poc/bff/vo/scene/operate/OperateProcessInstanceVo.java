@@ -3,6 +3,8 @@ package com.brandnewdata.mop.poc.bff.vo.scene.operate;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 public class OperateProcessInstanceVo {
@@ -28,9 +30,14 @@ public class OperateProcessInstanceVo {
     private String sceneName;
 
     /**
-     * 部署id
+     * 版本id
      */
-    private Long releaseDeployId;
+    private Long versionId;
+
+    /**
+     * 版本名称
+     */
+    private String versionName;
 
     /**
      * 流程 id
@@ -43,9 +50,9 @@ public class OperateProcessInstanceVo {
     private String processName;
 
     /**
-     * 流程版本
+     * 部署id
      */
-    private int version;
+    private Long releaseDeployId;
 
     /**
      * 运行状态：ACTIVE 运行，INCIDENT 异常，COMPLETED 完成，CANCELED 取消
@@ -55,10 +62,10 @@ public class OperateProcessInstanceVo {
     /**
      * 开始时间
      */
-    private String startTime;
+    private LocalDateTime startTime;
 
     /**
      * 结束时间
      */
-    private String endTime;
+    private LocalDateTime endTime;
 }
