@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.papi;
+package com.brandnewdata.mop.poc.constant;
 
 public interface ProxyConstants {
 

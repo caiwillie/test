@@ -10,7 +10,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
-import com.brandnewdata.mop.poc.papi.ProxyConstants;
+import com.brandnewdata.mop.poc.constant.ProxyConstants;
 import com.brandnewdata.mop.poc.papi.dao.ReverseProxyDao;
 import com.brandnewdata.mop.poc.papi.dto.APIDefinition;
 import com.brandnewdata.mop.poc.papi.dto.Endpoint;
