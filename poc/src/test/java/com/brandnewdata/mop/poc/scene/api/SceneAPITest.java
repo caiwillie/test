@@ -14,7 +14,7 @@ import java.util.List;
 class SceneAPITest {
 
     @Autowired
-    private SceneAPI sceneAPI;
+    private SceneApi sceneAPI;
 
     @Test
     void listByIds() {

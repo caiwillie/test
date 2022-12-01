@@ -8,9 +8,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
 
 @FeignClient(name = "poc", contextId = "mopScene")
-public interface ISceneAPI {
+public interface ISceneApi {
 
     @RequestMapping("/api/scene/listByIds")
     Result<List<SceneResp>> listByIds(@RequestBody ListSceneReq req);
+
+    // @RequestMapping(value = "/api/scene/version/process/start")
 
 }

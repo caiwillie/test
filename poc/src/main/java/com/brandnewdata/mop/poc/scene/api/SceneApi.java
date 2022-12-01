@@ -3,7 +3,7 @@ package com.brandnewdata.mop.poc.scene.api;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import com.brandnewdata.common.webresult.Result;
-import com.brandnewdata.mop.api.scene.ISceneAPI;
+import com.brandnewdata.mop.api.scene.ISceneApi;
 import com.brandnewdata.mop.api.scene.ListSceneReq;
 import com.brandnewdata.mop.api.scene.SceneResp;
 import com.brandnewdata.mop.poc.scene.dto.SceneDto;
@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-public class SceneAPI implements ISceneAPI {
+public class SceneApi implements ISceneApi {
 
     @Autowired
     private ISceneService service;
