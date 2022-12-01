@@ -48,4 +48,15 @@ public class SceneOperateController2 {
     public Result<ProcessDefinitionVo> definitionProcessInstance(@RequestBody OperateProcessInstanceVo vo) {
         return Result.OK();
     }
+
+    /**
+     * 获取统计数据
+     *
+     * @param filter
+     * @return
+     */
+    @PostMapping("/rest/scene/operate/statistic")
+    public Result<Statistic> statistic(@RequestBody Filter filter) {
+        return Result.OK();
+    }
 }

@@ -36,18 +36,6 @@ public class SceneOperateController {
     }
 
     /**
-     * 获取统计数据
-     *
-     * @param filter
-     * @return
-     */
-    @PostMapping("/rest/scene/operate/statistic")
-    public Result<Statistic> statistic(@RequestBody Filter filter) {
-        Statistic statistic = sceneOperateBffService.statistic(filter);
-        return Result.OK(statistic);
-    }
-
-    /**
      * 分页获取流程实例列表
      * @param filter
      * @return
