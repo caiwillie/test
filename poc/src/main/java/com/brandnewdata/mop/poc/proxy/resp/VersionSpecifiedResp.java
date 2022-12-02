@@ -13,6 +13,7 @@ public class VersionSpecifiedResp {
      * 版本号
      */
     private String version;
+
     /**
      * 1 停止（操作显示运行），
      * 2 运行（操作显示停止）
@@ -38,6 +39,11 @@ public class VersionSpecifiedResp {
      * endpoint总数
      */
     private Long endpointTotal;
+
+    /**
+     * 24小时内的调用次数
+     */
+    private Long callTimes24h;
 
     /**
      * 标签
