@@ -33,9 +33,5 @@ public class ProxyEndpointDtoConverter {
         target.setTag(dto.getTag());
     }
 
-    public static void updateFrom(ProxyEndpointDto target, ProxyDto dto) {
-        if(dto == null) return;
-        target.setProxyName(dto.getName());
-        target.setProxyVersion(dto.getVersion());
-    }
+
 }

@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.proxy.service;
+package com.brandnewdata.mop.poc.proxy.service.atomic;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
@@ -17,11 +17,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-public class ProxyService2 implements IProxyService2 {
-
+public class ProxyAtomicService implements IProxyAtomicService {
     @Resource
     private ProxyDao proxyDao;
-
 
     @Override
     public Map<Long, ProxyDto> fetchById(List<Long> idList) {

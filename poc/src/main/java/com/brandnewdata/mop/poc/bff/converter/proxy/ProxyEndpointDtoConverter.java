@@ -1,6 +1,7 @@
 package com.brandnewdata.mop.poc.bff.converter.proxy;
 
 import com.brandnewdata.mop.poc.bff.vo.proxy.ProxyEndpointVo;
+import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto;
 
 public class ProxyEndpointDtoConverter {
@@ -15,5 +16,11 @@ public class ProxyEndpointDtoConverter {
         dto.setDescription(vo.getDescription());
         dto.setTag(vo.getTag());
         return dto;
+    }
+
+    public static void updateFrom(ProxyEndpointDto target, ProxyDto dto) {
+        if(dto == null) return;
+        target.setProxyName(dto.getName());
+        target.setProxyVersion(dto.getVersion());
     }
 }

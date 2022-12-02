@@ -10,11 +10,6 @@ import java.util.List;
 public class SimpleProxyVersionVo {
 
     /**
-     * proxy id
-     */
-    private Long proxyId;
-
-    /**
      * 版本号
      */
     private String version;

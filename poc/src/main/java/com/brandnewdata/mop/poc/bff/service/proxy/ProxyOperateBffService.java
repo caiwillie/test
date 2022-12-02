@@ -2,16 +2,17 @@ package com.brandnewdata.mop.poc.bff.service.proxy;
 
 import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.mop.poc.bff.converter.proxy.ProxyEndpointCallVoConverter;
+import com.brandnewdata.mop.poc.bff.converter.proxy.ProxyEndpointDtoConverter;
 import com.brandnewdata.mop.poc.bff.vo.proxy.operate.ProxyEndpointCallFilter;
 import com.brandnewdata.mop.poc.bff.vo.proxy.operate.ProxyEndpointCallVo;
 import com.brandnewdata.mop.poc.common.dto.Page;
-import com.brandnewdata.mop.poc.proxy.converter.ProxyEndpointDtoConverter;
+
 import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointCallDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto;
 import com.brandnewdata.mop.poc.proxy.service.IProxyEndpointCallService;
 import com.brandnewdata.mop.poc.proxy.service.IProxyEndpointService2;
-import com.brandnewdata.mop.poc.proxy.service.IProxyService2;
+import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyAtomicService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,15 +24,15 @@ public class ProxyOperateBffService {
 
     private final IProxyEndpointService2 proxyEndpointService;
 
-    private final IProxyService2 proxyService;
+    private final IProxyAtomicService proxyAtomicService;
 
     private final IProxyEndpointCallService proxyEndpointCallService;
 
     public ProxyOperateBffService(IProxyEndpointService2 proxyEndpointService,
-                                  IProxyService2 proxyService,
+                                  IProxyAtomicService proxyAtomicService,
                                   IProxyEndpointCallService proxyEndpointCallService) {
         this.proxyEndpointService = proxyEndpointService;
-        this.proxyService = proxyService;
+        this.proxyAtomicService = proxyAtomicService;
         this.proxyEndpointCallService = proxyEndpointCallService;
     }
 
@@ -46,7 +47,7 @@ public class ProxyOperateBffService {
 
         // 查询关联的proxy
         List<Long> proxyIdList = proxyEndpointDtoList.stream().map(ProxyEndpointDto::getProxyId).collect(Collectors.toList());
-        Map<Long, ProxyDto> proxyDtoMap = proxyService.fetchById(proxyIdList);
+        Map<Long, ProxyDto> proxyDtoMap = proxyAtomicService.fetchById(proxyIdList);
 
         // 更新proxy信息
         for (ProxyEndpointDto proxyEndpointDto : proxyEndpointDtoList) {
