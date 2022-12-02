@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 
 /**
- * api相关的接口（新）
+ * API管理相关的接口（新）
  *
  * @author caiwillie
  */
