@@ -33,3 +33,20 @@ CREATE TABLE `mop_proxy_endpoint_scene` (
 PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- 创建表 `mop_proxy_endpoint_call`
+CREATE TABLE `mop_proxy_endpoint_call` (
+`id` bigint(20) NOT NULL,
+`create_time` datetime NOT NULL,
+`update_time` datetime NOT NULL,
+`endpoint_id` bigint(20) NOT NULL,
+`ip` varchar(255) DEFAULT NULL,
+`mac` varchar(255) DEFAULT NULL,
+`user_agent` varchar(255) DEFAULT NULL,
+`http_method` varchar(255) DEFAULT NULL,
+`http_status` varchar(255) DEFAULT NULL,
+`http_query` varchar(1024) DEFAULT NULL,
+`http_body` text,
+`time_consuming` int(11) DEFAULT NULL,
+PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
