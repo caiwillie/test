@@ -101,6 +101,13 @@ public class ProxyEndpointService2 implements IProxyEndpointService2 {
                 .collect(Collectors.toMap(com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto::getId, Function.identity()));
     }
 
+    @Override
+    public List<ProxyEndpointDto> fetchAll() {
+        QueryWrapper<ProxyEndpointPo> query = new QueryWrapper<>();
+        List<ProxyEndpointPo> list = proxyEndpointDao.selectList(query);
+        return list.stream().map(ProxyEndpointDtoConverter::createFrom).collect(Collectors.toList());
+    }
+
     private void checkPath(Long proxyId, String location) {
         // endpoint 的唯一性校验
         ProxyEndpointDto exist = fetchByProxyIdAndLocation(proxyId, location);

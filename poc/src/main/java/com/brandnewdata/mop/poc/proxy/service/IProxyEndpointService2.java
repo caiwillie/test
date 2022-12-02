@@ -13,4 +13,6 @@ public interface IProxyEndpointService2 {
 
     Map<Long, ProxyEndpointDto> fetchByIds(List<Long> ids);
 
+    List<ProxyEndpointDto> fetchAll();
+
 }

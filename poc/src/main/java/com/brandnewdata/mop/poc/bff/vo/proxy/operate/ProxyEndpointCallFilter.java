@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class EndpointCallFilter {
+public class ProxyEndpointCallFilter {
     /**
      * pageNum
      */
