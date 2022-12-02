@@ -10,6 +10,7 @@ public class ProxyEndpointDtoConverter {
 
     // copy properties from dto to po
     public static ProxyEndpointDto createFrom(ProxyEndpointPo po) {
+        if(po == null) return null;
         ProxyEndpointDto dto = new ProxyEndpointDto();
         dto.setId(po.getId());
         dto.setCreateTime(Opt.ofNullable(po.getCreateTime()).map(LocalDateTimeUtil::of).orElse(null));
@@ -24,6 +25,7 @@ public class ProxyEndpointDtoConverter {
     }
 
     public static void updateFrom(ProxyEndpointDto target, ProxyEndpointDto dto) {
+        if(dto == null) return;
         target.setLocation(dto.getLocation());
         target.setDescription(dto.getDescription());
         target.setBackendType(dto.getBackendType());
@@ -32,6 +34,7 @@ public class ProxyEndpointDtoConverter {
     }
 
     public static void updateFrom(ProxyEndpointDto target, ProxyDto dto) {
+        if(dto == null) return;
         target.setProxyName(dto.getName());
         target.setProxyVersion(dto.getVersion());
     }
