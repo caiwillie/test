@@ -7,9 +7,11 @@ import com.brandnewdata.mop.poc.proxy.converter.ProxyEndpointScenePoConverter;
 import com.brandnewdata.mop.poc.proxy.dao.ProxyEndpointSceneDao;
 import com.brandnewdata.mop.poc.proxy.po.ProxyEndpointScenePo;
 import com.dxy.library.json.jackson.JacksonUtil;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
+@Service
 public class ProxyEndpointSceneService implements IProxyEndpointSceneService{
 
     @Resource
