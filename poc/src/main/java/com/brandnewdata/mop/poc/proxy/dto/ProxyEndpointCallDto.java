@@ -15,7 +15,11 @@ public class ProxyEndpointCallDto {
 
     private LocalDateTime updateTime;
 
+    private Long proxyId;
+
     private String proxyName;
+
+    private String version;
 
     private String location;
 

@@ -1,6 +1,7 @@
 package com.brandnewdata.mop.poc.bff.controller.proxy;
 
 import com.brandnewdata.common.webresult.Result;
+import com.brandnewdata.mop.poc.bff.service.proxy.ProxyOperateBffService;
 import com.brandnewdata.mop.poc.bff.vo.proxy.operate.ProxyEndpointCallFilter;
 import com.brandnewdata.mop.poc.bff.vo.proxy.operate.ProxyEndpointCallVo;
 import com.brandnewdata.mop.poc.bff.vo.proxy.operate.ProxyStatistic;
@@ -15,6 +16,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class ProxyOperateController {
 
+    private final ProxyOperateBffService proxyOperateBffService;
+
+    public ProxyOperateController(ProxyOperateBffService proxyOperateBffService) {
+        this.proxyOperateBffService = proxyOperateBffService;
+    }
+
     /**
      * 获取统计数据
      *
@@ -22,7 +29,7 @@ public class ProxyOperateController {
      * @return the proxy statistic
      */
     @PostMapping("/proxy/operate/call/statistic")
-    public ProxyStatistic statistic (@RequestBody ProxyEndpointCallFilter filter) {
+    public Result<ProxyStatistic> statistic (@RequestBody ProxyEndpointCallFilter filter) {
         return null;
     }
 
@@ -33,9 +40,9 @@ public class ProxyOperateController {
      * @return the page
      */
     @PostMapping(value = "/rest/proxy/operate/call/page")
-    public Page<ProxyEndpointCallVo> pageCallTime(@RequestBody ProxyEndpointCallFilter filter) {
-        return null;
-
+    public Result<Page<ProxyEndpointCallVo>> pageCallTime(@RequestBody ProxyEndpointCallFilter filter) {
+        Page<ProxyEndpointCallVo> ret = proxyOperateBffService.page(filter);
+        return Result.OK(ret);
     }
 
     /**

@@ -12,7 +12,7 @@ public class ProxyEndpointCallVo {
     /**
      * id
      */
-    private Long id;
+    private String id;
 
     /**
      * 创建时间
