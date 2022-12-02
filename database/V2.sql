@@ -50,3 +50,6 @@ CREATE TABLE `mop_proxy_endpoint_call` (
 PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- 新增 mop_env_service 表中的端口字段
+ALTER TABLE `mop`.`mop_env_service` ADD COLUMN `ports` varchar(64) NULL AFTER `cluster_ip`;
+
