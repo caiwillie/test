@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.proxy.service;
+package com.brandnewdata.mop.poc.proxy.service.atomic;
 
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 
 @Service
-public class ProxyEndpointSceneService implements IProxyEndpointSceneService{
+public class ProxyEndpointSceneAService implements IProxyEndpointSceneAService {
 
     @Resource
     private ProxyEndpointSceneDao proxyEndpointSceneDao;
@@ -21,14 +21,7 @@ public class ProxyEndpointSceneService implements IProxyEndpointSceneService{
     public void save(Long endpointId, String config) {
         ProxyEndpointScenePo proxyEndpointScenePo = fetchByEndpointId(endpointId);
         Assert.notNull(config, "场景配置不能为空");
-        ProxyEndpointSceneBo bo = JacksonUtil.from(config, ProxyEndpointSceneBo.class);
-
-        Assert.notNull(bo.getEnvId(), "环境ID不能为空");
-        Assert.notNull(bo.getEnvName(), "环境名称不能为空");
-        Assert.notNull(bo.getSceneId(), "场景ID不能为空");
-        Assert.notNull(bo.getSceneName(), "场景名称不能为空");
-        Assert.notNull(bo.getProcessId(), "流程ID不能为空");
-        Assert.notNull(bo.getProcessName(), "流程名称不能为空");
+        ProxyEndpointSceneBo bo = parseConfig(config);
 
         if(proxyEndpointScenePo == null) {
             proxyEndpointScenePo = new ProxyEndpointScenePo();
@@ -39,6 +32,18 @@ public class ProxyEndpointSceneService implements IProxyEndpointSceneService{
             ProxyEndpointScenePoConverter.updateFrom(proxyEndpointScenePo, bo);
             proxyEndpointSceneDao.updateById(proxyEndpointScenePo);
         }
+    }
+
+    @Override
+    public ProxyEndpointSceneBo parseConfig(String config) {
+        ProxyEndpointSceneBo bo = JacksonUtil.from(config, ProxyEndpointSceneBo.class);
+        Assert.notNull(bo.getEnvId(), "环境ID不能为空");
+        Assert.notNull(bo.getEnvName(), "环境名称不能为空");
+        Assert.notNull(bo.getSceneId(), "场景ID不能为空");
+        Assert.notNull(bo.getSceneName(), "场景名称不能为空");
+        Assert.notNull(bo.getProcessId(), "流程ID不能为空");
+        Assert.notNull(bo.getProcessName(), "流程名称不能为空");
+        return bo;
     }
 
     private ProxyEndpointScenePo fetchByEndpointId(Long endpointId) {

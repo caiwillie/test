@@ -17,7 +17,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-public class ProxyAtomicService implements IProxyAtomicService {
+public class ProxyAService implements IProxyAService {
     @Resource
     private ProxyDao proxyDao;
 
@@ -32,5 +32,10 @@ public class ProxyAtomicService implements IProxyAtomicService {
         List<ProxyPo> proxyPoList = proxyDao.selectList(query);
         return proxyPoList.stream().map(ProxyDtoConverter::createFrom)
                 .collect(Collectors.toMap(ProxyDto::getId, Function.identity()));
+    }
+
+    @Override
+    public ProxyDto fetchByDomain(String domain) {
+        return null;
     }
 }

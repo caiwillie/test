@@ -10,9 +10,9 @@ import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointCallDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto;
-import com.brandnewdata.mop.poc.proxy.service.IProxyEndpointCallService;
-import com.brandnewdata.mop.poc.proxy.service.IProxyEndpointService2;
-import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyAtomicService;
+import com.brandnewdata.mop.poc.proxy.service.combined.IProxyEndpointCallCService;
+import com.brandnewdata.mop.poc.proxy.service.combined.IProxyEndpointCService;
+import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyAService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,15 +22,15 @@ import java.util.stream.Collectors;
 @Service
 public class ProxyOperateBffService {
 
-    private final IProxyEndpointService2 proxyEndpointService;
+    private final IProxyEndpointCService proxyEndpointService;
 
-    private final IProxyAtomicService proxyAtomicService;
+    private final IProxyAService proxyAtomicService;
 
-    private final IProxyEndpointCallService proxyEndpointCallService;
+    private final IProxyEndpointCallCService proxyEndpointCallService;
 
-    public ProxyOperateBffService(IProxyEndpointService2 proxyEndpointService,
-                                  IProxyAtomicService proxyAtomicService,
-                                  IProxyEndpointCallService proxyEndpointCallService) {
+    public ProxyOperateBffService(IProxyEndpointCService proxyEndpointService,
+                                  IProxyAService proxyAtomicService,
+                                  IProxyEndpointCallCService proxyEndpointCallService) {
         this.proxyEndpointService = proxyEndpointService;
         this.proxyAtomicService = proxyAtomicService;
         this.proxyEndpointCallService = proxyEndpointCallService;

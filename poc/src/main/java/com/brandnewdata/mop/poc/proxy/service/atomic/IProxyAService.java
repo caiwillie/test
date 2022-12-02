@@ -5,8 +5,10 @@ import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
 import java.util.List;
 import java.util.Map;
 
-public interface IProxyAtomicService {
+public interface IProxyAService {
 
     Map<Long, ProxyDto> fetchById(List<Long> idList);
+
+    ProxyDto fetchByDomain(String domain);
 
 }

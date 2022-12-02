@@ -1,11 +1,11 @@
-package com.brandnewdata.mop.poc.proxy.service;
+package com.brandnewdata.mop.poc.proxy.service.combined;
 
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto;
 
 import java.util.List;
 import java.util.Map;
 
-public interface IProxyEndpointService2 {
+public interface IProxyEndpointCService {
 
     ProxyEndpointDto save(ProxyEndpointDto dto);
 

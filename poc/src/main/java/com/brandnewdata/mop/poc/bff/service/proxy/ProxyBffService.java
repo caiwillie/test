@@ -9,8 +9,8 @@ import com.brandnewdata.mop.poc.bff.vo.proxy.SimpleProxyVersionVo;
 import com.brandnewdata.mop.poc.bff.vo.proxy.SimpleProxyVo;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto;
-import com.brandnewdata.mop.poc.proxy.service.IProxyEndpointService2;
-import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyAtomicService;
+import com.brandnewdata.mop.poc.proxy.service.combined.IProxyEndpointCService;
+import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyAService;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -19,15 +19,15 @@ import java.util.stream.Collectors;
 @Service
 public class ProxyBffService {
 
-    private final IProxyEndpointService2 proxyEndpointService2;
+    private final IProxyEndpointCService proxyEndpointService2;
 
-    private final IProxyEndpointService2 proxyEndpointService;
+    private final IProxyEndpointCService proxyEndpointService;
 
-    private final IProxyAtomicService proxyAtomicService;
+    private final IProxyAService proxyAtomicService;
 
-    public ProxyBffService(IProxyEndpointService2 proxyEndpointService2,
-                           IProxyEndpointService2 proxyEndpointService,
-                           IProxyAtomicService proxyAtomicService) {
+    public ProxyBffService(IProxyEndpointCService proxyEndpointService2,
+                           IProxyEndpointCService proxyEndpointService,
+                           IProxyAService proxyAtomicService) {
         this.proxyEndpointService2 = proxyEndpointService2;
         this.proxyEndpointService = proxyEndpointService;
         this.proxyAtomicService = proxyAtomicService;

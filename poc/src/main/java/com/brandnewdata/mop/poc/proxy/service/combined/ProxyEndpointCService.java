@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.proxy.service;
+package com.brandnewdata.mop.poc.proxy.service.combined;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
@@ -14,6 +14,7 @@ import com.brandnewdata.mop.poc.proxy.converter.ProxyEndpointPoConverter;
 import com.brandnewdata.mop.poc.proxy.dao.ProxyEndpointDao;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto;
 import com.brandnewdata.mop.poc.proxy.po.ProxyEndpointPo;
+import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyEndpointSceneAService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -23,14 +24,14 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-public class ProxyEndpointService2 implements IProxyEndpointService2 {
+public class ProxyEndpointCService implements IProxyEndpointCService {
 
     @Resource
     private ProxyEndpointDao proxyEndpointDao;
 
-    private final IProxyEndpointSceneService proxyEndpointSceneService;
+    private final IProxyEndpointSceneAService proxyEndpointSceneService;
 
-    public ProxyEndpointService2(IProxyEndpointSceneService proxyEndpointSceneService) {
+    public ProxyEndpointCService(IProxyEndpointSceneAService proxyEndpointSceneService) {
         this.proxyEndpointSceneService = proxyEndpointSceneService;
     }
 
@@ -75,7 +76,7 @@ public class ProxyEndpointService2 implements IProxyEndpointService2 {
     }
 
     @Override
-    public com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto fetchByProxyIdAndLocation(Long proxyId, String location) {
+    public ProxyEndpointDto fetchByProxyIdAndLocation(Long proxyId, String location) {
         // proxy id not null
         Assert.notNull(proxyId, "proxy id not null");
         Assert.notNull(location, "location not null");

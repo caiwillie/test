@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.proxy.service;
+package com.brandnewdata.mop.poc.proxy.service.combined;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class ProxyEndpointCallService implements IProxyEndpointCallService {
+public class ProxyEndpointCallCService implements IProxyEndpointCallCService {
 
     @Resource
     private ProxyEndpointCallDao proxyEndpointCallDao;
