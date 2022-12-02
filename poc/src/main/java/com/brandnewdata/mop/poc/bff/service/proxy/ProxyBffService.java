@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.bff.service;
+package com.brandnewdata.mop.poc.bff.service.proxy;
 
 import com.brandnewdata.mop.poc.bff.converter.proxy.ProxyEndpointDtoConverter;
 import com.brandnewdata.mop.poc.bff.converter.proxy.ProxyEndpointVoConverter;

@@ -2,7 +2,7 @@ package com.brandnewdata.mop.poc.bff.controller.proxy;
 
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.bff.vo.proxy.operate.EndpointCallFilter;
-import com.brandnewdata.mop.poc.bff.vo.proxy.operate.EndpointCallVo;
+import com.brandnewdata.mop.poc.bff.vo.proxy.operate.ProxyEndpointCallVo;
 import com.brandnewdata.mop.poc.bff.vo.proxy.operate.ProxyStatistic;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +33,7 @@ public class ProxyOperateController {
      * @return the page
      */
     @PostMapping(value = "/rest/proxy/operate/call/page")
-    public Page<EndpointCallVo> pageCallTime(@RequestBody EndpointCallFilter filter) {
+    public Page<ProxyEndpointCallVo> pageCallTime(@RequestBody EndpointCallFilter filter) {
         return null;
 
     }
@@ -45,7 +45,7 @@ public class ProxyOperateController {
      * @return the call time detail
      */
     @GetMapping(value = "/rest/proxy/operate/call/detail")
-    public Result<EndpointCallVo> getCallTimeDetail(@RequestParam Long callTimeId) {
+    public Result<ProxyEndpointCallVo> getCallTimeDetail(@RequestParam Long callTimeId) {
         return null;
     }
 

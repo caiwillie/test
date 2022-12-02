@@ -7,6 +7,16 @@ import lombok.Setter;
 @Setter
 public class EndpointCallFilter {
     /**
+     * pageNum
+     */
+    private Integer pageNum;
+
+    /**
+     * pageSize
+     */
+    private Integer pageSize;
+
+    /**
      * proxy 名称
      */
     private String proxyName;

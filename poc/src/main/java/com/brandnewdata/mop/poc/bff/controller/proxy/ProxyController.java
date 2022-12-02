@@ -1,7 +1,7 @@
 package com.brandnewdata.mop.poc.bff.controller.proxy;
 
 import com.brandnewdata.common.webresult.Result;
-import com.brandnewdata.mop.poc.bff.service.ProxyBffService;
+import com.brandnewdata.mop.poc.bff.service.proxy.ProxyBffService;
 import com.brandnewdata.mop.poc.bff.vo.proxy.ProxyEndpointVo;
 import com.brandnewdata.mop.poc.bff.vo.proxy.SimpleProxyVo;
 import com.brandnewdata.mop.poc.common.dto.Page;

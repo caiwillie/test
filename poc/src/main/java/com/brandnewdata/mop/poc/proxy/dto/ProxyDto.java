@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class ProxyEndpointDto {
+public class ProxyDto {
 
     private Long id;
 
@@ -15,19 +15,17 @@ public class ProxyEndpointDto {
 
     private LocalDateTime updateTime;
 
-    private String proxyName;
+    private String name;
 
-    private Long proxyId;
+    private Integer protocol;
 
-    private String proxyVersion;
-
-    private String location;
+    private String version;
 
     private String description;
 
-    private Integer backendType;
-
-    private String backendConfig;
+    private String domain;
 
     private String tag;
+
+    private Integer state;
 }

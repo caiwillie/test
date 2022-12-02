@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class EndpointCallVo {
+public class ProxyEndpointCallVo {
 
     /**
      * id
