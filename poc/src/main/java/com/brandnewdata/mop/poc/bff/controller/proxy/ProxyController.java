@@ -67,7 +67,8 @@ public class ProxyController {
      */
     @GetMapping(value = "/rest/proxy/oprate/getAllProxy")
     public Result<List<SimpleProxyVo>> getAllProxy() {
-        return null;
+        List<SimpleProxyVo> ret = proxyBffService.getAllProxy();
+        return Result.OK(ret);
     }
 
 }
