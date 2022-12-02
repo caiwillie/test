@@ -53,23 +53,6 @@ public class ProxyRest2 {
         return Result.ok(resp);
     }
 
-    /**
-     * 【V2】API 分页列表
-     *
-     * @param pageNum  分页页码
-     * @param pageSize 分页大小
-     * @param name     搜索名称
-     * @param tags     标签（多个用‘,’分隔）
-     * @return the result
-     */
-    @GetMapping("/rest/reverseProxy/v2/page")
-    public Result<Page<ApiResp>> page(@RequestParam int pageNum,
-                                      @RequestParam int pageSize,
-                                      @RequestParam(required = false) String name,
-                                      @RequestParam(required = false) String tags) {
-        Page<ApiResp> resp = proxyService.pageV2(pageNum, pageSize, name, tags);
-        return Result.OK(resp);
-    }
 
     /**
      * 创建自配置文件
