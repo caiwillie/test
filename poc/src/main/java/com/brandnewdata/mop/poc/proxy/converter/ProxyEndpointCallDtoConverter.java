@@ -6,7 +6,6 @@ import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointCallDto;
 import com.brandnewdata.mop.poc.proxy.po.ProxyEndpointCallPo;
 
 public class ProxyEndpointCallDtoConverter {
-
     public static ProxyEndpointCallDto createFrom(ProxyEndpointCallPo po) {
         ProxyEndpointCallDto dto = new ProxyEndpointCallDto();
         dto.setId(po.getId());
