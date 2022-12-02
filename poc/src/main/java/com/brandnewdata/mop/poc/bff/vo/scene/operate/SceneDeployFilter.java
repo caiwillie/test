@@ -38,12 +38,12 @@ public class SceneDeployFilter {
     private String processId;
 
     /**
-     * 开始时间
+     * 开始时间 yyyy-MM-dd HH:mm:ss
      */
     private String startTime;
 
     /**
-     * 结束时间
+     * 结束时间 yyyy-MM-dd HH:mm:ss
      */
     private String endTime;
 }

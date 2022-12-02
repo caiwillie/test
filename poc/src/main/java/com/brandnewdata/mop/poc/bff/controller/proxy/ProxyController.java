@@ -3,12 +3,14 @@ package com.brandnewdata.mop.poc.bff.controller.proxy;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.bff.service.ProxyBffService;
 import com.brandnewdata.mop.poc.bff.vo.proxy.ProxyEndpointVo;
+import com.brandnewdata.mop.poc.bff.vo.proxy.SimpleProxyVo;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.proxy.resp.ApiResp;
 import com.brandnewdata.mop.poc.proxy.service.ProxyService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * API管理相关的接口（新）
@@ -56,6 +58,11 @@ public class ProxyController {
     public Result<ProxyEndpointVo> saveEndpoint(@RequestBody ProxyEndpointVo vo) {
         ProxyEndpointVo ret = proxyBffService.save(vo);
         return Result.OK(ret);
+    }
+
+    @GetMapping(value = "/rest/proxy/oprate/getAllProxy")
+    public Result<List<SimpleProxyVo>> getAllProxy() {
+        return null;
     }
 
 }

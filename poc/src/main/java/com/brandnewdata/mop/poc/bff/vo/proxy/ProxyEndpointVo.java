@@ -30,6 +30,7 @@ public class ProxyEndpointVo {
      *
      * 如果是集成流，json格式如下
      * {
+     *     Long envId;
      *     String envName;
      *     Long sceneId;
      *     String sceneName;
