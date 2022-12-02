@@ -2,7 +2,7 @@ package com.brandnewdata.mop.poc.bff.controller.scene;
 
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.bff.service.scene.SceneOperateBffService2;
-import com.brandnewdata.mop.poc.bff.vo.operate.Statistic;
+import com.brandnewdata.mop.poc.bff.vo.scene.operate.SceneStatistic;
 import com.brandnewdata.mop.poc.bff.vo.process.ProcessDefinitionVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.operate.OperateProcessInstanceVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.operate.SceneDeployFilter;
@@ -53,7 +53,7 @@ public class SceneOperateController2 {
      * @return
      */
     @PostMapping("/rest/scene/operate/statistic")
-    public Result<Statistic> statistic(@RequestBody SceneDeployFilter filter) {
+    public Result<SceneStatistic> statistic(@RequestBody SceneDeployFilter filter) {
         return Result.OK();
     }
 }

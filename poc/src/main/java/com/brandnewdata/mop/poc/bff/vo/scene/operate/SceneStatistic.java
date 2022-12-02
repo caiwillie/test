@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.bff.vo.operate;
+package com.brandnewdata.mop.poc.bff.vo.scene.operate;
 
 import com.brandnewdata.mop.poc.bff.vo.operate.charts.ChartOption;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Statistic {
+public class SceneStatistic {
     /**
      * 运行次数
      */

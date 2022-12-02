@@ -2,13 +2,12 @@ package com.brandnewdata.mop.poc.bff.vo.proxy.operate;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.tomcat.jni.Local;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class EndpointCallTimeVo {
+public class EndpointCallVo {
 
     /**
      * id

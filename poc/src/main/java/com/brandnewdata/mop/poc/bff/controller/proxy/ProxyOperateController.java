@@ -1,8 +1,9 @@
 package com.brandnewdata.mop.poc.bff.controller.proxy;
 
 import com.brandnewdata.common.webresult.Result;
-import com.brandnewdata.mop.poc.bff.vo.proxy.operate.EndpointCallTimeFilter;
-import com.brandnewdata.mop.poc.bff.vo.proxy.operate.EndpointCallTimeVo;
+import com.brandnewdata.mop.poc.bff.vo.proxy.operate.EndpointCallFilter;
+import com.brandnewdata.mop.poc.bff.vo.proxy.operate.EndpointCallVo;
+import com.brandnewdata.mop.poc.bff.vo.proxy.operate.ProxyStatistic;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +15,16 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class ProxyOperateController {
 
+    /**
+     * 获取统计数据
+     *
+     * @param filter the filter
+     * @return the proxy statistic
+     */
+    @PostMapping("/proxy/operate/call/statistic")
+    public ProxyStatistic statistic (@RequestBody EndpointCallFilter filter) {
+        return null;
+    }
 
     /**
      * 分页获取调用列表
@@ -21,9 +32,10 @@ public class ProxyOperateController {
      * @param filter the filter
      * @return the page
      */
-    @PostMapping(value = "/rest/proxy/oprate/callTime/page")
-    public Page<EndpointCallTimeVo> pageCallTime(@RequestBody EndpointCallTimeFilter filter) {
+    @PostMapping(value = "/rest/proxy/operate/call/page")
+    public Page<EndpointCallVo> pageCallTime(@RequestBody EndpointCallFilter filter) {
         return null;
+
     }
 
     /**
@@ -32,9 +44,10 @@ public class ProxyOperateController {
      * @param callTimeId the call time id
      * @return the call time detail
      */
-    @GetMapping(value = "/rest/proxy/oprate/callTime/detail")
-    public Result<EndpointCallTimeVo> getCallTimeDetail(@RequestParam Long callTimeId) {
+    @GetMapping(value = "/rest/proxy/operate/call/detail")
+    public Result<EndpointCallVo> getCallTimeDetail(@RequestParam Long callTimeId) {
         return null;
     }
+
 
 }

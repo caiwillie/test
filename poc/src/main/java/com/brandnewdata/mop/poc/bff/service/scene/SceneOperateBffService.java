@@ -5,7 +5,7 @@ import cn.hutool.core.lang.Opt;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
-import com.brandnewdata.mop.poc.bff.vo.operate.Statistic;
+import com.brandnewdata.mop.poc.bff.vo.scene.operate.SceneStatistic;
 import com.brandnewdata.mop.poc.bff.vo.operate.charts.ChartOption;
 import com.brandnewdata.mop.poc.bff.vo.operate.charts.Series;
 import com.brandnewdata.mop.poc.bff.vo.scene.operate.ProcessInstance;
@@ -134,8 +134,8 @@ public class SceneOperateBffService {
         return page;
     }
 
-    public Statistic statistic(Filter filter) {
-        Statistic ret = new Statistic();
+    public SceneStatistic statistic(Filter filter) {
+        SceneStatistic ret = new SceneStatistic();
         List<Scene> sceneList = getAllScene();
         Map<ProcessIdAndVersion, String[]> processIdAndVersionMap = new HashMap<>();
         for (Scene scene : sceneList) {

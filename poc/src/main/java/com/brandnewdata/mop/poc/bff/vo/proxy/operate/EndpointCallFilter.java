@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class EndpointCallTimeFilter {
+public class EndpointCallFilter {
     /**
      * proxy 名称
      */

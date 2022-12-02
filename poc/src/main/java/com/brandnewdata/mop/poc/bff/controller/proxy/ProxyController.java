@@ -60,6 +60,11 @@ public class ProxyController {
         return Result.OK(ret);
     }
 
+    /**
+     * 获取所有 api-版本-路径
+     *
+     * @return the all proxy
+     */
     @GetMapping(value = "/rest/proxy/oprate/getAllProxy")
     public Result<List<SimpleProxyVo>> getAllProxy() {
         return null;
