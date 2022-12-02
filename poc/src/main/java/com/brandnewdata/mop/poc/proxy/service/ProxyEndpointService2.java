@@ -14,6 +14,7 @@ import com.brandnewdata.mop.poc.proxy.converter.ProxyEndpointPoConverter;
 import com.brandnewdata.mop.poc.proxy.dao.ProxyEndpointDao;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto;
 import com.brandnewdata.mop.poc.proxy.po.ProxyEndpointPo;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Service
 public class ProxyEndpointService2 implements IProxyEndpointService2 {
 
     @Resource
