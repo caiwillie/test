@@ -2,7 +2,6 @@ package com.brandnewdata.mop.poc.proxy.converter;
 
 import com.brandnewdata.mop.poc.proxy.bo.ProxyEndpointSceneBo;
 import com.brandnewdata.mop.poc.proxy.po.ProxyEndpointScenePo;
-import com.dxy.library.json.jackson.JacksonUtil;
 
 public class ProxyEndpointScenePoConverter {
 
