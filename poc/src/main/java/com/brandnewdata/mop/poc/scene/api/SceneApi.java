@@ -48,7 +48,7 @@ public class SceneApi implements ISceneApi {
 
         String processId = sceneReleaseDeployDto.getProcessId();
         Long envId = sceneReleaseDeployDto.getEnvId();
-        Map<String, Object> variables = Opt.of(versionProcessStartDto.getVariables()).orElse(MapUtil.empty());
+        Map<String, Object> variables = Opt.ofNullable(JacksonUtil.fromMap(versionProcessStartDto.getContent())).orElse(MapUtil.empty());
 
         processDeployService.startAsync(processId, variables, envId);
 
