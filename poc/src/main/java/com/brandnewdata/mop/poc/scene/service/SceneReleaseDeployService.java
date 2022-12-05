@@ -1,6 +1,8 @@
 package com.brandnewdata.mop.poc.scene.service;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.scene.converter.SceneReleaseDeployDtoConverter;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,5 +52,18 @@ public class SceneReleaseDeployService implements ISceneReleaseDeployService {
         List<SceneReleaseDeployPo> sceneReleaseDeployPoList = sceneReleaseDeployDao.selectList(query);
 
         return sceneReleaseDeployPoList.stream().map(SceneReleaseDeployDtoConverter::createFrom).collect(Collectors.toList());
+    }
+
+    @Override
+    public Map<Long, List<SceneReleaseDeployDto>> fetchListByVersionId(List<Long> versionIdList) {
+        if(CollUtil.isEmpty(versionIdList)) return MapUtil.empty();
+        Assert.isTrue(CollUtil.hasNull(versionIdList), "processIdList中存在null值");
+
+        QueryWrapper<SceneReleaseDeployPo> query = new QueryWrapper<>();
+        query.in(SceneReleaseDeployPo.VERSION_ID, versionIdList);
+
+        List<SceneReleaseDeployPo> sceneReleaseDeployPoList = sceneReleaseDeployDao.selectList(query);
+        return sceneReleaseDeployPoList.stream().map(SceneReleaseDeployDtoConverter::createFrom)
+                .collect(Collectors.groupingBy(SceneReleaseDeployDto::getVersionId));
     }
 }

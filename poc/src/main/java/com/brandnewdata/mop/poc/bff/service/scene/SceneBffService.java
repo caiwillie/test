@@ -22,7 +22,6 @@ import com.brandnewdata.mop.poc.env.service.IEnvService;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService2;
 import com.brandnewdata.mop.poc.process.dto.ProcessSnapshotDeployDto;
-import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService2;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
 import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
 import com.brandnewdata.mop.poc.scene.dto.SceneReleaseDeployDto;
@@ -54,8 +53,6 @@ public class SceneBffService {
 
     private final IProcessInstanceService2 processInstanceService;
 
-    private final IProcessDefinitionService2 processDefinitionService;
-
     private final ISceneReleaseDeployService sceneReleaseDeployService;
 
     public SceneBffService(ISceneService2 sceneService,
@@ -64,7 +61,6 @@ public class SceneBffService {
                            IEnvService envService,
                            IProcessDeployService2 processDeployService,
                            IProcessInstanceService2 processInstanceService,
-                           IProcessDefinitionService2 processDefinitionService,
                            ISceneReleaseDeployService sceneReleaseDeployService) {
         this.sceneService = sceneService;
         this.sceneVersionService = sceneVersionService;
@@ -72,7 +68,6 @@ public class SceneBffService {
         this.envService = envService;
         this.processDeployService = processDeployService;
         this.processInstanceService = processInstanceService;
-        this.processDefinitionService = processDefinitionService;
         this.sceneReleaseDeployService = sceneReleaseDeployService;
     }
 
@@ -109,6 +104,23 @@ public class SceneBffService {
         Assert.notNull(sceneId, "场景id不能为空");
         List<SceneVersionDto> sceneVersionDtoList =
                 sceneVersionService.fetchSceneVersionListBySceneId(ListUtil.of(sceneId)).get(sceneId);
+
+        // 查询环境信息
+        List<Long> versionIdList = sceneVersionDtoList.stream().map(SceneVersionDto::getId).collect(Collectors.toList());
+        Map<Long, List<SceneReleaseDeployDto>> sceneReleaseDeployDtoListMap =
+                sceneReleaseDeployService.fetchListByVersionId(versionIdList);
+
+        Map<Long, List<EnvDto>> envDtoListMap = new HashMap<>();
+        for (SceneVersionDto sceneVersionDto : sceneVersionDtoList) {
+            List<SceneReleaseDeployDto> sceneReleaseDeployDtoList = sceneReleaseDeployDtoListMap.get(sceneVersionDto.getId());
+            List<EnvDto> envDtoList = sceneReleaseDeployDtoList.stream().map(sceneReleaseDeployDto -> {
+                EnvDto envDto = new EnvDto();
+                envDto.setId(sceneReleaseDeployDto.getEnvId());
+                return envDto;
+            }).collect(Collectors.toList());
+            envDtoListMap.put(sceneVersionDto.getId(), envDtoList);
+        }
+
         return sceneVersionDtoList.stream()
                 .map(SceneVersionVoConverter::createFrom).collect(Collectors.toList());
     }
