@@ -1,6 +1,5 @@
 package com.brandnewdata.mop.poc.bff.vo.env;
 
-import com.brandnewdata.mop.poc.env.dto.EnvDto;
 import lombok.Getter;
 import lombok.Setter;
 
