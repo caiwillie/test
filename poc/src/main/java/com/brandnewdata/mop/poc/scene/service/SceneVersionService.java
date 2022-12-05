@@ -15,10 +15,12 @@ import com.brandnewdata.mop.poc.constant.SceneConst;
 import com.brandnewdata.mop.poc.env.dto.EnvDto;
 import com.brandnewdata.mop.poc.env.service.IEnvService;
 import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
+import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService2;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
 import com.brandnewdata.mop.poc.scene.converter.SceneReleaseDeployDtoConverter;
 import com.brandnewdata.mop.poc.scene.converter.SceneVersionDtoConverter;
 import com.brandnewdata.mop.poc.scene.converter.SceneVersionPoConverter;
+import com.brandnewdata.mop.poc.scene.converter.VersionProcessDtoConverter;
 import com.brandnewdata.mop.poc.scene.dao.SceneVersionDao;
 import com.brandnewdata.mop.poc.scene.dto.SceneReleaseDeployDto;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
@@ -45,18 +47,22 @@ public class SceneVersionService implements ISceneVersionService {
 
     private final IVersionProcessService versionProcessService;
 
+    private final ISceneReleaseDeployService sceneReleaseDeployService;
+
     private final IProcessDeployService2 processDeployService;
 
-    private final ISceneReleaseDeployService sceneReleaseDeployService;
+    private final IProcessDefinitionService2 processDefinitionService;
 
     public SceneVersionService(IEnvService envService,
                                IVersionProcessService versionProcessService,
                                IProcessDeployService2 processDeployService,
-                               ISceneReleaseDeployService sceneReleaseDeployService) {
+                               ISceneReleaseDeployService sceneReleaseDeployService,
+                               IProcessDefinitionService2 processDefinitionService) {
         this.envService = envService;
         this.versionProcessService = versionProcessService;
         this.processDeployService = processDeployService;
         this.sceneReleaseDeployService = sceneReleaseDeployService;
+        this.processDefinitionService = processDefinitionService;
     }
 
     @Override
@@ -280,14 +286,27 @@ public class SceneVersionService implements ISceneVersionService {
         newSceneVersionDto.setSceneId(oldSceneVersionDto.getSceneId());
         newSceneVersionDto.setVersion(LocalDateTimeUtil.format(LocalDateTime.now(), DatePattern.PURE_DATETIME_PATTERN));
         newSceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__CONFIGURING);
-        SceneVersionPo sceneVersionPo = SceneVersionPoConverter.createFrom(newSceneVersionDto);
-        sceneVersionDao.insert(sceneVersionPo);
+        SceneVersionPo newSceneVersionPo = SceneVersionPoConverter.createFrom(newSceneVersionDto);
+        sceneVersionDao.insert(newSceneVersionPo);
+        Long newVersionId = newSceneVersionPo.getId();
 
         // 查询版本下的流程
         List<VersionProcessDto> versionProcessDtoList =
                 versionProcessService.fetchVersionProcessListByVersionId(ListUtil.of(id), false).get(id);
 
-        return null;
+        // build new version process
+        for (VersionProcessDto versionProcessDto : versionProcessDtoList) {
+            BpmnXmlDto bpmnXmlDto = new BpmnXmlDto();
+            bpmnXmlDto.setProcessId(versionProcessDto.getProcessId());
+            bpmnXmlDto.setProcessName(versionProcessDto.getProcessName());
+            bpmnXmlDto.setProcessXml(versionProcessDto.getProcessXml());
+            BpmnXmlDto newBpmnXmlDto = processDefinitionService.replaceProcessId(bpmnXmlDto);
+            VersionProcessDto newVersionProcessDto = VersionProcessDtoConverter
+                    .createFrom(newVersionId, newBpmnXmlDto, versionProcessDto.getProcessImg());
+            versionProcessService.save(newVersionProcessDto);
+        }
+
+        return newSceneVersionDto;
     }
 
     private SceneVersionDto getAndCheckStatus(Long id, int[] statusArr) {

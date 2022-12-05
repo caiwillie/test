@@ -57,7 +57,7 @@ public class VersionProcessService implements IVersionProcessService {
         List<VersionProcessPo> versionProcessPos = versionProcessDao.selectList(query);
 
         return versionProcessPos.stream().collect(Collectors.groupingBy(VersionProcessPo::getVersionId,
-                Collectors.mapping(VersionProcessDtoConverter::from, Collectors.toList())));
+                Collectors.mapping(VersionProcessDtoConverter::createFrom, Collectors.toList())));
     }
 
     @Override
@@ -70,7 +70,7 @@ public class VersionProcessService implements IVersionProcessService {
 
         List<VersionProcessPo> versionProcessPos = versionProcessDao.selectList(query);
 
-        return versionProcessPos.stream().map(VersionProcessDtoConverter::from)
+        return versionProcessPos.stream().map(VersionProcessDtoConverter::createFrom)
                 .collect(Collectors.toMap(VersionProcessDto::getId, Function.identity()));
     }
 
@@ -83,7 +83,7 @@ public class VersionProcessService implements IVersionProcessService {
         query.in(VersionProcessPo.PROCESS_ID, processIdList);
 
         List<VersionProcessPo> versionProcessPos = versionProcessDao.selectList(query);
-        return versionProcessPos.stream().map(VersionProcessDtoConverter::from)
+        return versionProcessPos.stream().map(VersionProcessDtoConverter::createFrom)
                 .collect(Collectors.toMap(VersionProcessDto::getProcessId, Function.identity()));
     }
 
