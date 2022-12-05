@@ -222,7 +222,8 @@ public class SceneController2 {
      */
     @PostMapping(value = "/rest/scene/version/copyToNew")
     public Result<SceneVersionVo> versionCopyToNew(@RequestBody SceneVersionVo oldVersion) {
-        return Result.OK();
+        SceneVersionVo ret = sceneBffService.versionCopyToNew(oldVersion);
+        return Result.OK(ret);
     }
 
     /**

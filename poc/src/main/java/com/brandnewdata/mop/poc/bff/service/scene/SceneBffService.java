@@ -149,8 +149,6 @@ public class SceneBffService {
         return SceneVersionVoConverter.createFrom(sceneVersionDto);
     }
 
-
-
     public SceneVersionVo deployVersion(Long versionId, List<Long> envIdList, String version) {
         // 查询 scene name 传递给下层服务
         Long sceneId = sceneVersionService.fetchById(ListUtil.of(versionId)).get(versionId).getSceneId();
@@ -167,6 +165,11 @@ public class SceneBffService {
     public SceneVersionVo versionResume(Long versionId, List<Long> envIdList) {
         SceneVersionDto dto = sceneVersionService.resume(versionId, envIdList);
         return SceneVersionVoConverter.createFrom(dto);
+    }
+
+    public SceneVersionVo versionCopyToNew(SceneVersionVo oldSceneVersionVo) {
+        SceneVersionDto sceneVersionDto = sceneVersionService.copyToNew(oldSceneVersionVo.getId());
+        return SceneVersionVoConverter.createFrom(sceneVersionDto);
     }
 
     public Page<DebugProcessInstanceVo> listDebugProcessInstance(Integer pageNum, Integer pageSize, Long versionId) {
