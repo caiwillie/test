@@ -53,3 +53,11 @@ PRIMARY KEY (`id`)
 -- 新增 mop_env_service 表中的端口字段
 ALTER TABLE `mop`.`mop_env_service` ADD COLUMN `ports` varchar(64) NULL AFTER `cluster_ip`;
 
+-- 修改 mop_proxy_endpoint_call 的字段
+ALTER TABLE `mop`.`mop_proxy_endpoint_call`
+CHANGE COLUMN `ip` `ip_address` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+CHANGE COLUMN `mac` `mac_address` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+CHANGE COLUMN `http_query` `request_query` varchar(1024) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+CHANGE COLUMN `http_body` `request_body` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
+ADD COLUMN `response_body` text NULL,
+ADD COLUMN `error_message` text NULL;
