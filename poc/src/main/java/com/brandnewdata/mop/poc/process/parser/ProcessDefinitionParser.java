@@ -39,13 +39,15 @@ public class ProcessDefinitionParser implements
 
     private Document originalDocument;
 
-    private String processId;
-
-    private String name;
+    private String originalDocumentStr;
 
     private Document zeebeDocument;
 
     private String zeebeDocumentStr;
+
+    private String processId;
+
+    private String name;
 
     private String protocol;
 
@@ -618,7 +620,7 @@ public class ProcessDefinitionParser implements
      * 打印xml
      */
     private void logXML() {
-        String originalDocumentStr = serialize(originalDocument);
+        originalDocumentStr = serialize(originalDocument);
         zeebeDocumentStr = serialize(zeebeDocument);
         String TEMPLATE =
                 "\n======================= 转换前 xml =======================\n{}" +
