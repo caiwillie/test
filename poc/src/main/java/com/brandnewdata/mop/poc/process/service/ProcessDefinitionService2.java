@@ -22,4 +22,12 @@ public class ProcessDefinitionService2 implements IProcessDefinitionService2{
         ret.setConfigs(step1Result.getConfigs());
         return ret;
     }
+
+    @Override
+    public void replaceProcessId(BizDeployDto bizDeployDto) {
+        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.step1(bizDeployDto.getProcessId(),
+                bizDeployDto.getProcessName(), bizDeployDto.getProcessXml());
+
+        step1.replProcessId()
+    }
 }

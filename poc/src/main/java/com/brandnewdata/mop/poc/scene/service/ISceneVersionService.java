@@ -33,4 +33,6 @@ public interface ISceneVersionService {
     Map<Long, Long> countById(List<Long> sceneIdList);
 
     Map<Long, SceneVersionDto> fetchById(List<Long> idList);
+
+    SceneVersionDto copyToNew(Long id);
 }

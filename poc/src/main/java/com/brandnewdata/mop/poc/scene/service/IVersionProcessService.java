@@ -13,9 +13,9 @@ public interface IVersionProcessService {
 
     Map<String, VersionProcessDto> fetchVersionProcessByProcessId(List<String> processIdList);
 
-    Map<Long, Integer> fetchVersionProcessCountByVersionIdList(List<Long> versionIdList);
+    Map<Long, Integer> fetchVersionProcessCountByVersionId(List<Long> versionIdList);
 
-    Map<Long, VersionProcessDto> fetchLatestProcessByVersionIdList(List<Long> versionIdList);
+    Map<Long, VersionProcessDto> fetchLatestProcessByVersionId(List<Long> versionIdList);
 
     VersionProcessDto save(VersionProcessDto versionProcessDto);
 

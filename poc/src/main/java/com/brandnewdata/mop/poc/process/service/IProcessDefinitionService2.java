@@ -5,4 +5,6 @@ import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionStaticParseDto;
 
 public interface IProcessDefinitionService2 {
     ProcessDefinitionStaticParseDto staticParse(BizDeployDto dto);
+
+    void replaceProcessId(BizDeployDto bizDeployDto);
 }

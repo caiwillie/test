@@ -37,15 +37,15 @@ import static com.brandnewdata.mop.poc.process.parser.constants.QNameConstants.*
 public class ProcessDefinitionParser implements
         ProcessDefinitionParseStep1, ProcessDefinitionParseStep2 {
 
-    private String oldDocument;
+    private Document originalDocument;
 
     private String processId;
 
     private String name;
 
-    private Document document;
+    private Document zeebeDocument;
 
-    private String documentStr;
+    private String zeebeDocumentStr;
 
     private String protocol;
 
@@ -87,7 +87,7 @@ public class ProcessDefinitionParser implements
                 BPMN_SERVICE_TASK_QNAME.getQualifiedName(),
                 BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
                 BRANDNEWDATA_TASK_DEFINITION_QNAME.getQualifiedName()));
-        List<Node> nodes = path.selectNodes(document);
+        List<Node> nodes = path.selectNodes(zeebeDocument);
         if(CollUtil.isEmpty(nodes)) {
             return this;
         }
@@ -162,7 +162,7 @@ public class ProcessDefinitionParser implements
         Step1Result ret = new Step1Result();
         ret.setProcessId(processId);
         ret.setName(name);
-        ret.setXml(documentStr);
+        ret.setXml(zeebeDocumentStr);
         ret.setConfigs(configs);
         return ret;
     }
@@ -249,8 +249,8 @@ public class ProcessDefinitionParser implements
     private void init(String processId, String name, String xml) {
         this.processId = processId;
         this.name = name;
-        this.document = readRoot(xml);
-        this.oldDocument = serialize(document);
+        this.originalDocument = readRoot(xml);
+        this.zeebeDocument = readRoot(xml);
 
         // 转换namespace zeebe2 => zeebe
         replNsZeebe2();
@@ -263,8 +263,6 @@ public class ProcessDefinitionParser implements
 
         // 设置为可执行
         set_exec();
-
-
     }
 
     /**
@@ -285,14 +283,14 @@ public class ProcessDefinitionParser implements
      * 替换 namespace zeebe2 => namespace
      */
     private void replNsZeebe2() {
-        Namespace namespace = document.getRootElement().getNamespaceForPrefix(BPMN2.getPrefix());
+        Namespace namespace = zeebeDocument.getRootElement().getNamespaceForPrefix(BPMN2.getPrefix());
         // bpmn2 namespace 不存在，就直接返回
         if(namespace == null) return;
 
         XPath path = DocumentHelper.createXPath(StrUtil.join(StringPool.SLASH,
                 StringPool.SLASH,
                 BPMN2_ALL_QNAME));
-        List<Node> nodes = path.selectNodes(document);
+        List<Node> nodes = path.selectNodes(zeebeDocument);
         if(CollUtil.isEmpty(nodes)) {
             return;
         }
@@ -304,7 +302,7 @@ public class ProcessDefinitionParser implements
                 e.setQName(qName);
             }
         }
-        Element root = document.getRootElement();
+        Element root = zeebeDocument.getRootElement();
         root.add(BPMN_NAMESPACE);
         Namespace bpmn2 = root.getNamespaceForPrefix(BPMN2.getPrefix());
         if(bpmn2 != null) {
@@ -321,7 +319,7 @@ public class ProcessDefinitionParser implements
      * 新增 namespace zeebe
      */
     private void addNs(Namespace ns) {
-        Element root = document.getRootElement();
+        Element root = zeebeDocument.getRootElement();
         Namespace namespace = root.getNamespaceForPrefix(ns.getPrefix());
         if(namespace == null) {
             root.add(ns);
@@ -365,7 +363,7 @@ public class ProcessDefinitionParser implements
                 BPMN_SERVICE_TASK_QNAME.getQualifiedName(),
                 BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
                 BRANDNEWDATA_TASK_DEFINITION_QNAME.getQualifiedName()));
-        List<Node> nodes = path.selectNodes(document);
+        List<Node> nodes = path.selectNodes(zeebeDocument);
         if(CollUtil.isEmpty(nodes)) {
             return this;
         }
@@ -402,7 +400,7 @@ public class ProcessDefinitionParser implements
                 BPMN_SERVICE_TASK_QNAME.getQualifiedName(),
                 BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
                 BRANDNEWDATA_TASK_DEFINITION_QNAME.getQualifiedName()));
-        List<Node> nodes = path.selectNodes(document);
+        List<Node> nodes = path.selectNodes(zeebeDocument);
         if(CollUtil.isEmpty(nodes)) {
             return;
         }
@@ -439,7 +437,7 @@ public class ProcessDefinitionParser implements
                 BPMN_SERVICE_TASK_QNAME.getQualifiedName(),
                 BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
                 BRANDNEWDATA_INPUT_MAPPING_QNAME.getQualifiedName()));
-        List<Node> nodes = path.selectNodes(document);
+        List<Node> nodes = path.selectNodes(zeebeDocument);
         if(CollUtil.isEmpty(nodes)) {
             return;
         }
@@ -460,7 +458,7 @@ public class ProcessDefinitionParser implements
                 BPMN_SERVICE_TASK_QNAME.getQualifiedName(),
                 BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
                 BRANDNEWDATA_OUTPUT_MAPPING_QNAME.getQualifiedName()));
-        List<Node> nodes = path.selectNodes(document);
+        List<Node> nodes = path.selectNodes(zeebeDocument);
         if(CollUtil.isEmpty(nodes)) {
             return;
         }
@@ -535,7 +533,7 @@ public class ProcessDefinitionParser implements
                 BPMN_EXTENSION_ELEMENTS_QNAME.getQualifiedName(),
                 ZEEBE_TASK_DEFINITION_QNAME.getQualifiedName()));
 
-        List<Node> nodes = path.selectNodes(document);
+        List<Node> nodes = path.selectNodes(zeebeDocument);
         if(CollUtil.isEmpty(nodes)) {
             return;
         }
@@ -584,12 +582,12 @@ public class ProcessDefinitionParser implements
      * 替换 xsi:type = "bpmn:tFormalExpression"
      */
     private void replAttrXt() {
-        Namespace bpmn2Namespace = document.getRootElement().getNamespaceForPrefix(BPMN2.getPrefix());
+        Namespace bpmn2Namespace = zeebeDocument.getRootElement().getNamespaceForPrefix(BPMN2.getPrefix());
         if(bpmn2Namespace == null) return;
 
         XPath path = DocumentHelper.createXPath(StrUtil.format("//*[@{}='{}']",
                 XSI_TYPE_QNAME.getQualifiedName(), BPMN2_T_FORMAL_EXPRESSION_QNAME.getQualifiedName()));
-        List<Node> nodes = path.selectNodes(document);
+        List<Node> nodes = path.selectNodes(zeebeDocument);
         if(CollUtil.isEmpty(nodes)) return;
 
         for (Node node : nodes) {
@@ -620,11 +618,12 @@ public class ProcessDefinitionParser implements
      * 打印xml
      */
     private void logXML() {
-        documentStr = serialize(document);
+        String originalDocumentStr = serialize(originalDocument);
+        zeebeDocumentStr = serialize(zeebeDocument);
         String TEMPLATE =
                 "\n======================= 转换前 xml =======================\n{}" +
                         "\n======================= 转换后 xml =======================\n{}";
-        log.info(StrUtil.format(TEMPLATE, oldDocument, documentStr));
+        log.info(StrUtil.format(TEMPLATE, originalDocumentStr, zeebeDocumentStr));
     }
 
     /**
@@ -653,7 +652,7 @@ public class ProcessDefinitionParser implements
      * 清理 namespace
      */
     private void clearNamespace() {
-        Element root = document.getRootElement();
+        Element root = zeebeDocument.getRootElement();
         List<Namespace> namespaces = root.declaredNamespaces();
         for (Namespace namespace : namespaces) {
             if(StrUtil.equalsAny(namespace.getPrefix(), DI_NAMESPACE.getPrefix(), DC_NAMESPACE.getPrefix(),
@@ -672,7 +671,7 @@ public class ProcessDefinitionParser implements
                 StringPool.SLASH,
                 BPMN_SERVICE_TASK_QNAME.getQualifiedName()));
 
-        List<Node> nodes = Opt.ofNullable(path.selectNodes(document)).orElse(ListUtil.empty());
+        List<Node> nodes = Opt.ofNullable(path.selectNodes(zeebeDocument)).orElse(ListUtil.empty());
 
         for (Node node : nodes) {
             Element oldE = (Element) node;
@@ -763,7 +762,7 @@ public class ProcessDefinitionParser implements
         XPath path = DocumentHelper.createXPath(StrUtil.join(StringPool.SLASH,
                 StringPool.SLASH,
                 BPMN_START_EVENT_QNAME.getQualifiedName()));
-        List<Node> nodes = path.selectNodes(document);
+        List<Node> nodes = path.selectNodes(zeebeDocument);
         Assert.isTrue(CollUtil.size(nodes) == 1, ErrorMessage.CHECK_ERROR("有且只能有一个触发器", null));
         return (Element) nodes.get(0);
     }
@@ -877,7 +876,7 @@ public class ProcessDefinitionParser implements
         // 替换 bpmndi:BPMNShape
         XPath shapePath = DocumentHelper.createXPath(StrUtil.format("//{}[@{}='{}']",
                 BPMNDI_BPMN_SHAPE_QNAME.getQualifiedName(), BPMN_ELEMENT_ATTRIBUTE, oldId));
-        Element shape = (Element) shapePath.selectSingleNode(document);
+        Element shape = (Element) shapePath.selectSingleNode(zeebeDocument);
         shape.addAttribute(ID_ATTRIBUTE, StrUtil.format("{}_di", newId));
         shape.addAttribute(BPMN_ELEMENT_ATTRIBUTE, newId);
 
@@ -890,7 +889,7 @@ public class ProcessDefinitionParser implements
         // 替换 sequence 的属性 source ref
         XPath sequencePath = DocumentHelper.createXPath(StrUtil.format("//{}[@{}='{}']",
                 BPMN_SEQUENCE_FLOW_QNAME.getQualifiedName(), SOURCE_REF_ATTRIBUTE, oldId));
-        List<Node> nodes = sequencePath.selectNodes(document);
+        List<Node> nodes = sequencePath.selectNodes(zeebeDocument);
         if(CollUtil.isNotEmpty(nodes)) {
             for (Node node : nodes) {
                 Element sequence = (Element) node;
@@ -898,7 +897,7 @@ public class ProcessDefinitionParser implements
                 String sequenceId = sequence.attributeValue(ID_ATTRIBUTE);
                 XPath edgePath = DocumentHelper.createXPath(StrUtil.format("//{}[@{}='{}']",
                         BPMNDI_BPMN_EDGE_QNAME.getQualifiedName(), BPMN_ELEMENT_ATTRIBUTE, sequenceId));
-                Element edge = (Element) edgePath.selectSingleNode(document);
+                Element edge = (Element) edgePath.selectSingleNode(zeebeDocument);
                 List<Node> wayPoints = edge.selectNodes(DI_WAYPOINT_QNAME.getQualifiedName());
                 Element firstWayPoint = (Element) wayPoints.get(0);
                 // 修改所有连线的节点到 右边界中点
@@ -993,7 +992,7 @@ public class ProcessDefinitionParser implements
         XPath path = DocumentHelper.createXPath(StrUtil.join(StringPool.SLASH,
                 BPMN_DEFINITIONS_QNAME.getQualifiedName(),
                 BPMN_PROCESS_QNAME.getQualifiedName()));
-        return (Element) path.selectSingleNode(document);
+        return (Element) path.selectSingleNode(zeebeDocument);
     }
 
     private void set_exec() {

@@ -88,7 +88,7 @@ public class VersionProcessService implements IVersionProcessService {
     }
 
     @Override
-    public Map<Long, Integer> fetchVersionProcessCountByVersionIdList(List<Long> versionIdList) {
+    public Map<Long, Integer> fetchVersionProcessCountByVersionId(List<Long> versionIdList) {
         if(CollUtil.isEmpty(versionIdList)) return MapUtil.empty();
         Map<Long, Integer> ret = new HashMap<>();
         QueryWrapper<VersionProcessPo> query = new QueryWrapper<>();
@@ -107,7 +107,7 @@ public class VersionProcessService implements IVersionProcessService {
     }
 
     @Override
-    public Map<Long, VersionProcessDto> fetchLatestProcessByVersionIdList(List<Long> versionIdList) {
+    public Map<Long, VersionProcessDto> fetchLatestProcessByVersionId(List<Long> versionIdList) {
         Map<Long, List<VersionProcessDto>> versionProcessListMap = fetchVersionProcessListByVersionId(versionIdList, true);
         Map<Long, Long> idMap = versionProcessListMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> {
             List<VersionProcessDto> versionProcessDtos = entry.getValue();

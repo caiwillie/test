@@ -2,6 +2,8 @@ package com.brandnewdata.mop.poc.scene.service;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Opt;
 import cn.hutool.core.map.MapUtil;
@@ -12,7 +14,6 @@ import com.brandnewdata.mop.poc.constant.ProcessConst;
 import com.brandnewdata.mop.poc.constant.SceneConst;
 import com.brandnewdata.mop.poc.env.dto.EnvDto;
 import com.brandnewdata.mop.poc.env.service.IEnvService;
-import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService2;
 import com.brandnewdata.mop.poc.process.dto.BizDeployDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
 import com.brandnewdata.mop.poc.scene.converter.SceneReleaseDeployDtoConverter;
@@ -28,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -45,19 +47,15 @@ public class SceneVersionService implements ISceneVersionService {
 
     private final IProcessDeployService2 processDeployService;
 
-    private final IProcessInstanceService2 processInstanceService;
-
     private final ISceneReleaseDeployService sceneReleaseDeployService;
 
     public SceneVersionService(IEnvService envService,
                                IVersionProcessService versionProcessService,
                                IProcessDeployService2 processDeployService,
-                               IProcessInstanceService2 processInstanceService,
                                ISceneReleaseDeployService sceneReleaseDeployService) {
         this.envService = envService;
         this.versionProcessService = versionProcessService;
         this.processDeployService = processDeployService;
-        this.processInstanceService = processInstanceService;
         this.sceneReleaseDeployService = sceneReleaseDeployService;
     }
 
@@ -272,11 +270,31 @@ public class SceneVersionService implements ISceneVersionService {
                 .collect(Collectors.toMap(SceneVersionDto::getId, Function.identity()));
     }
 
+    @Override
+    public SceneVersionDto copyToNew(Long id) {
+        SceneVersionDto oldSceneVersionDto = getAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__RUNNING,
+                SceneConst.SCENE_VERSION_STATUS__STOPPED});
+
+        // build new scene version
+        SceneVersionDto newSceneVersionDto = new SceneVersionDto();
+        newSceneVersionDto.setSceneId(oldSceneVersionDto.getSceneId());
+        newSceneVersionDto.setVersion(LocalDateTimeUtil.format(LocalDateTime.now(), DatePattern.PURE_DATETIME_PATTERN));
+        newSceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__CONFIGURING);
+        SceneVersionPo sceneVersionPo = SceneVersionPoConverter.createFrom(newSceneVersionDto);
+        sceneVersionDao.insert(sceneVersionPo);
+
+        // 查询版本下的流程
+        List<VersionProcessDto> versionProcessDtoList =
+                versionProcessService.fetchVersionProcessListByVersionId(ListUtil.of(id), false).get(id);
+
+        return null;
+    }
+
     private SceneVersionDto getAndCheckStatus(Long id, int[] statusArr) {
-        Assert.notNull(id, "版本id不能为空");
+        Assert.notNull(id, "版本ID不能为空");
 
         SceneVersionDto versionDto = fetchById(ListUtil.of(id)).get(id);
-        Assert.notNull(versionDto, "流程id不存在。id: {}", id);
+        Assert.notNull(versionDto, "版本ID不存在。ID: {}", id);
 
         boolean flag = false;
         for (int status : statusArr) {

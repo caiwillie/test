@@ -89,9 +89,9 @@ public class SceneBffService {
         List<Long> versionIdList = sceneVersionDtoMap.values().stream().map(SceneVersionDto::getId).collect(Collectors.toList());
 
         // 获取某版本下的流程个数
-        Map<Long, Integer> countMap = versionProcessService.fetchVersionProcessCountByVersionIdList(versionIdList);
+        Map<Long, Integer> countMap = versionProcessService.fetchVersionProcessCountByVersionId(versionIdList);
         // 获取某版本下的最新流程
-        Map<Long, VersionProcessDto> processDtoMap = versionProcessService.fetchLatestProcessByVersionIdList(versionIdList);
+        Map<Long, VersionProcessDto> processDtoMap = versionProcessService.fetchLatestProcessByVersionId(versionIdList);
 
         for (SceneDto2 sceneDto : records) {
             SceneVo sceneVo = new SceneVo().from(sceneDto);
