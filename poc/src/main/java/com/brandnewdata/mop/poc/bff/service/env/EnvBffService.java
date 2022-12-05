@@ -1,6 +1,7 @@
 package com.brandnewdata.mop.poc.bff.service.env;
 
 import cn.hutool.core.util.NumberUtil;
+import com.brandnewdata.mop.poc.bff.converter.env.EnvVoConverter;
 import com.brandnewdata.mop.poc.bff.vo.env.EnvVo;
 import com.brandnewdata.mop.poc.env.service.EnvService;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,7 @@ public class EnvBffService {
 
     public List<EnvVo> list() {
         return service.fetchEnvList().stream().filter(envDto -> NumberUtil.equals(envDto.getType(), ENV_TYPE__NORMAL))
-                .map(envDto -> new EnvVo().from(envDto)).collect(Collectors.toList());
+                .map(EnvVoConverter::createFrom).collect(Collectors.toList());
     }
 
 }

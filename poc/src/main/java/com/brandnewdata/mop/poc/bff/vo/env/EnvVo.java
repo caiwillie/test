@@ -70,14 +70,5 @@ public class EnvVo {
      */
     private Integer processCount;
 
-    public EnvVo from(EnvDto envDto) {
-        this.setId(envDto.getId());
-        this.setName(envDto.getName());
-        this.setCreateTime(envDto.getCreateTime());
-        this.setUpdateTime(envDto.getUpdateTime());
-        this.setDeployTime(envDto.getDeployTime());
-        this.setStatus(envDto.getStatus());
-        this.setDescription(envDto.getDescription());
-        return this;
-    }
+
 }
