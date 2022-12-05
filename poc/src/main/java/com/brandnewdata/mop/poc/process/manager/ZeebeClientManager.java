@@ -20,13 +20,11 @@ public class ZeebeClientManager {
 
     private final IEnvService envService;
 
-    private final Integer grpcPort;
     private final LoadingCache<Long, ZeebeClient> cache;
 
     public ZeebeClientManager(IEnvService envService,
                               @Value("${brandnewdata.cloud-native.zeebe.zeebe-gateway.grpc-port}") Integer grpcPort) {
         this.envService = envService;
-        this.grpcPort = grpcPort;
         this.cache = CacheBuilder.newBuilder().build(getCacheLoader());
     }
 
@@ -47,9 +45,10 @@ public class ZeebeClientManager {
                 Assert.isTrue(serviceOpt.isPresent(), "环境信息配置有误");
                 EnvServiceDto envServiceDto = serviceOpt.get();
                 String serviceName = envServiceDto.getName();
+                String ports = envServiceDto.getPorts();
                 String namespace = envDto.getNamespace();
                 ZeebeClient client = ZeebeClient.newClientBuilder()
-                        .gatewayAddress(StrUtil.format("{}.{}:{}", serviceName, namespace, grpcPort))
+                        .gatewayAddress(StrUtil.format("{}.{}:{}", serviceName, namespace, ports))
                         .usePlaintext()
                         .build();
                 return client;

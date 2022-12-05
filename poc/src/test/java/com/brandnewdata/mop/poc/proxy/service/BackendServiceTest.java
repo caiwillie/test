@@ -1,18 +1,12 @@
 package com.brandnewdata.mop.poc.proxy.service;
 
-import cn.hutool.core.collection.ListUtil;
 import com.brandnewdata.mop.poc.proxy.dao.ProxyDao;
 import com.brandnewdata.mop.poc.proxy.dao.ProxyEndpointDao;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
-import org.springframework.test.util.ReflectionTestUtils;
-
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.when;
 
 class BackendServiceTest {
     @Mock
@@ -21,8 +15,7 @@ class BackendServiceTest {
     ProxyEndpointDao proxyEndpointDao;
     @Mock
     Logger log;
-    @InjectMocks
-    BackendService backendService;
+
 
     @BeforeEach
     void setUp() {
@@ -32,10 +25,7 @@ class BackendServiceTest {
     @Test
     void testGetBackend() {
         // api\.([\w-]+)\.g2-dev\.brandnewdata\.com
-        ReflectionTestUtils.setField(backendService, "domainRegEx", "api\\.([\\w-]+)\\.g2-dev\\.brandnewdata\\.com");
-
-        when(proxyEndpointDao.selectList(any())).thenReturn(ListUtil.empty());
-        backendService.getBackend("api.xxx.g2-dev.brandnewdata.com", "/asdasd");
+        // ReflectionTestUtils.setField(backendService, "domainRegEx", "api\\.([\\w-]+)\\.g2-dev\\.brandnewdata\\.com");
     }
 }
 

@@ -66,10 +66,10 @@ public class ElasticsearchManager {
 
                 Assert.isTrue(serviceOpt.isPresent(), "环境信息配置有误");
 
-
+                EnvServiceDto envServiceDto = serviceOpt.get();
 
                 HttpHost httpHost = HttpHostUtil.createHttpHost(StrUtil.format("{}.{}:{}",
-                        serviceOpt.get().getName(), envDto.getNamespace(), port));
+                        envServiceDto.getName(), envDto.getNamespace(), envServiceDto.getPorts()));
 
                 // Create the low-level client
                 RestClient restClient = RestClient.builder(new HttpHost[]{httpHost}).build();
