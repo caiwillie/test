@@ -73,8 +73,8 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
         String xml = dto.getXml(); // xml 需要取原始的数据
         // process id 和 name 需要取解析后的
         String processId = step2Result.getProcessId();
-        String name = step2Result.getName();
-        String zeebeXML = step2Result.getXml();
+        String name = step2Result.getProcessName();
+        String zeebeXML = step2Result.getZeebeXml();
 
         // 调用 zeebe 部署
         DeploymentEvent deploymentEvent = zeebe.newDeployResourceCommand()

@@ -122,7 +122,7 @@ public class DataExternalService {
 
             // 解析流程中用到的流程
             ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.step1(processId, name, xml);
-            configs.putAll(Opt.ofNullable(step1.parseConfig().step1Result().getConfigs()).orElse(MapUtil.empty()));
+            configs.putAll(Opt.ofNullable(step1.parseConfig().step1Result().getConnectorConfigMap()).orElse(MapUtil.empty()));
         }
         fileMap.put(FILENAME__PROCESS_DEFINITION, createTempFile(JacksonUtil.to(processDefinitionMap)));
 

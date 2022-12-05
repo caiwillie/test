@@ -10,7 +10,7 @@ import com.brandnewdata.mop.api.connector.dto.ConnectorResource;
 import com.brandnewdata.mop.poc.constant.ProcessConst;
 import com.brandnewdata.mop.poc.env.dto.EnvDto;
 import com.brandnewdata.mop.poc.env.service.IEnvService;
-import com.brandnewdata.mop.poc.process.dto.BizDeployDto;
+import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
 import com.brandnewdata.mop.poc.process.util.ProcessUtil;
 import org.springframework.stereotype.Service;
@@ -46,22 +46,22 @@ public class ConnectorApi implements IConnectorApi {
         // 部署触发器
         if(CollUtil.isNotEmpty(triggers)) {
             for (BPMNResource trigger : triggers) {
-                BizDeployDto bizDeployDto = new BizDeployDto();
-                bizDeployDto.setProcessId(ProcessUtil.convertProcessId(trigger.getModelKey()));
-                bizDeployDto.setProcessName(StrUtil.format("【触发器】{}", trigger.getName()));
-                bizDeployDto.setProcessXml(trigger.getEditorXML());
-                processDeployService2.releaseDeploy(bizDeployDto, envIdList, ProcessConst.PROCESS_BIZ_TYPE__TRIGGER);
+                BpmnXmlDto bpmnXmlDto = new BpmnXmlDto();
+                bpmnXmlDto.setProcessId(ProcessUtil.convertProcessId(trigger.getModelKey()));
+                bpmnXmlDto.setProcessName(StrUtil.format("【触发器】{}", trigger.getName()));
+                bpmnXmlDto.setProcessXml(trigger.getEditorXML());
+                processDeployService2.releaseDeploy(bpmnXmlDto, envIdList, ProcessConst.PROCESS_BIZ_TYPE__TRIGGER);
             }
         }
 
         // 部署操作
         if(CollUtil.isNotEmpty(operates)) {
             for (BPMNResource operate : operates) {
-                BizDeployDto bizDeployDto = new BizDeployDto();
-                bizDeployDto.setProcessId(ProcessUtil.convertProcessId(operate.getModelKey()));
-                bizDeployDto.setProcessName(StrUtil.format("【操作】{}", operate.getName()));
-                bizDeployDto.setProcessXml(operate.getEditorXML());
-                processDeployService2.releaseDeploy(bizDeployDto, envIdList, ProcessConst.PROCESS_BIZ_TYPE__OPERATE);
+                BpmnXmlDto bpmnXmlDto = new BpmnXmlDto();
+                bpmnXmlDto.setProcessId(ProcessUtil.convertProcessId(operate.getModelKey()));
+                bpmnXmlDto.setProcessName(StrUtil.format("【操作】{}", operate.getName()));
+                bpmnXmlDto.setProcessXml(operate.getEditorXML());
+                processDeployService2.releaseDeploy(bpmnXmlDto, envIdList, ProcessConst.PROCESS_BIZ_TYPE__OPERATE);
             }
         }
 

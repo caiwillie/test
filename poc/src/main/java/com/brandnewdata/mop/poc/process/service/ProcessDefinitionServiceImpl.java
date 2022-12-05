@@ -64,7 +64,7 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService {
                 .step1Result();
         String processId = step1Result.getProcessId();
         entity.setId(processId);
-        entity.setName(step1Result.getName());
+        entity.setName(step1Result.getProcessName());
 
         ProcessDefinitionPo oldEntity = exist(processId);
 

@@ -91,7 +91,7 @@ public class ConnectorManager {
         IConnectorCommonTriggerProcessConfFeign.ConnectorCommonTriggerProcessConfParamDTO dto =
                 new IConnectorCommonTriggerProcessConfFeign.ConnectorCommonTriggerProcessConfParamDTO();
         dto.setProcessId(step2Result.getProcessId());
-        dto.setProcessName(step2Result.getName());
+        dto.setProcessName(step2Result.getProcessName());
         dto.setProtocol(step2Result.getProtocol());
         dto.setConfig(JacksonUtil.to(step2Result.getRequestParams()));
         dto.setTriggerFullId(step2Result.getTrigger().getFullId());

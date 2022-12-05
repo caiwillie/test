@@ -7,7 +7,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class BizDeployDto {
+public class BpmnXmlDto {
 
     private String processId;
 

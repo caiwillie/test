@@ -9,7 +9,8 @@ import java.util.Map;
 @Setter
 public class Step1Result {
     private String processId;
-    private String name;
-    private String xml;
-    private Map<String, String> configs;
+    private String processName;
+    private String originalXml;
+    private String zeebeXml;
+    private Map<String, String> connectorConfigMap;
 }

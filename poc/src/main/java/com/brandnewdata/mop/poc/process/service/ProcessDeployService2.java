@@ -17,7 +17,7 @@ import com.brandnewdata.mop.poc.process.converter.ProcessSnapshotDeployDtoConver
 import com.brandnewdata.mop.poc.process.converter.ProcessSnapshotDeployPoConverter;
 import com.brandnewdata.mop.poc.process.dao.ProcessReleaseDeployDao;
 import com.brandnewdata.mop.poc.process.dao.ProcessSnapshotDeployDao;
-import com.brandnewdata.mop.poc.process.dto.BizDeployDto;
+import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
 import com.brandnewdata.mop.poc.process.dto.ProcessReleaseDeployDto;
 import com.brandnewdata.mop.poc.process.dto.ProcessSnapshotDeployDto;
 import com.brandnewdata.mop.poc.process.manager.ConnectorManager;
@@ -67,8 +67,8 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
     }
 
     @Override
-    public void snapshotDeploy(BizDeployDto bizDeployDto, Long envId, String bizType) {
-        ZeebeDeployBo bo = zeebeDeploy(bizDeployDto, envId, bizType);
+    public void snapshotDeploy(BpmnXmlDto bpmnXmlDto, Long envId, String bizType) {
+        ZeebeDeployBo bo = zeebeDeploy(bpmnXmlDto, envId, bizType);
         QueryWrapper<ProcessSnapshotDeployPo> query = new QueryWrapper<>();
         query.eq(ProcessSnapshotDeployPo.ENV_ID, envId);
         query.eq(ProcessSnapshotDeployPo.PROCESS_ZEEBE_KEY, bo.getZeebeKey());
@@ -78,16 +78,16 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
             return;
         }
         po = ProcessSnapshotDeployPoConverter.createFrom(bo);
-        ProcessSnapshotDeployPoConverter.updateFrom(envId, bizDeployDto.getProcessXml(), po);
+        ProcessSnapshotDeployPoConverter.updateFrom(envId, bpmnXmlDto.getProcessXml(), po);
         snapshotDeployDao.insert(po);
     }
 
     @Override
-    public void releaseDeploy(BizDeployDto bizDeployDto, List<Long> envIdList, String bizType) {
+    public void releaseDeploy(BpmnXmlDto bpmnXmlDto, List<Long> envIdList, String bizType) {
         if(CollUtil.isEmpty(envIdList)) return;
         for (Long envId : envIdList) {
-            Step1Result step1Result = ProcessDefinitionParser.step1(bizDeployDto.getProcessId(),
-                    bizDeployDto.getProcessName(), bizDeployDto.getProcessXml()).step1Result();
+            Step1Result step1Result = ProcessDefinitionParser.step1(bpmnXmlDto.getProcessId(),
+                    bpmnXmlDto.getProcessName(), bpmnXmlDto.getProcessXml()).step1Result();
 
             QueryWrapper<ProcessReleaseDeployPo> query = new QueryWrapper<>();
             query.eq(ProcessReleaseDeployPo.PROCESS_ID, step1Result.getProcessId());
@@ -95,7 +95,7 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
             ProcessReleaseDeployPo po = releaseDeployDao.selectOne(query);
             ZeebeDeployBo bo;
             if(po == null) {
-                bo = zeebeDeploy(bizDeployDto, envId, bizType);
+                bo = zeebeDeploy(bpmnXmlDto, envId, bizType);
                 po = ProcessReleaseDeployPoConverter.createFrom(bo);
                 po.setEnvId(envId);
                 releaseDeployDao.insert(po);
@@ -155,12 +155,12 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
     }
 
     @Override
-    public Map<String, Object> startSync(BizDeployDto bizDeployDto, Map<String, Object> values, Long envId, String bizType) {
+    public Map<String, Object> startSync(BpmnXmlDto bpmnXmlDto, Map<String, Object> values, Long envId, String bizType) {
         Assert.notNull(envId, "环境id不能为空");
         Assert.notNull(bizType, "环境类型不能为空");
 
-        String processId = bizDeployDto.getProcessId();
-        String expression = parseResponseExpression(bizDeployDto, bizType);
+        String processId = bpmnXmlDto.getProcessId();
+        String expression = parseResponseExpression(bpmnXmlDto, bizType);
 
         ZeebeClient zeebeClient = zeebeClientManager.getByEnvId(envId);
 
@@ -209,10 +209,10 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
         log.info("start process asynchronously: {}", processId);
     }
 
-    private String parseResponseExpression(BizDeployDto bizDeployDto, String bizType) {
-        String processId = bizDeployDto.getProcessId();
+    private String parseResponseExpression(BpmnXmlDto bpmnXmlDto, String bizType) {
+        String processId = bpmnXmlDto.getProcessId();
         Step2Result step2Result = ProcessDefinitionParser
-                .step1(processId, bizDeployDto.getProcessName(), bizDeployDto.getProcessXml())
+                .step1(processId, bpmnXmlDto.getProcessName(), bpmnXmlDto.getProcessXml())
                 .step2().replEleSceneSe(connectorManager).step2Result();
 
         // 解析 xml 后得到响应表达式
@@ -230,11 +230,11 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
     }
 
 
-    private ZeebeDeployBo zeebeDeploy(BizDeployDto bizDeployDto, Long envId, String bizType) {
+    private ZeebeDeployBo zeebeDeploy(BpmnXmlDto bpmnXmlDto, Long envId, String bizType) {
         Assert.notNull(envId, "环境id不能为空");
         Assert.notNull(bizType, "环境类型不能为空");
-        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.step1(bizDeployDto.getProcessId(),
-                bizDeployDto.getProcessName(), bizDeployDto.getProcessXml());
+        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.step1(bpmnXmlDto.getProcessId(),
+                bpmnXmlDto.getProcessName(), bpmnXmlDto.getProcessXml());
         ProcessDefinitionParseStep2 step2 = step1.replServiceTask(true, connectorManager).replAttr().step2();
 
         if(StrUtil.equals(bizType, ProcessConst.PROCESS_BIZ_TYPE__SCENE)) {
@@ -250,7 +250,7 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
         Step2Result step2Result = step2.step2Result();
 
         // process id 和 name 需要取解析后确认
-        String zeebeXml = step2Result.getXml();
+        String zeebeXml = step2Result.getZeebeXml();
 
         return zeebeDeploy(zeebeXml, envId);
     }

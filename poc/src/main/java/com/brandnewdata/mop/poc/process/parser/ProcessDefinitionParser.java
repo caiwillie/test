@@ -111,7 +111,15 @@ public class ProcessDefinitionParser implements
 
     @Override
     public ProcessDefinitionParseStep1 replProcessId(String processId) {
-        return null;
+        ProcessUtil.checkProcessId(processId);
+        this.processId = processId;
+
+        Element originalBpProcess = getBpProcess(originalDocument);
+        Element zeebeBpProcess = getBpProcess(zeebeDocument);
+
+        originalBpProcess.addAttribute(ID_ATTRIBUTE, processId);
+        zeebeBpProcess.addAttribute(ID_ATTRIBUTE, processId);
+        return this;
     }
 
     @Override
@@ -163,9 +171,10 @@ public class ProcessDefinitionParser implements
         logXML();
         Step1Result ret = new Step1Result();
         ret.setProcessId(processId);
-        ret.setName(name);
-        ret.setXml(zeebeDocumentStr);
-        ret.setConfigs(configs);
+        ret.setProcessName(name);
+        ret.setOriginalXml(originalDocumentStr);
+        ret.setZeebeXml(zeebeDocumentStr);
+        ret.setConnectorConfigMap(configs);
         return ret;
     }
 
@@ -332,7 +341,7 @@ public class ProcessDefinitionParser implements
      * 解析 process id 和 name
      */
     private void parseIdName() {
-        Element bpProcess = getBpProcess();
+        Element bpProcess = getBpProcess(zeebeDocument);
 
         if(processId == null) {
             processId = bpProcess.attributeValue(ID_ATTRIBUTE);
@@ -828,7 +837,7 @@ public class ProcessDefinitionParser implements
         Element callActivity = bndStartEvent.getCallActivity();
 
         // 新增空开始事件
-        Element bpProcess = getBpProcess();
+        Element bpProcess = getBpProcess(zeebeDocument);
         Element noneStartEvent = ElementCreator.createBpStartEvent();
         noneStartEvent.setParent(bpProcess);
         bpProcess.content().add(noneStartEvent);
@@ -964,7 +973,7 @@ public class ProcessDefinitionParser implements
 
     private void connectTwoElement(Element source, Element target) {
         Element sequenceFlow = ElementCreator.createBpSequenceFlow();
-        Element bpProcess = getBpProcess();
+        Element bpProcess = getBpProcess(zeebeDocument);
         sequenceFlow.setParent(bpProcess);
         bpProcess.content().add(sequenceFlow);
 
@@ -990,15 +999,15 @@ public class ProcessDefinitionParser implements
         content.add(content.indexOf(firstOutGoing), incoming);
     }
 
-    private Element getBpProcess() {
+    private Element getBpProcess(Document document) {
         XPath path = DocumentHelper.createXPath(StrUtil.join(StringPool.SLASH,
                 BPMN_DEFINITIONS_QNAME.getQualifiedName(),
                 BPMN_PROCESS_QNAME.getQualifiedName()));
-        return (Element) path.selectSingleNode(zeebeDocument);
+        return (Element) path.selectSingleNode(document);
     }
 
     private void set_exec() {
-        Element process = getBpProcess();
+        Element process = getBpProcess(zeebeDocument);
         process.addAttribute(IS_EXECUTABLE_ATTRIBUTE, StringPool.TRUE);
     }
 

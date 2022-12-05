@@ -14,7 +14,7 @@ import com.brandnewdata.mop.poc.constant.ProcessConst;
 import com.brandnewdata.mop.poc.constant.SceneConst;
 import com.brandnewdata.mop.poc.env.dto.EnvDto;
 import com.brandnewdata.mop.poc.env.service.IEnvService;
-import com.brandnewdata.mop.poc.process.dto.BizDeployDto;
+import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
 import com.brandnewdata.mop.poc.scene.converter.SceneReleaseDeployDtoConverter;
 import com.brandnewdata.mop.poc.scene.converter.SceneVersionDtoConverter;
@@ -154,7 +154,7 @@ public class SceneVersionService implements ISceneVersionService {
         Assert.notNull(envId, "环境id不能为空");
 
         for (VersionProcessDto versionProcessDto : versionProcessDtoList) {
-            BizDeployDto deployDto = new BizDeployDto();
+            BpmnXmlDto deployDto = new BpmnXmlDto();
             deployDto.setProcessId(versionProcessDto.getProcessId());
             deployDto.setProcessName(versionProcessDto.getProcessName());
             deployDto.setProcessXml(versionProcessDto.getProcessXml());
@@ -215,7 +215,7 @@ public class SceneVersionService implements ISceneVersionService {
 
         // 发布到zeebe
         for (VersionProcessDto versionProcessDto : versionProcessDtoList) {
-            BizDeployDto deployDto = new BizDeployDto();
+            BpmnXmlDto deployDto = new BpmnXmlDto();
             deployDto.setProcessId(versionProcessDto.getProcessId());
             deployDto.setProcessName(versionProcessDto.getProcessName());
             deployDto.setProcessXml(versionProcessDto.getProcessXml());

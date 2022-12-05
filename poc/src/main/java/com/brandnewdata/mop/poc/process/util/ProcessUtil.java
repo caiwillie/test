@@ -10,13 +10,20 @@ import java.util.regex.Pattern;
 
 public class ProcessUtil {
 
-    private static final Pattern PROCESS_PATERN = Pattern.compile("[a-zA-Z0-9.:\\-_]+");
+    private static final Pattern PROCESS_PATERN = Pattern.compile("[a-zA-Z0-9\\-_]+");
 
     public static String convertProcessId(String id) {
-        Assert.isTrue(ReUtil.isMatch(PROCESS_PATERN, id), "流程id只能包含大小写英文、数字、-、_");
-        // . 和 :
+        Assert.notNull(id, "流程ID不能为空");
+        // . 替换为 _，: 替换为 __
         id = StrUtil.replace(id, ".", "_");
-        return StrUtil.replace(id, ":", "__");
+        id = StrUtil.replace(id, ":", "__");
+        checkProcessId(id);
+        return id;
+    }
+
+    public static void checkProcessId(String id) {
+        Assert.notNull(id, "流程ID不能为空");
+        Assert.isTrue(ReUtil.isMatch(PROCESS_PATERN, id), "流程ID只能包含大小写英文、数字、-、_");
     }
 
     /**

@@ -7,7 +7,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.brandnewdata.mop.poc.process.dto.BizDeployDto;
+import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionStaticParseDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService2;
 import com.brandnewdata.mop.poc.scene.converter.VersionProcessDtoConverter;
@@ -123,11 +123,11 @@ public class VersionProcessService implements IVersionProcessService {
         String processXml = versionProcessDto.getProcessXml();
         Assert.notNull(processXml, "流程定义不能为空");
 
-        BizDeployDto bizDeployDto = new BizDeployDto();
-        bizDeployDto.setProcessId(versionProcessDto.getProcessId());
-        bizDeployDto.setProcessName(versionProcessDto.getProcessName());
-        bizDeployDto.setProcessXml(processXml);
-        ProcessDefinitionStaticParseDto processDefinitionStaticParseDto = processDefinitionService.staticParse(bizDeployDto);
+        BpmnXmlDto bpmnXmlDto = new BpmnXmlDto();
+        bpmnXmlDto.setProcessId(versionProcessDto.getProcessId());
+        bpmnXmlDto.setProcessName(versionProcessDto.getProcessName());
+        bpmnXmlDto.setProcessXml(processXml);
+        ProcessDefinitionStaticParseDto processDefinitionStaticParseDto = processDefinitionService.staticParse(bpmnXmlDto);
 
         String processId = processDefinitionStaticParseDto.getProcessId();
         String name = processDefinitionStaticParseDto.getName();

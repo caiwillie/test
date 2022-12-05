@@ -10,7 +10,7 @@ import cn.hutool.extra.servlet.ServletUtil;
 import cn.hutool.http.Method;
 import com.brandnewdata.mop.poc.constant.ProcessConst;
 import com.brandnewdata.mop.poc.constant.ProxyConst;
-import com.brandnewdata.mop.poc.process.dto.BizDeployDto;
+import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
 import com.brandnewdata.mop.poc.proxy.bo.ProxyEndpointSceneBo;
 import com.brandnewdata.mop.poc.proxy.bo.ProxyEndpointServerBo;
@@ -167,12 +167,12 @@ public class ReverseProxyServlet extends ProxyServlet {
         Assert.notNull(versionProcessDto, "process not found: {}", processId);
         String processXml = versionProcessDto.getProcessXml();
 
-        BizDeployDto bizDeployDto = new BizDeployDto();
-        bizDeployDto.setProcessId(processId);
-        bizDeployDto.setProcessName(processName);
-        bizDeployDto.setProcessXml(processXml);
+        BpmnXmlDto bpmnXmlDto = new BpmnXmlDto();
+        bpmnXmlDto.setProcessId(processId);
+        bpmnXmlDto.setProcessName(processName);
+        bpmnXmlDto.setProcessXml(processXml);
 
-        Map<String, Object> result = deployService2.startSync(bizDeployDto, variables, envId, ProcessConst.PROCESS_BIZ_TYPE__SCENE);
+        Map<String, Object> result = deployService2.startSync(bpmnXmlDto, variables, envId, ProcessConst.PROCESS_BIZ_TYPE__SCENE);
         ServletUtil.write(response, JacksonUtil.to(result), "application/json;charset=utf-8");
     }
 
