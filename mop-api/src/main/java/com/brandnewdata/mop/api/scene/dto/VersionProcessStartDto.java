@@ -15,7 +15,7 @@ public class VersionProcessStartDto {
     private String processRelevantInfo;
 
     /**
-     * 流程入参
+     * 流程入参（json格式的字符串）
      */
-    private Map<String, Object> variables;
+    private String content;
 }
