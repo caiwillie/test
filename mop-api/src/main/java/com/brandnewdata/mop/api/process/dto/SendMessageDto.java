@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.api.process;
+package com.brandnewdata.mop.api.process.dto;
 
 import lombok.Getter;
 import lombok.Setter;
