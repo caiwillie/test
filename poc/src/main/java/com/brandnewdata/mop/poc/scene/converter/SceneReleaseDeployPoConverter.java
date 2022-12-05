@@ -17,4 +17,14 @@ public class SceneReleaseDeployPoConverter {
         po.setEnvId(dto.getEnvId());
         return po;
     }
+
+    public static void updateFrom(SceneReleaseDeployPo target, SceneReleaseDeployDto dto) {
+        target.setSceneId(dto.getSceneId());
+        target.setSceneName(dto.getSceneName());
+        target.setVersionId(dto.getVersionId());
+        target.setVersionName(dto.getVersionName());
+        target.setProcessId(dto.getProcessId());
+        target.setProcessName(dto.getProcessName());
+        target.setEnvId(dto.getEnvId());
+    }
 }

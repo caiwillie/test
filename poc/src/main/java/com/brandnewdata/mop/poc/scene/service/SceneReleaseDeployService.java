@@ -29,11 +29,15 @@ public class SceneReleaseDeployService implements ISceneReleaseDeployService {
         QueryWrapper<SceneReleaseDeployPo> query = new QueryWrapper<>();
         query.eq(SceneReleaseDeployPo.ENV_ID, envId);
         query.eq(SceneReleaseDeployPo.PROCESS_ID, processId);
-        Long count = sceneReleaseDeployDao.selectCount(query);
-        Assert.isTrue(count == 0, "版本已经发布");
-
-        dto.setId(IdUtil.getSnowflakeNextId());
-        sceneReleaseDeployDao.insert(SceneReleaseDeployPoConverter.createFrom(dto));
+        SceneReleaseDeployPo sceneReleaseDeployPo = sceneReleaseDeployDao.selectOne(query);
+        if(sceneReleaseDeployPo == null) {
+            dto.setId(IdUtil.getSnowflakeNextId());
+            sceneReleaseDeployDao.insert(SceneReleaseDeployPoConverter.createFrom(dto));
+        } else {
+            dto.setId(sceneReleaseDeployPo.getId());
+            SceneReleaseDeployPoConverter.updateFrom(sceneReleaseDeployPo, dto);
+            sceneReleaseDeployDao.updateById(sceneReleaseDeployPo);
+        }
 
         return dto;
     }
