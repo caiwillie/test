@@ -1,11 +1,14 @@
 package com.brandnewdata.mop.poc.env.po;
 
-import com.baomidou.mybatisplus.annotation.*;
-import lombok.Getter;
-import lombok.Setter;
-
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * <p>
@@ -13,7 +16,7 @@ import java.util.Date;
  * </p>
  *
  * @author caiwillie
- * @since 2022-11-22
+ * @since 2022-12-05
  */
 @Getter
 @Setter
@@ -37,6 +40,9 @@ public class EnvServicePo implements Serializable {
 
     private String clusterIp;
 
+    private String ports;
+
+
     public static final String ID = "id";
 
     public static final String CREATE_TIME = "create_time";
@@ -48,5 +54,7 @@ public class EnvServicePo implements Serializable {
     public static final String ENV_ID = "env_id";
 
     public static final String CLUSTER_IP = "cluster_ip";
+
+    public static final String PORTS = "ports";
 
 }

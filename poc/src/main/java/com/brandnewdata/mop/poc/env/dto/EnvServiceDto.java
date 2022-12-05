@@ -20,4 +20,6 @@ public class EnvServiceDto {
 
     private String clusterIp;
 
+    private String ports;
+
 }

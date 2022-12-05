@@ -33,13 +33,10 @@ public class ElasticsearchManager {
 
     private final LoadingCache<Long, ElasticsearchClient> cache;
 
-    private Integer port;
-
     public ElasticsearchManager(IEnvService envService,
                                 @Value("${brandnewdata.cloud-native.elasticsearch.http-port}") Integer port) {
         this.envService = envService;
         this.objectMapper = initJackson();
-        this.port = port;
         this.cache = CacheBuilder.newBuilder().build(getCacheLoader());
     }
 
@@ -68,6 +65,8 @@ public class ElasticsearchManager {
                         .findFirst();
 
                 Assert.isTrue(serviceOpt.isPresent(), "环境信息配置有误");
+
+
 
                 HttpHost httpHost = HttpHostUtil.createHttpHost(StrUtil.format("{}.{}:{}",
                         serviceOpt.get().getName(), envDto.getNamespace(), port));
