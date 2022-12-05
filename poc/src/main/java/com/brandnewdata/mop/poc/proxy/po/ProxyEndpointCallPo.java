@@ -3,18 +3,17 @@ package com.brandnewdata.mop.poc.proxy.po;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serializable;
 import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * <p>
  * 
  * </p>
  *
- * @author caiwilie
+ * @author caiwillie
  * @since 2022-12-05
  */
 @Getter
@@ -44,7 +43,7 @@ public class ProxyEndpointCallPo implements Serializable {
 
     private String httpMethod;
 
-    private String httpStatus;
+    private String executeStatus;
 
     private String requestQuery;
 
@@ -75,7 +74,7 @@ public class ProxyEndpointCallPo implements Serializable {
 
     public static final String HTTP_METHOD = "http_method";
 
-    public static final String HTTP_STATUS = "http_status";
+    public static final String EXECUTE_STATUS = "execute_status";
 
     public static final String REQUEST_QUERY = "request_query";
 

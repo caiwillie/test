@@ -55,14 +55,19 @@ public class ProxyEndpointCallVo {
     private String httpMethod;
 
     /**
-     * 返回状态
+     * 调用状态。success 成功, false 失败
      */
-    private String httpStatus;
+    private String executeStatus;
 
     /**
      * 请求体
      */
-    private String httpBody;
+    private String requestBody;
+
+    /**
+     * 错误消息
+     */
+    private String errorMessage;
 
     /**
      * 请求耗时

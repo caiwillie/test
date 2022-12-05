@@ -119,10 +119,10 @@ public class ReverseProxyServlet extends ProxyServlet {
             }
 
             int status = response.getStatus();
-            proxyEndpointCallDto.setHttpStatus(String.valueOf(status));
+            proxyEndpointCallDto.setExecuteStatus(String.valueOf(status));
         } catch (Exception e) {
             log.error("ReverseProxyServlet.service error", e);
-            proxyEndpointCallDto.setHttpStatus("500");
+            proxyEndpointCallDto.setExecuteStatus("500");
             proxyEndpointCallDto.setErrorMessage(e.getMessage());
         } finally {
             long time = LocalDateTimeUtil.between(startTime, LocalDateTime.now()).toMillis();

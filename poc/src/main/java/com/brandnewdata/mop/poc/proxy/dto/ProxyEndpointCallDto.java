@@ -35,7 +35,7 @@ public class ProxyEndpointCallDto {
 
     private String httpMethod;
 
-    private String httpStatus;
+    private String executeStatus;
 
     private String requestQuery;
 

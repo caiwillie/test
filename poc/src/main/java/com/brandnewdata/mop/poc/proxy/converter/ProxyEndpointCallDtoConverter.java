@@ -17,7 +17,7 @@ public class ProxyEndpointCallDtoConverter {
         dto.setMacAddress(po.getMacAddress());
         dto.setUserAgent(po.getUserAgent());
         dto.setHttpMethod(po.getHttpMethod());
-        dto.setHttpStatus(po.getHttpStatus());
+        dto.setExecuteStatus(po.getExecuteStatus());
         dto.setRequestQuery(po.getRequestQuery());
         dto.setRequestBody(po.getRequestBody());
         dto.setResponseBody(po.getResponseBody());

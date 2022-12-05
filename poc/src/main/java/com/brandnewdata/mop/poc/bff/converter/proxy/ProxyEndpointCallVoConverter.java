@@ -13,8 +13,9 @@ public class ProxyEndpointCallVoConverter {
         vo.setProxyName(dto.getProxyName());
         vo.setLocation(dto.getLocation());
         vo.setHttpMethod(dto.getHttpMethod());
-        vo.setHttpStatus(dto.getHttpStatus());
-        vo.setHttpBody(dto.getHttpBody());
+        vo.setExecuteStatus(dto.getExecuteStatus());
+        vo.setRequestBody(dto.getRequestBody());
+        vo.setErrorMessage(dto.getErrorMessage());
         return vo;
     }
 
