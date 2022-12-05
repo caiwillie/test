@@ -14,7 +14,6 @@ import com.brandnewdata.mop.poc.scene.service.ISceneService;
 import com.dxy.library.json.jackson.JacksonUtil;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +36,7 @@ public class SceneApi implements ISceneApi {
     }
 
     @Override
-    public Result startVersionProcessAsync(ArrayList<VersionProcessStartDto> startDtoList) {
+    public Result startVersionProcessAsync(List<VersionProcessStartDto> startDtoList) {
         Result ret = Result.OK();
         if(CollUtil.isEmpty(startDtoList)) return ret;
 
