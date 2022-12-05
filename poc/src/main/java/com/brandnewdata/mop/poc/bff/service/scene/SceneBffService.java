@@ -122,7 +122,9 @@ public class SceneBffService {
         }
 
         return sceneVersionDtoList.stream()
-                .map(SceneVersionVoConverter::createFrom).collect(Collectors.toList());
+                .map(sceneVersionDto ->
+                        SceneVersionVoConverter.createFrom(sceneVersionDto, envDtoListMap.get(sceneVersionDto.getId())))
+                .collect(Collectors.toList());
     }
 
     public List<VersionProcessVo> processList(Long versionId) {
