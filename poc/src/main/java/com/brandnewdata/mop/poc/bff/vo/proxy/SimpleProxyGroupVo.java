@@ -7,15 +7,15 @@ import java.util.List;
 
 @Getter
 @Setter
-public class SimpleProxyVersionVo {
+public class SimpleProxyGroupVo {
 
     /**
-     * 版本号
+     * api 名称
      */
-    private String version;
+    private String name;
 
     /**
-     * 路径列表
+     * 版本列表
      */
-    private List<SimpleProxyVersionEndpointVo> endpointList;
+    private List<SimpleProxyVo> versionList;
 }

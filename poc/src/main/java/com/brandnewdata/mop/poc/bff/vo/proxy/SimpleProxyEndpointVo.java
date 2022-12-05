@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SimpleProxyVersionEndpointVo {
+public class SimpleProxyEndpointVo {
 
     /**
      * endpoint id

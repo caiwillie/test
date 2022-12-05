@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.proxy.service.combined;
+package com.brandnewdata.mop.poc.proxy.service.atomic;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class ProxyEndpointCallCService implements IProxyEndpointCallCService {
+public class ProxyEndpointCallAService implements IProxyEndpointCallAService {
 
     @Resource
     private ProxyEndpointCallDao proxyEndpointCallDao;
@@ -38,6 +38,12 @@ public class ProxyEndpointCallCService implements IProxyEndpointCallCService {
         List<ProxyEndpointCallDto> dtoList = records.stream()
                 .map(ProxyEndpointCallDtoConverter::createFrom).collect(Collectors.toList());
         return new Page<>(page.getTotal(), dtoList);
+    }
+
+    @Override
+    public ProxyEndpointCallDto save(ProxyEndpointCallDto dto) {
+
+        return null;
     }
 
 }

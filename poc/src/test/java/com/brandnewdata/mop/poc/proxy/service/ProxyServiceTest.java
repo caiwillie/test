@@ -37,8 +37,7 @@ class ProxyServiceTest {
         when(proxyDao.selectList(any())).thenReturn(testPageV2Data1());
         when(endpointService.listByProxyIdList(any())).thenReturn(ListUtil.empty());
 
-        // call method
-        proxyService.pageV2(1, 10, null, null);
+
     }
 
     private List<ProxyPo> testPageV2Data1() {

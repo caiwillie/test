@@ -2,7 +2,6 @@ package com.brandnewdata.mop.poc.proxy.converter;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Opt;
-import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto;
 import com.brandnewdata.mop.poc.proxy.po.ProxyEndpointPo;
 

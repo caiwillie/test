@@ -3,7 +3,9 @@ package com.brandnewdata.mop.poc.bff.controller.proxy;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.bff.service.proxy.ProxyBffService;
 import com.brandnewdata.mop.poc.bff.vo.proxy.ProxyEndpointVo;
-import com.brandnewdata.mop.poc.bff.vo.proxy.SimpleProxyVo;
+import com.brandnewdata.mop.poc.bff.vo.proxy.ProxyGroupVo;
+import com.brandnewdata.mop.poc.bff.vo.proxy.ProxyVo;
+import com.brandnewdata.mop.poc.bff.vo.proxy.SimpleProxyGroupVo;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.proxy.resp.ApiResp;
 import com.brandnewdata.mop.poc.proxy.service.ProxyService;
@@ -20,13 +22,22 @@ import java.util.List;
 @RestController
 public class ProxyController {
 
-    @Resource
-    private ProxyService proxyService;
-
     private final ProxyBffService proxyBffService;
 
     public ProxyController(ProxyBffService proxyBffService) {
         this.proxyBffService = proxyBffService;
+    }
+
+    /**
+     * 保存 API
+     *
+     * @param proxyVo the proxy vo
+     * @return the result
+     */
+    @PostMapping("/rest/reverseProxy/save")
+    public Result save(@RequestBody ProxyVo proxyVo) {
+        proxyBffService.saveProxy(proxyVo);
+        return Result.OK();
     }
 
     /**
@@ -39,12 +50,12 @@ public class ProxyController {
      * @return the result
      */
     @GetMapping("/rest/proxy/page")
-    public Result<Page<ApiResp>> pageProxy(@RequestParam int pageNum,
-                                           @RequestParam int pageSize,
-                                           @RequestParam(required = false) String name,
-                                           @RequestParam(required = false) String tags) {
-        Page<ApiResp> resp = proxyService.pageV2(pageNum, pageSize, name, tags);
-        return Result.OK(resp);
+    public Result<Page<ProxyGroupVo>> pageProxy(@RequestParam int pageNum,
+                                                @RequestParam int pageSize,
+                                                @RequestParam(required = false) String name,
+                                                @RequestParam(required = false) String tags) {
+        Page<ProxyGroupVo> ret = proxyBffService.pageProxy(pageNum, pageSize, name, tags);
+        return Result.OK(ret);
     }
 
 
@@ -56,7 +67,7 @@ public class ProxyController {
      */
     @PostMapping("/rest/proxy/endpoint/save")
     public Result<ProxyEndpointVo> saveEndpoint(@RequestBody ProxyEndpointVo vo) {
-        ProxyEndpointVo ret = proxyBffService.save(vo);
+        ProxyEndpointVo ret = proxyBffService.saveEndpoint(vo);
         return Result.OK(ret);
     }
 
@@ -66,8 +77,8 @@ public class ProxyController {
      * @return the all proxy
      */
     @GetMapping(value = "/rest/proxy/oprate/getAllProxy")
-    public Result<List<SimpleProxyVo>> getAllProxy() {
-        List<SimpleProxyVo> ret = proxyBffService.getAllProxy();
+    public Result<List<SimpleProxyGroupVo>> getAllProxy() {
+        List<SimpleProxyGroupVo> ret = proxyBffService.getAllProxy();
         return Result.OK(ret);
     }
 

@@ -6,7 +6,9 @@ import com.brandnewdata.mop.poc.proxy.dto.old.Endpoint;
 import com.brandnewdata.mop.poc.proxy.dto.old.Proxy;
 import com.brandnewdata.mop.poc.proxy.service.EndpointService;
 import com.brandnewdata.mop.poc.proxy.service.ProxyService;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 
@@ -24,17 +26,7 @@ public class ProxyRest {
     @Resource
     private EndpointService endpointService;
 
-    /**
-     * 新增/更新 API
-     *
-     * @param proxy the reverse proxy
-     * @return the result
-     */
-    @PostMapping("/rest/reverseProxy/save")
-    public Result<Proxy> save(@RequestBody Proxy proxy) {
-        Proxy result = proxyService.save(proxy);
-        return Result.OK(result);
-    }
+
 
     /**
      * API详情
@@ -47,9 +39,6 @@ public class ProxyRest {
         Proxy result = proxyService.getOne(id);
         return Result.OK(result);
     }
-
-
-
 
     /**
      * endpoint 详情

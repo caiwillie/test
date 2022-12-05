@@ -6,13 +6,13 @@ import com.brandnewdata.mop.poc.bff.converter.proxy.ProxyEndpointDtoConverter;
 import com.brandnewdata.mop.poc.bff.vo.proxy.operate.ProxyEndpointCallFilter;
 import com.brandnewdata.mop.poc.bff.vo.proxy.operate.ProxyEndpointCallVo;
 import com.brandnewdata.mop.poc.common.dto.Page;
-
 import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointCallDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto;
-import com.brandnewdata.mop.poc.proxy.service.combined.IProxyEndpointCallCService;
-import com.brandnewdata.mop.poc.proxy.service.combined.IProxyEndpointCService;
 import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyAService;
+import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyEndpointAService;
+import com.brandnewdata.mop.poc.proxy.service.combined.IProxyEndpointCService;
+import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyEndpointCallAService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,16 +22,20 @@ import java.util.stream.Collectors;
 @Service
 public class ProxyOperateBffService {
 
-    private final IProxyEndpointCService proxyEndpointService;
+    private final IProxyEndpointCService proxyEndpointCService;
+
+    private final IProxyEndpointAService proxyEndpointAService;
 
     private final IProxyAService proxyAtomicService;
 
-    private final IProxyEndpointCallCService proxyEndpointCallService;
+    private final IProxyEndpointCallAService proxyEndpointCallService;
 
-    public ProxyOperateBffService(IProxyEndpointCService proxyEndpointService,
+    public ProxyOperateBffService(IProxyEndpointCService proxyEndpointCService,
+                                  IProxyEndpointAService proxyEndpointAService,
                                   IProxyAService proxyAtomicService,
-                                  IProxyEndpointCallCService proxyEndpointCallService) {
-        this.proxyEndpointService = proxyEndpointService;
+                                  IProxyEndpointCallAService proxyEndpointCallService) {
+        this.proxyEndpointCService = proxyEndpointCService;
+        this.proxyEndpointAService = proxyEndpointAService;
         this.proxyAtomicService = proxyAtomicService;
         this.proxyEndpointCallService = proxyEndpointCallService;
     }
@@ -43,7 +47,7 @@ public class ProxyOperateBffService {
         String version = filter.getVersion();
         String location = filter.getLocation();
 
-        List<ProxyEndpointDto> proxyEndpointDtoList = proxyEndpointService.fetchAll();
+        List<ProxyEndpointDto> proxyEndpointDtoList = proxyEndpointAService.fetchAll();
 
         // 查询关联的proxy
         List<Long> proxyIdList = proxyEndpointDtoList.stream().map(ProxyEndpointDto::getProxyId).collect(Collectors.toList());

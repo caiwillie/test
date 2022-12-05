@@ -9,10 +9,6 @@ public interface IProxyEndpointCService {
 
     ProxyEndpointDto save(ProxyEndpointDto dto);
 
-    ProxyEndpointDto fetchByProxyIdAndLocation(Long proxyId, String location);
 
-    Map<Long, ProxyEndpointDto> fetchByIds(List<Long> ids);
-
-    List<ProxyEndpointDto> fetchAll();
 
 }

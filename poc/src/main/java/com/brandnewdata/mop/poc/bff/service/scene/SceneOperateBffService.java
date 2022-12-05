@@ -13,7 +13,6 @@ import com.brandnewdata.mop.poc.bff.vo.scene.operate.condition.Filter;
 import com.brandnewdata.mop.poc.bff.vo.scene.operate.condition.Process;
 import com.brandnewdata.mop.poc.bff.vo.scene.operate.condition.Scene;
 import com.brandnewdata.mop.poc.bff.vo.scene.operate.condition.Version;
-import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService2;
 import com.brandnewdata.mop.poc.process.dto.ProcessDeployDto;
@@ -96,42 +95,6 @@ public class SceneOperateBffService {
 
         List<Scene> sceneList = getSceneList(sceneSortedList, sceneMap, processDeployMap);
         return sceneList;
-    }
-
-    public Page<ProcessInstance> pageProcessInstance(Filter filter) {
-        List<Scene> sceneList = getAllScene();
-        Map<ProcessIdAndVersion, ProcessDeployInfo> processIdAndVersionMap = new HashMap<>();
-        List<Long> deployIdList = new ArrayList<>();
-        for (Scene scene : sceneList) {
-            if(filter.getSceneId() != null && ! NumberUtil.equals(filter.getSceneId(), scene.getId())) continue;
-            for (Process process : scene.getProcessList()) {
-                if (filter.getProcessId() != null && !StrUtil.equals(filter.getProcessId(), process.getProcessId())) continue;
-                for (Version version : process.getVersionList()) {
-                    if(filter.getVersion() != null && !NumberUtil.equals(filter.getVersion(), version.getVersion())) continue;
-                    deployIdList.add(version.getDeployId());
-                    ProcessDeployInfo processDeployInfo = new ProcessDeployInfo();
-                    processDeployInfo.setSceneId(scene.getId());
-                    processDeployInfo.setSceneName(scene.getName());
-                    processDeployInfo.setProcessId(process.getProcessId());
-                    processDeployInfo.setProcessName(process.getName());
-                    processDeployInfo.setDeployId(version.getDeployId());
-                    processIdAndVersionMap.put(new ProcessIdAndVersion(process.getProcessId(), version.getVersion()), processDeployInfo);
-                }
-            }
-        }
-
-        List<ProcessDeployDto> processDeployDtoList = processDeployService.listByIdList(deployIdList);
-
-        List<Long> zeebeKeyList = processDeployDtoList.stream().map(ProcessDeployDto::getZeebeKey).collect(Collectors.toList());
-
-        // todo caiwillie
-        Page<ListViewProcessInstanceDto> listViewProcessInstanceDtoPage =
-                processInstanceService.pageProcessInstanceByZeebeKey(null, zeebeKeyList, filter.getPageNum(), filter.getPageSize(), null);
-        List<ProcessInstance> records = listViewProcessInstanceDtoPage.getRecords().stream().map(r -> toProcessInstance(r, processIdAndVersionMap))
-                .collect(Collectors.toList());
-        Page page = new Page(listViewProcessInstanceDtoPage.getTotal(), records);
-        page.setExtraMap(listViewProcessInstanceDtoPage.getExtraMap());
-        return page;
     }
 
     public SceneStatistic statistic(Filter filter) {

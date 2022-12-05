@@ -1,16 +1,19 @@
 package com.brandnewdata.mop.poc.bff.service.proxy;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import com.brandnewdata.mop.poc.bff.converter.proxy.ProxyDtoConverter;
 import com.brandnewdata.mop.poc.bff.converter.proxy.ProxyEndpointDtoConverter;
 import com.brandnewdata.mop.poc.bff.converter.proxy.ProxyEndpointVoConverter;
-import com.brandnewdata.mop.poc.bff.vo.proxy.ProxyEndpointVo;
-import com.brandnewdata.mop.poc.bff.vo.proxy.SimpleProxyVersionEndpointVo;
-import com.brandnewdata.mop.poc.bff.vo.proxy.SimpleProxyVersionVo;
-import com.brandnewdata.mop.poc.bff.vo.proxy.SimpleProxyVo;
+import com.brandnewdata.mop.poc.bff.converter.proxy.ProxyVoConverter;
+import com.brandnewdata.mop.poc.bff.vo.proxy.*;
+import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto;
-import com.brandnewdata.mop.poc.proxy.service.combined.IProxyEndpointCService;
+import com.brandnewdata.mop.poc.proxy.dto.ProxyGroupDto;
 import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyAService;
+import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyEndpointAService;
+import com.brandnewdata.mop.poc.proxy.service.combined.IProxyEndpointCService;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -19,31 +22,56 @@ import java.util.stream.Collectors;
 @Service
 public class ProxyBffService {
 
-    private final IProxyEndpointCService proxyEndpointService2;
+    private final IProxyEndpointCService proxyEndpointCService;
+
+    private final IProxyEndpointAService proxyEndpointAService;
 
     private final IProxyEndpointCService proxyEndpointService;
 
-    private final IProxyAService proxyAtomicService;
+    private final IProxyAService proxyAService;
 
-    public ProxyBffService(IProxyEndpointCService proxyEndpointService2,
+    public ProxyBffService(IProxyEndpointCService proxyEndpointCService,
+                           IProxyEndpointAService proxyEndpointAService,
                            IProxyEndpointCService proxyEndpointService,
-                           IProxyAService proxyAtomicService) {
-        this.proxyEndpointService2 = proxyEndpointService2;
+                           IProxyAService proxyAService) {
+        this.proxyEndpointCService = proxyEndpointCService;
+        this.proxyEndpointAService = proxyEndpointAService;
         this.proxyEndpointService = proxyEndpointService;
-        this.proxyAtomicService = proxyAtomicService;
+        this.proxyAService = proxyAService;
     }
 
-    public ProxyEndpointVo save(ProxyEndpointVo vo) {
-        ProxyEndpointDto dto = proxyEndpointService2.save(ProxyEndpointDtoConverter.createFrom(vo));
+    public Page<ProxyGroupVo> pageProxy(Integer pageNum, Integer pageSize, String name, String tags) {
+        Page<ProxyGroupDto> proxyGroupDtoPage = proxyAService.pageGroupByName(pageNum, pageSize, name, tags);
+        List<ProxyGroupDto> records = proxyGroupDtoPage.getRecords();
+        if(CollUtil.isEmpty(records)) return Page.empty();
+
+        List<ProxyGroupVo> voList = new ArrayList<>();
+        for (ProxyGroupDto record : records) {
+            ProxyGroupVo proxyGroupVo = new ProxyGroupVo();
+            proxyGroupVo.setName(record.getName());
+            proxyGroupVo.setVersions(record.getProxyDtoList()
+                    .stream().map(ProxyVoConverter::createFrom).collect(Collectors.toList()));
+            voList.add(proxyGroupVo);
+        }
+
+        return new Page<>(proxyGroupDtoPage.getTotal(), voList);
+    }
+
+    public void saveProxy(ProxyVo proxyVo) {
+        proxyAService.save(ProxyDtoConverter.createFrom(proxyVo), false);
+    }
+
+    public ProxyEndpointVo saveEndpoint(ProxyEndpointVo vo) {
+        ProxyEndpointDto dto = proxyEndpointCService.save(ProxyEndpointDtoConverter.createFrom(vo));
         return ProxyEndpointVoConverter.createFrom(dto);
     }
 
-    public List<SimpleProxyVo> getAllProxy() {
-        List<ProxyEndpointDto> proxyEndpointDtoList = proxyEndpointService.fetchAll();
+    public List<SimpleProxyGroupVo> getAllProxy() {
+        List<ProxyEndpointDto> proxyEndpointDtoList = proxyEndpointAService.fetchAll();
 
         // 查询关联的proxy
         List<Long> proxyIdList = proxyEndpointDtoList.stream().map(ProxyEndpointDto::getProxyId).collect(Collectors.toList());
-        Map<Long, ProxyDto> proxyDtoMap = proxyAtomicService.fetchById(proxyIdList);
+        Map<Long, ProxyDto> proxyDtoMap = proxyAService.fetchById(proxyIdList);
 
         // 更新proxy信息
         for (ProxyEndpointDto proxyEndpointDto : proxyEndpointDtoList) {
@@ -55,9 +83,9 @@ public class ProxyBffService {
         ListUtil.sort(proxyEndpointDtoList, Comparator.comparing(ProxyEndpointDto::getUpdateTime));
 
         // 按照顺序依次放入不同集合中
-        LinkedHashMap<String, SimpleProxyVo> proxyMap = new LinkedHashMap<>();
-        Map<String, LinkedHashMap<String, SimpleProxyVersionVo>> proxyVersionMapMap = new HashMap<>();
-        Map<String, LinkedHashMap<String, SimpleProxyVersionEndpointVo>> proxyVersionEndpointMapMap = new HashMap<>();
+        LinkedHashMap<String, SimpleProxyGroupVo> proxyMap = new LinkedHashMap<>();
+        Map<String, LinkedHashMap<String, SimpleProxyVo>> proxyVersionMapMap = new HashMap<>();
+        Map<String, LinkedHashMap<String, SimpleProxyEndpointVo>> proxyVersionEndpointMapMap = new HashMap<>();
 
         for (ProxyEndpointDto proxyEndpointDto : proxyEndpointDtoList) {
             String proxyName = proxyEndpointDto.getProxyName();
@@ -66,23 +94,23 @@ public class ProxyBffService {
 
 
             if(!proxyMap.containsKey(proxyName)) {
-                SimpleProxyVo proxyVo = new SimpleProxyVo();
+                SimpleProxyGroupVo proxyVo = new SimpleProxyGroupVo();
                 proxyVo.setName(proxyName);
                 proxyMap.put(proxyName, proxyVo);
             }
 
-            LinkedHashMap<String, SimpleProxyVersionVo> proxyVersionMap =
+            LinkedHashMap<String, SimpleProxyVo> proxyVersionMap =
                     proxyVersionMapMap.computeIfAbsent(proxyName, k -> new LinkedHashMap<>());
             if(!proxyVersionMap.containsKey(proxyVersion)) {
-                SimpleProxyVersionVo proxyVersionVo = new SimpleProxyVersionVo();
+                SimpleProxyVo proxyVersionVo = new SimpleProxyVo();
                 proxyVersionVo.setVersion(proxyVersion);
                 proxyVersionMap.put(proxyVersion, proxyVersionVo);
             }
 
-            LinkedHashMap<String, SimpleProxyVersionEndpointVo> proxyVersionEndpointMap =
+            LinkedHashMap<String, SimpleProxyEndpointVo> proxyVersionEndpointMap =
                     proxyVersionEndpointMapMap.computeIfAbsent(proxyVersion, k -> new LinkedHashMap<>());
             if(!proxyVersionEndpointMap.containsKey(location)) {
-                SimpleProxyVersionEndpointVo proxyVersionEndpointVo = new SimpleProxyVersionEndpointVo();
+                SimpleProxyEndpointVo proxyVersionEndpointVo = new SimpleProxyEndpointVo();
                 proxyVersionEndpointVo.setEndpointId(proxyEndpointDto.getId());
                 proxyVersionEndpointVo.setLocation(location);
                 proxyVersionEndpointMap.put(location, proxyVersionEndpointVo);
@@ -90,12 +118,12 @@ public class ProxyBffService {
         }
 
         // 组合
-        for (SimpleProxyVo proxyVo : proxyMap.values()) {
+        for (SimpleProxyGroupVo proxyVo : proxyMap.values()) {
             String name = proxyVo.getName();
-            List<SimpleProxyVersionVo> proxyVersionVoList = ListUtil.toList(proxyVersionMapMap.get(name).values());
+            List<SimpleProxyVo> proxyVersionVoList = ListUtil.toList(proxyVersionMapMap.get(name).values());
             proxyVo.setVersionList(proxyVersionVoList);
-            for (SimpleProxyVersionVo proxyVersionVo : proxyVersionVoList) {
-                List<SimpleProxyVersionEndpointVo> proxyVersionEndpointVoList =
+            for (SimpleProxyVo proxyVersionVo : proxyVersionVoList) {
+                List<SimpleProxyEndpointVo> proxyVersionEndpointVoList =
                         ListUtil.toList(proxyVersionEndpointMapMap.get(proxyVersionVo.getVersion()).values());
                 proxyVersionVo.setEndpointList(proxyVersionEndpointVoList);
             }

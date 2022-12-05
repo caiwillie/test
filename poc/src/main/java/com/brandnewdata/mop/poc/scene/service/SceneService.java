@@ -5,10 +5,7 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.brandnewdata.mop.poc.common.dto.Page;
-import com.brandnewdata.mop.poc.constant.ProcessConst;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService;
@@ -45,29 +42,6 @@ public class SceneService implements ISceneService {
 
     @Resource
     private IProcessDeployService processDeployService;
-
-    @Override
-    public Page<SceneDto> page(int pageNumber, int pageSize, String name) {
-        com.baomidou.mybatisplus.extension.plugins.pagination.Page<ScenePo> page =
-                com.baomidou.mybatisplus.extension.plugins.pagination.Page.of(pageNumber, pageSize);
-        QueryWrapper<ScenePo> queryWrapper = new QueryWrapper<>();
-        if(StrUtil.isNotBlank(name)) queryWrapper.like(ScenePo.NAME, name); // 设置名称
-        queryWrapper.orderByDesc(ScenePo.UPDATE_TIME);
-        page = sceneDao.selectPage(page, queryWrapper);
-        List<ScenePo> entities = Optional.ofNullable(page.getRecords()).orElse(ListUtil.empty());
-
-        List<Long> sceneIdList = entities.stream().map(ScenePo::getId).collect(Collectors.toList());
-
-        Collection<SceneDto> list = list(sceneIdList, true);
-
-        return new Page<>(page.getTotal(), ListUtil.toList(list));
-    }
-
-    @Override
-    public SceneDto getOne(Long id) {
-        Collection<SceneDto> list = list(ListUtil.of(id), true);
-        return CollUtil.isEmpty(list) ? null : ListUtil.toList(list).get(0);
-    }
 
     @Override
     public List<SceneDto> listByIds(List<Long> ids) {
@@ -114,44 +88,6 @@ public class SceneService implements ISceneService {
         // 更新 business scene id
         updateSceneUpdateTime(sceneProcessDTO.getBusinessSceneId());
         return toDTO(sceneProcessPo, processDefinitionDTO);
-    }
-
-    @Override
-    public void deploy(SceneProcessDto sceneProcessDTO) {
-        ProcessDefinitionDto processDefinitionDTO = toDTO(sceneProcessDTO);
-        processDeployService.deploy(processDefinitionDTO, ProcessConst.PROCESS_TYPE_SCENE);
-    }
-
-    @Override
-    public void deleteProcessDefinition(SceneProcessDto sceneProcessDTO) {
-        // 先删除流程定义
-        ProcessDefinitionDto processDefinitionDTO = toDTO(sceneProcessDTO);
-        processDefinitionService.delete(processDefinitionDTO);
-
-        // 再删除关联关系
-        Long id = sceneProcessDTO.getId();
-        sceneProcessDao.deleteById(id);
-    }
-
-    @Override
-    public void delete(SceneDto sceneDTO) {
-        // 先删除绑定的流程
-        Long sceneId = sceneDTO.getId();
-        List<SceneProcessPo> businessSceneProcessEntities = listSceneProcessBySceneId(sceneId);
-        if(CollUtil.isNotEmpty(businessSceneProcessEntities)) {
-            for (SceneProcessPo sceneProcessPo : businessSceneProcessEntities) {
-                SceneProcessDto sceneProcessDTO = toDTO(sceneProcessPo, null);
-                deleteProcessDefinition(sceneProcessDTO);
-            }
-        }
-        // 再删除场景
-        sceneDao.deleteById(sceneId);
-    }
-
-    private List<SceneProcessPo> listSceneProcessBySceneId(Long sceneId) {
-        QueryWrapper<SceneProcessPo> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(SceneProcessPo.BUSINESS_SCENE_ID, sceneId);
-        return sceneProcessDao.selectList(queryWrapper);
     }
 
     private ScenePo exist(Long id) {
