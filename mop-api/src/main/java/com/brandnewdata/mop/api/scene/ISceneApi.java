@@ -18,7 +18,7 @@ public interface ISceneApi {
     Result<List<SceneDto>> listByIds(@RequestBody SceneQuery req);
 
     @RequestMapping(value = "/api/scene/version/process/asyncStart")
-    Result startVersionProcessAsync(ArrayList<VersionProcessStartDto> startDtoList);
+    Result startVersionProcessAsync(@RequestBody ArrayList<VersionProcessStartDto> startDtoList);
 
 
 }

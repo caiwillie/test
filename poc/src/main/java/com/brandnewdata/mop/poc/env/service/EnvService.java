@@ -38,7 +38,7 @@ public class EnvService implements IEnvService {
     public List<EnvServiceDto> fetchEnvService(Long envId) {
         Assert.notNull(envId, "环境不能为空");
         return envServiceCache.asMap().values().stream()
-                .filter(envServiceDto -> NumberUtil.equals(envServiceDto.getEnvId(), envServiceDto.getEnvId()))
+                .filter(envServiceDto -> NumberUtil.equals(envId, envServiceDto.getEnvId()))
                 .collect(Collectors.toList());
     }
 

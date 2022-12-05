@@ -91,7 +91,7 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
 
             QueryWrapper<ProcessReleaseDeployPo> query = new QueryWrapper<>();
             query.eq(ProcessReleaseDeployPo.PROCESS_ID, step1Result.getProcessId());
-            query.eq(ProcessReleaseDeployPo.ENV_ID, envIdList);
+            query.eq(ProcessReleaseDeployPo.ENV_ID, envId);
             ProcessReleaseDeployPo po = releaseDeployDao.selectOne(query);
             ZeebeDeployBo bo;
             if(po == null) {

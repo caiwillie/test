@@ -208,9 +208,7 @@ public class SceneVersionService implements ISceneVersionService {
         Assert.notEmpty(envIdList, "环境列表不能为空");
         Assert.notNull(version, "版本不能为空");
         Assert.isFalse(StrUtil.equals(sceneVersionDto.getVersion(), version), "请修改为正式版本号");
-
-        // 查询场景
-        sceneVersionDto.getSceneId();
+        sceneVersionDto.setVersion(version);
 
         // 查询版本下的流程
         List<VersionProcessDto> versionProcessDtoList =
