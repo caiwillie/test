@@ -15,6 +15,7 @@ import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
 import com.brandnewdata.mop.poc.process.util.ProcessUtil;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,8 +41,12 @@ public class ConnectorApi implements IConnectorApi {
         Assert.isFalse(CollUtil.isEmpty(operates) && CollUtil.isEmpty(triggers),
                 "操作和触发器不能都为空");
         List<EnvDto> envDtoList = envService.fetchEnvList();
-        Assert.notEmpty(envDtoList, "环境列表为空");
-        List<Long> envIdList = envDtoList.stream().map(EnvDto::getId).collect(Collectors.toList());
+        EnvDto debugEnvDto = envService.fetchDebugEnv();
+        List<Long> envIdList = new ArrayList<>();
+
+        // debug env 和 normal env 都需要发布连接器
+        envIdList.add(debugEnvDto.getId());
+        envDtoList.forEach(envDto -> envIdList.add(envDto.getId()));
 
         // 部署触发器
         if(CollUtil.isNotEmpty(triggers)) {
