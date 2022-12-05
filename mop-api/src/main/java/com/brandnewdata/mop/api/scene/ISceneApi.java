@@ -1,6 +1,8 @@
 package com.brandnewdata.mop.api.scene;
 
 import com.brandnewdata.common.webresult.Result;
+import com.brandnewdata.mop.api.scene.dto.SceneQuery;
+import com.brandnewdata.mop.api.scene.dto.SceneDto;
 import com.brandnewdata.mop.api.scene.dto.VersionProcessStartDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,7 +15,7 @@ import java.util.List;
 public interface ISceneApi {
 
     @RequestMapping("/api/scene/listByIds")
-    Result<List<SceneResp>> listByIds(@RequestBody ListSceneReq req);
+    Result<List<SceneDto>> listByIds(@RequestBody SceneQuery req);
 
     @RequestMapping(value = "/api/scene/version/process/asyncStart")
     Result startVersionProcessAsync(ArrayList<VersionProcessStartDto> startDtoList);

@@ -1,12 +1,13 @@
-package com.brandnewdata.mop.api.scene;
+package com.brandnewdata.mop.api.scene.dto;
 
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
-public class SceneResp {
-
+public class SceneDto {
     /**
      * 场景 id
      */
@@ -20,15 +21,13 @@ public class SceneResp {
     /**
      * 创建时间
      */
-    private String createTime;
+    private LocalDateTime createTime;
 
     /**
      * 修改时间
      */
-    private String updateTime;
+    private LocalDateTime updateTime;
 
-    /**
-     * 图片URL
-     */
-    private String imgUrl;
+
+
 }

@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.api.dto;
+package com.brandnewdata.mop.api.connector.dto;
 
 import lombok.Data;
 

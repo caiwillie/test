@@ -1,18 +1,14 @@
 package com.brandnewdata.mop.poc.scene.api;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Opt;
 import cn.hutool.core.map.MapUtil;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.api.scene.ISceneApi;
-import com.brandnewdata.mop.api.scene.ListSceneReq;
-import com.brandnewdata.mop.api.scene.SceneResp;
+import com.brandnewdata.mop.api.scene.dto.SceneQuery;
 import com.brandnewdata.mop.api.scene.dto.VersionProcessStartDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
-import com.brandnewdata.mop.poc.scene.dto.SceneDto;
 import com.brandnewdata.mop.poc.scene.dto.SceneReleaseDeployDto;
 import com.brandnewdata.mop.poc.scene.service.ISceneService;
 import com.dxy.library.json.jackson.JacksonUtil;
@@ -21,8 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 public class SceneApi implements ISceneApi {
@@ -38,14 +32,8 @@ public class SceneApi implements ISceneApi {
     }
 
     @Override
-    public Result<List<SceneResp>> listByIds(ListSceneReq req) {
-        List<Long> ids = Optional.ofNullable(req).map(ListSceneReq::getIdList).orElse(ListUtil.empty());
-
-        List<SceneDto> sceneDtos = service.listByIds(ids);
-
-        List<SceneResp> sceneResps = sceneDtos.stream().map(this::toDTO).collect(Collectors.toList());
-
-        return Result.OK(sceneResps);
+    public Result<List<com.brandnewdata.mop.api.scene.dto.SceneDto>> listByIds(SceneQuery req) {
+        return null;
     }
 
     @Override
@@ -68,13 +56,4 @@ public class SceneApi implements ISceneApi {
         return ret;
     }
 
-    private SceneResp toDTO(SceneDto sceneDTO) {
-        SceneResp sceneResp = new SceneResp();
-        sceneResp.setId(sceneDTO.getId());
-        sceneResp.setName(sceneDTO.getName());
-        sceneResp.setCreateTime(LocalDateTimeUtil.formatNormal(sceneDTO.getCreateTime()));
-        sceneResp.setUpdateTime(LocalDateTimeUtil.formatNormal(sceneDTO.getUpdateTime()));
-        sceneResp.setImgUrl(sceneDTO.getImgUrl());
-        return sceneResp;
-    }
 }
