@@ -15,6 +15,8 @@ public class ProxyEndpointCallDto {
 
     private LocalDateTime updateTime;
 
+    private LocalDateTime startTime;
+
     private Long proxyId;
 
     private String proxyName;
@@ -25,9 +27,9 @@ public class ProxyEndpointCallDto {
 
     private Long endpointId;
 
-    private String ip;
+    private String ipAddress;
 
-    private String mac;
+    private String macAddress;
 
     private String userAgent;
 
@@ -35,10 +37,14 @@ public class ProxyEndpointCallDto {
 
     private String httpStatus;
 
-    private String httpQuery;
+    private String requestQuery;
 
-    private String httpBody;
+    private String requestBody;
 
     private Integer timeConsuming;
+
+    private String responseBody;
+
+    private String errorMessage;
 
 }

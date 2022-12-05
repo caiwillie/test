@@ -14,8 +14,8 @@ import java.util.Date;
  * 
  * </p>
  *
- * @author caiwillie
- * @since 2022-12-02
+ * @author caiwilie
+ * @since 2022-12-05
  */
 @Getter
 @Setter
@@ -32,11 +32,13 @@ public class ProxyEndpointCallPo implements Serializable {
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
 
+    private Date startTime;
+
     private Long endpointId;
 
-    private String ip;
+    private String ipAddress;
 
-    private String mac;
+    private String macAddress;
 
     private String userAgent;
 
@@ -44,11 +46,15 @@ public class ProxyEndpointCallPo implements Serializable {
 
     private String httpStatus;
 
-    private String httpQuery;
+    private String requestQuery;
 
-    private String httpBody;
+    private String requestBody;
 
     private Integer timeConsuming;
+
+    private String responseBody;
+
+    private String errorMessage;
 
 
     public static final String ID = "id";
@@ -57,11 +63,13 @@ public class ProxyEndpointCallPo implements Serializable {
 
     public static final String UPDATE_TIME = "update_time";
 
+    public static final String START_TIME = "start_time";
+
     public static final String ENDPOINT_ID = "endpoint_id";
 
-    public static final String IP = "ip";
+    public static final String IP_ADDRESS = "ip_address";
 
-    public static final String MAC = "mac";
+    public static final String MAC_ADDRESS = "mac_address";
 
     public static final String USER_AGENT = "user_agent";
 
@@ -69,10 +77,14 @@ public class ProxyEndpointCallPo implements Serializable {
 
     public static final String HTTP_STATUS = "http_status";
 
-    public static final String HTTP_QUERY = "http_query";
+    public static final String REQUEST_QUERY = "request_query";
 
-    public static final String HTTP_BODY = "http_body";
+    public static final String REQUEST_BODY = "request_body";
 
     public static final String TIME_CONSUMING = "time_consuming";
+
+    public static final String RESPONSE_BODY = "response_body";
+
+    public static final String ERROR_MESSAGE = "error_message";
 
 }

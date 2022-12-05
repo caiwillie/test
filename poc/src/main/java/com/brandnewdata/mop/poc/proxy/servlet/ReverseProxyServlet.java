@@ -1,30 +1,33 @@
 package com.brandnewdata.mop.poc.proxy.servlet;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
-import cn.hutool.http.ContentType;
-import cn.hutool.http.HttpUtil;
 import cn.hutool.http.Method;
+import com.brandnewdata.mop.poc.constant.ProcessConst;
 import com.brandnewdata.mop.poc.constant.ProxyConst;
-import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
+import com.brandnewdata.mop.poc.process.dto.BizDeployDto;
+import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
+import com.brandnewdata.mop.poc.proxy.bo.ProxyEndpointSceneBo;
 import com.brandnewdata.mop.poc.proxy.bo.ProxyEndpointServerBo;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointCallDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto;
-import com.brandnewdata.mop.poc.proxy.dto.old.ProcessConfig;
 import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyAService;
 import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyEndpointAService;
+import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyEndpointCallAService;
 import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyEndpointSceneAService;
+import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
+import com.brandnewdata.mop.poc.scene.service.IVersionProcessService;
 import com.dxy.library.json.jackson.JacksonUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.utils.URIUtils;
 import org.mitre.dsmiley.httpproxy.ProxyServlet;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebInitParam;
@@ -36,20 +39,22 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @WebServlet(urlPatterns = "/proxy/*", initParams = {
 @WebInitParam(name = ProxyServlet.P_TARGET_URI, value = "http://www.brandnewdata.com")})
 public class ReverseProxyServlet extends ProxyServlet {
-    @Autowired
-    private IProcessDeployService deployService;
-
     private final IProxyAService proxyAService;
 
     private final IProxyEndpointAService proxyEndpointAService;
 
     private final IProxyEndpointSceneAService proxyEndpointSceneAService;
+
+    private final IProxyEndpointCallAService proxyEndpointCallAService;
+
+    private final IProcessDeployService2 deployService2;
+
+    private final IVersionProcessService processService;
 
     private static final String ATTR_TARGET_URI =
             ProxyServlet.class.getSimpleName() + ".targetUri";
@@ -57,14 +62,18 @@ public class ReverseProxyServlet extends ProxyServlet {
     private static final String ATTR_TARGET_HOST =
             ProxyServlet.class.getSimpleName() + ".targetHost";
 
-    public ReverseProxyServlet(IProcessDeployService deployService,
-                               IProxyAService proxyAService,
+    public ReverseProxyServlet(IProxyAService proxyAService,
                                IProxyEndpointAService proxyEndpointAService,
-                               IProxyEndpointSceneAService proxyEndpointSceneAService) {
-        this.deployService = deployService;
+                               IProxyEndpointSceneAService proxyEndpointSceneAService,
+                               IProxyEndpointCallAService proxyEndpointCallAService,
+                               IProcessDeployService2 deployService2,
+                               IVersionProcessService processService) {
         this.proxyAService = proxyAService;
         this.proxyEndpointAService = proxyEndpointAService;
         this.proxyEndpointSceneAService = proxyEndpointSceneAService;
+        this.proxyEndpointCallAService = proxyEndpointCallAService;
+        this.deployService2 = deployService2;
+        this.processService = processService;
     }
 
     @Override
@@ -102,22 +111,23 @@ public class ReverseProxyServlet extends ProxyServlet {
             updateFrom(proxyEndpointCallDto, request);
 
             if (NumberUtil.equals(endpointDto.getBackendType(), ProxyConst.BACKEND_TYPE__SERVER)) {
-                ProxyEndpointServerBo proxyEndpointServerBo = proxyEndpointAService.parseServerConfig(backendConfig);
-                forward(request, response, proxyEndpointServerBo);
+                ProxyEndpointServerBo config = proxyEndpointAService.parseServerConfig(backendConfig);
+                forward(request, response, config);
             } else {
-                proxyEndpointSceneAService.parseConfig(backendConfig);
+                ProxyEndpointSceneBo config = proxyEndpointSceneAService.parseConfig(backendConfig);
+                callProcess(request, response, config);
             }
 
             int status = response.getStatus();
-
-
+            proxyEndpointCallDto.setHttpStatus(String.valueOf(status));
         } catch (Exception e) {
             log.error("ReverseProxyServlet.service error", e);
             proxyEndpointCallDto.setHttpStatus("500");
-            proxyEndpointCallDto.setHttpBody(e.getMessage());
+            proxyEndpointCallDto.setErrorMessage(e.getMessage());
         } finally {
             long time = LocalDateTimeUtil.between(startTime, LocalDateTime.now()).toMillis();
             proxyEndpointCallDto.setTimeConsuming((int)time);
+            proxyEndpointCallAService.save(proxyEndpointCallDto);
         }
 
     }
@@ -143,33 +153,42 @@ public class ReverseProxyServlet extends ProxyServlet {
 
         dto.setUserAgent(userAgent);
         dto.setHttpMethod(httpMethod);
-        dto.setHttpQuery(queryString);
-        dto.setHttpBody(body);
+        dto.setRequestBody(queryString);
+        dto.setRequestQuery(body);
     }
 
+    private void callProcess(HttpServletRequest request, HttpServletResponse response, ProxyEndpointSceneBo config) {
+        Map<String, Object> variables = getVariables(request);
 
-    private void startProcess(HttpServletRequest request, HttpServletResponse response, ProcessConfig config) {
-        String body = ServletUtil.getBody(request);
-
-        String contentType = HttpUtil.getContentTypeByRequestBody(body);
-        Map<String, Object> variables = new HashMap<>();
-
-        // 将query参数放入map中
-        variables.putAll(ServletUtil.getParamMap(request));
-
-        // 如果content type是JSON，将body参数放入map中
-        if(StrUtil.equals(contentType, ContentType.JSON.toString())
-                && StrUtil.isNotBlank(body)) {
-            // 如果是json类型，并且是object
-            variables.putAll(JacksonUtil.fromMap(body));
-        }
-
-        String errorMessage = null;
+        Long envId = config.getEnvId();
         String processId = config.getProcessId();
-        Map<String, Object> result = deployService.startWithResult(processId, variables);
-        log.info("response is: {}", JacksonUtil.to(result));
-        result = Optional.ofNullable(result).orElse(MapUtil.empty());
+        String processName = config.getProcessName();
+        VersionProcessDto versionProcessDto = processService.fetchVersionProcessByProcessId(ListUtil.of(processId)).get(processId);
+        Assert.notNull(versionProcessDto, "process not found: {}", processId);
+        String processXml = versionProcessDto.getProcessXml();
+
+        BizDeployDto bizDeployDto = new BizDeployDto();
+        bizDeployDto.setProcessId(processId);
+        bizDeployDto.setProcessName(processName);
+        bizDeployDto.setProcessXml(processXml);
+
+        Map<String, Object> result = deployService2.startSync(bizDeployDto, variables, envId, ProcessConst.PROCESS_BIZ_TYPE__SCENE);
         ServletUtil.write(response, JacksonUtil.to(result), "application/json;charset=utf-8");
+    }
+
+    private Map<String, Object> getVariables(HttpServletRequest request) {
+        Map<String, Object> ret = new HashMap<>();
+        Map<String, String> paramMap = ServletUtil.getParamMap(request);
+        if(CollUtil.isNotEmpty(paramMap)) ret.putAll(paramMap);
+
+        if (StrUtil.equals(request.getMethod(), Method.POST.name())) {
+            String contentType = request.getHeader("Content-Type");
+            Assert.isTrue(StrUtil.equals(contentType, "application/json"), "Content-Type must be application/json");
+            String body = ServletUtil.getBody(request);
+            Map<String, Object> bodyMap = JacksonUtil.fromMap(body);
+            if(CollUtil.isNotEmpty(bodyMap)) ret.putAll(bodyMap);
+        }
+        return ret;
     }
 
     @SneakyThrows

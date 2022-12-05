@@ -11,14 +11,17 @@ public class ProxyEndpointCallDtoConverter {
         dto.setId(po.getId());
         dto.setCreateTime(Opt.of(po.getCreateTime()).map(LocalDateTimeUtil::of).orElse(null));
         dto.setUpdateTime(Opt.of(po.getUpdateTime()).map(LocalDateTimeUtil::of).orElse(null));
+        dto.setStartTime(Opt.of(po.getStartTime()).map(LocalDateTimeUtil::of).orElse(null));
         dto.setEndpointId(po.getEndpointId());
-        dto.setIp(po.getIp());
-        dto.setMac(po.getMac());
+        dto.setIpAddress(po.getIpAddress());
+        dto.setMacAddress(po.getMacAddress());
         dto.setUserAgent(po.getUserAgent());
         dto.setHttpMethod(po.getHttpMethod());
         dto.setHttpStatus(po.getHttpStatus());
-        dto.setHttpQuery(po.getHttpQuery());
-        dto.setHttpBody(po.getHttpBody());
+        dto.setRequestQuery(po.getRequestQuery());
+        dto.setRequestBody(po.getRequestBody());
+        dto.setResponseBody(po.getResponseBody());
+        dto.setErrorMessage(po.getErrorMessage());
         dto.setTimeConsuming(po.getTimeConsuming());
         return dto;
     }

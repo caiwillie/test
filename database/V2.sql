@@ -60,4 +60,5 @@ CHANGE COLUMN `mac` `mac_address` varchar(255) CHARACTER SET utf8 COLLATE utf8_g
 CHANGE COLUMN `http_query` `request_query` varchar(1024) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
 CHANGE COLUMN `http_body` `request_body` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
 ADD COLUMN `response_body` text NULL,
-ADD COLUMN `error_message` text NULL;
+ADD COLUMN `error_message` text NULL,
+ADD COLUMN `start_time` datetime NOT NULL;

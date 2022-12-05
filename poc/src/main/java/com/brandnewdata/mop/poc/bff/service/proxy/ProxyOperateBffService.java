@@ -11,8 +11,8 @@ import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointCallDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto;
 import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyAService;
 import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyEndpointAService;
-import com.brandnewdata.mop.poc.proxy.service.combined.IProxyEndpointCService;
 import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyEndpointCallAService;
+import com.brandnewdata.mop.poc.proxy.service.combined.IProxyEndpointCService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

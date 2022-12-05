@@ -2,9 +2,11 @@ package com.brandnewdata.mop.poc.proxy.service.atomic;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.proxy.converter.ProxyEndpointCallDtoConverter;
+import com.brandnewdata.mop.poc.proxy.converter.ProxyEndpointCallPoConverter;
 import com.brandnewdata.mop.poc.proxy.dao.ProxyEndpointCallDao;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointCallDto;
 import com.brandnewdata.mop.poc.proxy.po.ProxyEndpointCallPo;
@@ -42,8 +44,9 @@ public class ProxyEndpointCallAService implements IProxyEndpointCallAService {
 
     @Override
     public ProxyEndpointCallDto save(ProxyEndpointCallDto dto) {
-
-        return null;
+        dto.setId(IdUtil.getSnowflakeNextId());
+        proxyEndpointCallDao.insert(ProxyEndpointCallPoConverter.createFrom(dto));
+        return dto;
     }
 
 }

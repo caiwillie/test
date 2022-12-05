@@ -8,8 +8,8 @@ import com.brandnewdata.mop.poc.proxy.po.ProxyEndpointCallPo;
  *  Mapper 接口
  * </p>
  *
- * @author caiwillie
- * @since 2022-12-02
+ * @author caiwilie
+ * @since 2022-12-05
  */
 public interface ProxyEndpointCallDao extends BaseMapper<ProxyEndpointCallPo> {
 
