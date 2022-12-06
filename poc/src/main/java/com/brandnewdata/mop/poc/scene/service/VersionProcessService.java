@@ -163,4 +163,10 @@ public class VersionProcessService implements IVersionProcessService {
         }
     }
 
+    @Override
+    public boolean checkReleaseVersion(String version) {
+
+        return false;
+    }
+
 }

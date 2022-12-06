@@ -17,6 +17,7 @@ import com.brandnewdata.mop.poc.env.service.IEnvService;
 import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService2;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
+import com.brandnewdata.mop.poc.scene.bo.SceneVersionBo;
 import com.brandnewdata.mop.poc.scene.converter.SceneReleaseDeployDtoConverter;
 import com.brandnewdata.mop.poc.scene.converter.SceneVersionDtoConverter;
 import com.brandnewdata.mop.poc.scene.converter.SceneVersionPoConverter;
@@ -67,27 +68,31 @@ public class SceneVersionService implements ISceneVersionService {
     }
 
     @Override
-    public Map<Long, SceneVersionDto> fetchLatestVersion(List<Long> sceneIdList) {
-        if(CollUtil.isEmpty(sceneIdList)) return MapUtil.empty();
+    public Map<Long, SceneVersionDto> fetchLatestOneBySceneId(List<Long> sceneIdList, List<Integer> statusList) {
+        if (CollUtil.isEmpty(sceneIdList)) return MapUtil.empty();
         Map<Long, List<SceneVersionDto>> sceneVersionListMap = fetchSceneVersionListBySceneId(sceneIdList);
         Map<Long, SceneVersionDto> ret = new HashMap<>();
+
         for (Long sceneId : sceneIdList) {
             List<SceneVersionDto> sceneVersionDtoList = sceneVersionListMap.get(sceneId);
-            if(CollUtil.isEmpty(sceneVersionDtoList)) {
+            if (CollUtil.isEmpty(sceneVersionDtoList)) {
                 log.error("场景版本数据异常。sceneId：{}", sceneId);
                 throw new RuntimeException("【01】场景版本数据异常");
             }
             // 选择状态不是“已停止”的最新版本; 如果状态都是“已停止”，选择最新版本
-            Optional<SceneVersionDto> versionOpt = sceneVersionDtoList.stream().filter(sceneVersionPo ->
-                    !NumberUtil.equals(sceneVersionPo.getStatus(), SceneConst.SCENE_VERSION_STATUS__STOPPED)).findFirst();
-            ret.put(sceneId, versionOpt.orElseGet(() -> sceneVersionDtoList.get(0)));
+            Optional<SceneVersionDto> versionOpt = sceneVersionDtoList.stream().filter(sceneVersionDto -> {
+                        if (CollUtil.isEmpty(statusList)) return true;
+                        else return statusList.contains(sceneVersionDto.getStatus());
+                    })
+                    .findFirst();
+            ret.put(sceneId, versionOpt.orElse(null));
         }
         return ret;
     }
 
     @Override
     public Map<Long, List<SceneVersionDto>> fetchSceneVersionListBySceneId(List<Long> sceneIdList) {
-        if(CollUtil.isEmpty(sceneIdList)) return MapUtil.empty();
+        if (CollUtil.isEmpty(sceneIdList)) return MapUtil.empty();
         long count = sceneIdList.stream().filter(Objects::isNull).count();
         Assert.isTrue(count == 0, "场景id列表不能存在空值");
         QueryWrapper<SceneVersionPo> query = new QueryWrapper<>();
@@ -108,7 +113,7 @@ public class SceneVersionService implements ISceneVersionService {
     @Override
     public VersionProcessDto saveProcess(VersionProcessDto dto) {
         Long versionId = dto.getVersionId();
-        getAndCheckStatus(versionId, new int[] {SceneConst.SCENE_VERSION_STATUS__CONFIGURING});
+        getAndCheckStatus(versionId, new int[]{SceneConst.SCENE_VERSION_STATUS__CONFIGURING});
         return versionProcessService.save(dto);
     }
 
@@ -251,7 +256,7 @@ public class SceneVersionService implements ISceneVersionService {
 
     @Override
     public Map<Long, Long> countById(List<Long> idList) {
-        if(CollUtil.isEmpty(idList)) return MapUtil.empty();
+        if (CollUtil.isEmpty(idList)) return MapUtil.empty();
         Assert.isTrue(idList.stream().filter(Objects::isNull).count() == 0, "版本id不能为空");
         QueryWrapper<SceneVersionPo> query = new QueryWrapper<>();
         query.in(SceneVersionPo.ID, idList);
@@ -268,7 +273,7 @@ public class SceneVersionService implements ISceneVersionService {
 
     @Override
     public Map<Long, SceneVersionDto> fetchById(List<Long> idList) {
-        if(CollUtil.isEmpty(idList)) return MapUtil.empty();
+        if (CollUtil.isEmpty(idList)) return MapUtil.empty();
         Assert.isTrue(idList.stream().filter(Objects::isNull).count() == 0, "版本id不能为空");
         QueryWrapper<SceneVersionPo> query = new QueryWrapper<>();
         query.in(SceneVersionPo.ID, idList);
@@ -286,7 +291,7 @@ public class SceneVersionService implements ISceneVersionService {
         Long sceneId = oldSceneVersionDto.getSceneId();
 
         // check latest version status
-        SceneVersionDto latestSceneVersionDto = fetchLatestVersion(ListUtil.of(sceneId)).get(sceneId);
+        SceneVersionDto latestSceneVersionDto = fetchLatestOneBySceneId(ListUtil.of(sceneId), null).get(sceneId);
         if (NumberUtil.equals(latestSceneVersionDto.getStatus(), SceneConst.SCENE_VERSION_STATUS__DEBUGGING)) {
             throw new RuntimeException("请先退出调试模式");
         } else if (NumberUtil.equals(latestSceneVersionDto.getStatus(), SceneConst.SCENE_VERSION_STATUS__CONFIGURING)) {
@@ -312,7 +317,7 @@ public class SceneVersionService implements ISceneVersionService {
         Long latestVersionId = latestSceneVersionDto.getId();
         List<VersionProcessDto> latestVersionProcessDtoList =
                 versionProcessService.fetchListByVersionId(ListUtil.of(latestVersionId), true).get(latestVersionId);
-        if(CollUtil.isNotEmpty(latestVersionProcessDtoList)) {
+        if (CollUtil.isNotEmpty(latestVersionProcessDtoList)) {
             List<Long> idList = latestVersionProcessDtoList.stream().map(VersionProcessDto::getId).collect(Collectors.toList());
             versionProcessService.deleteById(idList);
         }
@@ -332,6 +337,16 @@ public class SceneVersionService implements ISceneVersionService {
         return latestSceneVersionDto;
     }
 
+    @Override
+    public boolean checkNewReleaseVersion(Long sceneId, String version) {
+        SceneVersionDto sceneVersionDto = fetchLatestOneBySceneId(ListUtil.of(sceneId),
+                ListUtil.of(SceneConst.SCENE_VERSION_STATUS__RUNNING, SceneConst.SCENE_VERSION_STATUS__STOPPED)).get(sceneId);
+        if(sceneVersionDto == null) return true;
+        return false;
+    }
+
+
+
     private SceneVersionDto getAndCheckStatus(Long id, int[] statusArr) {
         Assert.notNull(id, "版本ID不能为空");
 
@@ -340,13 +355,13 @@ public class SceneVersionService implements ISceneVersionService {
 
         boolean flag = false;
         for (int status : statusArr) {
-            if(NumberUtil.equals(versionDto.getStatus(), status)) {
+            if (NumberUtil.equals(versionDto.getStatus(), status)) {
                 flag = true;
                 break;
             }
         }
 
-        if(!flag) {
+        if (!flag) {
             throw new RuntimeException(StrUtil.format("版本状态异常，id: {}", id));
         } else {
             return versionDto;

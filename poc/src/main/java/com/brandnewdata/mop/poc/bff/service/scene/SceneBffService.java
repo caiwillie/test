@@ -80,7 +80,7 @@ public class SceneBffService {
 
         // 获取所有场景的最新版本
         List<Long> sceneIdList = records.stream().map(SceneDto2::getId).collect(Collectors.toList());
-        Map<Long, SceneVersionDto> sceneVersionDtoMap = sceneVersionService.fetchLatestVersion(sceneIdList);
+        Map<Long, SceneVersionDto> sceneVersionDtoMap = sceneVersionService.fetchLatestOneBySceneId(sceneIdList, null);
         List<Long> versionIdList = sceneVersionDtoMap.values().stream().map(SceneVersionDto::getId).collect(Collectors.toList());
 
         // 获取某版本下的流程个数
