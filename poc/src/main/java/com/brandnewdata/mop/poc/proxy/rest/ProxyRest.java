@@ -26,8 +26,6 @@ public class ProxyRest {
     @Resource
     private EndpointService endpointService;
 
-
-
     /**
      * API详情
      *
