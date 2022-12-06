@@ -13,10 +13,8 @@ import com.brandnewdata.mop.poc.process.manager.dto.ConfigInfo;
 import com.brandnewdata.mop.poc.process.manager.dto.ConnectorBasicInfo;
 import com.brandnewdata.mop.poc.process.manager.dto.TriggerInfo;
 import com.brandnewdata.mop.poc.process.parser.dto.Action;
-import com.brandnewdata.mop.poc.process.parser.dto.Step2Result;
 import com.brandnewdata.mop.poc.scene.dto.SceneReleaseDeployDto;
 import com.dxy.library.json.jackson.JacksonUtil;
-import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
