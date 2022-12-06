@@ -29,6 +29,7 @@ import com.brandnewdata.mop.poc.scene.po.SceneVersionPo;
 import com.brandnewdata.mop.poc.util.CollectorsUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -135,7 +136,7 @@ public class SceneVersionService implements ISceneVersionService {
         // 查询流程
         Long id = dto.getId();
         Assert.notNull(id, "流程不能为空");
-        VersionProcessDto versionProcessDto = versionProcessService.fetchVersionProcessById(ListUtil.of(id)).get(id);
+        VersionProcessDto versionProcessDto = versionProcessService.fetchOneById(ListUtil.of(id)).get(id);
         Assert.notNull(versionProcessDto, "流程不存在: {}", id);
 
         // 查询调试环境
@@ -154,7 +155,7 @@ public class SceneVersionService implements ISceneVersionService {
 
         // 获取版本下的流程
         List<VersionProcessDto> versionProcessDtoList =
-                versionProcessService.fetchVersionProcessListByVersionId(ListUtil.of(id), false).get(id);
+                versionProcessService.fetchListByVersionId(ListUtil.of(id), false).get(id);
         Assert.isTrue(CollUtil.isNotEmpty(versionProcessDtoList), "该版本下至少需要配置一个流程");
 
         Assert.notNull(envId, "环境id不能为空");
@@ -216,7 +217,7 @@ public class SceneVersionService implements ISceneVersionService {
 
         // 查询版本下的流程
         List<VersionProcessDto> versionProcessDtoList =
-                versionProcessService.fetchVersionProcessListByVersionId(ListUtil.of(id), false).get(id);
+                versionProcessService.fetchListByVersionId(ListUtil.of(id), false).get(id);
         Assert.isTrue(CollUtil.isNotEmpty(versionProcessDtoList), "该版本下至少需要配置一个流程");
 
         // 发布到zeebe
@@ -277,36 +278,58 @@ public class SceneVersionService implements ISceneVersionService {
     }
 
     @Override
+    @Transactional
     public SceneVersionDto copyToNew(Long id) {
         SceneVersionDto oldSceneVersionDto = getAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__RUNNING,
                 SceneConst.SCENE_VERSION_STATUS__STOPPED});
 
-        // build new scene version
-        SceneVersionDto newSceneVersionDto = new SceneVersionDto();
-        newSceneVersionDto.setSceneId(oldSceneVersionDto.getSceneId());
-        newSceneVersionDto.setVersion(LocalDateTimeUtil.format(LocalDateTime.now(), DatePattern.PURE_DATETIME_PATTERN));
-        newSceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__CONFIGURING);
-        SceneVersionPo newSceneVersionPo = SceneVersionPoConverter.createFrom(newSceneVersionDto);
-        sceneVersionDao.insert(newSceneVersionPo);
-        Long newVersionId = newSceneVersionPo.getId();
+        Long sceneId = oldSceneVersionDto.getSceneId();
+
+        // check latest version status
+        SceneVersionDto latestSceneVersionDto = fetchLatestVersion(ListUtil.of(sceneId)).get(sceneId);
+        if (NumberUtil.equals(latestSceneVersionDto.getStatus(), SceneConst.SCENE_VERSION_STATUS__DEBUGGING)) {
+            throw new RuntimeException("请先退出调试模式");
+        } else if (NumberUtil.equals(latestSceneVersionDto.getStatus(), SceneConst.SCENE_VERSION_STATUS__CONFIGURING)) {
+            // update old version name
+            latestSceneVersionDto.setVersion(LocalDateTimeUtil.format(LocalDateTime.now(), DatePattern.PURE_DATETIME_PATTERN));
+            sceneVersionDao.updateById(SceneVersionPoConverter.createFrom(latestSceneVersionDto));
+        } else {
+            // build new version
+            latestSceneVersionDto = new SceneVersionDto();
+            latestSceneVersionDto.setSceneId(sceneId);
+            latestSceneVersionDto.setVersion(LocalDateTimeUtil.format(LocalDateTime.now(), DatePattern.PURE_DATETIME_PATTERN));
+            latestSceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__CONFIGURING);
+            SceneVersionPo sceneVersionPo = SceneVersionPoConverter.createFrom(latestSceneVersionDto);
+            sceneVersionDao.insert(sceneVersionPo);
+            latestSceneVersionDto.setId(sceneVersionPo.getId());
+        }
 
         // 查询版本下的流程
         List<VersionProcessDto> versionProcessDtoList =
-                versionProcessService.fetchVersionProcessListByVersionId(ListUtil.of(id), false).get(id);
+                versionProcessService.fetchListByVersionId(ListUtil.of(id), false).get(id);
+
+        // delete old version process
+        Long latestVersionId = latestSceneVersionDto.getId();
+        List<VersionProcessDto> latestVersionProcessDtoList =
+                versionProcessService.fetchListByVersionId(ListUtil.of(latestVersionId), true).get(latestVersionId);
+        if(CollUtil.isNotEmpty(latestVersionProcessDtoList)) {
+            List<Long> idList = latestVersionProcessDtoList.stream().map(VersionProcessDto::getId).collect(Collectors.toList());
+            versionProcessService.deleteById(idList);
+        }
 
         // build new version process
-        for (VersionProcessDto versionProcessDto : versionProcessDtoList) {
+        for (VersionProcessDto versionProcessDto : latestVersionProcessDtoList) {
             BpmnXmlDto bpmnXmlDto = new BpmnXmlDto();
             bpmnXmlDto.setProcessId(versionProcessDto.getProcessId());
             bpmnXmlDto.setProcessName(versionProcessDto.getProcessName());
             bpmnXmlDto.setProcessXml(versionProcessDto.getProcessXml());
             BpmnXmlDto newBpmnXmlDto = processDefinitionService.replaceProcessId(bpmnXmlDto);
             VersionProcessDto newVersionProcessDto = VersionProcessDtoConverter
-                    .createFrom(newVersionId, newBpmnXmlDto, versionProcessDto.getProcessImg());
+                    .createFrom(latestVersionId, newBpmnXmlDto, versionProcessDto.getProcessImg());
             versionProcessService.save(newVersionProcessDto);
         }
 
-        return newSceneVersionDto;
+        return latestSceneVersionDto;
     }
 
     private SceneVersionDto getAndCheckStatus(Long id, int[] statusArr) {

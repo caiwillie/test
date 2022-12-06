@@ -84,9 +84,9 @@ public class SceneBffService {
         List<Long> versionIdList = sceneVersionDtoMap.values().stream().map(SceneVersionDto::getId).collect(Collectors.toList());
 
         // 获取某版本下的流程个数
-        Map<Long, Integer> countMap = versionProcessService.fetchVersionProcessCountByVersionId(versionIdList);
+        Map<Long, Integer> countMap = versionProcessService.fetchCountByVersionId(versionIdList);
         // 获取某版本下的最新流程
-        Map<Long, VersionProcessDto> processDtoMap = versionProcessService.fetchLatestProcessByVersionId(versionIdList);
+        Map<Long, VersionProcessDto> processDtoMap = versionProcessService.fetchLatestOneByVersionId(versionIdList);
 
         for (SceneDto2 sceneDto : records) {
             SceneVo sceneVo = new SceneVo().from(sceneDto);
@@ -113,6 +113,7 @@ public class SceneBffService {
         Map<Long, List<EnvDto>> envDtoListMap = new HashMap<>();
         for (SceneVersionDto sceneVersionDto : sceneVersionDtoList) {
             List<SceneReleaseDeployDto> sceneReleaseDeployDtoList = sceneReleaseDeployDtoListMap.get(sceneVersionDto.getId());
+            if(sceneReleaseDeployDtoList == null) continue;
             List<EnvDto> envDtoList = sceneReleaseDeployDtoList.stream().map(sceneReleaseDeployDto -> {
                 EnvDto envDto = new EnvDto();
                 envDto.setId(sceneReleaseDeployDto.getEnvId());
@@ -130,7 +131,7 @@ public class SceneBffService {
     public List<VersionProcessVo> processList(Long versionId) {
         Assert.notNull(versionId, "版本id不能为空");
         List<VersionProcessDto> versionProcessDtoList =
-                versionProcessService.fetchVersionProcessListByVersionId(ListUtil.of(versionId), false).get(versionId);
+                versionProcessService.fetchListByVersionId(ListUtil.of(versionId), false).get(versionId);
         return Opt.ofNullable(versionProcessDtoList).orElse(ListUtil.empty()).stream()
                 .map(VersionProcessVoConverter::createFrom).collect(Collectors.toList());
     }
@@ -181,6 +182,7 @@ public class SceneBffService {
         return SceneVersionVoConverter.createFrom(dto);
     }
 
+
     public SceneVersionVo versionCopyToNew(SceneVersionVo oldSceneVersionVo) {
         SceneVersionDto sceneVersionDto = sceneVersionService.copyToNew(oldSceneVersionVo.getId());
         return SceneVersionVoConverter.createFrom(sceneVersionDto);
@@ -200,7 +202,7 @@ public class SceneBffService {
 
         // 获取该版本下当前的流程定义
         List<VersionProcessDto> versionProcessDtoList =
-                versionProcessService.fetchVersionProcessListByVersionId(ListUtil.of(versionId), true).get(versionId);
+                versionProcessService.fetchListByVersionId(ListUtil.of(versionId), true).get(versionId);
         if(CollUtil.isEmpty(versionProcessDtoList)) return new Page<>(0, ListUtil.empty());
         Map<String, VersionProcessDto> versionProcessDtoMap =
                 versionProcessDtoList.stream().collect(Collectors.toMap(VersionProcessDto::getProcessId, Function.identity()));

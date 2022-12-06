@@ -44,7 +44,7 @@ public class VersionProcessService implements IVersionProcessService {
     }
 
     @Override
-    public Map<Long, List<VersionProcessDto>> fetchVersionProcessListByVersionId(List<Long> versionIdList, boolean simple) {
+    public Map<Long, List<VersionProcessDto>> fetchListByVersionId(List<Long> versionIdList, boolean simple) {
         if(CollUtil.isEmpty(versionIdList)) return MapUtil.empty();
 
         QueryWrapper<VersionProcessPo> query = new QueryWrapper<>();
@@ -61,7 +61,7 @@ public class VersionProcessService implements IVersionProcessService {
     }
 
     @Override
-    public Map<Long, VersionProcessDto> fetchVersionProcessById(List<Long> idList) {
+    public Map<Long, VersionProcessDto> fetchOneById(List<Long> idList) {
         if(CollUtil.isEmpty(idList)) return MapUtil.empty();
         Assert.isFalse(CollUtil.hasNull(idList), "版本id列表不能含有空值");
 
@@ -75,7 +75,7 @@ public class VersionProcessService implements IVersionProcessService {
     }
 
     @Override
-    public Map<String, VersionProcessDto> fetchVersionProcessByProcessId(List<String> processIdList) {
+    public Map<String, VersionProcessDto> fetchOneByProcessId(List<String> processIdList) {
         if(CollUtil.isEmpty(processIdList)) return MapUtil.empty();
         Assert.isFalse(CollUtil.hasNull(processIdList), "流程id列表不能含有空值");
 
@@ -88,7 +88,7 @@ public class VersionProcessService implements IVersionProcessService {
     }
 
     @Override
-    public Map<Long, Integer> fetchVersionProcessCountByVersionId(List<Long> versionIdList) {
+    public Map<Long, Integer> fetchCountByVersionId(List<Long> versionIdList) {
         if(CollUtil.isEmpty(versionIdList)) return MapUtil.empty();
         Map<Long, Integer> ret = new HashMap<>();
         QueryWrapper<VersionProcessPo> query = new QueryWrapper<>();
@@ -107,14 +107,14 @@ public class VersionProcessService implements IVersionProcessService {
     }
 
     @Override
-    public Map<Long, VersionProcessDto> fetchLatestProcessByVersionId(List<Long> versionIdList) {
-        Map<Long, List<VersionProcessDto>> versionProcessListMap = fetchVersionProcessListByVersionId(versionIdList, true);
+    public Map<Long, VersionProcessDto> fetchLatestOneByVersionId(List<Long> versionIdList) {
+        Map<Long, List<VersionProcessDto>> versionProcessListMap = fetchListByVersionId(versionIdList, true);
         Map<Long, Long> idMap = versionProcessListMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> {
             List<VersionProcessDto> versionProcessDtos = entry.getValue();
             return versionProcessDtos.stream().max(Comparator.comparing(VersionProcessDto::getUpdateTime))
                     .map(VersionProcessDto::getId).orElse(-1L);
         }));
-        Map<Long, VersionProcessDto> versionProcessMap = fetchVersionProcessById(ListUtil.toList(idMap.values()));
+        Map<Long, VersionProcessDto> versionProcessMap = fetchOneById(ListUtil.toList(idMap.values()));
         return idMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> versionProcessMap.get(entry.getValue())));
     }
 
@@ -141,7 +141,7 @@ public class VersionProcessService implements IVersionProcessService {
             versionProcessDao.insert(VersionProcessPoConverter.createFrom(versionProcessDto));
         } else {
             VersionProcessDto updateContent = versionProcessDto;
-            versionProcessDto = fetchVersionProcessById(ListUtil.of(id)).get(id);
+            versionProcessDto = fetchOneById(ListUtil.of(id)).get(id);
             if(!StrUtil.equals(versionProcessDto.getProcessId(), processId)) {
                 throw new RuntimeException("流程id不能改变");
             }
@@ -152,6 +152,15 @@ public class VersionProcessService implements IVersionProcessService {
         }
 
         return versionProcessDto;
+    }
+
+    @Override
+    public void deleteById(List<Long> idList) {
+        if(CollUtil.isEmpty(idList)) return;
+        Assert.isFalse(CollUtil.hasNull(idList), "版本id列表不能含有空值");
+        for (Long id : idList) {
+            versionProcessDao.deleteById(id);
+        }
     }
 
 }

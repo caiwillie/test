@@ -7,17 +7,19 @@ import java.util.Map;
 
 public interface IVersionProcessService {
 
-    Map<Long, List<VersionProcessDto>> fetchVersionProcessListByVersionId(List<Long> versionIdList, boolean simple);
+    Map<Long, List<VersionProcessDto>> fetchListByVersionId(List<Long> versionIdList, boolean simple);
 
-    Map<Long, VersionProcessDto> fetchVersionProcessById(List<Long> idList);
+    Map<Long, VersionProcessDto> fetchOneById(List<Long> idList);
 
-    Map<String, VersionProcessDto> fetchVersionProcessByProcessId(List<String> processIdList);
+    Map<String, VersionProcessDto> fetchOneByProcessId(List<String> processIdList);
 
-    Map<Long, Integer> fetchVersionProcessCountByVersionId(List<Long> versionIdList);
+    Map<Long, Integer> fetchCountByVersionId(List<Long> versionIdList);
 
-    Map<Long, VersionProcessDto> fetchLatestProcessByVersionId(List<Long> versionIdList);
+    Map<Long, VersionProcessDto> fetchLatestOneByVersionId(List<Long> versionIdList);
 
     VersionProcessDto save(VersionProcessDto versionProcessDto);
+
+    void deleteById(List<Long> idList);
 
 
 }

@@ -10,9 +10,13 @@ import static com.brandnewdata.mop.poc.process.parser.constants.NamespaceConstan
 public interface QNameConstants {
 
     // bpmn2
-    String BPMN2_ALL_QNAME = StrUtil.format("{}:*", BPMN2.getPrefix());
+    String BPMN2_ALL_QNAME = StrUtil.format("{}:*", BPMN2_NAMESPACE.getPrefix());
 
-    QName BPMN2_T_FORMAL_EXPRESSION_QNAME = DocumentHelper.createQName(T_FORMAL_EXPRESSION_LOCALNAME, BPMN2);
+    QName BPMN2_T_FORMAL_EXPRESSION_QNAME = DocumentHelper.createQName(T_FORMAL_EXPRESSION_LOCALNAME, BPMN2_NAMESPACE);
+
+    QName BPMN2_DEFINITIONS_QNAME = DocumentHelper.createQName(DEFINITIONS_LOCALNAME, BPMN2_NAMESPACE);
+
+    QName BPMN2_PROCESS_QNAME = DocumentHelper.createQName(PROCESS_LOCALNAME, BPMN2_NAMESPACE);
 
     // bpmn
     QName BPMN_DEFINITIONS_QNAME = DocumentHelper.createQName(DEFINITIONS_LOCALNAME, BPMN_NAMESPACE);

@@ -163,7 +163,7 @@ public class ReverseProxyServlet extends ProxyServlet {
         Long envId = config.getEnvId();
         String processId = config.getProcessId();
         String processName = config.getProcessName();
-        VersionProcessDto versionProcessDto = processService.fetchVersionProcessByProcessId(ListUtil.of(processId)).get(processId);
+        VersionProcessDto versionProcessDto = processService.fetchOneByProcessId(ListUtil.of(processId)).get(processId);
         Assert.notNull(versionProcessDto, "process not found: {}", processId);
         String processXml = versionProcessDto.getProcessXml();
 

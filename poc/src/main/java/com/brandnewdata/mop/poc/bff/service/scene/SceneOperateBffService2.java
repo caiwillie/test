@@ -104,7 +104,7 @@ public class SceneOperateBffService2 {
     public ProcessDefinitionVo definitionProcessInstance(OperateProcessInstanceVo vo) {
         String processId = vo.getProcessId();
         VersionProcessDto versionProcessDto =
-                versionProcessService.fetchVersionProcessByProcessId(ListUtil.of(vo.getProcessId())).get(processId);
+                versionProcessService.fetchOneByProcessId(ListUtil.of(vo.getProcessId())).get(processId);
         Assert.notNull(versionProcessDto, "流程id不存在");
 
         return ProcessDefinitionVoConverter.createFrom(vo.getProcessId(), vo.getProcessName(), versionProcessDto.getProcessXml());

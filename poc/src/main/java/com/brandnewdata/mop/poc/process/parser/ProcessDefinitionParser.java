@@ -114,8 +114,8 @@ public class ProcessDefinitionParser implements
         ProcessUtil.checkProcessId(processId);
         this.processId = processId;
 
-        Element originalBpProcess = getBpProcess(originalDocument);
-        Element zeebeBpProcess = getBpProcess(zeebeDocument);
+        Element originalBpProcess = getOriginalBpProcess();
+        Element zeebeBpProcess = getBpProcess();
 
         originalBpProcess.addAttribute(ID_ATTRIBUTE, processId);
         zeebeBpProcess.addAttribute(ID_ATTRIBUTE, processId);
@@ -294,7 +294,7 @@ public class ProcessDefinitionParser implements
      * 替换 namespace zeebe2 => namespace
      */
     private void replNsZeebe2() {
-        Namespace namespace = zeebeDocument.getRootElement().getNamespaceForPrefix(BPMN2.getPrefix());
+        Namespace namespace = zeebeDocument.getRootElement().getNamespaceForPrefix(BPMN2_NAMESPACE.getPrefix());
         // bpmn2 namespace 不存在，就直接返回
         if(namespace == null) return;
 
@@ -315,7 +315,7 @@ public class ProcessDefinitionParser implements
         }
         Element root = zeebeDocument.getRootElement();
         root.add(BPMN_NAMESPACE);
-        Namespace bpmn2 = root.getNamespaceForPrefix(BPMN2.getPrefix());
+        Namespace bpmn2 = root.getNamespaceForPrefix(BPMN2_NAMESPACE.getPrefix());
         if(bpmn2 != null) {
             root.remove(bpmn2);
         }
@@ -341,7 +341,7 @@ public class ProcessDefinitionParser implements
      * 解析 process id 和 name
      */
     private void parseIdName() {
-        Element bpProcess = getBpProcess(zeebeDocument);
+        Element bpProcess = getBpProcess();
 
         if(processId == null) {
             processId = bpProcess.attributeValue(ID_ATTRIBUTE);
@@ -593,7 +593,7 @@ public class ProcessDefinitionParser implements
      * 替换 xsi:type = "bpmn:tFormalExpression"
      */
     private void replAttrXt() {
-        Namespace bpmn2Namespace = zeebeDocument.getRootElement().getNamespaceForPrefix(BPMN2.getPrefix());
+        Namespace bpmn2Namespace = zeebeDocument.getRootElement().getNamespaceForPrefix(BPMN2_NAMESPACE.getPrefix());
         if(bpmn2Namespace == null) return;
 
         XPath path = DocumentHelper.createXPath(StrUtil.format("//*[@{}='{}']",
@@ -837,7 +837,7 @@ public class ProcessDefinitionParser implements
         Element callActivity = bndStartEvent.getCallActivity();
 
         // 新增空开始事件
-        Element bpProcess = getBpProcess(zeebeDocument);
+        Element bpProcess = getBpProcess();
         Element noneStartEvent = ElementCreator.createBpStartEvent();
         noneStartEvent.setParent(bpProcess);
         bpProcess.content().add(noneStartEvent);
@@ -973,7 +973,7 @@ public class ProcessDefinitionParser implements
 
     private void connectTwoElement(Element source, Element target) {
         Element sequenceFlow = ElementCreator.createBpSequenceFlow();
-        Element bpProcess = getBpProcess(zeebeDocument);
+        Element bpProcess = getBpProcess();
         sequenceFlow.setParent(bpProcess);
         bpProcess.content().add(sequenceFlow);
 
@@ -999,15 +999,22 @@ public class ProcessDefinitionParser implements
         content.add(content.indexOf(firstOutGoing), incoming);
     }
 
-    private Element getBpProcess(Document document) {
+    private Element getBpProcess() {
         XPath path = DocumentHelper.createXPath(StrUtil.join(StringPool.SLASH,
                 BPMN_DEFINITIONS_QNAME.getQualifiedName(),
                 BPMN_PROCESS_QNAME.getQualifiedName()));
-        return (Element) path.selectSingleNode(document);
+        return (Element) path.selectSingleNode(zeebeDocument);
+    }
+
+    private Element getOriginalBpProcess() {
+        XPath path = DocumentHelper.createXPath(StrUtil.join(StringPool.SLASH,
+                BPMN2_DEFINITIONS_QNAME.getQualifiedName(),
+                BPMN2_PROCESS_QNAME.getQualifiedName()));
+        return (Element) path.selectSingleNode(originalDocument);
     }
 
     private void set_exec() {
-        Element process = getBpProcess(zeebeDocument);
+        Element process = getBpProcess();
         process.addAttribute(IS_EXECUTABLE_ATTRIBUTE, StringPool.TRUE);
     }
 

@@ -57,7 +57,7 @@ public class SceneReleaseDeployService implements ISceneReleaseDeployService {
     @Override
     public Map<Long, List<SceneReleaseDeployDto>> fetchListByVersionId(List<Long> versionIdList) {
         if(CollUtil.isEmpty(versionIdList)) return MapUtil.empty();
-        Assert.isTrue(CollUtil.hasNull(versionIdList), "processIdList中存在null值");
+        Assert.isFalse(CollUtil.hasNull(versionIdList), "processIdList中存在null值");
 
         QueryWrapper<SceneReleaseDeployPo> query = new QueryWrapper<>();
         query.in(SceneReleaseDeployPo.VERSION_ID, versionIdList);
