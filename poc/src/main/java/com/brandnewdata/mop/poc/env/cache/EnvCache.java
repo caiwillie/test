@@ -56,7 +56,6 @@ public class EnvCache {
         envDto.setStatus(entity.getStr(EnvPo.STATUS));
         envDto.setType(entity.getInt(EnvPo.TYPE));
         envDto.setDescription(entity.getStr(EnvPo.DESCRIPTION));
-        envDto.setHttpListenerDomainIdentifier(entity.getStr(EnvPo.HTTP_LISTENER_DOMAIN_IDEN));
         return envDto;
     }
 }

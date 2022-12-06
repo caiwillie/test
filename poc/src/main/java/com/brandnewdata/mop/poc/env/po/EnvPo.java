@@ -46,9 +46,6 @@ public class EnvPo implements Serializable {
 
     private String description;
 
-    private String httpListenerDomainIden;
-
-
     public static final String ID = "id";
 
     public static final String CREATE_TIME = "create_time";
@@ -66,7 +63,5 @@ public class EnvPo implements Serializable {
     public static final String TYPE = "type";
 
     public static final String DESCRIPTION = "description";
-
-    public static final String HTTP_LISTENER_DOMAIN_IDEN = "http_listener_domain_iden";
 
 }
