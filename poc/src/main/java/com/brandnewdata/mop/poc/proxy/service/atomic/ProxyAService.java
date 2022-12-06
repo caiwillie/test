@@ -4,25 +4,28 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.PageUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.constant.ProxyConst;
+import com.brandnewdata.mop.poc.proxy.cache.ProxyCache;
 import com.brandnewdata.mop.poc.proxy.converter.ProxyDtoConverter;
 import com.brandnewdata.mop.poc.proxy.converter.ProxyPoConverter;
 import com.brandnewdata.mop.poc.proxy.dao.ProxyDao;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyGroupDto;
 import com.brandnewdata.mop.poc.proxy.po.ProxyPo;
+import com.brandnewdata.mop.poc.util.CollectorsUtil;
+import com.brandnewdata.mop.poc.util.PageEnhancedUtil;
+import com.google.gson.internal.LinkedTreeMap;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -31,14 +34,16 @@ public class ProxyAService implements IProxyAService {
     @Resource
     private ProxyDao proxyDao;
 
+    private final ProxyCache proxyCache;
 
     private final String domainRegEx;
 
-
     private final String domainPattern;
 
-    public ProxyAService(@Value("${brandnewdata.api.domainRegEx}") String domainRegEx,
+    public ProxyAService(ProxyCache proxyCache,
+                         @Value("${brandnewdata.api.domainRegEx}") String domainRegEx,
                          @Value("${brandnewdata.api.domainPattern}") String domainPattern) {
+        this.proxyCache = proxyCache;
         this.domainRegEx = domainRegEx;
         this.domainPattern = domainPattern;
     }
@@ -49,42 +54,29 @@ public class ProxyAService implements IProxyAService {
         Assert.notNull(pageNum > 0, "pageNum must be greater than 0");
         Assert.notNull(pageSize > 0, "pageSize must be greater than 0");
 
+        Map<String, List<ProxyDto>> proxyDtoMap = new LinkedHashMap<>();
+
         // 根据 name 分组
-        QueryWrapper<ProxyPo> query = new QueryWrapper<>();
-        if (StrUtil.isNotBlank(name)) {
-            query.like(ProxyPo.NAME, name);
-        }
-        query.orderByDesc(ProxyPo.UPDATE_TIME);
-        query.groupBy(ProxyPo.NAME);
-        query.select(ProxyPo.NAME, "count(*) as count");
+        proxyCache.asMap().values().stream().sorted(Comparator.comparing(ProxyDto::getUpdateTime))
+                .collect(Collectors.groupingBy(ProxyDto::getName,
+                        CollectorsUtil.toSortedList((o1, o2) -> o2.getUpdateTime().compareTo(o1.getUpdateTime()))))
+                .entrySet().stream()
+                .sorted((o1, o2) -> o2.getValue().get(0).getUpdateTime().compareTo(o1.getValue().get(0).getUpdateTime()))
+                .forEach(entry -> proxyDtoMap.put(entry.getKey(), entry.getValue()));
 
-        com.baomidou.mybatisplus.extension.plugins.pagination.Page<Map<String, Object>> page =
-                new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(pageNum, pageSize);
-        page = proxyDao.selectMapsPage(page, query);
-
-        List<Map<String, Object>> records = page.getRecords();
-        if(CollUtil.isEmpty(records)) return Page.empty();
-
-        List<String> nameList = records.stream().map(map -> (String) map.get(ProxyPo.NAME)).collect(Collectors.toList());
-
-        // 根据 name 查询 proxy
-        QueryWrapper<ProxyPo> query2 = new QueryWrapper<>();
-        query2.in(ProxyPo.NAME, nameList);
-        List<ProxyPo> proxyPoList = proxyDao.selectList(query2);
-
-        Map<String, List<ProxyDto>> proxyListMap = proxyPoList.stream().map(po -> ProxyDtoConverter.createFrom(po, domainPattern))
-                .collect(Collectors.groupingBy(ProxyDto::getName));
+        PageUtil.setFirstPageNo(1);
+        List<String> nameList = PageEnhancedUtil.slice(pageNum, pageSize, ListUtil.toList(proxyDtoMap.keySet()));
 
         // 组装结果
         List<ProxyGroupDto> ret = new ArrayList<>();
         for (String _name : nameList) {
             ProxyGroupDto proxyGroupDto = new ProxyGroupDto();
             proxyGroupDto.setName(_name);
-            proxyGroupDto.setProxyDtoList(proxyListMap.get(_name));
+            proxyGroupDto.setProxyDtoList(proxyDtoMap.get(_name));
             ret.add(proxyGroupDto);
         }
 
-        return new Page<>(page.getTotal(), ret);
+        return new Page<>(proxyDtoMap.size(), ret);
     }
 
     @Override

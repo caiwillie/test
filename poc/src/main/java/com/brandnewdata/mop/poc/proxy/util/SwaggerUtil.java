@@ -1,7 +1,6 @@
 package com.brandnewdata.mop.poc.proxy.util;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.mop.poc.proxy.dto.old.Endpoint;
 import com.brandnewdata.mop.poc.proxy.dto.old.ImportDTO;
@@ -65,11 +64,6 @@ public class SwaggerUtil {
         ret.setEndpointList(endpoints);
 
         return ret;
-    }
-
-    public static void main(String[] args) {
-        String content = ResourceUtil.readUtf8Str("case.yaml");
-        SwaggerUtil.parse(content);
     }
 
 }

@@ -9,7 +9,6 @@ import com.google.common.cache.Cache;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.util.List;
 import java.util.Map;
@@ -18,13 +17,9 @@ import java.util.function.BiConsumer;
 @Component
 public class EnvServiceCache {
 
-    @Resource
-    private DataSource dataSource;
+    private final ScheduleUpdateCache<Long, EnvServiceDto> scheduleCache;
 
-    private ScheduleUpdateCache<Long, EnvServiceDto> scheduleCache;
-
-    @PostConstruct
-    private void postConstruct() {
+    public EnvServiceCache(DataSource dataSource) {
         scheduleCache = new ScheduleUpdateCache<>("mop_env_service", "id", "update_time", dataSource,
                 "0/4 * * * * ?", 10, getConsume());
     }
