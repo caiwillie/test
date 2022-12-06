@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.poc.operate.dto;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import com.brandnewdata.mop.poc.operate.po.FlowNodeInstancePo;
 import com.brandnewdata.mop.poc.operate.po.FlowNodeType;
 import lombok.Getter;
@@ -87,8 +88,10 @@ public class FlowNodeInstanceTreeNodeDto extends OperateZeebeDto implements From
     public FlowNodeInstanceTreeNodeDto from(FlowNodeInstancePo entity) {
         this.setId(entity.getId());
         this.setFlowNodeId(entity.getFlowNodeId());
-        this.setStartDate(Optional.ofNullable(entity.getStartDate()).map(OffsetDateTime::toLocalDateTime).orElse(null));
-        this.setEndDate(Optional.ofNullable(entity.getEndDate()).map(OffsetDateTime::toLocalDateTime).orElse(null));
+        this.setStartDate(Optional.ofNullable(entity.getStartDate())
+                .map(offsetDateTime -> LocalDateTimeUtil.of(offsetDateTime.toInstant())).orElse(null));
+        this.setEndDate(Optional.ofNullable(entity.getEndDate())
+                .map(offsetDateTime -> LocalDateTimeUtil.of(offsetDateTime.toInstant())).orElse(null));
         this.setState(FlowNodeStateDto.getState(entity.getState()));
         this.setType(entity.getType());
         this.setIncidentKey(entity.getIncidentKey());

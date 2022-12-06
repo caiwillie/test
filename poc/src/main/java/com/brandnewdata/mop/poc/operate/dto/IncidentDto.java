@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.poc.operate.dto;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import com.brandnewdata.mop.poc.operate.po.IncidentPo;
 import lombok.Getter;
 import lombok.Setter;
@@ -44,7 +45,8 @@ public class IncidentDto {
         this.setErrorMessage(incidentPo.getErrorMessage());
         this.setErrorType(new ErrorTypeDto().from(incidentPo.getErrorType()));
         this.setJobId(Optional.ofNullable(incidentPo.getJobKey()).map(String::valueOf).orElse(null));
-        this.setCreationTime(Optional.ofNullable(incidentPo.getCreationTime()).map(OffsetDateTime::toLocalDateTime).orElse(null));
+        this.setCreationTime(Optional.ofNullable(incidentPo.getCreationTime())
+                .map(offsetDateTime -> LocalDateTimeUtil.of(offsetDateTime.toInstant())).orElse(null));
         return this;
     }
 

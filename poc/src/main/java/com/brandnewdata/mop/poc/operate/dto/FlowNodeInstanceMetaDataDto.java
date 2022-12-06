@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.poc.operate.dto;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import com.brandnewdata.mop.poc.operate.po.EventMetadataPo;
 import com.brandnewdata.mop.poc.operate.po.EventPo;
 import com.brandnewdata.mop.poc.operate.po.FlowNodeInstancePo;
@@ -35,8 +36,10 @@ public class FlowNodeInstanceMetaDataDto {
         this.setFlowNodeInstanceId(flowNodeInstancePo.getId());
         this.setFlowNodeId(flowNodeInstancePo.getFlowNodeId());
         this.setFlowNodeType(flowNodeInstancePo.getType());
-        this.setStartDate(Optional.ofNullable(flowNodeInstancePo.getStartDate()).map(OffsetDateTime::toLocalDateTime).orElse(null));
-        this.setEndDate(Optional.ofNullable(flowNodeInstancePo.getEndDate()).map(OffsetDateTime::toLocalDateTime).orElse(null));
+        this.setStartDate(Optional.ofNullable(flowNodeInstancePo.getStartDate())
+                .map(offsetDateTime -> LocalDateTimeUtil.of(offsetDateTime.toInstant())).orElse(null));
+        this.setEndDate(Optional.ofNullable(flowNodeInstancePo.getEndDate())
+                .map(offsetDateTime -> LocalDateTimeUtil.of(offsetDateTime.toInstant())).orElse(null));
 
         EventMetadataPo eventMetadataPo = eventEntity.getMetadata();
         if (eventMetadataPo == null) return this;
