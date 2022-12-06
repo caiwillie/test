@@ -20,7 +20,6 @@ import com.brandnewdata.mop.poc.proxy.dto.ProxyGroupDto;
 import com.brandnewdata.mop.poc.proxy.po.ProxyPo;
 import com.brandnewdata.mop.poc.util.CollectorsUtil;
 import com.brandnewdata.mop.poc.util.PageEnhancedUtil;
-import com.google.gson.internal.LinkedTreeMap;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 

@@ -10,7 +10,6 @@ import com.caiwillie.util.cache.ScheduleUpdateCache;
 import com.google.common.cache.Cache;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.util.List;
 import java.util.Map;
