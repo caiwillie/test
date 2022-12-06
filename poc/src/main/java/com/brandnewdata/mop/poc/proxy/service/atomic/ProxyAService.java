@@ -94,7 +94,7 @@ public class ProxyAService implements IProxyAService {
             String domainIdentifier = null;
             do {
                 domainIdentifier = RandomUtil.randomString(9);
-            } while (!existByDomainIdentifier(domainIdentifier));
+            } while (existByDomainIdentifier(domainIdentifier));
             proxyDto.setDomain(domainIdentifier);
 
             if(!imported) {
