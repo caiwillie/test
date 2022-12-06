@@ -164,6 +164,10 @@ public class SceneBffService {
         return SceneVersionVoConverter.createFrom(sceneVersionDto);
     }
 
+    public boolean checkNewReleaseName(Long sceneId, String releaseName) {
+        return sceneVersionService.checkNewReleaseVersion(sceneId, releaseName);
+    }
+
     public SceneVersionVo deployVersion(Long versionId, List<Long> envIdList, String version) {
         // 查询 scene name 传递给下层服务
         Long sceneId = sceneVersionService.fetchById(ListUtil.of(versionId)).get(versionId).getSceneId();

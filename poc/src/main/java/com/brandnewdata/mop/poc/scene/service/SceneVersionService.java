@@ -341,6 +341,8 @@ public class SceneVersionService implements ISceneVersionService {
 
     @Override
     public boolean checkNewReleaseVersion(Long sceneId, String version) {
+        Assert.notNull(sceneId, "场景id不能为空");
+        Assert.notNull(version, "版本号不能为空");
         SceneVersionDto latestSceneVersionDto = fetchLatestOneBySceneId(ListUtil.of(sceneId),
                 ListUtil.of(SceneConst.SCENE_VERSION_STATUS__RUNNING, SceneConst.SCENE_VERSION_STATUS__STOPPED)).get(sceneId);
         SceneReleaseVersionBo sceneReleaseVersionBo = parseReleaseVersion(version);

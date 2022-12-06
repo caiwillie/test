@@ -145,7 +145,6 @@ public class SceneController2 {
         return Result.OK(ret);
     }
 
-
     /**
      * 调试记录
      *
@@ -172,6 +171,13 @@ public class SceneController2 {
     public Result<ProcessDefinitionVo> definitionDebugProcessInstance(@RequestBody DebugProcessInstanceVo vo) {
         ProcessDefinitionVo ret = sceneBffService.definitionDebugProcessInstance(vo);
         return Result.OK(ret);
+    }
+
+    // check new version
+    @PostMapping(value = "/rest/scene/version/releaseName/checkNew")
+    public Result checkNewReleaseName(@RequestBody SceneVersionVo sceneVersionVo) {
+        boolean ret = sceneBffService.checkNewReleaseName(sceneVersionVo.getSceneId(), sceneVersionVo.getVersion());
+        return ret ? Result.OK() : Result.error();
     }
 
     /**
