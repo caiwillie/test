@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.poc.operate.dto;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import com.brandnewdata.mop.poc.operate.po.listview.ProcessInstanceForListViewPo;
 import com.brandnewdata.mop.poc.operate.util.TreePathUtil;
 import io.camunda.operate.dto.ProcessInstanceState;
@@ -36,8 +37,10 @@ public class ListViewProcessInstanceDto extends OperateZeebeDto {
             return null;
         }
         this.setId(entity.getId());
-        this.setStartDate(Optional.ofNullable(entity.getStartDate()).map(OffsetDateTime::toLocalDateTime).orElse(null));
-        this.setEndDate(Optional.ofNullable(entity.getEndDate()).map(OffsetDateTime::toLocalDateTime).orElse(null));
+        this.setStartDate(Optional.ofNullable(entity.getStartDate())
+                .map(offsetDateTime -> LocalDateTimeUtil.of(offsetDateTime.toInstant())).orElse(null));
+        this.setEndDate(Optional.ofNullable(entity.getEndDate())
+                .map(offsetDateTime -> LocalDateTimeUtil.of(offsetDateTime.toInstant())).orElse(null));
         if (entity.getState() == ProcessInstanceState.ACTIVE && entity.isIncident()) {
             // 这一步转换状态
             this.setState(ProcessInstanceStateDto.INCIDENT);
