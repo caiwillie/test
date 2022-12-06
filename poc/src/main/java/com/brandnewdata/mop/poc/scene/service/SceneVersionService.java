@@ -219,7 +219,7 @@ public class SceneVersionService implements ISceneVersionService {
                 new int[]{SceneConst.SCENE_VERSION_STATUS__CONFIGURING, SceneConst.SCENE_VERSION_STATUS__DEBUGGING});
         Assert.notEmpty(envIdList, "环境列表不能为空");
         Assert.notNull(version, "版本不能为空");
-        // Assert.isFalse(StrUtil.equals(sceneVersionDto.getVersion(), version), "请修改为正式版本号");
+        Assert.isTrue(checkNewReleaseVersion(sceneVersionDto.getSceneId(), version), "新版本号必须大于旧版本号");
         sceneVersionDto.setVersion(version);
 
         // 查询版本下的流程
@@ -349,8 +349,13 @@ public class SceneVersionService implements ISceneVersionService {
         String latestVersion = latestSceneVersionDto.getVersion();
         SceneReleaseVersionBo latestSceneReleaseVersionBo = parseReleaseVersion(latestVersion);
 
-        if(NumberUtil.compare(sceneReleaseVersionBo.getMajor(), latestSceneReleaseVersionBo.getMajor()))
-        return false;
+        if(NumberUtil.compare(sceneReleaseVersionBo.getMajor(), latestSceneReleaseVersionBo.getMajor()) < 0) return false;
+        if(NumberUtil.compare(sceneReleaseVersionBo.getMajor(), latestSceneReleaseVersionBo.getMajor()) > 0) return true;
+        if(NumberUtil.compare(sceneReleaseVersionBo.getMinor(), latestSceneReleaseVersionBo.getMinor()) < 0) return false;
+        if(NumberUtil.compare(sceneReleaseVersionBo.getMinor(), latestSceneReleaseVersionBo.getMinor()) > 0) return true;
+        if(NumberUtil.compare(sceneReleaseVersionBo.getPatch(), latestSceneReleaseVersionBo.getPatch()) < 0) return false;
+        if(NumberUtil.compare(sceneReleaseVersionBo.getPatch(), latestSceneReleaseVersionBo.getPatch()) > 0) return true;
+        throw new RuntimeException("版本号不能相同");
     }
 
     private SceneReleaseVersionBo parseReleaseVersion(String name) {
@@ -364,8 +369,6 @@ public class SceneVersionService implements ISceneVersionService {
         bo.setDate(LocalDateTimeUtil.parseDate(groups.get(3), DatePattern.PURE_DATE_PATTERN));
         return bo;
     }
-
-
 
     private SceneVersionDto getAndCheckStatus(Long id, int[] statusArr) {
         Assert.notNull(id, "版本ID不能为空");
