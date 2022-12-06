@@ -80,6 +80,7 @@ public class ReverseProxyServlet extends ProxyServlet {
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         LocalDateTime startTime = LocalDateTime.now();
         ProxyEndpointCallDto proxyEndpointCallDto = new ProxyEndpointCallDto();
+        proxyEndpointCallDto.setStartTime(startTime);
         try {
             /*
              * getRequestUri() 和 getPathInfo() 的区别：
@@ -99,6 +100,7 @@ public class ReverseProxyServlet extends ProxyServlet {
 
             ProxyEndpointDto endpointDto = proxyEndpointAService.fetchByProxyIdAndLocation(proxyDto.getId(), uri);
             Assert.notNull(endpointDto, "path not found: {}", uri);
+            proxyEndpointCallDto.setEndpointId(endpointDto.getId());
 
             Integer backendType = endpointDto.getBackendType();
             String backendConfig = endpointDto.getBackendConfig();
@@ -118,16 +120,17 @@ public class ReverseProxyServlet extends ProxyServlet {
                 callProcess(request, response, config);
             }
 
-            int status = response.getStatus();
-            proxyEndpointCallDto.setExecuteStatus(String.valueOf(status));
+            proxyEndpointCallDto.setExecuteStatus("success");
         } catch (Exception e) {
             log.error("ReverseProxyServlet.service error", e);
-            proxyEndpointCallDto.setExecuteStatus("500");
+            proxyEndpointCallDto.setExecuteStatus("false");
             proxyEndpointCallDto.setErrorMessage(e.getMessage());
         } finally {
-            long time = LocalDateTimeUtil.between(startTime, LocalDateTime.now()).toMillis();
-            proxyEndpointCallDto.setTimeConsuming((int)time);
-            proxyEndpointCallAService.save(proxyEndpointCallDto);
+            if (proxyEndpointCallDto.getEndpointId() != null) {
+                long time = LocalDateTimeUtil.between(startTime, LocalDateTime.now()).toMillis();
+                proxyEndpointCallDto.setTimeConsuming((int)time);
+                proxyEndpointCallAService.save(proxyEndpointCallDto);
+            }
         }
 
     }
