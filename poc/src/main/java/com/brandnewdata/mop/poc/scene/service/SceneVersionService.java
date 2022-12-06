@@ -8,6 +8,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Opt;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.constant.ProcessConst;
@@ -17,7 +18,7 @@ import com.brandnewdata.mop.poc.env.service.IEnvService;
 import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService2;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
-import com.brandnewdata.mop.poc.scene.bo.SceneVersionBo;
+import com.brandnewdata.mop.poc.scene.bo.SceneReleaseVersionBo;
 import com.brandnewdata.mop.poc.scene.converter.SceneReleaseDeployDtoConverter;
 import com.brandnewdata.mop.poc.scene.converter.SceneVersionDtoConverter;
 import com.brandnewdata.mop.poc.scene.converter.SceneVersionPoConverter;
@@ -54,6 +55,7 @@ public class SceneVersionService implements ISceneVersionService {
     private final IProcessDeployService2 processDeployService;
 
     private final IProcessDefinitionService2 processDefinitionService;
+
 
     public SceneVersionService(IEnvService envService,
                                IVersionProcessService versionProcessService,
@@ -339,10 +341,28 @@ public class SceneVersionService implements ISceneVersionService {
 
     @Override
     public boolean checkNewReleaseVersion(Long sceneId, String version) {
-        SceneVersionDto sceneVersionDto = fetchLatestOneBySceneId(ListUtil.of(sceneId),
+        SceneVersionDto latestSceneVersionDto = fetchLatestOneBySceneId(ListUtil.of(sceneId),
                 ListUtil.of(SceneConst.SCENE_VERSION_STATUS__RUNNING, SceneConst.SCENE_VERSION_STATUS__STOPPED)).get(sceneId);
-        if(sceneVersionDto == null) return true;
+        SceneReleaseVersionBo sceneReleaseVersionBo = parseReleaseVersion(version);
+        if(latestSceneVersionDto == null) return true;
+
+        String latestVersion = latestSceneVersionDto.getVersion();
+        SceneReleaseVersionBo latestSceneReleaseVersionBo = parseReleaseVersion(latestVersion);
+
+        if(NumberUtil.compare(sceneReleaseVersionBo.getMajor(), latestSceneReleaseVersionBo.getMajor()))
         return false;
+    }
+
+    private SceneReleaseVersionBo parseReleaseVersion(String name) {
+        Assert.isTrue(ReUtil.isMatch(SceneReleaseVersionBo.PATTERN, name), "版本名称格式不正确");
+        List<String> groups = ReUtil.getAllGroups(SceneReleaseVersionBo.PATTERN, name, false);
+
+        SceneReleaseVersionBo bo = new SceneReleaseVersionBo();
+        bo.setMajor(Integer.parseInt(groups.get(0)));
+        bo.setMinor(Integer.parseInt(groups.get(1)));
+        bo.setPatch(Integer.parseInt(groups.get(2)));
+        bo.setDate(LocalDateTimeUtil.parseDate(groups.get(3), DatePattern.PURE_DATE_PATTERN));
+        return bo;
     }
 
 

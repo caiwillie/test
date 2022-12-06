@@ -3,7 +3,7 @@ package com.brandnewdata.mop.poc.process.api;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import com.brandnewdata.common.webresult.Result;
-import com.brandnewdata.mop.api.process.IProcessAPI;
+import com.brandnewdata.mop.api.process.IProcessApi;
 import com.brandnewdata.mop.api.process.dto.MessageDto;
 import com.brandnewdata.mop.api.process.dto.SendMessageDto;
 import io.camunda.zeebe.client.ZeebeClient;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Optional;
 
 @RestController
-public class ProcessAPI implements IProcessAPI {
+public class ProcessApi implements IProcessApi {
 
     // todo caiwillie
     // @Resource
