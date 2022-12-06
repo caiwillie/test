@@ -1,0 +1,1 @@
+ALTER TABLE `mop`.`mop_env` ADD COLUMN `http_listener_domain_iden` varchar(64) NULL;

@@ -7,8 +7,12 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class ProcessDefinitionStaticParseDto {
+public class ProcessDefinitionParseDto {
     private String processId;
     private String name;
     private Map<String, String> configs;
+
+    private String triggerFullId;
+    private String protocol;
+    private String requestParams;
 }

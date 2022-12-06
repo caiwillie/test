@@ -4,9 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.PageUtil;
-import cn.hutool.core.util.ReUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.*;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
@@ -90,8 +88,12 @@ public class ProxyAService implements IProxyAService {
             // 名称和版本唯一
             Assert.isFalse(existByNameAndVersion(name, version), "API名称和版本不能重复");
 
-            String domain = DigestUtil.md5Hex(StrUtil.format("{}:{}", name, version));
-            proxyDto.setDomain(domain);
+            // 生成唯一的域名标识
+            String domainIdentifier = null;
+            do {
+                domainIdentifier = RandomUtil.randomString(9);
+            } while (!existByDomainIdentifier(domainIdentifier));
+            proxyDto.setDomain(domainIdentifier);
 
             if(!imported) {
                 proxyDto.setState(ProxyConst.PROXY_STATE__STOPPED);
@@ -140,12 +142,17 @@ public class ProxyAService implements IProxyAService {
         return ProxyDtoConverter.createFrom(proxyPo, domainRegEx);
     }
 
-
     private boolean existByNameAndVersion(String name, String version) {
         QueryWrapper<ProxyPo> query = new QueryWrapper<>();
         query.eq(ProxyPo.NAME, name);
         query.eq(ProxyPo.VERSION, version);
 
+        return proxyDao.selectCount(query) > 0;
+    }
+
+    private boolean existByDomainIdentifier(String domainIdentifier) {
+        QueryWrapper<ProxyPo> query = new QueryWrapper<>();
+        query.eq(ProxyPo.DOMAIN, domainIdentifier);
         return proxyDao.selectCount(query) > 0;
     }
 }

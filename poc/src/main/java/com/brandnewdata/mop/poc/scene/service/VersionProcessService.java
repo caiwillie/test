@@ -8,7 +8,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
-import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionStaticParseDto;
+import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionParseDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService2;
 import com.brandnewdata.mop.poc.scene.converter.VersionProcessDtoConverter;
 import com.brandnewdata.mop.poc.scene.converter.VersionProcessPoConverter;
@@ -127,10 +127,10 @@ public class VersionProcessService implements IVersionProcessService {
         bpmnXmlDto.setProcessId(versionProcessDto.getProcessId());
         bpmnXmlDto.setProcessName(versionProcessDto.getProcessName());
         bpmnXmlDto.setProcessXml(processXml);
-        ProcessDefinitionStaticParseDto processDefinitionStaticParseDto = processDefinitionService.staticParse(bpmnXmlDto);
+        ProcessDefinitionParseDto processDefinitionParseDto = processDefinitionService.parseIdAndName(bpmnXmlDto);
 
-        String processId = processDefinitionStaticParseDto.getProcessId();
-        String name = processDefinitionStaticParseDto.getName();
+        String processId = processDefinitionParseDto.getProcessId();
+        String name = processDefinitionParseDto.getName();
 
         Long id = versionProcessDto.getId();
         if(id == null) {

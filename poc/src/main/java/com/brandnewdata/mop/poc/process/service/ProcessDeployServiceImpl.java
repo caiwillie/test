@@ -123,7 +123,7 @@ public class ProcessDeployServiceImpl implements IProcessDeployService{
 
         if(type == ProcessConst.PROCESS_TYPE_SCENE && step2Result.getTrigger() != null) {
             // 如果有场景发布，并且是自定义触发器时，需要保存监听配置
-            connectorManager.saveRequestParams(step2Result);
+            // connectorManager.saveRequestParams(step2Result);
         }
 
         return new ProcessDeployDto().from(entity, true);

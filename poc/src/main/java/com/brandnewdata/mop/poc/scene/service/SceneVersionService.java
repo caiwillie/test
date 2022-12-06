@@ -16,6 +16,8 @@ import com.brandnewdata.mop.poc.constant.SceneConst;
 import com.brandnewdata.mop.poc.env.dto.EnvDto;
 import com.brandnewdata.mop.poc.env.service.IEnvService;
 import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
+import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionParseDto;
+import com.brandnewdata.mop.poc.process.manager.ConnectorManager;
 import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService2;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
 import com.brandnewdata.mop.poc.scene.bo.SceneReleaseVersionBo;
@@ -56,17 +58,21 @@ public class SceneVersionService implements ISceneVersionService {
 
     private final IProcessDefinitionService2 processDefinitionService;
 
+    private final ConnectorManager connectorManager;
+
 
     public SceneVersionService(IEnvService envService,
                                IVersionProcessService versionProcessService,
                                IProcessDeployService2 processDeployService,
                                ISceneReleaseDeployService sceneReleaseDeployService,
-                               IProcessDefinitionService2 processDefinitionService) {
+                               IProcessDefinitionService2 processDefinitionService,
+                               ConnectorManager connectorManager) {
         this.envService = envService;
         this.versionProcessService = versionProcessService;
         this.processDeployService = processDeployService;
         this.sceneReleaseDeployService = sceneReleaseDeployService;
         this.processDefinitionService = processDefinitionService;
+        this.connectorManager = connectorManager;
     }
 
     @Override
@@ -195,6 +201,13 @@ public class SceneVersionService implements ISceneVersionService {
     public SceneVersionDto stop(Long id) {
         SceneVersionDto sceneVersionDto = getAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__RUNNING});
 
+        // stop process
+        List<SceneReleaseDeployDto> sceneReleaseDeployDtoList =
+                sceneReleaseDeployService.fetchListByVersionId(ListUtil.of(id)).get(id);
+        for (SceneReleaseDeployDto sceneReleaseDeployDto : sceneReleaseDeployDtoList) {
+            connectorManager.stopVersionProcess(sceneReleaseDeployDto);
+        }
+
         // 修改状态
         sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__STOPPED);
         sceneVersionDao.updateById(SceneVersionPoConverter.createFrom(sceneVersionDto));
@@ -205,6 +218,13 @@ public class SceneVersionService implements ISceneVersionService {
     public SceneVersionDto resume(Long id, List<Long> envIdList) {
         SceneVersionDto sceneVersionDto = getAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__STOPPED});
         Assert.notEmpty(envIdList, "环境列表不能为空");
+
+        // resume process
+        List<SceneReleaseDeployDto> sceneReleaseDeployDtoList =
+                sceneReleaseDeployService.fetchListByVersionId(ListUtil.of(id)).get(id);
+        for (SceneReleaseDeployDto sceneReleaseDeployDto : sceneReleaseDeployDtoList) {
+            connectorManager.resumeVersionProcess(sceneReleaseDeployDto);
+        }
 
         // 修改状态
         sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__RUNNING);
@@ -236,17 +256,27 @@ public class SceneVersionService implements ISceneVersionService {
             processDeployService.releaseDeploy(deployDto, envIdList, ProcessConst.PROCESS_BIZ_TYPE__SCENE);
         }
 
-        //todo caiwillie 上报保存配置
-
         // 保存到场景列表
         for (VersionProcessDto versionProcessDto : versionProcessDtoList) {
+            BpmnXmlDto deployDto = new BpmnXmlDto();
+            deployDto.setProcessId(versionProcessDto.getProcessId());
+            deployDto.setProcessName(versionProcessDto.getProcessName());
+            deployDto.setProcessXml(versionProcessDto.getProcessXml());
+
+            ProcessDefinitionParseDto processDefinitionParseDto = processDefinitionService.parseSceneTrigger(deployDto);
+
             for (Long envId : envIdList) {
                 SceneReleaseDeployDto sceneReleaseDeployDto = new SceneReleaseDeployDto();
                 SceneReleaseDeployDtoConverter.updateFrom(sceneReleaseDeployDto, versionProcessDto);
                 SceneReleaseDeployDtoConverter.updateFrom(sceneReleaseDeployDto, sceneVersionDto);
                 sceneReleaseDeployDto.setSceneName(sceneName);
                 sceneReleaseDeployDto.setEnvId(envId);
-                sceneReleaseDeployService.save(sceneReleaseDeployDto);
+                sceneReleaseDeployDto = sceneReleaseDeployService.save(sceneReleaseDeployDto);
+
+                // todo caiwillie 上报
+                connectorManager.saveRequestParams(envId, processDefinitionParseDto.getTriggerFullId(),
+                        processDefinitionParseDto.getProtocol(), processDefinitionParseDto.getRequestParams(),
+                        sceneReleaseDeployDto);
             }
         }
 

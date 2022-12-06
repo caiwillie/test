@@ -7,12 +7,14 @@ import com.brandnewdata.connector.api.IConnectorBasicInfoFeign;
 import com.brandnewdata.connector.api.IConnectorCommonTriggerProcessConfFeign;
 import com.brandnewdata.connector.api.IConnectorConfFeign;
 import com.brandnewdata.connector.api.ITriggerProtocolFeign;
+import com.brandnewdata.mop.poc.env.service.IEnvService;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.process.manager.dto.ConfigInfo;
 import com.brandnewdata.mop.poc.process.manager.dto.ConnectorBasicInfo;
 import com.brandnewdata.mop.poc.process.manager.dto.TriggerInfo;
 import com.brandnewdata.mop.poc.process.parser.dto.Action;
 import com.brandnewdata.mop.poc.process.parser.dto.Step2Result;
+import com.brandnewdata.mop.poc.scene.dto.SceneReleaseDeployDto;
 import com.dxy.library.json.jackson.JacksonUtil;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
@@ -35,6 +37,12 @@ public class ConnectorManager {
 
     @Resource
     private ITriggerProtocolFeign protocolClient;
+
+    private final IEnvService envService;
+
+    public ConnectorManager(IEnvService envService) {
+        this.envService = envService;
+    }
 
     public ConfigInfo getConfigInfo(String configId) {
         IConnectorConfFeign.ConnectorConfDTO configInfo = confClient.getConfigInfo(Long.parseLong(configId));
@@ -86,20 +94,34 @@ public class ConnectorManager {
         return ret;
     }
 
-    @SneakyThrows
-    public void saveRequestParams(Step2Result step2Result) {
+    public void saveRequestParams(Long envId,
+                                  String triggerFullId,
+                                  String protocol,
+                                  String requestParams,
+                                  SceneReleaseDeployDto sceneReleaseDeployDto) {
         IConnectorCommonTriggerProcessConfFeign.ConnectorCommonTriggerProcessConfParamDTO dto =
                 new IConnectorCommonTriggerProcessConfFeign.ConnectorCommonTriggerProcessConfParamDTO();
-        dto.setProcessId(step2Result.getProcessId());
-        dto.setProcessName(step2Result.getProcessName());
-        dto.setProtocol(step2Result.getProtocol());
-        dto.setConfig(JacksonUtil.to(step2Result.getRequestParams()));
-        dto.setTriggerFullId(step2Result.getTrigger().getFullId());
-        Integer success = triggerClient.save(dto);
-        if(success == null || success != 1) {
+        dto.setEnvId(String.valueOf(envId));
+        dto.setProcessId(String.valueOf(sceneReleaseDeployDto.getId()));
+        dto.setProcessName(sceneReleaseDeployDto.getProcessName());
+        dto.setTriggerFullId(triggerFullId);
+        dto.setProtocol(protocol);
+        dto.setConfig(requestParams);
+        dto.setProcessRelevantInfo(JacksonUtil.to(sceneReleaseDeployDto));
+        Integer save = triggerClient.save(dto);
+        if(save == null || save != 1) {
             throw new RuntimeException("保存监听配置失败");
         }
+    }
 
+    public void resumeVersionProcess(SceneReleaseDeployDto dto) {
+        // 1 是生效
+        triggerClient.onOrOff(String.valueOf(dto.getId()), 1);
+    }
+
+    public void stopVersionProcess(SceneReleaseDeployDto dto) {
+        // 2 是禁用
+        triggerClient.onOrOff(String.valueOf(dto.getId()), 0);
     }
 
     public String getProtocol(String connectorId) {

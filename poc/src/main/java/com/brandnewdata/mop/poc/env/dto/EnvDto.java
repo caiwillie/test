@@ -25,4 +25,6 @@ public class EnvDto {
     private Integer type;
 
     private String description;
+
+    private String httpListenerDomainIdentifier;
 }
