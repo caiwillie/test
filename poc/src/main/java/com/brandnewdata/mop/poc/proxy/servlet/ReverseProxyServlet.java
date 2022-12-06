@@ -7,6 +7,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
+import cn.hutool.http.ContentType;
 import cn.hutool.http.Method;
 import com.brandnewdata.mop.poc.constant.ProcessConst;
 import com.brandnewdata.mop.poc.constant.ProxyConst;
@@ -125,6 +126,7 @@ public class ReverseProxyServlet extends ProxyServlet {
             log.error("ReverseProxyServlet.service error", e);
             proxyEndpointCallDto.setExecuteStatus("false");
             proxyEndpointCallDto.setErrorMessage(e.getMessage());
+            ServletUtil.write(response, e.getMessage(), ContentType.JSON.getValue());
         } finally {
             if (proxyEndpointCallDto.getEndpointId() != null) {
                 long time = LocalDateTimeUtil.between(startTime, LocalDateTime.now()).toMillis();
