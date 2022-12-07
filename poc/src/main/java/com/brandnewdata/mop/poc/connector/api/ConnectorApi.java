@@ -13,12 +13,12 @@ import com.brandnewdata.mop.poc.env.service.IEnvService;
 import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
 import com.brandnewdata.mop.poc.process.util.ProcessUtil;
-import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
+@RestController
 public class ConnectorApi implements IConnectorApi {
 
     private final IEnvService envService;
