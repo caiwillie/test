@@ -130,7 +130,7 @@ public class ProcessDefinitionParser implements
     @Override
     public ProcessDefinitionParseStep1 replServiceTask(boolean replConfig, ConnectorManager manager) {
         // 下面的顺序很重要，从内到外
-        if(replConfig && manager != null) {
+        if(replConfig) {
             // 要求替换连接配置，并且 manager 不为空
             replEle_Config(manager);
         }
@@ -384,12 +384,12 @@ public class ProcessDefinitionParser implements
             Element oldE = (Element) node;
             Element parent = oldE.getParent();
             Element ioMapping = getOrCreateIoMapping(parent);
-            String type = oldE.attributeValue(TYPE_ATTRIBUTE);
             String configId = oldE.attributeValue(CONFIG_ID_ATTRIBUTE);
             if(StrUtil.isBlank(configId)) {
                 continue;
             }
             String properties = manager.getConfigInfo(configId).getConfigs();
+            log.info("configId {}, data {}", configId, properties);
             if(StrUtil.isNotBlank(properties)) {
                 Element newE = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
                 newE.addAttribute(TARGET_ATTRIBUTE, PROPERTIES_PREFIX);
