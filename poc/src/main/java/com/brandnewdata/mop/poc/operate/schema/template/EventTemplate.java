@@ -28,6 +28,6 @@ public class EventTemplate extends AbstractTemplateDescriptor implements Process
 
     @Override
     public String getVersion() {
-        return "8.1.0";
+        return "1.0.0";
     }
 }
