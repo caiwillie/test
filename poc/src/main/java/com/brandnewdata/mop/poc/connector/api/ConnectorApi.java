@@ -2,6 +2,7 @@ package com.brandnewdata.mop.poc.connector.api;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.api.connector.IConnectorApi;
@@ -55,6 +56,7 @@ public class ConnectorApi implements IConnectorApi {
                 bpmnXmlDto.setProcessName(StrUtil.format("【触发器】{}", trigger.getName()));
                 bpmnXmlDto.setProcessXml(trigger.getEditorXML());
                 processDeployService2.releaseDeploy(bpmnXmlDto, envIdList, ProcessConst.PROCESS_BIZ_TYPE__TRIGGER);
+                ThreadUtil.sleep(500);
             }
         }
 
@@ -66,6 +68,7 @@ public class ConnectorApi implements IConnectorApi {
                 bpmnXmlDto.setProcessName(StrUtil.format("【操作】{}", operate.getName()));
                 bpmnXmlDto.setProcessXml(operate.getEditorXML());
                 processDeployService2.releaseDeploy(bpmnXmlDto, envIdList, ProcessConst.PROCESS_BIZ_TYPE__OPERATE);
+                ThreadUtil.sleep(500);
             }
         }
 
