@@ -88,7 +88,7 @@ class ProcessDefinitionParserTest {
 
     @Test
     void testParseOriginalXml2() {
-        String xml = ResourceUtil.readUtf8Str("process/process2.xml");
+        String xml = ResourceUtil.readUtf8Str("process/process3.xml");
         ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.step1(null, null, xml);
         step1.replServiceTask(false, null);
         Step1Result step1Result = step1.step1Result();

@@ -262,8 +262,7 @@ public class ProcessDefinitionParser implements
         this.name = name;
         this.originalDocument = readRoot(xml);
         this.zeebeDocument = readRoot(xml);
-        log.info("======================== 转换前的xml =====================\n");
-        log.info(serialize(originalDocument));
+        log.info("\n======================== 转换前的xml =====================\n{}", serialize(originalDocument));
 
         // 转换namespace zeebe2 => zeebe
         replNsZeebe2();
@@ -433,10 +432,8 @@ public class ProcessDefinitionParser implements
         Element parent = taskDefinition.getParent();
         List<Node> content = parent.content();
         Element newE = DocumentHelper.createElement(ZEEBE_TASK_DEFINITION_QNAME);
-        // 替换type中的特殊字符，并且校验type
-        String newType = ProcessUtil.convertProcessId(taskDefinition.attributeValue(TYPE_ATTRIBUTE));
-        ProcessUtil.checkProcessId(newType);
-        newE.addAttribute(TYPE_ATTRIBUTE, newType);
+        // 这里设置 type, isBrandnewdataConnector
+        newE.addAttribute(TYPE_ATTRIBUTE, taskDefinition.attributeValue(TYPE_ATTRIBUTE));
         newE.addAttribute(TYPE_IS_BND_CONNECTOR, StringPool.TRUE);
         newE.setParent(parent);
         // 新增 brandnewdata:taskDefinition 替换成 zeebe:taskDefinition
@@ -558,15 +555,16 @@ public class ProcessDefinitionParser implements
         for (Node node : nodes) {
             Element oldE = (Element) node;
             String value = oldE.attributeValue(TYPE_IS_BND_CONNECTOR);
-            if(StrUtil.equals(value, StringPool.TRUE)) {
-                // 如果是 服务任务，直接跳过
+            if(!StrUtil.equals(value, StringPool.TRUE)) {
+                // 如果是 普通服务任务，直接跳过
                 continue;
             }
 
-            String type = oldE.attributeValue(TYPE_ATTRIBUTE);
+            Action action = parseActionAndReplType(oldE);
 
-            Action action = ProcessUtil.parseActionInfo(type);
             if(StrUtil.equalsAny(action.getConnectorGroup(), BRANDNEWDATA_DOMAIN)) {
+                // 取出通用连接器 service 上的多余属性
+                clearAttribute(oldE, TYPE_ATTRIBUTE);
                 // 通用连接器直接跳过
                continue;
             }
@@ -575,10 +573,26 @@ public class ProcessDefinitionParser implements
 
             // 将 bpmn:serviceTask 替换成 bpmn:callActivity
             serviceTask.setQName(BPMN_CALL_ACTIVITY_QNAME);
+            // 清除多余属性
+            clearAttribute(serviceTask, ID_ATTRIBUTE, NAME_ATTRIBUTE);
 
             // 将 zeebe:taskDefinition 替换成 zeebe:calledElement
             replEleZbTdToZbCe(oldE);
         }
+    }
+
+
+    /**
+     * 选择 zeebe:taskDefinition 中的 type 并且解析成 Action, 然后替换type
+     */
+    private Action parseActionAndReplType(Element taskDefinition) {
+        String type = taskDefinition.attributeValue(TYPE_ATTRIBUTE);
+        Action action = ProcessUtil.parseActionInfo(type);
+        // 解析成action后就转换type
+        String newType = ProcessUtil.convertProcessId(type);
+        ProcessUtil.checkProcessId(newType);
+        taskDefinition.addAttribute(TYPE_ATTRIBUTE, newType);
+        return action;
     }
 
     /**
@@ -590,9 +604,7 @@ public class ProcessDefinitionParser implements
         Element parent = taskDefinition.getParent();
         // 创建 called element
         Element newE = DocumentHelper.createElement(ZEEBE_CALLED_ELEMENT_QNAME);
-        // 替换特殊字符
-        String processId = ProcessUtil.convertProcessId(type);
-        newE.addAttribute(PROCESS_ID_ATTRIBUTE, processId);
+        newE.addAttribute(PROCESS_ID_ATTRIBUTE, type);
         newE.addAttribute(PROPAGATE_ALL_CHILD_VARIABLES_ATTRIBUTE, StringPool.FALSE);
         newE.setParent(parent);
         // 替换成 calledElement
@@ -881,6 +893,8 @@ public class ProcessDefinitionParser implements
         replEleBndOmToZbImo(outputMapping);
 
         Element zbTaskDefinition = replEleBndTdToZbTd(bndTaskDefinition);
+
+        parseActionAndReplType(zbTaskDefinition);
 
         // 将 zeebe:taskDefinition 替换成 zeebe:calledElement
         replEleZbTdToZbCe(zbTaskDefinition);
