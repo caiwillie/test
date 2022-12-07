@@ -100,7 +100,7 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
                 po.setEnvId(envId);
                 releaseDeployDao.insert(po);
             } else {
-                bo = zeebeDeploy(po.getProcessZeebeXml(), envId);
+                bo = zeebeDeploy(po.getProcessZeebeXml(), bpmnXmlDto.getProcessName(), envId);
                 if(!StrUtil.equals(bo.getProcessId(), po.getProcessId())) {
                     throw new RuntimeException("zeebe xml's process id is not equal to biz xml' process id");
                 }
@@ -233,8 +233,9 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
     private ZeebeDeployBo zeebeDeploy(BpmnXmlDto bpmnXmlDto, Long envId, String bizType) {
         Assert.notNull(envId, "环境id不能为空");
         Assert.notNull(bizType, "环境类型不能为空");
+        String processName = bpmnXmlDto.getProcessName();
         ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.step1(bpmnXmlDto.getProcessId(),
-                bpmnXmlDto.getProcessName(), bpmnXmlDto.getProcessXml());
+                processName, bpmnXmlDto.getProcessXml());
         ProcessDefinitionParseStep2 step2 = step1.replServiceTask(true, connectorManager).replAttr().step2();
 
         if(StrUtil.equals(bizType, ProcessConst.PROCESS_BIZ_TYPE__SCENE)) {
@@ -252,16 +253,16 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
         // process id 和 name 需要取解析后确认
         String zeebeXml = step2Result.getZeebeXml();
 
-        return zeebeDeploy(zeebeXml, envId);
+        return zeebeDeploy(zeebeXml, processName, envId);
     }
 
-    private ZeebeDeployBo zeebeDeploy(String zeebeXml, Long envId) {
+    private ZeebeDeployBo zeebeDeploy(String zeebeXml, String name, Long envId) {
         ZeebeDeployBo ret = new ZeebeDeployBo();
         ZeebeClient zeebeClient = zeebeClientManager.getByEnvId(envId);
 
         // 调用 zeebe 部署
         DeploymentEvent deploymentEvent = zeebeClient.newDeployResourceCommand()
-                .addResourceStringUtf8(zeebeXml, StrUtil.format("{}.bpmn", IdUtil.simpleUUID()))
+                .addResourceStringUtf8(zeebeXml, StrUtil.format("{}.bpmn", name))
                 .send()
                 .join();
 
