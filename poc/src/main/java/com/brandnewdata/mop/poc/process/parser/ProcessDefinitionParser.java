@@ -433,7 +433,10 @@ public class ProcessDefinitionParser implements
         Element parent = taskDefinition.getParent();
         List<Node> content = parent.content();
         Element newE = DocumentHelper.createElement(ZEEBE_TASK_DEFINITION_QNAME);
-        newE.addAttribute(TYPE_ATTRIBUTE, taskDefinition.attributeValue(TYPE_ATTRIBUTE));
+        // 替换type中的特殊字符，并且校验type
+        String newType = ProcessUtil.convertProcessId(taskDefinition.attributeValue(TYPE_ATTRIBUTE));
+        ProcessUtil.checkProcessId(newType);
+        newE.addAttribute(TYPE_ATTRIBUTE, newType);
         newE.addAttribute(TYPE_IS_BND_CONNECTOR, StringPool.TRUE);
         newE.setParent(parent);
         // 新增 brandnewdata:taskDefinition 替换成 zeebe:taskDefinition
