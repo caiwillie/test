@@ -262,6 +262,8 @@ public class ProcessDefinitionParser implements
         this.name = name;
         this.originalDocument = readRoot(xml);
         this.zeebeDocument = readRoot(xml);
+        log.info("======================== 转换前的xml =====================\n");
+        log.info(serialize(originalDocument));
 
         // 转换namespace zeebe2 => zeebe
         replNsZeebe2();
@@ -632,8 +634,8 @@ public class ProcessDefinitionParser implements
         originalDocumentStr = serialize(originalDocument);
         zeebeDocumentStr = serialize(zeebeDocument);
         String TEMPLATE =
-                "\n======================= 转换前 xml =======================\n{}" +
-                        "\n======================= 转换后 xml =======================\n{}";
+                "\n======================= original xml =======================\n{}" +
+                        "\n======================= zeebe xml =======================\n{}";
         log.info(StrUtil.format(TEMPLATE, originalDocumentStr, zeebeDocumentStr));
     }
 
