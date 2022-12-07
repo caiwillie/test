@@ -10,6 +10,8 @@ public interface AttributeConstants {
 
     String TYPE_ATTRIBUTE = "type";
 
+    String TYPE_IS_BND_CONNECTOR = "isBrandnewdataConnector";
+
     String LABEL_ATTRIBUTE = "label";
 
     String DATA_TYPE_ATTRIBUTE = "dataType";

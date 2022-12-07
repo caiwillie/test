@@ -434,6 +434,7 @@ public class ProcessDefinitionParser implements
         List<Node> content = parent.content();
         Element newE = DocumentHelper.createElement(ZEEBE_TASK_DEFINITION_QNAME);
         newE.addAttribute(TYPE_ATTRIBUTE, taskDefinition.attributeValue(TYPE_ATTRIBUTE));
+        newE.addAttribute(TYPE_IS_BND_CONNECTOR, StringPool.TRUE);
         newE.setParent(parent);
         // 新增 brandnewdata:taskDefinition 替换成 zeebe:taskDefinition
         content.set(content.indexOf(taskDefinition), newE);
@@ -553,9 +554,15 @@ public class ProcessDefinitionParser implements
 
         for (Node node : nodes) {
             Element oldE = (Element) node;
-            String type = oldE.attributeValue(TYPE_ATTRIBUTE);
-            Action action = ProcessUtil.parseActionInfo(type);
+            String value = oldE.attributeValue(TYPE_IS_BND_CONNECTOR);
+            if(StrUtil.equals(value, StringPool.TRUE)) {
+                // 如果是 服务任务，直接跳过
+                continue;
+            }
 
+            String type = oldE.attributeValue(TYPE_ATTRIBUTE);
+
+            Action action = ProcessUtil.parseActionInfo(type);
             if(StrUtil.equalsAny(action.getConnectorGroup(), BRANDNEWDATA_DOMAIN)) {
                 // 通用连接器直接跳过
                continue;

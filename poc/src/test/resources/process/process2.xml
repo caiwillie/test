@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:brandnewdata="https://www.brandnewdata.com/schema/1.0" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+    <bpmn2:process id="Process_0421501d-5f7d-4b67-b358-3fb24505c281" isExecutable="false">
+        <bpmn2:startEvent id="StartEvent_1" name="开始事件">
+            <bpmn2:outgoing>Flow_124mmkw</bpmn2:outgoing>
+        </bpmn2:startEvent>
+        <bpmn2:serviceTask id="Activity_0hw6sj7" name="http连接器 - 发送请求" brandnewdata:modelerIcon="https://baida-private.oss-cn-hangzhou.aliyuncs.com/1656406256694http通用连接器.svg" brandnewdata:modelerGroup="com.brandnewdata" brandnewdata:modelerUid="http" brandnewdata:modelerId="1539800012315676673" brandnewdata:modelerType="3" brandnewdata:modelerName="http连接器" brandnewdata:modelerVersion="1.0.0">
+            <bpmn2:extensionElements>
+                <brandnewdata:taskDefinition type="com.brandnewdata:http.request:1.0.0" configId="1600399823713480705"/>
+                <brandnewdata:inputMapping label="入参配置">
+                    <brandnewdata:input type="string" name="url" label="请求URL" value="&quot;/devices&quot;" required="true"/>
+                    <brandnewdata:input type="string" name="requestMethod" label="请求方法" value="&quot;GET&quot;" required="true"/>
+                    <brandnewdata:input type="struct" name="urlParams" label="URL参数" required="false" dataType="string">
+                        <brandnewdata:input type="dict" name="pathParams" label="path参数" required="false" dataType="string"/>
+                        <brandnewdata:input type="dict" name="queryParams" label="query参数" required="false" dataType="string"/>
+                    </brandnewdata:input>
+                    <brandnewdata:input type="string" name="requestHeaders" label="请求头" value="" required="false"/>
+                    <brandnewdata:input type="string" name="requestBody" label="请求体" value="" required="false"/>
+                </brandnewdata:inputMapping>
+                <brandnewdata:outputMapping label="出参配置">
+                    <brandnewdata:output type="int" name="status" label="响应状态" value="status" required="false"/>
+                    <brandnewdata:output type="string" name="body" label="响应体" value="body" required="false"/>
+                </brandnewdata:outputMapping>
+            </bpmn2:extensionElements>
+            <bpmn2:incoming>Flow_124mmkw</bpmn2:incoming>
+            <bpmn2:outgoing>Flow_1pzpkmo</bpmn2:outgoing>
+        </bpmn2:serviceTask>
+        <bpmn2:sequenceFlow id="Flow_124mmkw" sourceRef="StartEvent_1" targetRef="Activity_0hw6sj7"/>
+        <bpmn2:serviceTask id="Activity_1cm2njt" name="服务任务">
+            <bpmn2:extensionElements>
+                <zeebe:taskHeaders>
+                    <zeebe:header key="language" value="groovy"/>
+                    <zeebe:header key="script" value="import groovy.json.JsonSlurper; def body = job.getVariablesAsMap().get(&quot;body&quot;); def json = new JsonSlurper(); def result = json.parseText(body); return result;"/>
+                </zeebe:taskHeaders>
+                <zeebe:taskDefinition type="script" retries=""/>
+                <zeebe:ioMapping>
+                    <zeebe:output source="= result.baseStatus" target="baseStatus"/>
+                    <zeebe:output source="= result.data" target="data"/>
+                    <zeebe:output source="= result.msg" target="msg"/>
+                    <zeebe:output source="= result.status" target="status"/>
+                </zeebe:ioMapping>
+            </bpmn2:extensionElements>
+            <bpmn2:incoming>Flow_1pzpkmo</bpmn2:incoming>
+            <bpmn2:outgoing>Flow_1lctp6z</bpmn2:outgoing>
+        </bpmn2:serviceTask>
+        <bpmn2:sequenceFlow id="Flow_1pzpkmo" sourceRef="Activity_0hw6sj7" targetRef="Activity_1cm2njt"/>
+        <bpmn2:endEvent id="Event_1hkafuv" name="结束事件">
+            <bpmn2:incoming>Flow_1lctp6z</bpmn2:incoming>
+        </bpmn2:endEvent>
+        <bpmn2:sequenceFlow id="Flow_1lctp6z" sourceRef="Activity_1cm2njt" targetRef="Event_1hkafuv"/>
+    </bpmn2:process>
+    <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+        <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_0421501d-5f7d-4b67-b358-3fb24505c281">
+            <bpmndi:BPMNEdge id="Flow_1lctp6z_di" bpmnElement="Flow_1lctp6z">
+                <di:waypoint x="544" y="424"/>
+                <di:waypoint x="544" y="496"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_1pzpkmo_di" bpmnElement="Flow_1pzpkmo">
+                <di:waypoint x="544" y="304"/>
+                <di:waypoint x="544" y="376"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_124mmkw_di" bpmnElement="Flow_124mmkw">
+                <di:waypoint x="544" y="184"/>
+                <di:waypoint x="544" y="256"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+                <dc:Bounds x="412" y="136" width="263" height="48"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Activity_0hw6sj7_di" bpmnElement="Activity_0hw6sj7">
+                <dc:Bounds x="412" y="256" width="263" height="48"/>
+                <bpmndi:BPMNLabel/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Activity_1cm2njt_di" bpmnElement="Activity_1cm2njt">
+                <dc:Bounds x="412" y="376" width="263" height="48"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Event_1hkafuv_di" bpmnElement="Event_1hkafuv">
+                <dc:Bounds x="412" y="496" width="263" height="48"/>
+            </bpmndi:BPMNShape>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

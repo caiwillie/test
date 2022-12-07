@@ -85,6 +85,15 @@ class ProcessDefinitionParserTest {
         Step1Result step1Result = step1.step1Result();
         return;
     }
+
+    @Test
+    void testParseOriginalXml2() {
+        String xml = ResourceUtil.readUtf8Str("process/process2.xml");
+        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.step1(null, null, xml);
+        step1.replServiceTask(false, null);
+        Step1Result step1Result = step1.step1Result();
+        return;
+    }
 }
 
 //Generated with love by TestMe :) Please report issues and submit feature requests at: http://weirddev.com/forum#!/testme
