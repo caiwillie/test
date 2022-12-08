@@ -389,7 +389,6 @@ public class ProcessDefinitionParser implements
                 continue;
             }
             String properties = manager.getConfigInfo(configId).getConfigs();
-            log.info("configId {}, data {}", configId, properties);
             if(StrUtil.isNotBlank(properties)) {
                 Element newE = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
                 newE.addAttribute(TARGET_ATTRIBUTE, PROPERTIES_PREFIX);

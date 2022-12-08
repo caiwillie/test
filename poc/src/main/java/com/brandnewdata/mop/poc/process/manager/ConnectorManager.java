@@ -15,12 +15,14 @@ import com.brandnewdata.mop.poc.process.manager.dto.TriggerInfo;
 import com.brandnewdata.mop.poc.process.parser.dto.Action;
 import com.brandnewdata.mop.poc.scene.dto.SceneReleaseDeployDto;
 import com.dxy.library.json.jackson.JacksonUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Component
 public class ConnectorManager {
 
@@ -44,6 +46,7 @@ public class ConnectorManager {
 
     public ConfigInfo getConfigInfo(String configId) {
         IConnectorConfFeign.ConnectorConfDTO configInfo = confClient.getConfigInfo(Long.parseLong(configId));
+        log.info("configId {}, data {}", configId, JacksonUtil.to(configInfo));
         if(configInfo == null) return null;
         ConfigInfo ret = new ConfigInfo();
         ret.setId(configInfo.getId());
