@@ -560,7 +560,7 @@ public class ProcessDefinitionParser implements
                 continue;
             }
 
-            Action action = parseActionAndReplType(oldE);
+            Action action = parseActionAndReplType(oldE, false);
 
             if(StrUtil.equalsAny(action.getConnectorGroup(), BRANDNEWDATA_DOMAIN)) {
                 // 取出通用连接器 service 上的多余属性
@@ -568,6 +568,8 @@ public class ProcessDefinitionParser implements
                 // 通用连接器直接跳过
                continue;
             }
+
+            parseActionAndReplType(oldE, true);
 
             Element serviceTask = oldE.getParent().getParent();
 
@@ -585,15 +587,18 @@ public class ProcessDefinitionParser implements
     /**
      * 选择 zeebe:taskDefinition 中的 type 并且解析成 Action, 然后替换type
      */
-    private Action parseActionAndReplType(Element taskDefinition) {
+    private Action parseActionAndReplType(Element taskDefinition, boolean replType) {
         String type = taskDefinition.attributeValue(TYPE_ATTRIBUTE);
         Action action = ProcessUtil.parseActionInfo(type);
         // 解析成action后就转换type
         String newType = ProcessUtil.convertProcessId(type);
         ProcessUtil.checkProcessId(newType);
-        taskDefinition.addAttribute(TYPE_ATTRIBUTE, newType);
+        if(replType) {
+            taskDefinition.addAttribute(TYPE_ATTRIBUTE, newType);
+        }
         return action;
     }
+
 
     /**
      * 选择 //zeebe:taskDefinition
@@ -894,7 +899,7 @@ public class ProcessDefinitionParser implements
 
         Element zbTaskDefinition = replEleBndTdToZbTd(bndTaskDefinition);
 
-        parseActionAndReplType(zbTaskDefinition);
+        parseActionAndReplType(zbTaskDefinition, true);
 
         // 将 zeebe:taskDefinition 替换成 zeebe:calledElement
         replEleZbTdToZbCe(zbTaskDefinition);
