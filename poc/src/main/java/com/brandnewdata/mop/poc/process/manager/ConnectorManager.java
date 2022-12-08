@@ -50,8 +50,8 @@ public class ConnectorManager {
         ret.setConnectorGroup(configInfo.getConnectorGroup());
         ret.setConnectorId(configInfo.getConnectorId());
         ret.setConnectorVersion(configInfo.getConnectorVersion());
-        ret.setConfigName(ret.getConfigName());
-        ret.setConfigs(ret.getConfigs());
+        ret.setConfigName(configInfo.getConfigName());
+        ret.setConfigs(configInfo.getConfigs());
         return ret;
     }
 
