@@ -9,6 +9,7 @@ import cn.hutool.core.lang.Opt;
 import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.process.manager.ConnectorManager;
+import com.brandnewdata.mop.poc.process.manager.dto.ConfigInfo;
 import com.brandnewdata.mop.poc.process.parser.constants.StringPool;
 import com.brandnewdata.mop.poc.process.parser.dto.*;
 import com.brandnewdata.mop.poc.process.util.ProcessUtil;
@@ -388,8 +389,10 @@ public class ProcessDefinitionParser implements
             if(StrUtil.isBlank(configId)) {
                 continue;
             }
-            String properties = manager.getConfigInfo(configId).getConfigs();
-            if(StrUtil.isNotBlank(properties)) {
+            ConfigInfo configInfo = manager.getConfigInfo(configId);
+            Assert.notNull(configInfo, "连接配置 {} 不存在", configId);
+            String properties = configInfo.getConfigs();
+            if(StrUtil.isNotBlank(configInfo.getConfigs())) {
                 Element newE = DocumentHelper.createElement(ZEEBE_INPUT_QNAME);
                 newE.addAttribute(TARGET_ATTRIBUTE, PROPERTIES_PREFIX);
                 newE.addAttribute(SOURCE_ATTRIBUTE, StrUtil.format("{} {}", StringPool.EQUALS, properties));
