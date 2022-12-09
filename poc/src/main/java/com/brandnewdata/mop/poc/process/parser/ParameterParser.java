@@ -33,7 +33,7 @@ public class ParameterParser {
 
     private final String nameAttribute;
 
-    private final String valueAttribute;
+    private final String expressionAttribute;
 
     private final String labelAttribute;
 
@@ -43,13 +43,13 @@ public class ParameterParser {
 
     public ParameterParser(String qName,
                             String nameAttribute,
-                            String valueAttribute,
+                            String expressionAttribute,
                             String labelAttribute,
                             String typeAttribute,
                             String innerTypeAttribute) {
         this.qName = qName;
         this.nameAttribute = nameAttribute;
-        this.valueAttribute = valueAttribute;
+        this.expressionAttribute = expressionAttribute;
         this.labelAttribute = labelAttribute;
         this.typeAttribute = typeAttribute;
         this.innerTypeAttribute = innerTypeAttribute;
@@ -57,7 +57,7 @@ public class ParameterParser {
 
 
     public ObjectNode parse(Element root) {
-        return parseStruct(root);
+        return (ObjectNode) parseStruct(root);
     }
 
     private Object parseEach(Element root) {
@@ -72,7 +72,7 @@ public class ParameterParser {
         } else if (StrUtil.equals(type, Constants.TYPE_ENUM)) {
             ret = parseList(root);
         } else {
-            String value = root.attributeValue(valueAttribute);
+            String value = root.attributeValue(expressionAttribute);
             if(StrUtil.isNotBlank(value)) {
                 // 基础类型直接放入的是 rawValue
                 ret = new RawValue(value);
@@ -82,7 +82,11 @@ public class ParameterParser {
         return ret;
     }
 
-    private ObjectNode parseStruct(Element root) {
+    private Object parseStruct(Element root) {
+        String expression = root.attributeValue(expressionAttribute);
+        if(StrUtil.isNotBlank(expression)) {
+            return new RawValue(expression);
+        }
         ObjectNode ret = OM.createObjectNode();
         if(root == null ) {
             return null;
