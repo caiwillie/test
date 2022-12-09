@@ -3,6 +3,7 @@ package com.brandnewdata.mop.poc.bff.controller.operate;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.bff.service.operate.OperateBffService;
 import com.brandnewdata.mop.poc.bff.vo.operate.process.FlowNodeStateVo;
+import com.brandnewdata.mop.poc.bff.vo.operate.process.ProcessInstanceVo;
 import com.brandnewdata.mop.poc.bff.vo.operate.process.SequenceFlowVo;
 import com.brandnewdata.mop.poc.bff.vo.operate.process.VariableVo;
 import com.brandnewdata.mop.poc.operate.dto.FlowNodeInstanceDto;
@@ -23,6 +24,20 @@ public class OperateController {
 
     public OperateController(OperateBffService operateBffService) {
         this.operateBffService = operateBffService;
+    }
+
+    /**
+     * 获取流程实例的详情
+     *
+     * @param envId             the env id
+     * @param processInstanceId the process instance id
+     * @return the result
+     */
+    @GetMapping("/rest/operate/process/processInstance/detail")
+    public Result<ProcessInstanceVo> detailProcessInstance(@RequestParam Long envId,
+                                                           @RequestParam String processInstanceId) {
+        ProcessInstanceVo processInstanceVo = operateBffService.detailProcessInstance(envId, processInstanceId);
+        return Result.OK(processInstanceVo);
     }
 
     /**

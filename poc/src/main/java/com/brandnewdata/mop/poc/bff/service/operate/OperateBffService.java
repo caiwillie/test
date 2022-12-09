@@ -3,8 +3,10 @@ package com.brandnewdata.mop.poc.bff.service.operate;
 import com.brandnewdata.mop.poc.bff.converter.operate.SequenceFlowVoConverter;
 import com.brandnewdata.mop.poc.bff.converter.operate.VariableVoConverter;
 import com.brandnewdata.mop.poc.bff.vo.operate.process.FlowNodeStateVo;
+import com.brandnewdata.mop.poc.bff.vo.operate.process.ProcessInstanceVo;
 import com.brandnewdata.mop.poc.bff.vo.operate.process.SequenceFlowVo;
 import com.brandnewdata.mop.poc.bff.vo.operate.process.VariableVo;
+import com.brandnewdata.mop.poc.bff.vo.scene.operate.ProcessInstance;
 import com.brandnewdata.mop.poc.operate.dto.*;
 import com.brandnewdata.mop.poc.operate.service.IFlowNodeInstanceService2;
 import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService2;
@@ -32,6 +34,11 @@ public class OperateBffService {
         this.processInstanceService = processInstanceService;
         this.variableService = variableService;
         this.flowNodeInstanceService = flowNodeInstanceService;
+    }
+
+    public ProcessInstanceVo detailProcessInstance(Long envId, String processInstanceId) {
+        ListViewProcessInstanceDto processInstanceDto = processInstanceService.detailProcessInstance(envId, Long.valueOf(processInstanceId));
+        return null;
     }
 
     public List<SequenceFlowVo> listSequenceFlows(Long envId, String processInstanceId) {
