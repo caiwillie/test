@@ -274,9 +274,12 @@ public class SceneVersionService implements ISceneVersionService {
                 sceneReleaseDeployDto = sceneReleaseDeployService.save(sceneReleaseDeployDto);
 
                 // todo caiwillie 上报
-                connectorManager.saveRequestParams(envId, processDefinitionParseDto.getTriggerFullId(),
-                        processDefinitionParseDto.getProtocol(), processDefinitionParseDto.getRequestParams(),
-                        sceneReleaseDeployDto);
+                if(StrUtil.isNotBlank(processDefinitionParseDto.getTriggerFullId())) {
+                    // 有触发器时，才需要上报
+                    connectorManager.saveRequestParams(envId, processDefinitionParseDto.getTriggerFullId(),
+                            processDefinitionParseDto.getProtocol(), processDefinitionParseDto.getRequestParams(),
+                            sceneReleaseDeployDto);
+                }
             }
         }
 

