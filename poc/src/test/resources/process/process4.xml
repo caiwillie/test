@@ -1,81 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:brandnewdata="https://www.brandnewdata.com/schema/1.0" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
-    <bpmn2:process id="Process_f6449900-a874-4d11-989d-71cae027091f" isExecutable="false">
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:brandnewdata="https://www.brandnewdata.com/schema/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+    <bpmn2:process id="Process_2ee46471-fcc6-46f0-b187-75eb731d5e0f" name="创建应用" isExecutable="false">
         <bpmn2:startEvent id="StartEvent_1" name="开始事件">
-            <bpmn2:outgoing>Flow_0f0z9l5</bpmn2:outgoing>
+            <bpmn2:outgoing>Flow_1a91skn</bpmn2:outgoing>
         </bpmn2:startEvent>
-        <bpmn2:serviceTask id="Activity_06k6mle" name="http连接器 - 发送请求" brandnewdata:modelerIcon="https://baida-private.oss-cn-hangzhou.aliyuncs.com/1656406256694http通用连接器.svg" brandnewdata:modelerGroup="com.brandnewdata" brandnewdata:modelerUid="http" brandnewdata:modelerId="1539800012315676673" brandnewdata:modelerType="3" brandnewdata:modelerName="http连接器" brandnewdata:modelerVersion="1.0.0">
+        <bpmn2:serviceTask id="Activity_084vrcs" name="AI中台 - POST 创建应用" brandnewdata:modelerIcon="https://baida-private.oss-cn-hangzhou.aliyuncs.com/166969019837616654696248268_8人工智能.png" brandnewdata:modelerGroup="com.developer" brandnewdata:modelerUid="ai-middle-platform" brandnewdata:modelerId="1597422061279944706" brandnewdata:modelerType="2" brandnewdata:modelerName="AI中台" brandnewdata:modelerVersion="1.0.0">
             <bpmn2:extensionElements>
-                <brandnewdata:taskDefinition type="com.brandnewdata:http.request:1.0.0" configId="1600399823713480705" />
+                <brandnewdata:taskDefinition type="com.developer:ai-middle-platform.add-application:1.0.0" />
                 <brandnewdata:inputMapping label="入参配置">
-                    <brandnewdata:input type="string" name="url" label="请求URL" value="/alertRule" required="true" />
-                    <brandnewdata:input type="string" name="requestMethod" label="请求方法" value="GET" required="true" />
-                    <brandnewdata:input type="struct" name="urlParams" label="URL参数" required="false" dataType="string" value="">
-                        <brandnewdata:input type="dict" name="pathParams" label="path参数" required="false" dataType="string" />
-                        <brandnewdata:input type="dict" name="queryParams" label="query参数" required="false" dataType="string" />
+                    <brandnewdata:input type="struct" name="appinfo" label="appinfo" required="true" dataType="undefined" value="appInfo">
+                        <brandnewdata:input type="string" name="name" label="name" value="" required="true" />
+                        <brandnewdata:input type="string" name="description" label="description" value="" required="true" />
+                        <brandnewdata:input type="string" name="appLabels" label="appLabels" value="" required="true" />
+                        <brandnewdata:input type="string" name="models" label="models" value="" required="true" />
                     </brandnewdata:input>
-                    <brandnewdata:input type="string" name="requestHeaders" label="请求头" value="" required="false" />
-                    <brandnewdata:input type="string" name="requestBody" label="请求体" value="" required="false" />
                 </brandnewdata:inputMapping>
                 <brandnewdata:outputMapping label="出参配置">
-                    <brandnewdata:output type="int" name="status" label="响应状态" value="status" required="false" />
-                    <brandnewdata:output type="string" name="body" label="响应体" value="body" required="false" />
+                    <brandnewdata:output type="string" name="baseStatus" label="baseStatus" value="baseStatus" required="false" />
+                    <brandnewdata:output type="bool" name="data" label="data" value="data" required="true" />
+                    <brandnewdata:output type="string" name="msg" label="msg" value="msg" required="false" />
+                    <brandnewdata:output type="string" name="status" label="status" value="status" required="true" />
                 </brandnewdata:outputMapping>
             </bpmn2:extensionElements>
-            <bpmn2:incoming>Flow_0f0z9l5</bpmn2:incoming>
-            <bpmn2:outgoing>Flow_01snwra</bpmn2:outgoing>
+            <bpmn2:incoming>Flow_1a91skn</bpmn2:incoming>
+            <bpmn2:outgoing>Flow_1jm407a</bpmn2:outgoing>
         </bpmn2:serviceTask>
-        <bpmn2:sequenceFlow id="Flow_0f0z9l5" sourceRef="StartEvent_1" targetRef="Activity_06k6mle" />
-        <bpmn2:scriptTask id="Activity_1iabefi" name="脚本任务">
-            <bpmn2:extensionElements>
-                <zeebe:taskHeaders>
-                    <zeebe:header key="language" value="groovy" />
-                    <zeebe:header key="script" value="import groovy.json.JsonSlurper;  def body = job.getVariablesAsMap().get(body); def json = new JsonSlurper(); def result = json.parseText(body); return result;" />
-                </zeebe:taskHeaders>
-                <zeebe:taskDefinition type="script" />
-                <zeebe:ioMapping>
-                    <zeebe:output source="= result.baseStatus" target="baseStatus" />
-                    <zeebe:output source="= result.data" target="data" />
-                    <zeebe:output source="= result.msg" target="msg" />
-                    <zeebe:output source="= result.status" target="status" />
-                </zeebe:ioMapping>
-            </bpmn2:extensionElements>
-            <bpmn2:incoming>Flow_01snwra</bpmn2:incoming>
-            <bpmn2:outgoing>Flow_1xlxfk0</bpmn2:outgoing>
-        </bpmn2:scriptTask>
-        <bpmn2:sequenceFlow id="Flow_01snwra" sourceRef="Activity_06k6mle" targetRef="Activity_1iabefi" />
-        <bpmn2:endEvent id="Event_1tlhzdm" name="结束事件">
-            <bpmn2:incoming>Flow_1xlxfk0</bpmn2:incoming>
+        <bpmn2:sequenceFlow id="Flow_1a91skn" sourceRef="StartEvent_1" targetRef="Activity_084vrcs" />
+        <bpmn2:endEvent id="Event_1t2k2oi" name="结束事件">
+            <bpmn2:incoming>Flow_1jm407a</bpmn2:incoming>
         </bpmn2:endEvent>
-        <bpmn2:sequenceFlow id="Flow_1xlxfk0" sourceRef="Activity_1iabefi" targetRef="Event_1tlhzdm" />
+        <bpmn2:sequenceFlow id="Flow_1jm407a" sourceRef="Activity_084vrcs" targetRef="Event_1t2k2oi" />
     </bpmn2:process>
     <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-        <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_f6449900-a874-4d11-989d-71cae027091f">
-            <bpmndi:BPMNEdge id="Flow_1xlxfk0_di" bpmnElement="Flow_1xlxfk0">
-                <di:waypoint x="540" y="224" />
-                <di:waypoint x="540" y="276" />
+        <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_2ee46471-fcc6-46f0-b187-75eb731d5e0f">
+            <bpmndi:BPMNEdge id="Flow_1jm407a_di" bpmnElement="Flow_1jm407a">
+                <di:waypoint x="560" y="174" />
+                <di:waypoint x="560" y="226" />
             </bpmndi:BPMNEdge>
-            <bpmndi:BPMNEdge id="Flow_01snwra_di" bpmnElement="Flow_01snwra">
-                <di:waypoint x="540" y="124" />
-                <di:waypoint x="540" y="176" />
-            </bpmndi:BPMNEdge>
-            <bpmndi:BPMNEdge id="Flow_0f0z9l5_di" bpmnElement="Flow_0f0z9l5">
-                <di:waypoint x="540" y="24" />
-                <di:waypoint x="540" y="76" />
+            <bpmndi:BPMNEdge id="Flow_1a91skn_di" bpmnElement="Flow_1a91skn">
+                <di:waypoint x="560" y="74" />
+                <di:waypoint x="560" y="126" />
             </bpmndi:BPMNEdge>
             <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
-                <dc:Bounds x="408" y="-24" width="263" height="48" />
+                <dc:Bounds x="428" y="26" width="263" height="48" />
             </bpmndi:BPMNShape>
-            <bpmndi:BPMNShape id="Activity_06k6mle_di" bpmnElement="Activity_06k6mle">
-                <dc:Bounds x="408" y="76" width="263" height="48" />
+            <bpmndi:BPMNShape id="Activity_084vrcs_di" bpmnElement="Activity_084vrcs">
+                <dc:Bounds x="428" y="126" width="263" height="48" />
                 <bpmndi:BPMNLabel />
             </bpmndi:BPMNShape>
-            <bpmndi:BPMNShape id="Activity_1iabefi_di" bpmnElement="Activity_1iabefi">
-                <dc:Bounds x="408" y="176" width="263" height="48" />
-                <bpmndi:BPMNLabel />
-            </bpmndi:BPMNShape>
-            <bpmndi:BPMNShape id="Event_1tlhzdm_di" bpmnElement="Event_1tlhzdm">
-                <dc:Bounds x="408" y="276" width="263" height="48" />
+            <bpmndi:BPMNShape id="Event_1t2k2oi_di" bpmnElement="Event_1t2k2oi">
+                <dc:Bounds x="428" y="226" width="263" height="48" />
             </bpmndi:BPMNShape>
         </bpmndi:BPMNPlane>
     </bpmndi:BPMNDiagram>

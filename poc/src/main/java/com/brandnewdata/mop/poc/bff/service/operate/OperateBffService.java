@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.poc.bff.service.operate;
 
+import com.brandnewdata.mop.poc.bff.converter.operate.ProcessInstanceVoConverter;
 import com.brandnewdata.mop.poc.bff.converter.operate.SequenceFlowVoConverter;
 import com.brandnewdata.mop.poc.bff.converter.operate.VariableVoConverter;
 import com.brandnewdata.mop.poc.bff.vo.operate.process.FlowNodeStateVo;
@@ -38,7 +39,7 @@ public class OperateBffService {
 
     public ProcessInstanceVo detailProcessInstance(Long envId, String processInstanceId) {
         ListViewProcessInstanceDto processInstanceDto = processInstanceService.detailProcessInstance(envId, Long.valueOf(processInstanceId));
-        return null;
+        return ProcessInstanceVoConverter.createFrom(processInstanceDto);
     }
 
     public List<SequenceFlowVo> listSequenceFlows(Long envId, String processInstanceId) {
