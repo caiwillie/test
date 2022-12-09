@@ -358,7 +358,7 @@ public class SceneVersionService implements ISceneVersionService {
         }
 
         // build new version process
-        for (VersionProcessDto versionProcessDto : latestVersionProcessDtoList) {
+        for (VersionProcessDto versionProcessDto : versionProcessDtoList) {
             BpmnXmlDto bpmnXmlDto = new BpmnXmlDto();
             bpmnXmlDto.setProcessId(versionProcessDto.getProcessId());
             bpmnXmlDto.setProcessName(versionProcessDto.getProcessName());
