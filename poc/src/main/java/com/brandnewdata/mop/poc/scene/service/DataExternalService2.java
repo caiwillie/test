@@ -109,6 +109,8 @@ public class DataExternalService2 implements IDataExternalService2 {
         SceneVersionExportDto ret = new SceneVersionExportDto();
         ret.setFileName(StrUtil.format("【场景导出】{}-{}.zip", sceneDto.getName(), sceneVersionDto.getVersion()));
         byte[] bytes = IoUtil.readBytes(FileUtil.getInputStream(zip));
+        ret.setBytes(bytes);
+        return ret;
     }
 
     private void parseConfig(Map<ConnectorExportBo, Map<String, ConfigExportBo>> configMap, Map<String, String> configIdMap) {
