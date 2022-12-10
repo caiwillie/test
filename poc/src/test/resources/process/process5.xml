@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:brandnewdata="https://www.brandnewdata.com/schema/1.0" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+    <bpmn2:process id="Process_5eb3d747-01c4-4745-9c94-e60a63a71d8b" name="获取所有节点" isExecutable="false">
+        <bpmn2:startEvent id="StartEvent_1" name="开始事件">
+            <bpmn2:outgoing>Flow_0z0m73m</bpmn2:outgoing>
+        </bpmn2:startEvent>
+        <bpmn2:serviceTask id="Activity_0vwo6jv" name="AI中台 - GET 获取所有节点" brandnewdata:modelerIcon="https://baida-private.oss-cn-hangzhou.aliyuncs.com/166969019837616654696248268_8人工智能.png" brandnewdata:modelerGroup="com.developer" brandnewdata:modelerUid="ai-middle-platform" brandnewdata:modelerId="1597422061279944706" brandnewdata:modelerType="2" brandnewdata:modelerName="AI中台" brandnewdata:modelerVersion="1.0.0">
+            <bpmn2:extensionElements>
+                <brandnewdata:taskDefinition type="com.developer:ai-middle-platform.list-nodes:1.0.0" />
+                <brandnewdata:outputMapping label="出参配置">
+                    <brandnewdata:output type="string" name="baseStatus" label="返回状态" value="baseStatus" required="false" />
+                    <brandnewdata:output type="list" name="data" label="返回数据" required="false" dataType="nodeInfo" value="data" />
+                    <brandnewdata:output type="string" name="msg" label="返回信息" value="msg" required="false" />
+                    <brandnewdata:output type="string" name="status" label="返回状态码" value="status" required="false" />
+                </brandnewdata:outputMapping>
+            </bpmn2:extensionElements>
+            <bpmn2:incoming>Flow_0z0m73m</bpmn2:incoming>
+            <bpmn2:outgoing>Flow_08lw3vh</bpmn2:outgoing>
+        </bpmn2:serviceTask>
+        <bpmn2:sequenceFlow id="Flow_0z0m73m" sourceRef="StartEvent_1" targetRef="Activity_0vwo6jv" />
+        <bpmn2:endEvent id="Event_0dk7vv7" name="结束事件">
+            <bpmn2:incoming>Flow_08lw3vh</bpmn2:incoming>
+        </bpmn2:endEvent>
+        <bpmn2:sequenceFlow id="Flow_08lw3vh" sourceRef="Activity_0vwo6jv" targetRef="Event_0dk7vv7" />
+    </bpmn2:process>
+    <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+        <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_5eb3d747-01c4-4745-9c94-e60a63a71d8b">
+            <bpmndi:BPMNEdge id="Flow_0z0m73m_di" bpmnElement="Flow_0z0m73m">
+                <di:waypoint x="560" y="74" />
+                <di:waypoint x="560" y="126" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_08lw3vh_di" bpmnElement="Flow_08lw3vh">
+                <di:waypoint x="560" y="174" />
+                <di:waypoint x="560" y="226" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+                <dc:Bounds x="428" y="26" width="263" height="48" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Activity_0vwo6jv_di" bpmnElement="Activity_0vwo6jv">
+                <dc:Bounds x="428" y="126" width="263" height="48" />
+                <bpmndi:BPMNLabel />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Event_0dk7vv7_di" bpmnElement="Event_0dk7vv7">
+                <dc:Bounds x="428" y="226" width="263" height="48" />
+            </bpmndi:BPMNShape>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

@@ -107,7 +107,11 @@ public class ParameterParser {
         return ret;
     }
 
-    private ArrayNode parseList(Element root) {
+    private Object parseList(Element root) {
+        String expression = root.attributeValue(expressionAttribute);
+        if(StrUtil.isNotBlank(expression)) {
+            return new RawValue(expression);
+        }
         ArrayNode ret = OM.createArrayNode();
         if(root == null) {
             return null;
