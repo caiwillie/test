@@ -8,4 +8,6 @@ public interface IDataExternalService2 {
 
     public SceneVersionExportDto export(Long versionId, List<String> processIdList);
 
+    public void importData();
+
 }

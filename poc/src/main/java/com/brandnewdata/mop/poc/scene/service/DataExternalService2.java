@@ -113,6 +113,11 @@ public class DataExternalService2 implements IDataExternalService2 {
         return ret;
     }
 
+    @Override
+    public void importData() {
+
+    }
+
     private void parseConfig(Map<ConnectorExportBo, Map<String, ConfigExportBo>> configMap, Map<String, String> configIdMap) {
         if(CollUtil.isEmpty(configIdMap)) return;
         Assert.isFalse(CollUtil.hasNull(configMap.keySet()), "配置ID不能为空");

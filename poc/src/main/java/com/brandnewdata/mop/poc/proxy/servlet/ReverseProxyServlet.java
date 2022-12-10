@@ -3,7 +3,9 @@ package com.brandnewdata.mop.poc.proxy.servlet;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.lang.Opt;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
@@ -128,7 +130,10 @@ public class ReverseProxyServlet extends ProxyServlet {
             proxyEndpointCallDto.setExecuteStatus("false");
             proxyEndpointCallDto.setErrorMessage(e.getMessage());
             response.setStatus(HttpStatus.HTTP_INTERNAL_ERROR);
-            ServletUtil.write(response, e.getMessage(), ContentType.JSON.getValue());
+            ServletUtil.write(response, StrUtil.format("{} {}",
+                    e.toString(),
+                    Opt.ofNullable(e.getMessage()).map(str -> ": " + str).orElse("")),
+                    ContentType.TEXT_PLAIN.getValue());
         } finally {
             if (proxyEndpointCallDto.getEndpointId() != null) {
                 long time = LocalDateTimeUtil.between(startTime, LocalDateTime.now()).toMillis();
@@ -151,17 +156,17 @@ public class ReverseProxyServlet extends ProxyServlet {
         if (StrUtil.equals(httpMethod, Method.POST.name())) {
             String contentType = request.getHeader("Content-Type");
             Assert.isTrue(StrUtil.equals(contentType, "application/json"), "Content-Type must be application/json");
-            body = ServletUtil.getBody(request);
+            // body = IoUtil.read(request.getReader(), false);
             // reset reader
-            request.getReader().reset();
+            // request.getReader().reset();
         }
 
         String queryString = request.getQueryString();
 
         dto.setUserAgent(userAgent);
         dto.setHttpMethod(httpMethod);
-        dto.setRequestBody(queryString);
-        dto.setRequestQuery(body);
+        dto.setRequestQuery(queryString);
+        dto.setRequestBody(body);
     }
 
     private void callProcess(HttpServletRequest request, HttpServletResponse response, ProxyEndpointSceneBo config) {
