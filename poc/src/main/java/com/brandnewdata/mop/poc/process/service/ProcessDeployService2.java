@@ -176,13 +176,13 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
         Map<String, Object> processVariables = result.getVariablesAsMap();
         log.info("start process result variables: {}", JacksonUtil.to(processVariables));
 
-        Map<String, Object> resultMap;
+        Map<String, Object> resultMap = processVariables;
         if(StrUtil.isNotBlank(expression)) {
-            Object expressionResult = FeelUtil.evalExpression(expression, processVariables);
-            resultMap = FeelUtil.convertMap(expressionResult);
+            // Object expressionResult = FeelUtil.evalExpression(expression, processVariables);
+            // resultMap = FeelUtil.convertMap(expressionResult);
         } else {
             // 如果表达式为空就返回特定字段的内容
-            resultMap = processVariables;
+            // resultMap = processVariables;
         }
 
         log.info("start process synchronously: {}, resultMap: {}, envId {}",

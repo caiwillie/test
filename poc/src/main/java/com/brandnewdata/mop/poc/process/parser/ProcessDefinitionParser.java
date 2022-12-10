@@ -849,7 +849,7 @@ public class ProcessDefinitionParser implements
         String xml = manager.getTriggerXML(trigger);
 
         // 解析自定义触发器内的通用触发器
-        Step2Result step3Result = ProcessDefinitionParser
+        Step2Result step2Result = ProcessDefinitionParser
                 .step1(trigger.getFullId(), null, xml)
                 .replServiceTask(false, null)
                 .replAttr()
@@ -858,9 +858,9 @@ public class ProcessDefinitionParser implements
                 .step2Result();
 
         // 替换成真实协议
-        protocol = step3Result.getProtocol();
-        requestParams = step3Result.getRequestParams();
-        responseParams = step3Result.getResponseParams();
+        protocol = step2Result.getProtocol();
+        requestParams = step2Result.getRequestParams();
+        responseParams = step2Result.getResponseParams();
 
         // 替换成 call activity
         BndStartEvent bndStartEvent = replEle_BpmnSeToZbCa(bndTaskDefinition);
