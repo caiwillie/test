@@ -183,7 +183,8 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
             response = resultVariables;
         }
 
-        log.info("start process synchronously: {}, response expression eval: {}", processId, JacksonUtil.to(response));
+        log.info("start process synchronously: {}, response: {}, envId {}",
+                processId, JacksonUtil.to(response), envId);
 
         if(response == null) {
             return null;
@@ -206,7 +207,7 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
                 .withResult()
                 .send();
 
-        log.info("start process asynchronously: {}", processId);
+        log.info("start process asynchronously: {}, envId {}", processId, envId);
     }
 
     private String parseResponseExpression(BpmnXmlDto bpmnXmlDto, String bizType) {
