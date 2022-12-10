@@ -51,7 +51,7 @@ public class ConnectorApi implements IConnectorApi {
         // 部署触发器
         if(CollUtil.isNotEmpty(triggers)) {
             for (BPMNResource trigger : triggers) {
-                try{
+                try {
                     BpmnXmlDto bpmnXmlDto = new BpmnXmlDto();
                     bpmnXmlDto.setProcessId(ProcessUtil.convertProcessId(trigger.getModelKey()));
                     bpmnXmlDto.setProcessName(StrUtil.format("【触发器】{}", trigger.getName()));
