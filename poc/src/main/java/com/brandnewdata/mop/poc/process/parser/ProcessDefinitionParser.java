@@ -591,7 +591,7 @@ public class ProcessDefinitionParser implements
      */
     private Action parseActionAndReplType(Element taskDefinition, boolean replType) {
         String type = taskDefinition.attributeValue(TYPE_ATTRIBUTE);
-        Action action = ProcessUtil.parseActionInfo(type);
+        Action action = ProcessUtil.parseAction(type);
         // 解析成action后就转换type
         String newType = ProcessUtil.convertProcessId(type);
         ProcessUtil.checkProcessId(newType);
@@ -744,7 +744,7 @@ public class ProcessDefinitionParser implements
      */
     private void parseTrigger(Element bndTD) {
         String type = bndTD.attributeValue(TYPE_ATTRIBUTE);
-        trigger = ProcessUtil.parseActionInfo(type);
+        trigger = ProcessUtil.parseAction(type);
     }
 
     /**

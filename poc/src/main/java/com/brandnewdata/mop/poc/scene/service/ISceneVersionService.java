@@ -44,4 +44,6 @@ public interface ISceneVersionService {
     SceneVersionDto copyToNew(Long id);
 
     boolean checkNewReleaseVersion(Long sceneId, String version);
+
+    SceneVersionDto fetchOneByIdAndCheckStatus(Long id, int[] statusArr);
 }

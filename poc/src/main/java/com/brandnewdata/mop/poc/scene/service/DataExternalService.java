@@ -226,7 +226,7 @@ public class DataExternalService {
             String configId = entry.getKey();
             String actionFullId = entry.getValue();
             // 根据 fullId 解析获取连接器信息
-            Action action = ProcessUtil.parseActionInfo(actionFullId);
+            Action action = ProcessUtil.parseAction(actionFullId);
             ConnectorBasicInfo connectorBasicInfo = connectorManager.getConnectorBasicInfo(action.getConnectorGroup(),
                     action.getConnectorId(), action.getConnectorVersion());
             Assert.notNull(connectorBasicInfo, "[0x01] 连接器不存在");
