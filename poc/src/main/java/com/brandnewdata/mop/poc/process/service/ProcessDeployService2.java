@@ -41,6 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -172,26 +173,22 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
                 .send()
                 .join();
 
-        Map<String, Object> resultVariables = result.getVariablesAsMap();
-        log.info("start process result variables: {}", JacksonUtil.to(resultVariables));
+        Map<String, Object> processVariables = result.getVariablesAsMap();
+        log.info("start process result variables: {}", JacksonUtil.to(processVariables));
 
-        Object response = null;
+        Map<String, Object> resultMap;
         if(StrUtil.isNotBlank(expression)) {
-            response = FeelUtil.evalExpression(expression, resultVariables);
+            Object expressionResult = FeelUtil.evalExpression(expression, processVariables);
+            resultMap = FeelUtil.convertMap(expressionResult);
         } else {
             // 如果表达式为空就返回特定字段的内容
-            response = resultVariables;
+            resultMap = processVariables;
         }
 
-        log.info("start process synchronously: {}, response: {}, envId {}",
-                processId, JacksonUtil.to(response), envId);
+        log.info("start process synchronously: {}, resultMap: {}, envId {}",
+                processId, JacksonUtil.to(resultMap), envId);
 
-        if(response == null) {
-            return null;
-        } else {
-            // 转换成string，再反序列化成map
-            return JacksonUtil.fromMap(JacksonUtil.to(response));
-        }
+        return Opt.ofNullable(resultMap).orElse(MapUtil.empty());
     }
 
     @Override
