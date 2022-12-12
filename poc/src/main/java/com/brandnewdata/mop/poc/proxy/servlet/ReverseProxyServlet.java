@@ -96,6 +96,7 @@ public class ReverseProxyServlet extends ProxyServlet {
 
             // http request domain
             String domain = request.getHeader("g2-domain");
+            Assert.notNull(domain,"domain not exist");
             log.info("proxy g2-domain: {}, uri: {}, queryString {}", domain, uri, queryString);
 
             ProxyDto proxyDto = proxyAService.fetchByDomain(domain);
@@ -131,10 +132,12 @@ public class ReverseProxyServlet extends ProxyServlet {
             proxyEndpointCallDto.setExecuteStatus("false");
             proxyEndpointCallDto.setErrorMessage(e.getMessage());
             response.setStatus(HttpStatus.HTTP_INTERNAL_ERROR);
-            ServletUtil.write(response, StrUtil.format("{} {}",
-                    e.toString(),
-                    Opt.ofNullable(e.getMessage()).map(str -> ": " + str).orElse("")),
-                    ContentType.TEXT_PLAIN.getValue());
+            String errorMessage = e.getMessage();
+            if(StrUtil.isBlank(errorMessage)) {
+                errorMessage = e.toString();
+            }
+
+            ServletUtil.write(response, errorMessage, ContentType.TEXT_PLAIN.getValue());
         } finally {
             if (proxyEndpointCallDto.getEndpointId() != null) {
                 long time = LocalDateTimeUtil.between(startTime, LocalDateTime.now()).toMillis();
