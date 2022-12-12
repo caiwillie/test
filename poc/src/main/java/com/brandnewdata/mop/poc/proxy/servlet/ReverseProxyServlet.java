@@ -3,7 +3,6 @@ package com.brandnewdata.mop.poc.proxy.servlet;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
-import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Opt;
 import cn.hutool.core.util.NumberUtil;
@@ -113,15 +112,17 @@ public class ReverseProxyServlet extends ProxyServlet {
                     && !NumberUtil.equals(backendType, ProxyConst.BACKEND_TYPE__SERVER)) {
                 throw new RuntimeException("backend type not support: " + endpointDto.getBackendType());
             }
+
+            RepeatReadHttpRequest repeatReadHttpRequest = new RepeatReadHttpRequest(request);
             // 更新 endpoint call dto
-            updateFrom(proxyEndpointCallDto, request);
+            updateFrom(proxyEndpointCallDto, repeatReadHttpRequest);
 
             if (NumberUtil.equals(endpointDto.getBackendType(), ProxyConst.BACKEND_TYPE__SERVER)) {
                 ProxyEndpointServerBo config = proxyEndpointAService.parseServerConfig(backendConfig);
-                forward(request, response, config);
+                forward(repeatReadHttpRequest, response, config);
             } else {
                 ProxyEndpointSceneBo config = proxyEndpointSceneAService.parseConfig(backendConfig);
-                callProcess(request, response, config);
+                callProcess(repeatReadHttpRequest, response, config);
             }
 
             proxyEndpointCallDto.setExecuteStatus("success");
@@ -156,9 +157,7 @@ public class ReverseProxyServlet extends ProxyServlet {
         if (StrUtil.equals(httpMethod, Method.POST.name())) {
             String contentType = request.getHeader("Content-Type");
             Assert.isTrue(StrUtil.equals(contentType, "application/json"), "Content-Type must be application/json");
-            // body = IoUtil.read(request.getReader(), false);
-            // reset reader
-            // request.getReader().reset();
+            ServletUtil.getBody(request);
         }
 
         String queryString = request.getQueryString();
