@@ -2,7 +2,6 @@ package com.brandnewdata.mop.poc.connector.api;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.api.connector.IConnectorApi;

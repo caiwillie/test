@@ -1,8 +1,5 @@
 package com.brandnewdata.mop.poc.util;
 
-import cn.hutool.core.net.Ipv4Util;
-import cn.hutool.extra.servlet.ServletUtil;
-import com.alibaba.nacos.common.utils.IPUtil;
 import org.apache.http.HttpHost;
 import org.springframework.util.StringUtils;
 
