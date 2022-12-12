@@ -9,6 +9,7 @@ import com.brandnewdata.mop.poc.proxy.po.ProxyPo;
 public class ProxyDtoConverter {
 
     public static ProxyDto createFrom(ProxyPo po, String domainPattern) {
+        if(po == null) return null;
         ProxyDto dto = new ProxyDto();
         dto.setId(po.getId());
         dto.setCreateTime(Opt.of(po.getCreateTime()).map(LocalDateTimeUtil::of).get());

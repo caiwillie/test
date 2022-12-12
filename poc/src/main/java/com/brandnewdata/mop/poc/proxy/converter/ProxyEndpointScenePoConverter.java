@@ -6,6 +6,7 @@ import com.brandnewdata.mop.poc.proxy.po.ProxyEndpointScenePo;
 public class ProxyEndpointScenePoConverter {
 
     public static void updateFrom(ProxyEndpointScenePo target, ProxyEndpointSceneBo bo) {
+        if(bo == null) return;
         target.setEnvId(bo.getEnvId());
         target.setEnvName(bo.getEnvName());
         target.setSceneId(bo.getSceneId());

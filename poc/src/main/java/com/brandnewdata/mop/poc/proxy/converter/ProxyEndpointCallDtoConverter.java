@@ -7,6 +7,7 @@ import com.brandnewdata.mop.poc.proxy.po.ProxyEndpointCallPo;
 
 public class ProxyEndpointCallDtoConverter {
     public static ProxyEndpointCallDto createFrom(ProxyEndpointCallPo po) {
+        if(po == null) return null;
         ProxyEndpointCallDto dto = new ProxyEndpointCallDto();
         dto.setId(po.getId());
         dto.setCreateTime(Opt.of(po.getCreateTime()).map(LocalDateTimeUtil::of).orElse(null));

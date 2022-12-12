@@ -160,7 +160,7 @@ public class ReverseProxyServlet extends ProxyServlet {
         if (StrUtil.equals(httpMethod, Method.POST.name())) {
             String contentType = request.getHeader("Content-Type");
             Assert.isTrue(StrUtil.equals(contentType, "application/json"), "Content-Type must be application/json");
-            ServletUtil.getBody(request);
+            body = ServletUtil.getBody(request);
         }
 
         String queryString = request.getQueryString();
