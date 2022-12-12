@@ -15,15 +15,9 @@
  */
 package com.brandnewdata.mop.script;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.lang.Pair;
 import cn.hutool.core.map.MapUtil;
 import org.junit.jupiter.api.Test;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -3,10 +3,10 @@ package com.brandnewdata.mop.generator;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.generator.FastAutoGenerator;
-import com.baomidou.mybatisplus.generator.config.*;
+import com.baomidou.mybatisplus.generator.config.DataSourceConfig;
+import com.baomidou.mybatisplus.generator.config.TemplateType;
 import com.baomidou.mybatisplus.generator.config.rules.DateType;
 import com.baomidou.mybatisplus.generator.fill.Column;
-import org.apache.ibatis.type.BlobTypeHandler;
 
 import java.util.Arrays;
 import java.util.Collections;
