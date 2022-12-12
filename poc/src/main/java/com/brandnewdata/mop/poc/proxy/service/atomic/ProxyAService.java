@@ -48,11 +48,30 @@ public class ProxyAService implements IProxyAService {
     }
 
     @Override
-    public Page<ProxyGroupDto> pageGroupByName(Integer pageNum, Integer pageSize,
-                                               String name, String tags) {
+    public Page<ProxyGroupDto> fetchPageGroupByName(Integer pageNum, Integer pageSize,
+                                                    String name, String tags) {
         Assert.notNull(pageNum > 0, "pageNum must be greater than 0");
         Assert.notNull(pageSize > 0, "pageSize must be greater than 0");
 
+        Map<String, List<ProxyDto>> proxyDtoListMap = fetchAllGroupByName(name, tags);
+
+        PageUtil.setFirstPageNo(1);
+        List<String> nameList = PageEnhancedUtil.slice(pageNum, pageSize, ListUtil.toList(proxyDtoListMap.keySet()));
+
+        // 组装结果
+        List<ProxyGroupDto> ret = new ArrayList<>();
+        for (String _name : nameList) {
+            ProxyGroupDto proxyGroupDto = new ProxyGroupDto();
+            proxyGroupDto.setName(_name);
+            proxyGroupDto.setProxyDtoList(proxyDtoListMap.get(_name));
+            ret.add(proxyGroupDto);
+        }
+
+        return new Page<>(proxyDtoListMap.size(), ret);
+    }
+
+    @Override
+    public Map<String, List<ProxyDto>> fetchAllGroupByName(String name, String tags) {
         Map<String, List<ProxyDto>> proxyDtoMap = new LinkedHashMap<>();
 
         // 根据 name 分组
@@ -62,20 +81,7 @@ public class ProxyAService implements IProxyAService {
                 .entrySet().stream()
                 .sorted((o1, o2) -> o2.getValue().get(0).getUpdateTime().compareTo(o1.getValue().get(0).getUpdateTime()))
                 .forEach(entry -> proxyDtoMap.put(entry.getKey(), entry.getValue()));
-
-        PageUtil.setFirstPageNo(1);
-        List<String> nameList = PageEnhancedUtil.slice(pageNum, pageSize, ListUtil.toList(proxyDtoMap.keySet()));
-
-        // 组装结果
-        List<ProxyGroupDto> ret = new ArrayList<>();
-        for (String _name : nameList) {
-            ProxyGroupDto proxyGroupDto = new ProxyGroupDto();
-            proxyGroupDto.setName(_name);
-            proxyGroupDto.setProxyDtoList(proxyDtoMap.get(_name));
-            ret.add(proxyGroupDto);
-        }
-
-        return new Page<>(proxyDtoMap.size(), ret);
+        return proxyDtoMap;
     }
 
     @Override

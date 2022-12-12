@@ -9,7 +9,9 @@ import java.util.Map;
 
 public interface IProxyAService {
 
-    Page<ProxyGroupDto> pageGroupByName(Integer pageNum, Integer pageSize, String name, String tags);
+    Page<ProxyGroupDto> fetchPageGroupByName(Integer pageNum, Integer pageSize, String name, String tags);
+
+    Map<String, List<ProxyDto>> fetchAllGroupByName(String name, String tags);
 
     ProxyDto save(ProxyDto proxy, boolean imported);
 

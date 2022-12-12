@@ -41,7 +41,7 @@ public class ProxyBffService {
     }
 
     public Page<ProxyGroupVo> pageProxy(Integer pageNum, Integer pageSize, String name, String tags) {
-        Page<ProxyGroupDto> proxyGroupDtoPage = proxyAService.pageGroupByName(pageNum, pageSize, name, tags);
+        Page<ProxyGroupDto> proxyGroupDtoPage = proxyAService.fetchPageGroupByName(pageNum, pageSize, name, tags);
         List<ProxyGroupDto> records = proxyGroupDtoPage.getRecords();
         if(CollUtil.isEmpty(records)) return Page.empty();
 
