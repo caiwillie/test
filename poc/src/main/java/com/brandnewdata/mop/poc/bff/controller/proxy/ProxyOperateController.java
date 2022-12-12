@@ -53,7 +53,7 @@ public class ProxyOperateController {
      */
     @GetMapping(value = "/rest/proxy/operate/call/detail")
     public Result<ProxyEndpointCallVo> getCallTimeDetail(@RequestParam Long callTimeId) {
-        return null;
+        return Result.OK();
     }
 
 
