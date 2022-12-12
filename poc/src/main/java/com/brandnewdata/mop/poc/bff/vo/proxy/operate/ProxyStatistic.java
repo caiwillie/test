@@ -23,6 +23,11 @@ public class ProxyStatistic {
     private int failCount;
 
     /**
+     * 平均耗时
+     */
+    private double averageTimeConsuming;
+
+    /**
      * 请求次数排名（API服务）
      */
     private ChartOption callCountProxyRanking;
@@ -41,4 +46,15 @@ public class ProxyStatistic {
      * 请求耗时排名（API路径）
      */
     private ChartOption timeConsumingEndpointRanking;
+
+    /**
+     * 请求次数趋势图
+     */
+    private ChartOption callCountTendency;
+
+    /**
+     * 平均请求耗时趋势图
+     */
+    private ChartOption averageTimeConsumingTendency;
+
 }
