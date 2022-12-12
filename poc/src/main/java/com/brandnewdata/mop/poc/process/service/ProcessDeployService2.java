@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Opt;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
@@ -271,6 +272,7 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
         ret.setZeebeXml(zeebeXml);
         ret.setZeebeKey(zeebeProcess.getProcessDefinitionKey());
         ret.setZeebeVersion(zeebeProcess.getVersion());
+        ThreadUtil.sleep(100);
         return ret;
     }
 

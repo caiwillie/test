@@ -57,7 +57,6 @@ public class ConnectorApi implements IConnectorApi {
                     bpmnXmlDto.setProcessName(StrUtil.format("【触发器】{}", trigger.getName()));
                     bpmnXmlDto.setProcessXml(trigger.getEditorXML());
                     processDeployService2.releaseDeploy(bpmnXmlDto, envIdList, ProcessConst.PROCESS_BIZ_TYPE__TRIGGER);
-                    ThreadUtil.sleep(500);
                 } catch (Exception e) {
                     throw new RuntimeException(StrUtil.format("【触发器】{} 部署异常: {}", trigger.getName(), e.getMessage()));
                 }
@@ -74,7 +73,6 @@ public class ConnectorApi implements IConnectorApi {
                     bpmnXmlDto.setProcessName(StrUtil.format("【操作】{}", operate.getName()));
                     bpmnXmlDto.setProcessXml(operate.getEditorXML());
                     processDeployService2.releaseDeploy(bpmnXmlDto, envIdList, ProcessConst.PROCESS_BIZ_TYPE__OPERATE);
-                    ThreadUtil.sleep(500);
                 } catch (Exception e) {
                     throw new RuntimeException(StrUtil.format("【操作】{} 部署异常: {}", operate.getName(), e.getMessage()));
                 }
