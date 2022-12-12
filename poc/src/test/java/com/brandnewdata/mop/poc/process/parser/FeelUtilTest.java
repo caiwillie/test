@@ -17,7 +17,7 @@ class FeelUtilTest {
         Map<String, Object> map = JacksonUtil.fromMap(str);
         Object o = FeelUtil.evalExpression(expression, map);
         Map<String, Object> result = FeelUtil.convertMap(o);
-        String to = JacksonUtil.to(o);
+        String to = JacksonUtil.to(result);
         return;
     }
 }
