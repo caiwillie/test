@@ -255,7 +255,7 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
         return zeebeDeploy(zeebeXml, processName, envId);
     }
 
-    private ZeebeDeployBo zeebeDeploy(String zeebeXml, String name, Long envId) {
+    private synchronized ZeebeDeployBo zeebeDeploy(String zeebeXml, String name, Long envId) {
         ZeebeDeployBo ret = new ZeebeDeployBo();
         ZeebeClient zeebeClient = zeebeClientManager.getByEnvId(envId);
 
