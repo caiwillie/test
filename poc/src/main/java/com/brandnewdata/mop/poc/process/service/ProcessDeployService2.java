@@ -174,8 +174,9 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
                 .send()
                 .join();
 
+        long processInstanceId = result.getProcessInstanceKey();
         Map<String, Object> processVariables = result.getVariablesAsMap();
-        log.info("process instance {} result variables: {}", JacksonUtil.to(processVariables));
+        log.info("process instance {} result variables: {}", processInstanceId, JacksonUtil.to(processVariables));
 
         Map<String, Object> resultMap;
         if(StrUtil.isNotBlank(expression)) {
