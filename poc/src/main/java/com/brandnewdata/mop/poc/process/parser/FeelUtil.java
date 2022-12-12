@@ -45,12 +45,14 @@ public class FeelUtil {
     public static Map<String, Object> convertMap(Object obj) {
         if (obj == null) return null;
         String str = OBJECT_MAPPER.writeValueAsString(obj);
+        // 使用objectMapper需未注册scala模块
         return JacksonUtil.fromMap(str);
     }
     @SneakyThrows
     public static <T> T convertValue(Object obj, Class<T> valueType) {
         if (obj == null) return null;
         String str = OBJECT_MAPPER.writeValueAsString(obj);
+        // 使用objectMapper需未注册scala模块
         return JacksonUtil.from(str, valueType);
     }
 
