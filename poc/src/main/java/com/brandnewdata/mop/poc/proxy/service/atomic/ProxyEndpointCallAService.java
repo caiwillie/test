@@ -2,6 +2,7 @@ package com.brandnewdata.mop.poc.proxy.service.atomic;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,8 +25,8 @@ public class ProxyEndpointCallAService implements IProxyEndpointCallAService {
     private ProxyEndpointCallDao proxyEndpointCallDao;
 
     @Override
-    public Page<ProxyEndpointCallDto> pageByEndpointId(Integer pageNum, Integer pageSize,
-                                                       List<Long> endpointIdList) {
+    public Page<ProxyEndpointCallDto> fetchPageByEndpointId(Integer pageNum, Integer pageSize,
+                                                            List<Long> endpointIdList) {
         Assert.isTrue(pageNum > 0, "pageNum must be greater than 0");
         Assert.isTrue(pageSize > 0, "pageSize must be greater than 0");
         if(CollUtil.isEmpty(endpointIdList)) return Page.empty();
@@ -47,6 +49,14 @@ public class ProxyEndpointCallAService implements IProxyEndpointCallAService {
         dto.setId(IdUtil.getSnowflakeNextId());
         proxyEndpointCallDao.insert(ProxyEndpointCallPoConverter.createFrom(dto));
         return dto;
+    }
+
+    @Override
+    public Map<Long, List<ProxyEndpointCallDto>> fetchListByEndpointId(List<Long> endpointIdList) {
+        if(CollUtil.isEmpty(endpointIdList)) return MapUtil.empty();
+        Assert.isFalse(CollUtil.hasNull(endpointIdList), "endpointIdList must not contain null");
+
+        return null;
     }
 
 }

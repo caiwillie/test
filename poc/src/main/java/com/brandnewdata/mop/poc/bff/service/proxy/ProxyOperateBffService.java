@@ -5,6 +5,7 @@ import com.brandnewdata.mop.poc.bff.converter.proxy.ProxyEndpointCallVoConverter
 import com.brandnewdata.mop.poc.bff.converter.proxy.ProxyEndpointDtoConverter;
 import com.brandnewdata.mop.poc.bff.vo.proxy.operate.ProxyEndpointCallFilter;
 import com.brandnewdata.mop.poc.bff.vo.proxy.operate.ProxyEndpointCallVo;
+import com.brandnewdata.mop.poc.bff.vo.proxy.operate.ProxyStatistic;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointCallDto;
@@ -70,7 +71,7 @@ public class ProxyOperateBffService {
         }).map(ProxyEndpointDto::getId).collect(Collectors.toList());
 
         Page<ProxyEndpointCallDto> page = proxyEndpointCallService
-                .pageByEndpointId(pageNum, pageSize, filterEndpointIdList);
+                .fetchPageByEndpointId(pageNum, pageSize, filterEndpointIdList);
 
         List<ProxyEndpointCallVo> voList = page.getRecords().stream()
                 .map(ProxyEndpointCallVoConverter::createFrom).collect(Collectors.toList());
@@ -78,4 +79,23 @@ public class ProxyOperateBffService {
         return new Page<>(page.getTotal(), voList);
     }
 
+    public ProxyStatistic statistic(ProxyEndpointCallFilter filter) {
+        ProxyStatistic statistic = new ProxyStatistic();
+        proxyAtomicService.fetchAllGroupByName(filter.getProxyName(), null);
+        List<ProxyEndpointDto> proxyEndpointDtoList = proxyEndpointAService.fetchAll();
+        List<ProxyEndpointCallDto> proxyEndpointCallDtoList = proxyEndpointCallService.fetchAll();
+
+        // 统计proxy数量
+        List<Long> proxyIdList = proxyEndpointDtoList.stream().map(ProxyEndpointDto::getProxyId).collect(Collectors.toList());
+        Map<Long, ProxyDto> proxyDtoMap = proxyAtomicService.fetchById(proxyIdList);
+        statistic.setProxyCount(proxyDtoMap.size());
+
+        // 统计endpoint数量
+        statistic.setEndpointCount(proxyEndpointDtoList.size());
+
+        // 统计调用次数
+        statistic.setCallCount(proxyEndpointCallDtoList.size());
+
+        return statistic;
+    }
 }
