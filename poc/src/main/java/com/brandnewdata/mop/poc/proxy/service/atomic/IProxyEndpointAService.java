@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.poc.proxy.service.atomic;
 
+import com.brandnewdata.mop.poc.proxy.bo.ProxyEndpointFilter;
 import com.brandnewdata.mop.poc.proxy.bo.ProxyEndpointServerBo;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto;
 
@@ -12,7 +13,7 @@ public interface IProxyEndpointAService {
 
     Map<Long, ProxyEndpointDto> fetchByIds(List<Long> ids);
 
-    Map<Long, List<ProxyEndpointDto>> fetchListByProxyId(List<Long> proxyIdList);
+    Map<Long, List<ProxyEndpointDto>> fetchListByProxyIdAndFilter(List<Long> proxyIdList, ProxyEndpointFilter filter);
 
     ProxyEndpointServerBo parseServerConfig(String config);
 }

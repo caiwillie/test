@@ -11,6 +11,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.constant.ProxyConst;
+import com.brandnewdata.mop.poc.proxy.bo.ProxyFilter;
 import com.brandnewdata.mop.poc.proxy.cache.ProxyCache;
 import com.brandnewdata.mop.poc.proxy.converter.ProxyDtoConverter;
 import com.brandnewdata.mop.poc.proxy.converter.ProxyPoConverter;
@@ -53,7 +54,17 @@ public class ProxyAService implements IProxyAService {
         Assert.notNull(pageNum > 0, "pageNum must be greater than 0");
         Assert.notNull(pageSize > 0, "pageSize must be greater than 0");
 
-        Map<String, List<ProxyDto>> proxyDtoListMap = fetchAllGroupByName(name, tags);
+
+
+        List<ProxyDto> proxyDtoList = fetchListByFilters(name, tags, null);
+
+        Map<String, List<ProxyDto>> proxyDtoListMap = new LinkedHashMap<>();
+        proxyDtoList.stream().sorted(Comparator.comparing(ProxyDto::getUpdateTime))
+                .collect(Collectors.groupingBy(ProxyDto::getName,
+                        CollectorsUtil.toSortedList((o1, o2) -> o2.getUpdateTime().compareTo(o1.getUpdateTime()))))
+                .entrySet().stream()
+                .sorted((o1, o2) -> o2.getValue().get(0).getUpdateTime().compareTo(o1.getValue().get(0).getUpdateTime()))
+                .forEach(entry -> proxyDtoListMap.put(entry.getKey(), entry.getValue()));
 
         PageUtil.setFirstPageNo(1);
         List<String> nameList = PageEnhancedUtil.slice(pageNum, pageSize, ListUtil.toList(proxyDtoListMap.keySet()));
@@ -71,17 +82,20 @@ public class ProxyAService implements IProxyAService {
     }
 
     @Override
-    public Map<String, List<ProxyDto>> fetchAllGroupByName(String name, String tags) {
-        Map<String, List<ProxyDto>> proxyDtoMap = new LinkedHashMap<>();
+    public List<ProxyDto> fetchListByFilter(ProxyFilter filter) {
+        String name = filter.getName();
+        String version = filter.getVersion();
+        String tags = filter.getTags();
 
-        // 根据 name 分组
-        proxyCache.asMap().values().stream().sorted(Comparator.comparing(ProxyDto::getUpdateTime))
-                .collect(Collectors.groupingBy(ProxyDto::getName,
-                        CollectorsUtil.toSortedList((o1, o2) -> o2.getUpdateTime().compareTo(o1.getUpdateTime()))))
-                .entrySet().stream()
-                .sorted((o1, o2) -> o2.getValue().get(0).getUpdateTime().compareTo(o1.getValue().get(0).getUpdateTime()))
-                .forEach(entry -> proxyDtoMap.put(entry.getKey(), entry.getValue()));
-        return proxyDtoMap;
+        // filter
+        List<ProxyDto> collect = proxyCache.asMap().values().stream().filter(proxyDto -> {
+            if (StrUtil.isBlank(name)) return true;
+            if (!StrUtil.equals(proxyDto.getName(), name)) return false;
+            if (StrUtil.isBlank(version)) return true;
+            if (!StrUtil.equals(proxyDto.getVersion(), version)) return false;
+            if (StrUtil.isBlank(tags)) return true;
+            return StrUtil.contains(tags, proxyDto.getTag());
+        }).collect(Collectors.toList());
     }
 
     @Override

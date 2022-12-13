@@ -1,12 +1,12 @@
 package com.brandnewdata.mop.poc.bff.service.proxy;
 
-import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.mop.poc.bff.converter.proxy.ProxyEndpointCallVoConverter;
-import com.brandnewdata.mop.poc.bff.converter.proxy.ProxyEndpointDtoConverter;
 import com.brandnewdata.mop.poc.bff.vo.proxy.operate.ProxyEndpointCallFilter;
 import com.brandnewdata.mop.poc.bff.vo.proxy.operate.ProxyEndpointCallVo;
 import com.brandnewdata.mop.poc.bff.vo.proxy.operate.ProxyStatistic;
 import com.brandnewdata.mop.poc.common.dto.Page;
+import com.brandnewdata.mop.poc.proxy.bo.ProxyEndpointFilter;
+import com.brandnewdata.mop.poc.proxy.bo.ProxyFilter;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointCallDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto;
@@ -44,36 +44,11 @@ public class ProxyOperateBffService {
     public Page<ProxyEndpointCallVo> page(ProxyEndpointCallFilter filter) {
         Integer pageNum = filter.getPageNum();
         Integer pageSize = filter.getPageSize();
-        String proxyName = filter.getProxyName();
-        String version = filter.getVersion();
-        String location = filter.getLocation();
 
-        proxyAtomicService.fetchAllGroupByName()
-
-        List<ProxyEndpointDto> proxyEndpointDtoList = proxyEndpointAService.fetchListByProxyId();
-
-        // 查询关联的proxy
-        List<Long> proxyIdList = proxyEndpointDtoList.stream().map(ProxyEndpointDto::getProxyId).collect(Collectors.toList());
-        Map<Long, ProxyDto> proxyDtoMap = proxyAtomicService.fetchById(proxyIdList);
-
-        // 更新proxy信息
-        for (ProxyEndpointDto proxyEndpointDto : proxyEndpointDtoList) {
-            ProxyDto proxyDto = proxyDtoMap.get(proxyEndpointDto.getProxyId());
-            ProxyEndpointDtoConverter.updateFrom(proxyEndpointDto, proxyDto);
-        }
-
-        // 过滤得到符合条件的proxyEndpoint
-        List<Long> filterEndpointIdList = proxyEndpointDtoList.stream().filter(proxyEndpointDto -> {
-            if (proxyName == null) return true;
-            if (!StrUtil.equals(proxyEndpointDto.getProxyName(), proxyName)) return false;
-            if (version == null) return true;
-            if (!StrUtil.equals(proxyEndpointDto.getProxyVersion(), version)) return false;
-            if (location == null) return true;
-            return StrUtil.equals(proxyEndpointDto.getLocation(), location);
-        }).map(ProxyEndpointDto::getId).collect(Collectors.toList());
+        List<Long> endpointIdList = fetchEndpointIdListByFilter(filter);
 
         Page<ProxyEndpointCallDto> page = proxyEndpointCallService
-                .fetchPageByEndpointId(pageNum, pageSize, filterEndpointIdList);
+                .fetchPageByEndpointId(pageNum, pageSize, endpointIdList);
 
         List<ProxyEndpointCallVo> voList = page.getRecords().stream()
                 .map(ProxyEndpointCallVoConverter::createFrom).collect(Collectors.toList());
@@ -82,13 +57,31 @@ public class ProxyOperateBffService {
     }
 
     public ProxyStatistic statistic(ProxyEndpointCallFilter filter) {
+        List<Long> endpointIdList = fetchEndpointIdListByFilter(filter);
+
         ProxyStatistic statistic = new ProxyStatistic();
-        proxyAtomicService.fetchAllGroupByName(filter.getProxyName(), null);
-        List<ProxyEndpointDto> proxyEndpointDtoList = proxyEndpointAService.fetchListByProxyId();
 
-
-        // proxyEndpointCallService.fetchListByEndpointId()
+        Map<Long, List<ProxyEndpointCallDto>> proxyEndpointCallDtoListMap =
+                proxyEndpointCallService.fetchListByEndpointId(endpointIdList);
 
         return statistic;
+    }
+
+    private List<Long> fetchEndpointIdListByFilter(ProxyEndpointCallFilter filter) {
+        String proxyName = filter.getProxyName();
+        String version = filter.getVersion();
+        String location = filter.getLocation();
+
+        // 查询proxy
+        ProxyFilter proxyFilter = new ProxyFilter().setName(proxyName).setVersion(version);
+        List<ProxyDto> proxyDtoList = proxyAtomicService.fetchListByFilter(proxyFilter);
+        List<Long> proxyIdList = proxyDtoList.stream().map(ProxyDto::getId).collect(Collectors.toList());
+
+        // 查询 proxyEndpoint
+        ProxyEndpointFilter proxyEndpointFilter = new ProxyEndpointFilter().setLocation(location);
+        Map<Long, List<ProxyEndpointDto>> proxyEndpointDtoListMap =
+                proxyEndpointAService.fetchListByProxyIdAndFilter(proxyIdList, proxyEndpointFilter);
+        return proxyEndpointDtoListMap.values().stream().flatMap(List::stream)
+                .map(ProxyEndpointDto::getId).collect(Collectors.toList());
     }
 }
