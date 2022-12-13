@@ -108,7 +108,7 @@ public class ProxyOperateBffService {
 
 
         Map<Long, List<ProxyEndpointCallDto>> proxyEndpointCallDtoListMap =
-                proxyEndpointCallService.fetchListByEndpointId(ListUtil.toList(proxyEndpointDtoMap.keySet()));
+                proxyEndpointCallService.fetchCacheListByEndpointId(ListUtil.toList(proxyEndpointDtoMap.keySet()));
 
         AtomicInteger totalCount = new AtomicInteger();
         AtomicInteger successCount = new AtomicInteger();

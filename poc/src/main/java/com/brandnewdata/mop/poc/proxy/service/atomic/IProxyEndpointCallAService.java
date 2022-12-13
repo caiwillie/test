@@ -12,6 +12,6 @@ public interface IProxyEndpointCallAService {
 
     ProxyEndpointCallDto save(ProxyEndpointCallDto dto);
 
-    Map<Long, List<ProxyEndpointCallDto>> fetchListByEndpointId(List<Long> endpointIdList);
+    Map<Long, List<ProxyEndpointCallDto>> fetchCacheListByEndpointId(List<Long> endpointIdList);
 
 }

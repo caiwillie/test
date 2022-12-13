@@ -40,7 +40,7 @@ public class ProxyEndpointCallCache {
     private ProxyEndpointCallDto toDto(Entity entity) {
         ProxyEndpointCallDto dto = new ProxyEndpointCallDto();
         dto.setId(entity.getLong(ProxyEndpointCallPo.ID));
-        dto.setCreateTime(LocalDateTimeUtil.of(entity.getDate(ProxyEndpointCallPo.CREATE_TIME)));
+        dto.setStartTime(LocalDateTimeUtil.of(entity.getDate(ProxyEndpointCallPo.START_TIME)));
         dto.setEndpointId(entity.getLong(ProxyEndpointCallPo.ENDPOINT_ID));
         dto.setExecuteStatus(entity.getStr(ProxyEndpointCallPo.EXECUTE_STATUS));
         dto.setTimeConsuming(entity.getInt(ProxyEndpointCallPo.TIME_CONSUMING));

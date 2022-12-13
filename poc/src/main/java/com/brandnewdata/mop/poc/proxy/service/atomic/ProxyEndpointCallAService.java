@@ -60,7 +60,7 @@ public class ProxyEndpointCallAService implements IProxyEndpointCallAService {
     }
 
     @Override
-    public Map<Long, List<ProxyEndpointCallDto>> fetchListByEndpointId(List<Long> endpointIdList) {
+    public Map<Long, List<ProxyEndpointCallDto>> fetchCacheListByEndpointId(List<Long> endpointIdList) {
         if(CollUtil.isEmpty(endpointIdList)) return MapUtil.empty();
         Assert.isFalse(CollUtil.hasNull(endpointIdList), "endpointIdList must not contain null");
 
