@@ -135,8 +135,10 @@ public class ProxyOperateBffService {
                 falseCount.getAndIncrement();
             }
             totalTimeConsuming.addAndGet(callDto.getTimeConsuming());
-
-            ProxyDto proxyDto = proxyDtoMap.get(callDto.getProxyId());
+            ProxyEndpointDto proxyEndpointDto = proxyEndpointDtoMap.get(callDto.getEndpointId());
+            if(proxyEndpointDto == null) return;
+            ProxyDto proxyDto = proxyDtoMap.get(proxyEndpointDto.getProxyId());
+            if(proxyDto == null) return;
 
             String name = proxyDto.getName();
             if(StrUtil.isNotBlank(name)) {
@@ -153,20 +155,17 @@ public class ProxyOperateBffService {
                         timeConsumingProxyRankingMap.getOrDefault(name, 0.0) + callDto.getTimeConsuming());
             }
 
-            ProxyEndpointDto proxyEndpointDto = proxyEndpointDtoMap.get(callDto.getEndpointId());
-            if(proxyEndpointDto != null) {
-                callCountEndpointRankingMap.put(proxyEndpointDto,
-                        callCountEndpointRankingMap.getOrDefault(proxyEndpointDto, 0) + 1);
-                if (StrUtil.equals(ProxyConst.CALL_EXECUTE_STATUS__SUCCESS, callDto.getExecuteStatus())) {
-                    callCountEndpointRankingSuccessMap.put(proxyEndpointDto,
-                            callCountEndpointRankingSuccessMap.getOrDefault(proxyEndpointDto, 0) + 1);
-                } else {
-                    callCountEndpointRankingFalseMap.put(proxyEndpointDto,
-                            callCountEndpointRankingFalseMap.getOrDefault(proxyEndpointDto, 0) + 1);
-                }
-                timeConsumingEndpointRankingMap.put(proxyEndpointDto,
-                        timeConsumingEndpointRankingMap.getOrDefault(proxyEndpointDto, 0.0) + callDto.getTimeConsuming());
+            callCountEndpointRankingMap.put(proxyEndpointDto,
+                    callCountEndpointRankingMap.getOrDefault(proxyEndpointDto, 0) + 1);
+            if (StrUtil.equals(ProxyConst.CALL_EXECUTE_STATUS__SUCCESS, callDto.getExecuteStatus())) {
+                callCountEndpointRankingSuccessMap.put(proxyEndpointDto,
+                        callCountEndpointRankingSuccessMap.getOrDefault(proxyEndpointDto, 0) + 1);
+            } else {
+                callCountEndpointRankingFalseMap.put(proxyEndpointDto,
+                        callCountEndpointRankingFalseMap.getOrDefault(proxyEndpointDto, 0) + 1);
             }
+            timeConsumingEndpointRankingMap.put(proxyEndpointDto,
+                    timeConsumingEndpointRankingMap.getOrDefault(proxyEndpointDto, 0.0) + callDto.getTimeConsuming());
 
             LocalDateTime startTime = callDto.getStartTime();
             if(startTime != null) {
