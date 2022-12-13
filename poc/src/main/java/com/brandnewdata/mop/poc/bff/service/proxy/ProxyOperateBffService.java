@@ -48,7 +48,9 @@ public class ProxyOperateBffService {
         String version = filter.getVersion();
         String location = filter.getLocation();
 
-        List<ProxyEndpointDto> proxyEndpointDtoList = proxyEndpointAService.fetchAll();
+        proxyAtomicService.fetchAllGroupByName()
+
+        List<ProxyEndpointDto> proxyEndpointDtoList = proxyEndpointAService.fetchListByProxyId();
 
         // 查询关联的proxy
         List<Long> proxyIdList = proxyEndpointDtoList.stream().map(ProxyEndpointDto::getProxyId).collect(Collectors.toList());
@@ -82,19 +84,10 @@ public class ProxyOperateBffService {
     public ProxyStatistic statistic(ProxyEndpointCallFilter filter) {
         ProxyStatistic statistic = new ProxyStatistic();
         proxyAtomicService.fetchAllGroupByName(filter.getProxyName(), null);
-        List<ProxyEndpointDto> proxyEndpointDtoList = proxyEndpointAService.fetchAll();
-        List<ProxyEndpointCallDto> proxyEndpointCallDtoList = proxyEndpointCallService.fetchAll();
+        List<ProxyEndpointDto> proxyEndpointDtoList = proxyEndpointAService.fetchListByProxyId();
 
-        // 统计proxy数量
-        List<Long> proxyIdList = proxyEndpointDtoList.stream().map(ProxyEndpointDto::getProxyId).collect(Collectors.toList());
-        Map<Long, ProxyDto> proxyDtoMap = proxyAtomicService.fetchById(proxyIdList);
-        statistic.setProxyCount(proxyDtoMap.size());
 
-        // 统计endpoint数量
-        statistic.setEndpointCount(proxyEndpointDtoList.size());
-
-        // 统计调用次数
-        statistic.setCallCount(proxyEndpointCallDtoList.size());
+        // proxyEndpointCallService.fetchListByEndpointId()
 
         return statistic;
     }

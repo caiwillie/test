@@ -67,7 +67,7 @@ public class ProxyBffService {
     }
 
     public List<SimpleProxyGroupVo> getAllProxy() {
-        List<ProxyEndpointDto> proxyEndpointDtoList = proxyEndpointAService.fetchAll();
+        List<ProxyEndpointDto> proxyEndpointDtoList = proxyEndpointAService.fetchListByProxyId();
 
         // 查询关联的proxy
         List<Long> proxyIdList = proxyEndpointDtoList.stream().map(ProxyEndpointDto::getProxyId).collect(Collectors.toList());

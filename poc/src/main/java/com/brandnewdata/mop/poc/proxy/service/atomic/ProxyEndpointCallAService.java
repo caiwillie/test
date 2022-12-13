@@ -6,6 +6,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
+import com.brandnewdata.mop.poc.proxy.cache.ProxyEndpointCallCache;
 import com.brandnewdata.mop.poc.proxy.converter.ProxyEndpointCallDtoConverter;
 import com.brandnewdata.mop.poc.proxy.converter.ProxyEndpointCallPoConverter;
 import com.brandnewdata.mop.poc.proxy.dao.ProxyEndpointCallDao;
@@ -14,6 +15,7 @@ import com.brandnewdata.mop.poc.proxy.po.ProxyEndpointCallPo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -23,6 +25,12 @@ public class ProxyEndpointCallAService implements IProxyEndpointCallAService {
 
     @Resource
     private ProxyEndpointCallDao proxyEndpointCallDao;
+
+    private final ProxyEndpointCallCache proxyEndpointCallCache;
+
+    public ProxyEndpointCallAService(ProxyEndpointCallCache proxyEndpointCallCache) {
+        this.proxyEndpointCallCache = proxyEndpointCallCache;
+    }
 
     @Override
     public Page<ProxyEndpointCallDto> fetchPageByEndpointId(Integer pageNum, Integer pageSize,
@@ -56,7 +64,19 @@ public class ProxyEndpointCallAService implements IProxyEndpointCallAService {
         if(CollUtil.isEmpty(endpointIdList)) return MapUtil.empty();
         Assert.isFalse(CollUtil.hasNull(endpointIdList), "endpointIdList must not contain null");
 
-        return null;
+        Map<Long, ProxyEndpointCallDto> proxyEndpointCallDtoMap = proxyEndpointCallCache.asMap();
+
+        Map<Long, List<ProxyEndpointCallDto>> proxyEndpointCallDtoListMap = new HashMap<>();
+        for (ProxyEndpointCallDto proxyEndpointCallDto : proxyEndpointCallDtoMap.values()) {
+            Long endpointId = proxyEndpointCallDto.getEndpointId();
+            if(!endpointIdList.contains(endpointId)) continue;
+
+            List<ProxyEndpointCallDto> proxyEndpointCallDtoList =
+                    proxyEndpointCallDtoListMap.computeIfAbsent(endpointId, k -> CollUtil.newArrayList());
+            proxyEndpointCallDtoList.add(proxyEndpointCallDto);
+        }
+
+        return proxyEndpointCallDtoListMap;
     }
 
 }

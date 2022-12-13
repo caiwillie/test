@@ -12,7 +12,7 @@ public interface IProxyEndpointAService {
 
     Map<Long, ProxyEndpointDto> fetchByIds(List<Long> ids);
 
-    List<ProxyEndpointDto> fetchAll();
+    Map<Long, List<ProxyEndpointDto>> fetchListByProxyId(List<Long> proxyIdList);
 
     ProxyEndpointServerBo parseServerConfig(String config);
 }

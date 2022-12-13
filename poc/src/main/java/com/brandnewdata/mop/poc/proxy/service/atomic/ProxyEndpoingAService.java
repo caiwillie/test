@@ -52,10 +52,14 @@ public class ProxyEndpoingAService implements IProxyEndpointAService {
     }
 
     @Override
-    public List<ProxyEndpointDto> fetchAll() {
+    public Map<Long, List<ProxyEndpointDto>> fetchListByProxyId(List<Long> proxyIdList) {
+        if(CollUtil.isEmpty(proxyIdList)) return MapUtil.empty();
+        Assert.isFalse(CollUtil.hasNull(proxyIdList), "proxyIdList can not contain null");
         QueryWrapper<ProxyEndpointPo> query = new QueryWrapper<>();
+        query.in(ProxyEndpointPo.PROXY_ID, proxyIdList);
         List<ProxyEndpointPo> list = proxyEndpointDao.selectList(query);
-        return list.stream().map(ProxyEndpointDtoConverter::createFrom).collect(Collectors.toList());
+        return list.stream().map(ProxyEndpointDtoConverter::createFrom)
+                .collect(Collectors.groupingBy(ProxyEndpointDto::getProxyId));
     }
 
     @Override
