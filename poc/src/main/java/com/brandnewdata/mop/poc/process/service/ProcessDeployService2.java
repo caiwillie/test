@@ -181,7 +181,7 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
         if(StrUtil.isNotBlank(expression)) {
             Object expressionResult = FeelUtil.evalExpression(expression, processVariables);
             Map<String, Object> computeExpressResult = FeelUtil.convertMap(expressionResult);
-            // 表达式计算结果更新
+            // 更新表达式计算结果
             if(computeExpressResult != null) resultMap.putAll(computeExpressResult);
         }
 
