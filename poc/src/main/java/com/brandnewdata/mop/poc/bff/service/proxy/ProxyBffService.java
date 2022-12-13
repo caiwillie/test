@@ -8,6 +8,8 @@ import com.brandnewdata.mop.poc.bff.converter.proxy.ProxyEndpointVoConverter;
 import com.brandnewdata.mop.poc.bff.converter.proxy.ProxyVoConverter;
 import com.brandnewdata.mop.poc.bff.vo.proxy.*;
 import com.brandnewdata.mop.poc.common.dto.Page;
+import com.brandnewdata.mop.poc.proxy.bo.ProxyEndpointFilter;
+import com.brandnewdata.mop.poc.proxy.bo.ProxyFilter;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyGroupDto;
@@ -17,6 +19,7 @@ import com.brandnewdata.mop.poc.proxy.service.combined.IProxyEndpointCService;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -67,11 +70,15 @@ public class ProxyBffService {
     }
 
     public List<SimpleProxyGroupVo> getAllProxy() {
-        List<ProxyEndpointDto> proxyEndpointDtoList = proxyEndpointAService.fetchListByProxyIdAndFilter();
+        // fetch proxy
+        List<ProxyDto> proxyDtoList = proxyAService.fetchListByFilter(new ProxyFilter());
+        Map<Long, ProxyDto> proxyDtoMap = proxyDtoList.stream().collect(Collectors.toMap(ProxyDto::getId, Function.identity()));
 
-        // 查询关联的proxy
-        List<Long> proxyIdList = proxyEndpointDtoList.stream().map(ProxyEndpointDto::getProxyId).collect(Collectors.toList());
-        Map<Long, ProxyDto> proxyDtoMap = proxyAService.fetchById(proxyIdList);
+        // fetch proxy endpoint
+        Map<Long, List<ProxyEndpointDto>> proxyEndpointDtoListMap = proxyEndpointAService.fetchListByProxyIdAndFilter(
+                ListUtil.toList(proxyDtoMap.keySet()), new ProxyEndpointFilter());
+        List<ProxyEndpointDto> proxyEndpointDtoList = proxyEndpointDtoListMap.values().stream()
+                .flatMap(Collection::stream).collect(Collectors.toList());
 
         // 更新proxy信息
         for (ProxyEndpointDto proxyEndpointDto : proxyEndpointDtoList) {
