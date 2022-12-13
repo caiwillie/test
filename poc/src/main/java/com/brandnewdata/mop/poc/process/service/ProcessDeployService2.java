@@ -41,6 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -176,13 +177,12 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
         Map<String, Object> processVariables = result.getVariablesAsMap();
         log.info("process instance {} result variables: {}", processInstanceId, JacksonUtil.to(processVariables));
 
-        Map<String, Object> resultMap;
+        Map<String, Object> resultMap = Opt.ofNullable(processVariables).orElse(new HashMap<>());
         if(StrUtil.isNotBlank(expression)) {
             Object expressionResult = FeelUtil.evalExpression(expression, processVariables);
-            resultMap = FeelUtil.convertMap(expressionResult);
-        } else {
-            // 如果表达式为空就返回特定字段的内容
-            resultMap = processVariables;
+            Map<String, Object> computeExpressResult = FeelUtil.convertMap(expressionResult);
+            // 表达式计算结果更新
+            if(computeExpressResult != null) resultMap.putAll(computeExpressResult);
         }
 
         log.info("start process synchronously: {}, resultMap: {}, envId {}",
