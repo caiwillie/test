@@ -54,9 +54,8 @@ public class ProxyAService implements IProxyAService {
         Assert.notNull(pageNum > 0, "pageNum must be greater than 0");
         Assert.notNull(pageSize > 0, "pageSize must be greater than 0");
 
-
-
-        List<ProxyDto> proxyDtoList = fetchListByFilters(name, tags, null);
+        ProxyFilter proxyFilter = new ProxyFilter().setName(name).setTags(tags);
+        List<ProxyDto> proxyDtoList = fetchListByFilter(proxyFilter);
 
         Map<String, List<ProxyDto>> proxyDtoListMap = new LinkedHashMap<>();
         proxyDtoList.stream().sorted(Comparator.comparing(ProxyDto::getUpdateTime))
@@ -88,7 +87,7 @@ public class ProxyAService implements IProxyAService {
         String tags = filter.getTags();
 
         // filter
-        List<ProxyDto> collect = proxyCache.asMap().values().stream().filter(proxyDto -> {
+        return proxyCache.asMap().values().stream().filter(proxyDto -> {
             if (StrUtil.isBlank(name)) return true;
             if (!StrUtil.equals(proxyDto.getName(), name)) return false;
             if (StrUtil.isBlank(version)) return true;
