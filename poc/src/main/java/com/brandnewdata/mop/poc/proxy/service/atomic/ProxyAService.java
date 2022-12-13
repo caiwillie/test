@@ -134,6 +134,8 @@ public class ProxyAService implements IProxyAService {
             Assert.isTrue(StrUtil.equals(oldProxyDto.getVersion(), version), "API版本不能修改");
 
             ProxyPoConverter.updateFrom(oldProxyDto, proxyDto);
+            // 注意需要将domain设置成null
+            oldProxyDto.setDomain(null);
             proxyDao.updateById(ProxyPoConverter.createFrom(oldProxyDto));
 
             return oldProxyDto;
