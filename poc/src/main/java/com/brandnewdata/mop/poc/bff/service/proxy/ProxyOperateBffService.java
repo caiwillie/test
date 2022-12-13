@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.poc.bff.service.proxy;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Pair;
 import cn.hutool.core.util.NumberUtil;
@@ -108,7 +109,8 @@ public class ProxyOperateBffService {
         AtomicInteger successCount = new AtomicInteger();
         AtomicInteger failCount = new AtomicInteger();
         AtomicInteger totalTimeConsuming = new AtomicInteger();
-        Map<String, Integer> callCountProxyRankingMap = new HashMap<>();
+        Map<String, Integer> callCountProxyRankingSuccessMap = new HashMap<>();
+        Map<String, Integer> callCountProxyRankingFalseMap = new HashMap<>();
         Map<String, Double> timeConsumingProxyRankingMap = new HashMap<>();
         Map<ProxyEndpointDto, Integer> callCountEndpointRankingMap = new HashMap<>();
         Map<ProxyEndpointDto, Integer> timeConsumingEndpointRankingMap = new HashMap<>();
@@ -129,8 +131,14 @@ public class ProxyOperateBffService {
 
             String name = proxyDto.getName();
             if(StrUtil.isNotBlank(name)) {
-                callCountProxyRankingMap.put(name,
-                        callCountProxyRankingMap.getOrDefault(name, 0) + 1);
+                if(StrUtil.equals(ProxyConst.CALL_EXECUTE_STATUS__SUCCESS, callDto.getExecuteStatus())) {
+                    callCountProxyRankingSuccessMap.put(name,
+                            callCountProxyRankingSuccessMap.getOrDefault(name, 0) + 1);
+                } else {
+                    callCountProxyRankingFalseMap.put(name,
+                            callCountProxyRankingFalseMap.getOrDefault(name, 0) + 1);
+                }
+
                 timeConsumingProxyRankingMap.put(name,
                         timeConsumingProxyRankingMap.getOrDefault(name, 0.0) + callDto.getTimeConsuming());
             }
@@ -152,12 +160,14 @@ public class ProxyOperateBffService {
             }
         });
 
+        /*
+
         List<Pair<String, Integer>> callCountProxyRankingList = callCountProxyRankingMap.entrySet().stream()
                 .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
                 .sorted((o1, o2) -> NumberUtil.compare(o2.getValue(), o1.getValue()))
                 .collect(Collectors.toList());
 
-        Stream<Pair<String, Double>> timeConsumingProxyRankingList = timeConsumingProxyRankingMap.entrySet().stream()
+        List<Pair<String, Double>> timeConsumingProxyRankingList = timeConsumingProxyRankingMap.entrySet().stream()
                 .map(entry -> {
                     String name = entry.getKey();
                     Double _totalTime = entry.getValue();
@@ -165,8 +175,8 @@ public class ProxyOperateBffService {
                     BigDecimal averageTime1 = NumberUtil.div(_totalTime, _totalCount, 2);
                     return Pair.of(name, averageTime1.doubleValue());
                 })
-                .sorted((o1, o2) -> NumberUtil.compare(o2.getValue(), o1.getValue()));
-
+                .sorted((o1, o2) -> NumberUtil.compare(o2.getValue(), o1.getValue())).collect(Collectors.toList());
+*/
 
         return statistic;
     }
