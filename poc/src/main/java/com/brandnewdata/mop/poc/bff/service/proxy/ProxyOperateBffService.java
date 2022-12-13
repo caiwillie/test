@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Pair;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.mop.poc.bff.converter.proxy.ProxyEndpointCallVoConverter;
+import com.brandnewdata.mop.poc.bff.converter.proxy.ProxyEndpointDtoConverter;
 import com.brandnewdata.mop.poc.bff.vo.operate.charts.ChartOption;
 import com.brandnewdata.mop.poc.bff.vo.operate.charts.Series;
 import com.brandnewdata.mop.poc.bff.vo.proxy.operate.ProxyEndpointCallFilter;
@@ -103,6 +104,12 @@ public class ProxyOperateBffService {
                 proxyEndpointAService.fetchListByProxyIdAndFilter(ListUtil.toList(proxyDtoMap.keySet()), proxyEndpointFilter);
         Map<Long, ProxyEndpointDto> proxyEndpointDtoMap = proxyEndpointDtoListMap.values().stream().flatMap(List::stream)
                 .collect(Collectors.toMap(ProxyEndpointDto::getId, Function.identity()));
+        // 更新 proxy endpoint 信息
+        for (ProxyEndpointDto proxyEndpointDto : proxyEndpointDtoMap.values()) {
+            ProxyDto proxyDto = proxyDtoMap.get(proxyEndpointDto.getProxyId());
+            ProxyEndpointDtoConverter.updateFrom(proxyEndpointDto, proxyDto);
+        }
+
 
         Map<Long, List<ProxyEndpointCallDto>> proxyEndpointCallDtoListMap =
                 proxyEndpointCallService.fetchListByEndpointId(ListUtil.toList(proxyEndpointDtoMap.keySet()));
@@ -173,15 +180,6 @@ public class ProxyOperateBffService {
         });
 
 
-        List<Pair<ProxyEndpointDto, Double>> timeConsumingEndpointRankingList = timeConsumingEndpointRankingMap.entrySet().stream()
-                .map(entry -> {
-                    ProxyEndpointDto endpointDto = entry.getKey();
-                    Double _totalTime = entry.getValue();
-                    Integer _totalCount = callCountEndpointRankingMap.get(endpointDto);
-                    BigDecimal averageTime1 = NumberUtil.div(_totalTime, _totalCount, 2);
-                    return Pair.of(endpointDto, averageTime1.doubleValue());
-                })
-                .sorted((o1, o2) -> NumberUtil.compare(o2.getValue(), o1.getValue())).collect(Collectors.toList());
 
         return statistic;
     }
@@ -258,13 +256,46 @@ public class ProxyOperateBffService {
                                                   Map<ProxyEndpointDto, Integer> callCountEndpointRankingMap,
                                                   Map<ProxyEndpointDto, Integer> callCountEndpointRankingSuccessMap,
                                                   Map<ProxyEndpointDto, Integer> callCountEndpointRankingFalseMap) {
+        ChartOption chart = new ChartOption();
+        List<Pair<ProxyEndpointDto, Integer>> callCountProxyRankingList = callCountEndpointRankingMap.entrySet().stream()
+                .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
+                .sorted((o1, o2) -> NumberUtil.compare(o2.getValue(), o1.getValue()))
+                .collect(Collectors.toList());
+        List<String> categoryList = new ArrayList<>();
+        List<Integer> successDataList = new ArrayList<>();
+        List<Integer> falseDataList = new ArrayList<>();
 
+        for (int i = 0; i < callCountProxyRankingList.size() && i < MAX_SIZE; i++) {
+            Pair<ProxyEndpointDto, Integer> pair = callCountProxyRankingList.get(i);
+            ProxyEndpointDto endpointDto = pair.getKey();
+            Integer successCount = callCountEndpointRankingSuccessMap.getOrDefault(endpointDto, 0);
+            Integer falseCount = callCountEndpointRankingFalseMap.getOrDefault(endpointDto, 0);
+            categoryList.add(StrUtil.format("{}\n{}({})", endpointDto.getLocation(),
+                    endpointDto.getProxyName(), endpointDto.getProxyVersion()));
+            successDataList.add(successCount);
+            falseDataList.add(falseCount);
+        }
+
+        chart.setCategory(categoryList.toArray());
+        Series seriesSuccess = new Series("请求成功次数", successDataList.toArray());
+        Series seriesFalse = new Series("请求失败次数", falseDataList.toArray());
+        chart.setSeries(new Series[]{seriesSuccess, seriesFalse});
+
+        statistic.setCallCountEndpointRanking(chart);
     }
 
     private void assembleTimeConsumingEndpointRanking(ProxyStatistic statistic,
                                                       Map<ProxyEndpointDto, Double> timeConsumingEndpointRankingMap,
                                                       Map<ProxyEndpointDto, Integer> callCountEndpointRankingMap) {
-
+        List<Pair<ProxyEndpointDto, Double>> timeConsumingEndpointRankingList = timeConsumingEndpointRankingMap.entrySet().stream()
+                .map(entry -> {
+                    ProxyEndpointDto endpointDto = entry.getKey();
+                    Double _totalTime = entry.getValue();
+                    Integer _totalCount = callCountEndpointRankingMap.get(endpointDto);
+                    BigDecimal averageTime1 = NumberUtil.div(_totalTime, _totalCount, 2);
+                    return Pair.of(endpointDto, averageTime1.doubleValue());
+                })
+                .sorted((o1, o2) -> NumberUtil.compare(o2.getValue(), o1.getValue())).collect(Collectors.toList());
     }
 
 }
