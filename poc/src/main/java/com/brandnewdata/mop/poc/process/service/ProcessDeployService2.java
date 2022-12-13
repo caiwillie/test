@@ -255,6 +255,8 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
     }
 
     private synchronized ZeebeDeployBo zeebeDeploy(String zeebeXml, String name, Long envId) {
+        // 防止发送过快，导致超出zeebe最大请求数
+        ThreadUtil.sleep(190);
         ZeebeDeployBo ret = new ZeebeDeployBo();
         ZeebeClient zeebeClient = zeebeClientManager.getByEnvId(envId);
 
@@ -271,8 +273,6 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
         ret.setZeebeXml(zeebeXml);
         ret.setZeebeKey(zeebeProcess.getProcessDefinitionKey());
         ret.setZeebeVersion(zeebeProcess.getVersion());
-        // 防止发送过快，导致超出zeebe最大请求数
-        ThreadUtil.sleep(100);
         return ret;
     }
 
