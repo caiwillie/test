@@ -74,7 +74,7 @@ public class SceneOperateBffService2 {
         }).collect(Collectors.toMap(SceneReleaseDeployDto::getProcessId, Function.identity()));
 
 
-        // 获取release deploy列表
+        // 获取 process release deploy列表
         Map<String, ProcessReleaseDeployDto> processReleaseDeployDtoMap =
                 processDeployService.fetchReleaseByEnvIdAndProcessId(envId, ListUtil.toList(filterSceneReleaseDeployDtoMap.keySet()));
 
