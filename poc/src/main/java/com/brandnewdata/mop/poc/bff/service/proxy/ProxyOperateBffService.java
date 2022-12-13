@@ -21,24 +21,18 @@ import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto;
 import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyAService;
 import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyEndpointAService;
 import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyEndpointCallAService;
-import com.brandnewdata.mop.poc.proxy.service.combined.IProxyEndpointCService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 public class ProxyOperateBffService {
-
-    private final IProxyEndpointCService proxyEndpointCService;
 
     private final IProxyEndpointAService proxyEndpointAService;
 
@@ -48,11 +42,9 @@ public class ProxyOperateBffService {
 
     private final int MAX_SIZE = 10;
 
-    public ProxyOperateBffService(IProxyEndpointCService proxyEndpointCService,
-                                  IProxyEndpointAService proxyEndpointAService,
+    public ProxyOperateBffService(IProxyEndpointAService proxyEndpointAService,
                                   IProxyAService proxyAtomicService,
                                   IProxyEndpointCallAService proxyEndpointCallService) {
-        this.proxyEndpointCService = proxyEndpointCService;
         this.proxyEndpointAService = proxyEndpointAService;
         this.proxyAtomicService = proxyAtomicService;
         this.proxyEndpointCallService = proxyEndpointCallService;
@@ -247,8 +239,8 @@ public class ProxyOperateBffService {
 
         chart.setCategory(categoryList.toArray());
         Series series = new Series("平均请求耗时", dataList.toArray());
-
         chart.setSeries(new Series[]{series});
+
         statistic.setTimeConsumingProxyRanking(chart);
     }
 
@@ -287,6 +279,7 @@ public class ProxyOperateBffService {
     private void assembleTimeConsumingEndpointRanking(ProxyStatistic statistic,
                                                       Map<ProxyEndpointDto, Double> timeConsumingEndpointRankingMap,
                                                       Map<ProxyEndpointDto, Integer> callCountEndpointRankingMap) {
+        ChartOption chart = new ChartOption();
         List<Pair<ProxyEndpointDto, Double>> timeConsumingEndpointRankingList = timeConsumingEndpointRankingMap.entrySet().stream()
                 .map(entry -> {
                     ProxyEndpointDto endpointDto = entry.getKey();
@@ -296,6 +289,31 @@ public class ProxyOperateBffService {
                     return Pair.of(endpointDto, averageTime1.doubleValue());
                 })
                 .sorted((o1, o2) -> NumberUtil.compare(o2.getValue(), o1.getValue())).collect(Collectors.toList());
+
+        List<String> categoryList = new ArrayList<>();
+        List<Double> dataList = new ArrayList<>();
+        for (int i = 0; i < timeConsumingEndpointRankingList.size() && i < MAX_SIZE; i++) {
+            Pair<ProxyEndpointDto, Double> pair = timeConsumingEndpointRankingList.get(i);
+            ProxyEndpointDto endpointDto = pair.getKey();
+            categoryList.add(StrUtil.format("{}\n{}({})", endpointDto.getLocation(),
+                    endpointDto.getProxyName(), endpointDto.getProxyVersion()));
+            dataList.add(pair.getValue());
+        }
+
+        chart.setCategory(categoryList.toArray());
+        Series series = new Series("平均请求耗时", dataList.toArray());
+        chart.setSeries(new Series[]{series});
+        statistic.setTimeConsumingEndpointRanking(chart);
     }
 
+    private void assembleCallCountTendency(ProxyStatistic statistic,
+                                           Map<LocalDate, Integer> callCountTendencyMap) {
+        ChartOption chart = new ChartOption();
+        List<Pair<LocalDate, Integer>> callCountTendencyList = callCountTendencyMap.entrySet().stream().map(entry -> Pair.of(entry.getKey(), entry.getValue()))
+                .sorted((o1, o2) -> o2.getKey().compareTo(o1.getKey())).collect(Collectors.toList());
+        for (int i = 0; i < callCountTendencyList.size() && i < MAX_SIZE; i++) {
+            Pair<LocalDate, Integer> pair = callCountTendencyList.get(i);
+
+        }
+    }
 }
