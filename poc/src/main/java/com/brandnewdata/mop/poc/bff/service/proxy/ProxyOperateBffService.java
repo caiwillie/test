@@ -1,6 +1,8 @@
 package com.brandnewdata.mop.poc.bff.service.proxy;
 
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.lang.Pair;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.mop.poc.bff.converter.proxy.ProxyEndpointCallVoConverter;
 import com.brandnewdata.mop.poc.bff.vo.proxy.operate.ProxyEndpointCallFilter;
@@ -19,6 +21,7 @@ import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyEndpointCallAService;
 import com.brandnewdata.mop.poc.proxy.service.combined.IProxyEndpointCService;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -27,6 +30,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class ProxyOperateBffService {
@@ -105,7 +109,7 @@ public class ProxyOperateBffService {
         AtomicInteger failCount = new AtomicInteger();
         AtomicInteger totalTimeConsuming = new AtomicInteger();
         Map<String, Integer> callCountProxyRankingMap = new HashMap<>();
-        Map<String, Integer> timeConsumingProxyRankingMap = new HashMap<>();
+        Map<String, Double> timeConsumingProxyRankingMap = new HashMap<>();
         Map<ProxyEndpointDto, Integer> callCountEndpointRankingMap = new HashMap<>();
         Map<ProxyEndpointDto, Integer> timeConsumingEndpointRankingMap = new HashMap<>();
         Map<LocalDate, Integer> callCountTendencyMap = new HashMap<>();
@@ -128,7 +132,7 @@ public class ProxyOperateBffService {
                 callCountProxyRankingMap.put(name,
                         callCountProxyRankingMap.getOrDefault(name, 0) + 1);
                 timeConsumingProxyRankingMap.put(name,
-                        timeConsumingProxyRankingMap.getOrDefault(name, 0) + callDto.getTimeConsuming());
+                        timeConsumingProxyRankingMap.getOrDefault(name, 0.0) + callDto.getTimeConsuming());
             }
 
             ProxyEndpointDto proxyEndpointDto = proxyEndpointDtoMap.get(callDto.getEndpointId());
@@ -148,7 +152,20 @@ public class ProxyOperateBffService {
             }
         });
 
-        // callCountProxyRankingMap.entrySet()
+        List<Pair<String, Integer>> callCountProxyRankingList = callCountProxyRankingMap.entrySet().stream()
+                .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
+                .sorted((o1, o2) -> NumberUtil.compare(o2.getValue(), o1.getValue()))
+                .collect(Collectors.toList());
+
+        Stream<Pair<String, Double>> timeConsumingProxyRankingList = timeConsumingProxyRankingMap.entrySet().stream()
+                .map(entry -> {
+                    String name = entry.getKey();
+                    Double _totalTime = entry.getValue();
+                    Integer _totalCount = callCountProxyRankingMap.get(name);
+                    BigDecimal averageTime1 = NumberUtil.div(_totalTime, _totalCount, 2);
+                    return Pair.of(name, averageTime1.doubleValue());
+                })
+                .sorted((o1, o2) -> NumberUtil.compare(o2.getValue(), o1.getValue()));
 
 
         return statistic;
