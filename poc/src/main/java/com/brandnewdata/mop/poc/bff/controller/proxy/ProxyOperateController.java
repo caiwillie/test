@@ -28,9 +28,10 @@ public class ProxyOperateController {
      * @param filter the filter
      * @return the proxy statistic
      */
-    @PostMapping("/proxy/operate/call/statistic")
+    @PostMapping("/rest/proxy/operate/call/statistic")
     public Result<ProxyStatistic> statistic (@RequestBody ProxyEndpointCallFilter filter) {
-        return null;
+        ProxyStatistic ret = proxyOperateBffService.statistic(filter);
+        return Result.OK(ret);
     }
 
     /**
