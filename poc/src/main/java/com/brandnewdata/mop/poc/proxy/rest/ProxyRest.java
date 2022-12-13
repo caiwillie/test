@@ -45,8 +45,8 @@ public class ProxyRest {
      * @return the result
      */
     @GetMapping("/rest/reverseProxy/detailEndpoint")
-    public Result<Endpoint> detailEndpoint(@RequestParam long id) {
-        Endpoint result = endpointService.getOne(id);
+    public Result<Endpoint> detailEndpoint(@RequestParam String id) {
+        Endpoint result = endpointService.getOne(Long.parseLong(id));
         return Result.OK(result);
     }
 

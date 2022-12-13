@@ -56,7 +56,7 @@ public class ProxyService {
     public void delete(Long id) {
         Assert.notNull(id, "api id 不能为空");
         List<Endpoint> endpoints = endpointService.listByProxyIdList(ListUtil.of(id));
-        List<Long> endpointIdList = endpoints.stream().map(Endpoint::getId).collect(Collectors.toList());
+        List<Long> endpointIdList = endpoints.stream().map(endpoint -> Long.parseLong(endpoint.getId())).collect(Collectors.toList());
         endpointService.deleteByIdList(endpointIdList);
         proxyDao.deleteById(id);
     }
