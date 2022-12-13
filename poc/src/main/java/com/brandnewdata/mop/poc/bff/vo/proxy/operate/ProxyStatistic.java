@@ -55,6 +55,6 @@ public class ProxyStatistic {
     /**
      * 平均请求耗时趋势图
      */
-    private ChartOption averageTimeConsumingTendency;
+    private ChartOption timeConsumingTendency;
 
 }

@@ -1,6 +1,7 @@
 package com.brandnewdata.mop.poc.bff.service.proxy;
 
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Pair;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
@@ -26,7 +27,10 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -108,7 +112,7 @@ public class ProxyOperateBffService {
 
         AtomicInteger totalCount = new AtomicInteger();
         AtomicInteger successCount = new AtomicInteger();
-        AtomicInteger failCount = new AtomicInteger();
+        AtomicInteger falseCount = new AtomicInteger();
         AtomicInteger totalTimeConsuming = new AtomicInteger();
         Map<String, Integer> callCountProxyRankingMap = new HashMap<>();
         Map<String, Integer> callCountProxyRankingSuccessMap = new HashMap<>();
@@ -119,14 +123,16 @@ public class ProxyOperateBffService {
         Map<ProxyEndpointDto, Integer> callCountEndpointRankingFalseMap = new HashMap<>();
         Map<ProxyEndpointDto, Double> timeConsumingEndpointRankingMap = new HashMap<>();
         Map<LocalDate, Integer> callCountTendencyMap = new HashMap<>();
-        Map<LocalDate, Integer> averageTimeConsumingTendencyMap = new HashMap<>();
+        Map<LocalDate, Integer> callCountTendencySuccessMap = new HashMap<>();
+        Map<LocalDate, Integer> callCountTendencyFalseMap = new HashMap<>();
+        Map<LocalDate, Double> timeConsumingTendencyMap = new HashMap<>();
 
         proxyEndpointCallDtoListMap.values().stream().flatMap(List::stream).forEach(callDto -> {
             totalCount.getAndIncrement();
             if (StrUtil.equals(ProxyConst.CALL_EXECUTE_STATUS__SUCCESS, callDto.getExecuteStatus())) {
                 successCount.getAndIncrement();
             } else {
-                failCount.getAndIncrement();
+                falseCount.getAndIncrement();
             }
             totalTimeConsuming.addAndGet(callDto.getTimeConsuming());
 
@@ -166,13 +172,24 @@ public class ProxyOperateBffService {
             if(startTime != null) {
                 LocalDate date = startTime.toLocalDate();
                 callCountTendencyMap.put(date, callCountTendencyMap.getOrDefault(date, 0) + 1);
-                averageTimeConsumingTendencyMap.put(date,
-                        averageTimeConsumingTendencyMap.getOrDefault(date, 0) + callDto.getTimeConsuming());
+                if(StrUtil.equals(ProxyConst.CALL_EXECUTE_STATUS__SUCCESS, callDto.getExecuteStatus())) {
+                    callCountTendencySuccessMap.put(date, callCountTendencySuccessMap.getOrDefault(date, 0) + 1);
+                } else {
+                    callCountTendencyFalseMap.put(date, callCountTendencyFalseMap.getOrDefault(date, 0) + 1);
+                }
+                timeConsumingTendencyMap.put(date,
+                        timeConsumingTendencyMap.getOrDefault(date, 0.0) + callDto.getTimeConsuming());
             }
         });
 
-
-
+        // 组装数据
+        assembleCount(statistic, totalCount.get(), successCount.get(), falseCount.get(), totalTimeConsuming.get());
+        assembleCallCountProxyRanking(statistic, callCountProxyRankingMap, callCountProxyRankingSuccessMap, callCountProxyRankingFalseMap);
+        assembleTimeConsumingProxyRanking(statistic, timeConsumingProxyRankingMap, callCountProxyRankingMap);
+        assembleCallCountEndpointRanking(statistic, callCountEndpointRankingMap, callCountEndpointRankingSuccessMap, callCountEndpointRankingFalseMap);
+        assembleTimeConsumingEndpointRanking(statistic, timeConsumingEndpointRankingMap, callCountEndpointRankingMap);
+        assembleCallCountTendency(statistic, callCountTendencyMap, callCountTendencySuccessMap, callCountTendencyFalseMap);
+        assembleTimeConsumingTendency(statistic, timeConsumingTendencyMap, callCountTendencyMap);
         return statistic;
     }
 
@@ -307,13 +324,60 @@ public class ProxyOperateBffService {
     }
 
     private void assembleCallCountTendency(ProxyStatistic statistic,
-                                           Map<LocalDate, Integer> callCountTendencyMap) {
+                                           Map<LocalDate, Integer> callCountTendencyMap,
+                                           Map<LocalDate, Integer> callCountTendencySuccessMap,
+                                           Map<LocalDate, Integer> callCountTendencyFalseMap) {
         ChartOption chart = new ChartOption();
         List<Pair<LocalDate, Integer>> callCountTendencyList = callCountTendencyMap.entrySet().stream().map(entry -> Pair.of(entry.getKey(), entry.getValue()))
                 .sorted((o1, o2) -> o2.getKey().compareTo(o1.getKey())).collect(Collectors.toList());
-        for (int i = 0; i < callCountTendencyList.size() && i < MAX_SIZE; i++) {
-            Pair<LocalDate, Integer> pair = callCountTendencyList.get(i);
 
+        List<String> categoryList = new ArrayList<>();
+        List<Integer> successDataList = new ArrayList<>();
+        List<Integer> falseDataList = new ArrayList<>();
+        for (int i = 0; i < callCountTendencyList.size(); i++) {
+            Pair<LocalDate, Integer> pair = callCountTendencyList.get(i);
+            LocalDate date = pair.getKey();
+            categoryList.add(LocalDateTimeUtil.formatNormal(date));
+            Integer successCount = callCountTendencySuccessMap.getOrDefault(date, 0);
+            Integer falseCount = callCountTendencyFalseMap.getOrDefault(date, 0);
+            successDataList.add(successCount);
+            falseDataList.add(falseCount);
         }
+
+        chart.setCategory(categoryList.toArray());
+        Series seriesSuccess = new Series("请求成功次数", successDataList.toArray());
+        Series seriesFalse = new Series("请求失败次数", falseDataList.toArray());
+        chart.setSeries(new Series[]{seriesSuccess, seriesFalse});
+
+        statistic.setCallCountTendency(chart);
+    }
+
+    private void assembleTimeConsumingTendency(ProxyStatistic statistic,
+                                                  Map<LocalDate, Double> timeConsumingTendencyMap,
+                                                  Map<LocalDate, Integer> callCountTendencyMap) {
+        ChartOption chart = new ChartOption();
+        List<Pair<LocalDate, Double>> timeConsumingTendencyList = timeConsumingTendencyMap.entrySet().stream()
+                .map(entry -> {
+                    LocalDate date = entry.getKey();
+                    Double _totalTime = entry.getValue();
+                    Integer _totalCount = callCountTendencyMap.get(date);
+                    BigDecimal averageTime1 = NumberUtil.div(_totalTime, _totalCount, 2);
+                    return Pair.of(date, averageTime1.doubleValue());
+                })
+                .sorted((o1, o2) -> o2.getKey().compareTo(o1.getKey())).collect(Collectors.toList());
+
+        List<String> categoryList = new ArrayList<>();
+        List<Double> dataList = new ArrayList<>();
+        for (int i = 0; i < timeConsumingTendencyList.size(); i++) {
+            Pair<LocalDate, Double> pair = timeConsumingTendencyList.get(i);
+            LocalDate date = pair.getKey();
+            categoryList.add(LocalDateTimeUtil.formatNormal(date));
+            dataList.add(pair.getValue());
+        }
+
+        chart.setCategory(categoryList.toArray());
+        Series series = new Series("平均请求耗时", dataList.toArray());
+        chart.setSeries(new Series[]{series});
+        statistic.setTimeConsumingTendency(chart);
     }
 }
