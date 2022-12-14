@@ -85,6 +85,7 @@ public class ReverseProxyServlet extends ProxyServlet {
         proxyEndpointCallDto.setStartTime(startTime);
         String clientIp = ServletUtil.getClientIP(request);
         proxyEndpointCallDto.setIpAddress(clientIp);
+        proxyEndpointCallDto.setHttpMethod(request.getMethod());
         try {
             /*
              * getRequestUri() 和 getPathInfo() 的区别：
@@ -166,7 +167,6 @@ public class ReverseProxyServlet extends ProxyServlet {
         String queryString = request.getQueryString();
 
         dto.setUserAgent(userAgent);
-        dto.setHttpMethod(httpMethod);
         dto.setRequestQuery(queryString);
         dto.setRequestBody(body);
     }
