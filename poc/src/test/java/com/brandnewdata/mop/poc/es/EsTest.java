@@ -3,43 +3,31 @@ package com.brandnewdata.mop.poc.es;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.FieldSort;
-import co.elastic.clients.elasticsearch._types.SortOptions;
-import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.ExistsQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.RangeQuery;
 import co.elastic.clients.elasticsearch.cluster.HealthResponse;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
-import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.json.JsonData;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
-import com.brandnewdata.mop.poc.operate.schema.template.ListViewTemplate;
 import com.brandnewdata.mop.poc.util.HttpHostUtil;
 import com.caiwillie.util.cache.ElasticsearchUtil;
-import com.caiwillie.util.cache.ScheduleScanEsCache;
 import com.dxy.library.json.jackson.JacksonUtil;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.cache.Cache;
 import lombok.SneakyThrows;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.sql.Date;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.function.BiConsumer;
 
 public class EsTest {
 
@@ -87,21 +75,18 @@ public class EsTest {
         return;
     }
 
+
+
     @Test
     void test2() {
-
         BoolQuery filter = new BoolQuery.Builder()
                 .must(new Query.Builder().term(t -> t.field("joinRelation").value("processInstance")).build())
                 .build();
 
-
-        new ScheduleScanEsCache("operate-list-view-1.3.0_alias", "id",
-                "startDate", client, "0/4 * * * * ?", filter,
-                (BiConsumer<List<ObjectNode>, Cache>) (objectNodes, cache) -> {
-                    return;
-                });
-        ThreadUtil.sleep(1000000);
+          ThreadUtil.sleep(1000000);
     }
+
+
 
     @Test
     void test3() {
