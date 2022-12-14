@@ -29,7 +29,7 @@ public class ProcessInstanceCache {
     public ProcessInstanceCache(ElasticsearchManager elasticsearchManager, IEnvService envService) {
         this.elasticsearchManager = elasticsearchManager;
         this.envService = envService;
-        init();
+        // init();
     }
 
     private void init() {
