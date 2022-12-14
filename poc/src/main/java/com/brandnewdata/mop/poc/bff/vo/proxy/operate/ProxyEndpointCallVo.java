@@ -40,6 +40,11 @@ public class ProxyEndpointCallVo {
     private String proxyName;
 
     /**
+     * api 版本
+     */
+    private String proxyVersion;
+
+    /**
      * endpoint id
      */
     private Long endpointId;

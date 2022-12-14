@@ -30,6 +30,7 @@ public class ProxyEndpointCallVoConverter {
         vo.setProxyId(proxyEndpointDto.getProxyId());
         vo.setProxyName(proxyEndpointDto.getProxyName());
         vo.setLocation(proxyEndpointDto.getLocation());
+        vo.setProxyVersion(proxyEndpointDto.getProxyVersion());
         vo.setHttpMethod(dto.getHttpMethod());
         vo.setExecuteStatus(StrUtil.equals(dto.getExecuteStatus(), ProxyConst.CALL_EXECUTE_STATUS__SUCCESS) ?
                 ProxyConst.CALL_EXECUTE_STATUS__SUCCESS : ProxyConst.CALL_EXECUTE_STATUS__FAIL);
