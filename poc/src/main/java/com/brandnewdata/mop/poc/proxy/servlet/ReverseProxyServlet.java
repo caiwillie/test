@@ -80,12 +80,11 @@ public class ReverseProxyServlet extends ProxyServlet {
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        LocalDateTime startTime = LocalDateTime.now();
+        RepeatReadHttpRequest repeatReadHttpRequest = new RepeatReadHttpRequest(request);
         ProxyEndpointCallDto proxyEndpointCallDto = new ProxyEndpointCallDto();
-        proxyEndpointCallDto.setStartTime(startTime);
-        String clientIp = ServletUtil.getClientIP(request);
-        proxyEndpointCallDto.setIpAddress(clientIp);
-        proxyEndpointCallDto.setHttpMethod(request.getMethod());
+        // 更新 endpoint call dto
+        updateProxyEndpointCallDto(proxyEndpointCallDto, repeatReadHttpRequest);
+
         try {
             /*
              * getRequestUri() 和 getPathInfo() 的区别：
@@ -116,9 +115,7 @@ public class ReverseProxyServlet extends ProxyServlet {
                 throw new RuntimeException("backend type not support: " + endpointDto.getBackendType());
             }
 
-            RepeatReadHttpRequest repeatReadHttpRequest = new RepeatReadHttpRequest(request);
-            // 更新 endpoint call dto
-            updateFrom(proxyEndpointCallDto, repeatReadHttpRequest);
+
 
             if (NumberUtil.equals(endpointDto.getBackendType(), ProxyConst.BACKEND_TYPE__SERVER)) {
                 ProxyEndpointServerBo config = proxyEndpointAService.parseServerConfig(backendConfig);
@@ -141,7 +138,7 @@ public class ReverseProxyServlet extends ProxyServlet {
             ServletUtil.write(response, errorMessage, ContentType.TEXT_PLAIN.getValue());
         } finally {
             if (proxyEndpointCallDto.getEndpointId() != null) {
-                long time = LocalDateTimeUtil.between(startTime, LocalDateTime.now()).toMillis();
+                long time = LocalDateTimeUtil.between(proxyEndpointCallDto.getStartTime(), LocalDateTime.now()).toMillis();
                 proxyEndpointCallDto.setTimeConsuming((int)time);
                 proxyEndpointCallAService.save(proxyEndpointCallDto);
             }
@@ -150,9 +147,15 @@ public class ReverseProxyServlet extends ProxyServlet {
     }
 
     @SneakyThrows
-    private void updateFrom(ProxyEndpointCallDto dto, HttpServletRequest request) {
-        String userAgent = request.getHeader("User-Agent");
+    private void updateProxyEndpointCallDto(ProxyEndpointCallDto dto, HttpServletRequest request) {
+        LocalDateTime startTime = LocalDateTime.now();
         String httpMethod = request.getMethod();
+        dto.setStartTime(startTime);
+        String clientIp = ServletUtil.getClientIP(request);
+        dto.setIpAddress(clientIp);
+        dto.setHttpMethod(httpMethod);
+        dto.setUserAgent(request.getHeader("User-Agent"));
+        dto.setRequestQuery(request.getQueryString());
         if(!StrUtil.equalsAny(httpMethod, Method.POST.name(), Method.GET.name())) {
             throw new RuntimeException("http method not support: " + httpMethod);
         }
@@ -163,11 +166,6 @@ public class ReverseProxyServlet extends ProxyServlet {
             Assert.isTrue(StrUtil.equals(contentType, "application/json"), "Content-Type must be application/json");
             body = ServletUtil.getBody(request);
         }
-
-        String queryString = request.getQueryString();
-
-        dto.setUserAgent(userAgent);
-        dto.setRequestQuery(queryString);
         dto.setRequestBody(body);
     }
 
