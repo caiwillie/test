@@ -65,20 +65,27 @@ public class ProxyOperateBffService {
         // 查询proxy
         ProxyFilter proxyFilter = new ProxyFilter().setName(proxyName).setVersion(version);
         List<ProxyDto> proxyDtoList = proxyAtomicService.fetchListByFilter(proxyFilter);
-        List<Long> proxyIdList = proxyDtoList.stream().map(ProxyDto::getId).collect(Collectors.toList());
+        Map<Long, ProxyDto> proxyDtoMap = proxyDtoList.stream().collect(Collectors.toMap(ProxyDto::getId, Function.identity()));
 
         // 查询 proxyEndpoint
         ProxyEndpointFilter proxyEndpointFilter = new ProxyEndpointFilter().setLocation(location);
         Map<Long, List<ProxyEndpointDto>> proxyEndpointDtoListMap =
-                proxyEndpointAService.fetchListByProxyIdAndFilter(proxyIdList, proxyEndpointFilter);
-        List<Long> endpointIdList = proxyEndpointDtoListMap.values().stream().flatMap(List::stream)
-                .map(ProxyEndpointDto::getId).collect(Collectors.toList());
+                proxyEndpointAService.fetchListByProxyIdAndFilter(ListUtil.toList(proxyDtoMap.keySet()), proxyEndpointFilter);
+        Map<Long, ProxyEndpointDto> proxyEndpointDtoMap = proxyEndpointDtoListMap.values().stream().flatMap(List::stream)
+                .collect(Collectors.toMap(ProxyEndpointDto::getId, Function.identity()));
+
+        // 更新 proxy endpoint 信息
+        for (ProxyEndpointDto proxyEndpointDto : proxyEndpointDtoMap.values()) {
+            ProxyDto proxyDto = proxyDtoMap.get(proxyEndpointDto.getProxyId());
+            ProxyEndpointDtoConverter.updateFrom(proxyEndpointDto, proxyDto);
+        }
 
         Page<ProxyEndpointCallDto> page = proxyEndpointCallService
-                .fetchPageByEndpointId(pageNum, pageSize, endpointIdList);
+                .fetchPageByEndpointId(pageNum, pageSize, ListUtil.toList(proxyEndpointDtoMap.keySet()));
 
         List<ProxyEndpointCallVo> voList = page.getRecords().stream()
-                .map(ProxyEndpointCallVoConverter::createFrom).collect(Collectors.toList());
+                .map(callDto -> ProxyEndpointCallVoConverter.createFrom(callDto, proxyEndpointDtoMap.get(callDto.getEndpointId())))
+                .collect(Collectors.toList());
 
         return new Page<>(page.getTotal(), voList);
     }
@@ -100,6 +107,7 @@ public class ProxyOperateBffService {
                 proxyEndpointAService.fetchListByProxyIdAndFilter(ListUtil.toList(proxyDtoMap.keySet()), proxyEndpointFilter);
         Map<Long, ProxyEndpointDto> proxyEndpointDtoMap = proxyEndpointDtoListMap.values().stream().flatMap(List::stream)
                 .collect(Collectors.toMap(ProxyEndpointDto::getId, Function.identity()));
+
         // 更新 proxy endpoint 信息
         for (ProxyEndpointDto proxyEndpointDto : proxyEndpointDtoMap.values()) {
             ProxyDto proxyDto = proxyDtoMap.get(proxyEndpointDto.getProxyId());
