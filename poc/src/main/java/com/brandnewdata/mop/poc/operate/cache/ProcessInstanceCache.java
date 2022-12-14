@@ -1,11 +1,13 @@
 package com.brandnewdata.mop.poc.operate.cache;
 
+import cn.hutool.core.date.DateUtil;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import com.brandnewdata.mop.poc.env.dto.EnvDto;
 import com.brandnewdata.mop.poc.env.service.IEnvService;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
+import com.brandnewdata.mop.poc.operate.dto.ProcessInstanceStateDto;
 import com.brandnewdata.mop.poc.operate.manager.ElasticsearchManager;
 import com.caiwillie.util.cache.ScheduleScanEsCache;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -27,6 +29,7 @@ public class ProcessInstanceCache {
     public ProcessInstanceCache(ElasticsearchManager elasticsearchManager, IEnvService envService) {
         this.elasticsearchManager = elasticsearchManager;
         this.envService = envService;
+        init();
     }
 
     private void init() {
@@ -51,6 +54,20 @@ public class ProcessInstanceCache {
     }
 
     private BiConsumer<List<ObjectNode>, Cache<String, ListViewProcessInstanceDto>> getConsume() {
-        return null;
+        return (objectNodes, cache) -> {
+            for (ObjectNode objectNode : objectNodes) {
+                ListViewProcessInstanceDto dto = convert(objectNode);
+                cache.put(dto.getId(), dto);
+            }
+        };
+    }
+
+    private ListViewProcessInstanceDto convert(ObjectNode objectNode) {
+        ListViewProcessInstanceDto dto = new ListViewProcessInstanceDto();
+        dto.setId(objectNode.path("id").textValue());
+        dto.setStartDate(DateUtil.parse(objectNode.path("startDate").textValue()).toLocalDateTime());
+        dto.setBpmnProcessId(objectNode.path("bpmnProcessId").textValue());
+        dto.setState(ProcessInstanceStateDto.valueOf(objectNode.path("state").textValue()));
+        return dto;
     }
 }

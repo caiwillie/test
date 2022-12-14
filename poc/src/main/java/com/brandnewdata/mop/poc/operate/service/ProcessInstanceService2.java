@@ -2,12 +2,14 @@ package com.brandnewdata.mop.poc.operate.service;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.lang.Assert;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermsQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
 import com.brandnewdata.mop.poc.common.dto.Page;
+import com.brandnewdata.mop.poc.operate.cache.ProcessInstanceCache;
 import com.brandnewdata.mop.poc.operate.converter.SequenceFlowDtoConverter;
 import com.brandnewdata.mop.poc.operate.dao.FlowNodeInstanceDao;
 import com.brandnewdata.mop.poc.operate.dao.ListViewDao;
@@ -37,8 +39,11 @@ public class ProcessInstanceService2 implements IProcessInstanceService2 {
 
     private final DaoManager daoManager;
 
-    public ProcessInstanceService2(DaoManager daoManager) {
+    private final ProcessInstanceCache processInstanceCache;
+
+    public ProcessInstanceService2(DaoManager daoManager, ProcessInstanceCache processInstanceCache) {
         this.daoManager = daoManager;
+        this.processInstanceCache = processInstanceCache;
     }
 
     @Override
@@ -93,6 +98,15 @@ public class ProcessInstanceService2 implements IProcessInstanceService2 {
             LocalDateTime t2 = Optional.ofNullable(o2.getStartDate()).orElse(LocalDateTime.MIN);
             return t2.compareTo(t1);
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ListViewProcessInstanceDto> listProcessInstanceCacheByZeebeKey(Long envId, List<Long> zeebeKeyList) {
+        Assert.notNull(envId, "envId is null");
+        if(CollUtil.isEmpty(zeebeKeyList)) return ListUtil.empty();
+        Assert.isFalse(CollUtil.hasNull(zeebeKeyList), "zeebeKeyList has null");
+        Map<String, ListViewProcessInstanceDto> map = processInstanceCache.asMap(envId);
+        return map.values().stream().filter(dto -> zeebeKeyList.contains(dto.getProcessId())).collect(Collectors.toList());
     }
 
     @Override

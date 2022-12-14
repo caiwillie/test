@@ -327,7 +327,8 @@ public class ProxyOperateBffService {
                                            Map<LocalDate, Integer> callCountTendencySuccessMap,
                                            Map<LocalDate, Integer> callCountTendencyFalseMap) {
         ChartOption chart = new ChartOption();
-        List<Pair<LocalDate, Integer>> callCountTendencyList = callCountTendencyMap.entrySet().stream().map(entry -> Pair.of(entry.getKey(), entry.getValue()))
+        List<Pair<LocalDate, Integer>> callCountTendencyList = callCountTendencyMap.entrySet().stream()
+                .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
                 .sorted((o1, o2) -> o2.getKey().compareTo(o1.getKey())).collect(Collectors.toList());
 
         List<String> categoryList = new ArrayList<>();

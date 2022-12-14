@@ -130,7 +130,7 @@ public class ReverseProxyServlet extends ProxyServlet {
             proxyEndpointCallDto.setExecuteStatus("success");
         } catch (Exception e) {
             log.error("ReverseProxyServlet.service error", e);
-            proxyEndpointCallDto.setExecuteStatus("false");
+            proxyEndpointCallDto.setExecuteStatus(ProxyConst.CALL_EXECUTE_STATUS__FAIL);
             response.setStatus(HttpStatus.HTTP_INTERNAL_ERROR);
             String errorMessage = e.getMessage();
             if(StrUtil.isBlank(errorMessage)) {

@@ -90,6 +90,10 @@ public class EsTest {
     @Test
     void test2() {
 
+        BoolQuery filter = new BoolQuery.Builder()
+                .must(new Query.Builder().term(t -> t.field("joinRelation").value("processInstance")).build())
+                .build();
+
 
         new ScheduleScanEsCache("operate-list-view-1.3.0_alias", "id",
                 "startDate", client, "0/4 * * * * ?", filter,

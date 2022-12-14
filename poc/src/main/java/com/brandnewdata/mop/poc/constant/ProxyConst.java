@@ -33,5 +33,5 @@ public interface ProxyConst {
 
     String CALL_EXECUTE_STATUS__SUCCESS = "success";
 
-    String CALL_EXECUTE_STATUS__FALSE = "false";
+    String CALL_EXECUTE_STATUS__FAIL = "fail";
 }

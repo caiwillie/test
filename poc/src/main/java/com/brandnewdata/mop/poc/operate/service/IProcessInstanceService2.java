@@ -21,6 +21,10 @@ public interface IProcessInstanceService2 {
             Long envId,
             List<Long> zeebeKeyList);
 
+    List<ListViewProcessInstanceDto> listProcessInstanceCacheByZeebeKey(
+            Long envId,
+            List<Long> zeebeKeyList);
+
     ListViewProcessInstanceDto detailProcessInstance(Long envId, Long processInstanceId);
 
     List<SequenceFlowDto> sequenceFlows(Long envId, Long processInstanceId);

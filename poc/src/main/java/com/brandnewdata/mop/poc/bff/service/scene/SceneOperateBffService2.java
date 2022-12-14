@@ -1,17 +1,22 @@
 package com.brandnewdata.mop.poc.bff.service.scene;
 
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.lang.Pair;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.mop.poc.bff.converter.process.ProcessDefinitionVoConverter;
 import com.brandnewdata.mop.poc.bff.converter.scene.OperateProcessInstanceVoConverter;
+import com.brandnewdata.mop.poc.bff.vo.operate.charts.ChartOption;
+import com.brandnewdata.mop.poc.bff.vo.operate.charts.Series;
 import com.brandnewdata.mop.poc.bff.vo.process.ProcessDefinitionVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.operate.OperateProcessInstanceVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.operate.SceneDeployFilter;
 import com.brandnewdata.mop.poc.bff.vo.scene.operate.SceneStatistic;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
+import com.brandnewdata.mop.poc.operate.dto.ProcessInstanceStateDto;
 import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService2;
 import com.brandnewdata.mop.poc.process.dto.ProcessReleaseDeployDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
@@ -21,6 +26,7 @@ import com.brandnewdata.mop.poc.scene.service.ISceneReleaseDeployService;
 import com.brandnewdata.mop.poc.scene.service.IVersionProcessService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +37,7 @@ import java.util.stream.Collectors;
 @Service
 public class SceneOperateBffService2 {
 
+    private final int MAX_SIZE = 10;
     private final ISceneReleaseDeployService sceneReleaseDeployService;
 
     private final IProcessDeployService2 processDeployService;
@@ -52,31 +59,14 @@ public class SceneOperateBffService2 {
     public Page<OperateProcessInstanceVo> pageProcessInstance(SceneDeployFilter filter) {
         Long envId = Assert.notNull(filter.getEnvId());
 
-        Long sceneId = filter.getSceneId();
-        Long versionId = filter.getVersionId();
-        String processId = filter.getProcessId();
-
         // 获取符合过滤条件的流程id列表
-        List<SceneReleaseDeployDto> sceneReleaseDeployDtoList = sceneReleaseDeployService.fetchByEnvId(envId);
-        Map<String, SceneReleaseDeployDto> filterSceneReleaseDeployDtoMap = sceneReleaseDeployDtoList.stream().filter(dto -> {
-            if (sceneId == null) return true;
-            if (!NumberUtil.equals(sceneId, dto.getSceneId())) return false;
-
-            if (versionId == null) return true;
-            if (!NumberUtil.equals(versionId, dto.getVersionId())) return false;
-
-            if (processId == null) return true;
-            if (!StrUtil.equals(processId, dto.getProcessId())) {
-                return false;
-            } else {
-                return true;
-            }
-        }).collect(Collectors.toMap(SceneReleaseDeployDto::getProcessId, Function.identity()));
-
+        List<SceneReleaseDeployDto> sceneReleaseDeployDtoList = fetchSceneReleaseDeployDtoList(filter);
+        Map<String, SceneReleaseDeployDto> sceneReleaseDeployDtoMap = sceneReleaseDeployDtoList.stream()
+                .collect(Collectors.toMap(SceneReleaseDeployDto::getProcessId, Function.identity()));
 
         // 获取 process release deploy列表
         Map<String, ProcessReleaseDeployDto> processReleaseDeployDtoMap =
-                processDeployService.fetchReleaseByEnvIdAndProcessId(envId, ListUtil.toList(filterSceneReleaseDeployDtoMap.keySet()));
+                processDeployService.fetchReleaseByEnvIdAndProcessId(envId, ListUtil.toList(sceneReleaseDeployDtoMap.keySet()));
 
         List<Long> zeebeKeyList = processReleaseDeployDtoMap.values().stream()
                 .map(ProcessReleaseDeployDto::getProcessZeebeKey).collect(Collectors.toList());
@@ -90,7 +80,7 @@ public class SceneOperateBffService2 {
             String _processId = listViewProcessInstanceDto.getBpmnProcessId();
             OperateProcessInstanceVo vo = OperateProcessInstanceVoConverter.createFrom(listViewProcessInstanceDto);
 
-            SceneReleaseDeployDto sceneReleaseDeployDto = filterSceneReleaseDeployDtoMap.get(_processId);
+            SceneReleaseDeployDto sceneReleaseDeployDto = sceneReleaseDeployDtoMap.get(_processId);
             OperateProcessInstanceVoConverter.updateFrom(vo, sceneReleaseDeployDto);
 
             ProcessReleaseDeployDto processReleaseDeployDto = processReleaseDeployDtoMap.get(_processId);
@@ -111,7 +101,161 @@ public class SceneOperateBffService2 {
     }
 
     public SceneStatistic statistic(SceneDeployFilter filter) {
-        return null;
+        SceneStatistic ret = new SceneStatistic();
+        Long envId = Assert.notNull(filter.getEnvId());
+
+        // 获取符合过滤条件的流程id列表
+        List<SceneReleaseDeployDto> sceneReleaseDeployDtoList = fetchSceneReleaseDeployDtoList(filter);
+        Map<String, SceneReleaseDeployDto> sceneReleaseDeployDtoMap = sceneReleaseDeployDtoList.stream()
+                .collect(Collectors.toMap(SceneReleaseDeployDto::getProcessId, Function.identity()));
+
+        // 获取 process release deploy列表
+        Map<String, ProcessReleaseDeployDto> processReleaseDeployDtoMap =
+                processDeployService.fetchReleaseByEnvIdAndProcessId(envId, ListUtil.toList(sceneReleaseDeployDtoMap.keySet()));
+
+        List<Long> zeebeKeyList = processReleaseDeployDtoMap.values().stream()
+                .map(ProcessReleaseDeployDto::getProcessZeebeKey).collect(Collectors.toList());
+
+        List<ListViewProcessInstanceDto> listViewProcessInstanceDtoList = processInstanceService.listProcessInstanceCacheByZeebeKey(envId, zeebeKeyList);
+
+        int executionCount = 0;
+        int successCount = 0;
+        int failCount = 0;
+        Map<String, Integer> executionSceneRankingMap = new HashMap<>();
+        Map<String, Integer> executionSceneRankingSuccessMap = new HashMap<>();
+        Map<String, Integer> executionSceneRankingFailMap = new HashMap<>();
+        Map<LocalDate, Integer> executionSceneTendencyMap = new HashMap<>();
+        Map<LocalDate, Integer> executionSceneTendencySuccessMap = new HashMap<>();
+        Map<LocalDate, Integer> executionSceneTendencyFailMap = new HashMap<>();
+        for (ListViewProcessInstanceDto dto : listViewProcessInstanceDtoList) {
+            ProcessInstanceStateDto state = dto.getState();
+            executionCount++;
+            if(state == ProcessInstanceStateDto.COMPLETED) {
+                successCount++;
+            } else if (state == ProcessInstanceStateDto.INCIDENT) {
+                failCount++;
+            }
+
+            if(state == ProcessInstanceStateDto.COMPLETED || state == ProcessInstanceStateDto.INCIDENT) {
+                SceneReleaseDeployDto sceneReleaseDeployDto = sceneReleaseDeployDtoMap.get(dto.getBpmnProcessId());
+                String sceneName = sceneReleaseDeployDto.getSceneName();
+                executionSceneRankingMap.put(sceneName, executionSceneRankingMap.getOrDefault(sceneName, 0) + 1);
+
+                if(state == ProcessInstanceStateDto.COMPLETED) {
+                    executionSceneRankingSuccessMap.put(sceneName, executionSceneRankingSuccessMap.getOrDefault(sceneName, 0) + 1);
+                } else {
+                    executionSceneRankingFailMap.put(sceneName, executionSceneRankingFailMap.getOrDefault(sceneName, 0) + 1);
+                }
+
+                LocalDate localDate = dto.getStartDate().toLocalDate();
+                executionSceneTendencyMap.put(localDate, executionSceneTendencyMap.getOrDefault(localDate, 0) + 1);
+                if(state == ProcessInstanceStateDto.COMPLETED) {
+                    executionSceneTendencySuccessMap.put(localDate, executionSceneTendencySuccessMap.getOrDefault(localDate, 0) + 1);
+                } else {
+                    executionSceneTendencyFailMap.put(localDate, executionSceneTendencyFailMap.getOrDefault(localDate, 0) + 1);
+                }
+
+            }
+
+        }
+
+        // assemble result
+        assembleCount(ret, executionCount, successCount, failCount);
+        assembleExecutionSceneRanking(ret, executionSceneRankingMap, executionSceneRankingSuccessMap, executionSceneRankingFailMap);
+        assembleExecutionSceneTendency(ret, executionSceneTendencyMap, executionSceneTendencySuccessMap, executionSceneTendencyFailMap);
+        return ret;
+    }
+
+    private List<SceneReleaseDeployDto> fetchSceneReleaseDeployDtoList(SceneDeployFilter filter) {
+        Long envId = Assert.notNull(filter.getEnvId());
+
+        Long sceneId = filter.getSceneId();
+        Long versionId = filter.getVersionId();
+        String processId = filter.getProcessId();
+
+        List<SceneReleaseDeployDto> sceneReleaseDeployDtoList = sceneReleaseDeployService.fetchByEnvId(envId);
+        return sceneReleaseDeployDtoList.stream().filter(dto -> {
+            if (sceneId == null) return true;
+            if (!NumberUtil.equals(sceneId, dto.getSceneId())) return false;
+
+            if (versionId == null) return true;
+            if (!NumberUtil.equals(versionId, dto.getVersionId())) return false;
+
+            if (processId == null) return true;
+            if (!StrUtil.equals(processId, dto.getProcessId())) {
+                return false;
+            } else {
+                return true;
+            }
+        }).collect(Collectors.toList());
+
+    }
+
+    private void assembleCount(SceneStatistic statistic, int executionCount, int successCount, int failCount) {
+        statistic.setExecutionCount(executionCount);
+        statistic.setSuccessCount(successCount);
+        statistic.setFailCount(failCount);
+    }
+
+    private void assembleExecutionSceneRanking(SceneStatistic statistic,
+                                               Map<String, Integer> executionSceneRankingMap,
+                                               Map<String, Integer> executionSceneRankingSuccessMap,
+                                               Map<String, Integer> executionSceneRankingFailMap) {
+        ChartOption chart = new ChartOption();
+        List<Pair<String, Integer>> executionSceneRankingList = executionSceneRankingMap.entrySet().stream()
+                .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
+                .sorted((o1, o2) -> NumberUtil.compare(o2.getValue(), o1.getValue()))
+                .collect(Collectors.toList());
+        List<String> categoryList = new ArrayList<>();
+        List<Integer> successDataList = new ArrayList<>();
+        List<Integer> falseDataList = new ArrayList<>();
+
+        for (int i = 0; i < executionSceneRankingList.size() && i < MAX_SIZE; i++) {
+            Pair<String, Integer> pair = executionSceneRankingList.get(i);
+            String name = pair.getKey();
+            Integer successCount = executionSceneRankingSuccessMap.getOrDefault(name, 0);
+            Integer falseCount = executionSceneRankingFailMap.getOrDefault(name, 0);
+            categoryList.add(name);
+            successDataList.add(successCount);
+            falseDataList.add(falseCount);
+        }
+
+        chart.setCategory(categoryList.toArray());
+        Series seriesSuccess = new Series("运行成功次数", successDataList.toArray());
+        Series seriesFalse = new Series("运行失败次数", falseDataList.toArray());
+        chart.setSeries(new Series[]{seriesSuccess, seriesFalse});
+        statistic.setExecutionSceneRanking(chart);
+    }
+
+    private void assembleExecutionSceneTendency(SceneStatistic statistic,
+                                                Map<LocalDate, Integer> executionSceneTendencyMap,
+                                                Map<LocalDate, Integer> executionSceneTendencySuccessMap,
+                                                Map<LocalDate, Integer> executionSceneTendencyFailMap) {
+        ChartOption chart = new ChartOption();
+        List<Pair<LocalDate, Integer>> executionSceneTendencyList = executionSceneTendencyMap.entrySet().stream()
+                .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
+                .sorted((o1, o2) -> o2.getKey().compareTo(o1.getKey()))
+                .collect(Collectors.toList());
+        List<String> categoryList = new ArrayList<>();
+        List<Integer> successDataList = new ArrayList<>();
+        List<Integer> falseDataList = new ArrayList<>();
+
+        for (int i = 0; i < executionSceneTendencyList.size() && i < MAX_SIZE; i++) {
+            Pair<LocalDate, Integer> pair = executionSceneTendencyList.get(i);
+            LocalDate date = pair.getKey();
+            Integer successCount = executionSceneTendencySuccessMap.getOrDefault(date, 0);
+            Integer falseCount = executionSceneTendencyFailMap.getOrDefault(date, 0);
+            categoryList.add(LocalDateTimeUtil.formatNormal(date));
+            successDataList.add(successCount);
+            falseDataList.add(falseCount);
+        }
+
+        chart.setCategory(categoryList.toArray());
+        Series seriesSuccess = new Series("运行成功次数", successDataList.toArray());
+        Series seriesFalse = new Series("运行失败次数", falseDataList.toArray());
+        chart.setSeries(new Series[]{seriesSuccess, seriesFalse});
+
+        statistic.setExecutionSceneTendency(chart);
     }
 
 }
