@@ -71,9 +71,6 @@ public class DataExternalService {
     @Resource
     private ConnectorManager connectorManager;
 
-    @Resource
-    private ISceneService sceneService;
-
     public LoadResp prepareLoad(byte[] bytes) {
         LoadResp resp = new LoadResp();
         AllExternal allExternal = getAllExternal(bytes);
@@ -96,7 +93,7 @@ public class DataExternalService {
         // 保存场景
         SceneDto sceneDto = new SceneDto();
         sceneDto.setName(sceneName);
-        sceneDto = sceneService.save(sceneDto);
+        // sceneDto = sceneService.save(sceneDto);
 
         // 保存场景下的流程
         SceneLoadPo sceneLoadPo = loadDao.selectById(req.getId());
@@ -116,7 +113,7 @@ public class DataExternalService {
             sceneProcessDto.setXml(processDefinitionExternal.getXml());
             sceneProcessDto.setImgUrl(processDefinitionExternal.getImgUrl());
             sceneProcessDto.setBusinessSceneId(sceneDto.getId());
-            sceneService.saveProcessDefinition(sceneProcessDto);
+            // sceneService.saveProcessDefinition(sceneProcessDto);
 
             // 仅为了测试
             count--;

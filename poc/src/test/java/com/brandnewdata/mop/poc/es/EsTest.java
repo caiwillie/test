@@ -17,7 +17,7 @@ import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.util.HttpHostUtil;
-import com.caiwillie.util.cache.ElasticsearchUtil;
+import com.caiwillie.util.es.ElasticsearchUtil;
 import com.caiwillie.util.cache.ScheduleScanEsCache;
 import com.dxy.library.json.jackson.JacksonUtil;
 import com.fasterxml.jackson.databind.node.ObjectNode;
