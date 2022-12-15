@@ -10,6 +10,7 @@ import com.brandnewdata.mop.poc.env.dto.EnvDto;
 import com.brandnewdata.mop.poc.env.dto.EnvServiceDto;
 import com.brandnewdata.mop.poc.env.service.IEnvService;
 import com.brandnewdata.mop.poc.util.HttpHostUtil;
+import com.dxy.library.json.jackson.JacksonUtil;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -76,7 +77,7 @@ public class ElasticsearchManager {
 
                 // Create the transport with a Jackson mapper
                 ElasticsearchTransport transport = new RestClientTransport(
-                        restClient, new JacksonJsonpMapper(objectMapper));
+                        restClient, new JacksonJsonpMapper(JacksonUtil.getObjectMapper()));
 
                 // And create the API client
                 return new ElasticsearchClient(transport);

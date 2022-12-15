@@ -1,0 +1,1 @@
+ALTER TABLE `mop`.`mop_process_snapshot_deploy` ADD COLUMN `process_digest` varchar(255) NULL;

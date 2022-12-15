@@ -15,10 +15,13 @@ import co.elastic.clients.json.JsonData;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
+import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.util.HttpHostUtil;
 import com.caiwillie.util.cache.ElasticsearchUtil;
+import com.caiwillie.util.cache.ScheduleScanEsCache;
 import com.dxy.library.json.jackson.JacksonUtil;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.cache.Cache;
 import lombok.SneakyThrows;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
@@ -28,6 +31,7 @@ import org.junit.jupiter.api.Test;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 public class EsTest {
 
@@ -82,8 +86,11 @@ public class EsTest {
         BoolQuery filter = new BoolQuery.Builder()
                 .must(new Query.Builder().term(t -> t.field("joinRelation").value("processInstance")).build())
                 .build();
+        ScheduleScanEsCache<String, ListViewProcessInstanceDto> cache = new ScheduleScanEsCache<>("operate-list-view-1.3.0_alias", "id",
+                "startDate", client, "0/4 * * * * ?", filter, (objectNodes, stringListViewProcessInstanceDtoCache) -> {
 
-          ThreadUtil.sleep(1000000);
+                });
+        ThreadUtil.sleep(1000000);
     }
 
 
