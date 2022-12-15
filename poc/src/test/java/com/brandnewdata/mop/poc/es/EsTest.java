@@ -21,7 +21,6 @@ import com.caiwillie.util.cache.ElasticsearchUtil;
 import com.caiwillie.util.cache.ScheduleScanEsCache;
 import com.dxy.library.json.jackson.JacksonUtil;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.cache.Cache;
 import lombok.SneakyThrows;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
@@ -31,7 +30,6 @@ import org.junit.jupiter.api.Test;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiConsumer;
 
 public class EsTest {
 
