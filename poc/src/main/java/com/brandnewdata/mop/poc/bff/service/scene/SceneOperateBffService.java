@@ -35,7 +35,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-public class SceneOperateBffService2 {
+public class SceneOperateBffService {
 
     private final int MAX_SIZE = 10;
     private final ISceneReleaseDeployService sceneReleaseDeployService;
@@ -46,10 +46,10 @@ public class SceneOperateBffService2 {
 
     private final IVersionProcessService versionProcessService;
 
-    public SceneOperateBffService2(ISceneReleaseDeployService sceneReleaseDeployService,
-                                   IProcessDeployService2 processDeployService,
-                                   IProcessInstanceService2 processInstanceService,
-                                   IVersionProcessService versionProcessService) {
+    public SceneOperateBffService(ISceneReleaseDeployService sceneReleaseDeployService,
+                                  IProcessDeployService2 processDeployService,
+                                  IProcessInstanceService2 processInstanceService,
+                                  IVersionProcessService versionProcessService) {
         this.sceneReleaseDeployService = sceneReleaseDeployService;
         this.processDeployService = processDeployService;
         this.processInstanceService = processInstanceService;
