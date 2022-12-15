@@ -24,11 +24,11 @@ import java.util.stream.Collectors;
  * @author caiwillie
  */
 @RestController
-public class SceneController2 {
+public class SceneController {
 
     private final SceneBffService sceneBffService;
 
-    public SceneController2(SceneBffService sceneBffService) {
+    public SceneController(SceneBffService sceneBffService) {
         this.sceneBffService = sceneBffService;
     }
 
