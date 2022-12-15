@@ -80,11 +80,8 @@ public class ReverseProxyServlet extends ProxyServlet {
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        RepeatReadHttpRequest repeatReadHttpRequest = new RepeatReadHttpRequest(request);
-        ProxyEndpointCallDto proxyEndpointCallDto = new ProxyEndpointCallDto();
-        // 更新 endpoint call dto
-        updateProxyEndpointCallDto(proxyEndpointCallDto, repeatReadHttpRequest);
 
+        ProxyEndpointDto endpointDto = null;
         try {
             /*
              * getRequestUri() 和 getPathInfo() 的区别：
@@ -103,10 +100,24 @@ public class ReverseProxyServlet extends ProxyServlet {
             ProxyDto proxyDto = proxyAService.fetchByDomain(domain);
             Assert.notNull(proxyDto, "domain not found: {}", domain);
 
-            ProxyEndpointDto endpointDto = proxyEndpointAService.fetchByProxyIdAndLocation(proxyDto.getId(), uri);
+            endpointDto = proxyEndpointAService.fetchByProxyIdAndLocation(proxyDto.getId(), uri);
             Assert.notNull(endpointDto, "path not found: {}", uri);
-            proxyEndpointCallDto.setEndpointId(endpointDto.getId());
+        } catch(Exception e) {
+            String errorMessage = e.getMessage();
+            if(StrUtil.isBlank(errorMessage)) {
+                errorMessage = e.toString();
+            }
+            ServletUtil.write(response, errorMessage, ContentType.TEXT_PLAIN.getValue());
+            return;
+        }
 
+        RepeatReadHttpRequest repeatReadHttpRequest = new RepeatReadHttpRequest(request);
+        ProxyEndpointCallDto proxyEndpointCallDto = new ProxyEndpointCallDto();
+        proxyEndpointCallDto.setEndpointId(endpointDto.getId());
+        // 更新 endpoint call dto
+        updateProxyEndpointCallDto(proxyEndpointCallDto, repeatReadHttpRequest);
+
+        try {
             Integer backendType = endpointDto.getBackendType();
             String backendConfig = endpointDto.getBackendConfig();
 
@@ -114,8 +125,6 @@ public class ReverseProxyServlet extends ProxyServlet {
                     && !NumberUtil.equals(backendType, ProxyConst.BACKEND_TYPE__SERVER)) {
                 throw new RuntimeException("backend type not support: " + endpointDto.getBackendType());
             }
-
-
 
             if (NumberUtil.equals(endpointDto.getBackendType(), ProxyConst.BACKEND_TYPE__SERVER)) {
                 ProxyEndpointServerBo config = proxyEndpointAService.parseServerConfig(backendConfig);
