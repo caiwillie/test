@@ -1,19 +1,14 @@
 package com.brandnewdata.mop.poc.scene.service;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Opt;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ZipUtil;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDto;
 import com.brandnewdata.mop.poc.process.manager.ConnectorManager;
 import com.brandnewdata.mop.poc.process.manager.dto.ConfigInfo;
 import com.brandnewdata.mop.poc.process.manager.dto.ConnectorBasicInfo;
-import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParseStep1;
-import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParser;
 import com.brandnewdata.mop.poc.process.parser.dto.Action;
 import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService;
 import com.brandnewdata.mop.poc.process.util.ProcessUtil;
@@ -26,8 +21,6 @@ import com.brandnewdata.mop.poc.scene.dto.external.ConfigExternal;
 import com.brandnewdata.mop.poc.scene.dto.external.ProcessDefinitionExternal;
 import com.brandnewdata.mop.poc.scene.dto.external.SceneProcessExternal;
 import com.brandnewdata.mop.poc.scene.po.SceneLoadPo;
-import com.brandnewdata.mop.poc.scene.po.SceneProcessPo;
-import com.brandnewdata.mop.poc.scene.request.ExportReq;
 import com.brandnewdata.mop.poc.scene.response.ConnConfResp;
 import com.brandnewdata.mop.poc.scene.response.LoadResp;
 import com.dxy.library.json.jackson.JacksonUtil;
@@ -80,59 +73,6 @@ public class DataExternalService {
 
     @Resource
     private ISceneService sceneService;
-
-    public File export(ExportReq req) {
-        Assert.isTrue(CollUtil.isNotEmpty(req.getProcessIds()), "所选流程不能为空");
-        QueryWrapper<SceneProcessPo> queryWrapper = new QueryWrapper<>();
-        List<SceneProcessPo> entities = sceneProcessDao.selectList(queryWrapper);
-
-        Map<String, File> fileMap = new HashMap<>();
-
-        // 场景下的流程
-        Map<Long, SceneProcessExternal> sceneProcessMap = new HashMap<>();
-        List<String> processIds = new ArrayList<>();
-        for (SceneProcessPo entity : entities) {
-            SceneProcessExternal external = new SceneProcessExternal();
-            Long id = entity.getId();
-            String processId = entity.getProcessId();
-            external.setId(id);
-            external.setSceneId(entity.getBusinessSceneId());
-            external.setProcessId(processId);
-            sceneProcessMap.put(id, external);
-            processIds.add(processId);
-        }
-        // 获取file
-        fileMap.put(FILENAME__SCENE_PROCESS, createTempFile(JacksonUtil.to(sceneProcessMap)));
-
-        List<ProcessDefinitionDto> processDefinitionDtoList = processDefinitionService.list(processIds, true);
-        // 流程具体定义
-        Map<String, ProcessDefinitionExternal> processDefinitionMap = new HashMap<>();
-        Map<String, String> configs = new HashMap<>();
-        for (ProcessDefinitionDto processDefinitionDto : processDefinitionDtoList) {
-            ProcessDefinitionExternal external = new ProcessDefinitionExternal();
-            String processId = processDefinitionDto.getProcessId();
-            String name = processDefinitionDto.getName();
-            String xml = processDefinitionDto.getXml();
-            external.setId(processId);
-            external.setName(name);
-            external.setXml(xml);
-            external.setImgUrl(processDefinitionDto.getImgUrl());
-            // 缓存连接器
-            processDefinitionMap.put(processId, external);
-
-            // 解析流程中用到的流程
-            ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.step1(processId, name, xml);
-            configs.putAll(Opt.ofNullable(step1.parseConfig().step1Result().getConnectorConfigMap()).orElse(MapUtil.empty()));
-        }
-        fileMap.put(FILENAME__PROCESS_DEFINITION, createTempFile(JacksonUtil.to(processDefinitionMap)));
-
-        Map<String, ConfigExternal> configExternalMap = getConfigExternalMap(configs);
-        fileMap.put(FILENAME__CONFIG, createTempFile(JacksonUtil.to(configExternalMap)));
-
-        File dir = createTempDir(fileMap, true);
-        File zip = ZipUtil.zip(dir);
-        return zip;
-    }
 
     public LoadResp prepareLoad(byte[] bytes) {
         LoadResp resp = new LoadResp();
