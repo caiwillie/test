@@ -1,7 +1,7 @@
 package com.brandnewdata.mop.poc.bff.controller.scene;
 
 import com.brandnewdata.common.webresult.Result;
-import com.brandnewdata.mop.poc.bff.service.scene.SceneOperateBffService;
+import com.brandnewdata.mop.poc.bff.service.scene.SceneOperateBffService2;
 import com.brandnewdata.mop.poc.bff.vo.process.ProcessDefinitionVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.operate.OperateProcessInstanceVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.operate.SceneDeployFilter;
@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class SceneOperateController {
 
-    private final SceneOperateBffService sceneOperateBffService;
+    private final SceneOperateBffService2 sceneOperateBffService;
 
-    public SceneOperateController(SceneOperateBffService sceneOperateBffService) {
+    public SceneOperateController(SceneOperateBffService2 sceneOperateBffService) {
         this.sceneOperateBffService = sceneOperateBffService;
     }
 
