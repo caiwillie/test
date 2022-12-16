@@ -13,6 +13,7 @@ import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto;
 import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyEndpointAService;
 import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyEndpointSceneAService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
@@ -33,6 +34,7 @@ public class ProxyEndpointCService implements IProxyEndpointCService {
     }
 
     @Override
+    @Transactional
     public ProxyEndpointDto save(ProxyEndpointDto dto) {
         Long id = dto.getId();
         Long proxyId = dto.getProxyId();

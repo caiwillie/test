@@ -591,7 +591,7 @@ public class ProcessDefinitionParser implements
      */
     private Action parseActionAndReplType(Element taskDefinition, boolean replType) {
         String type = taskDefinition.attributeValue(TYPE_ATTRIBUTE);
-        Action action = ProcessUtil.parseActionInfo(type);
+        Action action = ProcessUtil.parseAction(type);
         // 解析成action后就转换type
         String newType = ProcessUtil.convertProcessId(type);
         ProcessUtil.checkProcessId(newType);
@@ -744,7 +744,7 @@ public class ProcessDefinitionParser implements
      */
     private void parseTrigger(Element bndTD) {
         String type = bndTD.attributeValue(TYPE_ATTRIBUTE);
-        trigger = ProcessUtil.parseActionInfo(type);
+        trigger = ProcessUtil.parseAction(type);
     }
 
     /**
@@ -849,7 +849,7 @@ public class ProcessDefinitionParser implements
         String xml = manager.getTriggerXML(trigger);
 
         // 解析自定义触发器内的通用触发器
-        Step2Result step3Result = ProcessDefinitionParser
+        Step2Result step2Result = ProcessDefinitionParser
                 .step1(trigger.getFullId(), null, xml)
                 .replServiceTask(false, null)
                 .replAttr()
@@ -858,9 +858,9 @@ public class ProcessDefinitionParser implements
                 .step2Result();
 
         // 替换成真实协议
-        protocol = step3Result.getProtocol();
-        requestParams = step3Result.getRequestParams();
-        responseParams = step3Result.getResponseParams();
+        protocol = step2Result.getProtocol();
+        requestParams = step2Result.getRequestParams();
+        responseParams = step2Result.getResponseParams();
 
         // 替换成 call activity
         BndStartEvent bndStartEvent = replEle_BpmnSeToZbCa(bndTaskDefinition);

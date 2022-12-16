@@ -28,9 +28,10 @@ public class ProxyOperateController {
      * @param filter the filter
      * @return the proxy statistic
      */
-    @PostMapping("/proxy/operate/call/statistic")
+    @PostMapping("/rest/proxy/operate/call/statistic")
     public Result<ProxyStatistic> statistic (@RequestBody ProxyEndpointCallFilter filter) {
-        return null;
+        ProxyStatistic ret = proxyOperateBffService.statistic(filter);
+        return Result.OK(ret);
     }
 
     /**
@@ -53,7 +54,7 @@ public class ProxyOperateController {
      */
     @GetMapping(value = "/rest/proxy/operate/call/detail")
     public Result<ProxyEndpointCallVo> getCallTimeDetail(@RequestParam Long callTimeId) {
-        return null;
+        return Result.OK();
     }
 
 

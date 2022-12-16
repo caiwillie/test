@@ -121,7 +121,7 @@ public class SceneVersionService implements ISceneVersionService {
     @Override
     public VersionProcessDto saveProcess(VersionProcessDto dto) {
         Long versionId = dto.getVersionId();
-        getAndCheckStatus(versionId, new int[]{SceneConst.SCENE_VERSION_STATUS__CONFIGURING});
+        fetchOneByIdAndCheckStatus(versionId, new int[]{SceneConst.SCENE_VERSION_STATUS__CONFIGURING});
         return versionProcessService.save(dto);
     }
 
@@ -189,7 +189,7 @@ public class SceneVersionService implements ISceneVersionService {
 
     @Override
     public SceneVersionDto stopDebug(Long id, Long envId) {
-        SceneVersionDto sceneVersionDto = getAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__DEBUGGING});
+        SceneVersionDto sceneVersionDto = fetchOneByIdAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__DEBUGGING});
 
         // 修改状态
         sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__CONFIGURING);
@@ -199,7 +199,7 @@ public class SceneVersionService implements ISceneVersionService {
 
     @Override
     public SceneVersionDto stop(Long id) {
-        SceneVersionDto sceneVersionDto = getAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__RUNNING});
+        SceneVersionDto sceneVersionDto = fetchOneByIdAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__RUNNING});
 
         // stop process
         List<SceneReleaseDeployDto> sceneReleaseDeployDtoList =
@@ -216,7 +216,7 @@ public class SceneVersionService implements ISceneVersionService {
 
     @Override
     public SceneVersionDto resume(Long id, List<Long> envIdList) {
-        SceneVersionDto sceneVersionDto = getAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__STOPPED});
+        SceneVersionDto sceneVersionDto = fetchOneByIdAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__STOPPED});
         Assert.notEmpty(envIdList, "环境列表不能为空");
 
         // resume process
@@ -235,7 +235,7 @@ public class SceneVersionService implements ISceneVersionService {
     @Override
     public SceneVersionDto deploy(Long id, String sceneName, List<Long> envIdList, String version) {
         // 配置中，和调试中均可以进行发布
-        SceneVersionDto sceneVersionDto = getAndCheckStatus(id,
+        SceneVersionDto sceneVersionDto = fetchOneByIdAndCheckStatus(id,
                 new int[]{SceneConst.SCENE_VERSION_STATUS__CONFIGURING, SceneConst.SCENE_VERSION_STATUS__DEBUGGING});
         Assert.notEmpty(envIdList, "环境列表不能为空");
         Assert.notNull(version, "版本不能为空");
@@ -320,7 +320,7 @@ public class SceneVersionService implements ISceneVersionService {
     @Override
     @Transactional
     public SceneVersionDto copyToNew(Long id) {
-        SceneVersionDto oldSceneVersionDto = getAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__RUNNING,
+        SceneVersionDto oldSceneVersionDto = fetchOneByIdAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__RUNNING,
                 SceneConst.SCENE_VERSION_STATUS__STOPPED});
 
         Long sceneId = oldSceneVersionDto.getSceneId();
@@ -405,7 +405,8 @@ public class SceneVersionService implements ISceneVersionService {
         return bo;
     }
 
-    private SceneVersionDto getAndCheckStatus(Long id, int[] statusArr) {
+    @Override
+    public SceneVersionDto fetchOneByIdAndCheckStatus(Long id, int[] statusArr) {
         Assert.notNull(id, "版本ID不能为空");
 
         SceneVersionDto versionDto = fetchById(ListUtil.of(id)).get(id);

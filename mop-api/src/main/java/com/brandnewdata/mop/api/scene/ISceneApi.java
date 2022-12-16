@@ -8,7 +8,6 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @FeignClient(name = "poc", contextId = "mopScene")
@@ -20,5 +19,6 @@ public interface ISceneApi {
     @RequestMapping(value = "/api/scene/version/process/asyncStart")
     Result startVersionProcessAsync(@RequestBody List<VersionProcessStartDto> startDtoList);
 
-
+    @RequestMapping(value = "/api/scene/version/process/syncStart")
+    Result startVersionProcessSync(@RequestBody List<VersionProcessStartDto> startDtoList);
 }

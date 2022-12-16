@@ -34,7 +34,7 @@ public class EndpointService {
             Assert.isNull(exist, "路径 {} 已存在", endpoint.getLocation());
 
             endpointDao.insert(entity);
-            endpoint.setId(entity.getId());
+            endpoint.setId(String.valueOf(entity.getId()));
         } else {
             ProxyEndpointPo oldEntity = endpointDao.selectById(id);
 
@@ -92,7 +92,7 @@ public class EndpointService {
     private ProxyEndpointPo toEntity(Endpoint dto) {
         Assert.notNull(dto);
         ProxyEndpointPo entity = new ProxyEndpointPo();
-        entity.setId(dto.getId());
+        entity.setId(Long.parseLong(dto.getId()));
         entity.setProxyId(dto.getProxyId());
         entity.setLocation(dto.getLocation());
         entity.setDescription(dto.getDescription());
@@ -105,7 +105,7 @@ public class EndpointService {
     private Endpoint toDTO(ProxyEndpointPo entity) {
         Assert.notNull(entity);
         Endpoint dto = new Endpoint();
-        dto.setId(entity.getId());
+        dto.setId(String.valueOf(entity.getId()));
         dto.setProxyId(entity.getProxyId());
         dto.setLocation(entity.getLocation());
         dto.setDescription(entity.getDescription());

@@ -7,7 +7,6 @@ import com.brandnewdata.mop.poc.bff.vo.operate.process.FlowNodeStateVo;
 import com.brandnewdata.mop.poc.bff.vo.operate.process.ProcessInstanceVo;
 import com.brandnewdata.mop.poc.bff.vo.operate.process.SequenceFlowVo;
 import com.brandnewdata.mop.poc.bff.vo.operate.process.VariableVo;
-import com.brandnewdata.mop.poc.bff.vo.scene.operate.ProcessInstance;
 import com.brandnewdata.mop.poc.operate.dto.*;
 import com.brandnewdata.mop.poc.operate.service.IFlowNodeInstanceService2;
 import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService2;

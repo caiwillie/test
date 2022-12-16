@@ -50,7 +50,7 @@ public class FeelEngineTest {
             JsonNode jsonNode = objectMapper.readTree(s);
             Map<String, Object> values = objectMapper.convertValue(jsonNode, mapType);
             Object o = FeelUtil.evalExpression("{\"a\": a}", values);
-            Map<String, Object> result = objectMapper.convertValue(o, mapType);
+            FeelUtil.convertMap(o);
             return;
 
         } catch (JsonProcessingException e) {

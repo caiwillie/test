@@ -1,55 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:brandnewdata="https://www.brandnewdata.com/schema/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
-    <bpmn2:process id="Process_2ee46471-fcc6-46f0-b187-75eb731d5e0f" name="创建应用" isExecutable="false">
-        <bpmn2:startEvent id="StartEvent_1" name="开始事件">
-            <bpmn2:outgoing>Flow_1a91skn</bpmn2:outgoing>
-        </bpmn2:startEvent>
-        <bpmn2:serviceTask id="Activity_084vrcs" name="AI中台 - POST 创建应用" brandnewdata:modelerIcon="https://baida-private.oss-cn-hangzhou.aliyuncs.com/166969019837616654696248268_8人工智能.png" brandnewdata:modelerGroup="com.developer" brandnewdata:modelerUid="ai-middle-platform" brandnewdata:modelerId="1597422061279944706" brandnewdata:modelerType="2" brandnewdata:modelerName="AI中台" brandnewdata:modelerVersion="1.0.0">
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:brandnewdata="https://www.brandnewdata.com/schema/1.0" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+    <bpmn2:process id="Process_9fcbe117-b63c-440a-bd27-d377a3e14a40" name="告警信息回调" isExecutable="false">
+        <bpmn2:startEvent id="Event_072c8l9" name="AIOT - AIOT告警" brandnewdata:modelerIcon="https://baida-private.oss-cn-hangzhou.aliyuncs.com/166969020267616654696248268_8人工智能.png" brandnewdata:modelerGroup="com.developer" brandnewdata:modelerUid="ai-middle-platform" brandnewdata:modelerId="1597422061279944706" brandnewdata:modelerType="2" brandnewdata:modelerName="AIOT" brandnewdata:modelerVersion="1.0.0">
             <bpmn2:extensionElements>
-                <brandnewdata:taskDefinition type="com.developer:ai-middle-platform.add-application:1.0.0" />
-                <brandnewdata:inputMapping label="入参配置">
-                    <brandnewdata:input type="struct" name="appinfo" label="appinfo" required="true" dataType="undefined" value="appInfo">
-                        <brandnewdata:input type="string" name="name" label="name" value="" required="true" />
-                        <brandnewdata:input type="string" name="description" label="description" value="" required="true" />
-                        <brandnewdata:input type="string" name="appLabels" label="appLabels" value="" required="true" />
-                        <brandnewdata:input type="string" name="models" label="models" value="" required="true" />
-                    </brandnewdata:input>
-                </brandnewdata:inputMapping>
+                <brandnewdata:taskDefinition type="com.developer:ai-middle-platform.alert-callback:1.0.0" />
+                <brandnewdata:inputMapping label="入参配置" />
                 <brandnewdata:outputMapping label="出参配置">
-                    <brandnewdata:output type="string" name="baseStatus" label="baseStatus" value="baseStatus" required="false" />
-                    <brandnewdata:output type="bool" name="data" label="data" value="data" required="true" />
-                    <brandnewdata:output type="string" name="msg" label="msg" value="msg" required="false" />
-                    <brandnewdata:output type="string" name="status" label="status" value="status" required="true" />
+                    <brandnewdata:output type="string" name="baseStatus" label="响应状态" value="baseStatus" required="false" />
+                    <brandnewdata:output type="bool" name="data" label="返回数据" value="data" required="false" />
+                    <brandnewdata:output type="string" name="msg" label="返回信息" value="msg" required="false" />
+                    <brandnewdata:output type="string" name="status" label="返回状态码" value="status" required="false" />
                 </brandnewdata:outputMapping>
             </bpmn2:extensionElements>
-            <bpmn2:incoming>Flow_1a91skn</bpmn2:incoming>
-            <bpmn2:outgoing>Flow_1jm407a</bpmn2:outgoing>
-        </bpmn2:serviceTask>
-        <bpmn2:sequenceFlow id="Flow_1a91skn" sourceRef="StartEvent_1" targetRef="Activity_084vrcs" />
-        <bpmn2:endEvent id="Event_1t2k2oi" name="结束事件">
-            <bpmn2:incoming>Flow_1jm407a</bpmn2:incoming>
+            <bpmn2:outgoing>Flow_1tk16cv</bpmn2:outgoing>
+        </bpmn2:startEvent>
+        <bpmn2:endEvent id="Event_1x2vh2b" name="结束事件">
+            <bpmn2:incoming>Flow_1tk16cv</bpmn2:incoming>
         </bpmn2:endEvent>
-        <bpmn2:sequenceFlow id="Flow_1jm407a" sourceRef="Activity_084vrcs" targetRef="Event_1t2k2oi" />
+        <bpmn2:sequenceFlow id="Flow_1tk16cv" sourceRef="Event_072c8l9" targetRef="Event_1x2vh2b" />
     </bpmn2:process>
     <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-        <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_2ee46471-fcc6-46f0-b187-75eb731d5e0f">
-            <bpmndi:BPMNEdge id="Flow_1jm407a_di" bpmnElement="Flow_1jm407a">
-                <di:waypoint x="560" y="174" />
-                <di:waypoint x="560" y="226" />
+        <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_9fcbe117-b63c-440a-bd27-d377a3e14a40">
+            <bpmndi:BPMNEdge id="Flow_1tk16cv_di" bpmnElement="Flow_1tk16cv">
+                <di:waypoint x="611" y="104" />
+                <di:waypoint x="611" y="276" />
             </bpmndi:BPMNEdge>
-            <bpmndi:BPMNEdge id="Flow_1a91skn_di" bpmnElement="Flow_1a91skn">
-                <di:waypoint x="560" y="74" />
-                <di:waypoint x="560" y="126" />
-            </bpmndi:BPMNEdge>
-            <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
-                <dc:Bounds x="428" y="26" width="263" height="48" />
+            <bpmndi:BPMNShape id="Event_18waqe0_di" bpmnElement="Event_072c8l9">
+                <dc:Bounds x="479" y="56" width="263" height="48" />
             </bpmndi:BPMNShape>
-            <bpmndi:BPMNShape id="Activity_084vrcs_di" bpmnElement="Activity_084vrcs">
-                <dc:Bounds x="428" y="126" width="263" height="48" />
-                <bpmndi:BPMNLabel />
-            </bpmndi:BPMNShape>
-            <bpmndi:BPMNShape id="Event_1t2k2oi_di" bpmnElement="Event_1t2k2oi">
-                <dc:Bounds x="428" y="226" width="263" height="48" />
+            <bpmndi:BPMNShape id="Event_1x2vh2b_di" bpmnElement="Event_1x2vh2b">
+                <dc:Bounds x="479" y="276" width="263" height="48" />
             </bpmndi:BPMNShape>
         </bpmndi:BPMNPlane>
     </bpmndi:BPMNDiagram>

@@ -40,6 +40,11 @@ public class ProxyEndpointCallVo {
     private String proxyName;
 
     /**
+     * api 版本
+     */
+    private String proxyVersion;
+
+    /**
      * endpoint id
      */
     private Long endpointId;
@@ -55,7 +60,7 @@ public class ProxyEndpointCallVo {
     private String httpMethod;
 
     /**
-     * 调用状态。success 成功, false 失败
+     * 调用状态。success 成功, fail 失败
      */
     private String executeStatus;
 

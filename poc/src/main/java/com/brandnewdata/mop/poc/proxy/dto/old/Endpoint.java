@@ -8,7 +8,7 @@ public class Endpoint {
     /**
      * id
      */
-    private Long id;
+    private String id;
 
     /**
      * api id

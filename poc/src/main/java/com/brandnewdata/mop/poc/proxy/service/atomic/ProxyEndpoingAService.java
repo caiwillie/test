@@ -3,7 +3,9 @@ package com.brandnewdata.mop.poc.proxy.service.atomic;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.brandnewdata.mop.poc.proxy.bo.ProxyEndpointFilter;
 import com.brandnewdata.mop.poc.proxy.bo.ProxyEndpointServerBo;
 import com.brandnewdata.mop.poc.proxy.converter.ProxyEndpointDtoConverter;
 import com.brandnewdata.mop.poc.proxy.dao.ProxyEndpointDao;
@@ -52,10 +54,20 @@ public class ProxyEndpoingAService implements IProxyEndpointAService {
     }
 
     @Override
-    public List<ProxyEndpointDto> fetchAll() {
+    public Map<Long, List<ProxyEndpointDto>> fetchListByProxyIdAndFilter(List<Long> proxyIdList, ProxyEndpointFilter filter) {
+        if(CollUtil.isEmpty(proxyIdList)) return MapUtil.empty();
+        Assert.isFalse(CollUtil.hasNull(proxyIdList), "proxyIdList can not contain null");
+
         QueryWrapper<ProxyEndpointPo> query = new QueryWrapper<>();
+        query.in(ProxyEndpointPo.PROXY_ID, proxyIdList);
+        String location = filter.getLocation();
+        if(StrUtil.isNotBlank(location)) {
+            query.eq(ProxyEndpointPo.LOCATION, location);
+        }
+
         List<ProxyEndpointPo> list = proxyEndpointDao.selectList(query);
-        return list.stream().map(ProxyEndpointDtoConverter::createFrom).collect(Collectors.toList());
+        return list.stream().map(ProxyEndpointDtoConverter::createFrom)
+                .collect(Collectors.groupingBy(ProxyEndpointDto::getProxyId));
     }
 
     @Override

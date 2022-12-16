@@ -30,4 +30,8 @@ public interface ProxyConst {
     Integer BACKEND_TYPE__SCENE = 1;
 
     Integer BACKEND_TYPE__SERVER = 2;
+
+    String CALL_EXECUTE_STATUS__SUCCESS = "success";
+
+    String CALL_EXECUTE_STATUS__FAIL = "fail";
 }

@@ -80,9 +80,8 @@ public class ReverseProxyServlet extends ProxyServlet {
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        LocalDateTime startTime = LocalDateTime.now();
-        ProxyEndpointCallDto proxyEndpointCallDto = new ProxyEndpointCallDto();
-        proxyEndpointCallDto.setStartTime(startTime);
+
+        ProxyEndpointDto endpointDto = null;
         try {
             /*
              * getRequestUri() 和 getPathInfo() 的区别：
@@ -95,15 +94,30 @@ public class ReverseProxyServlet extends ProxyServlet {
 
             // http request domain
             String domain = request.getHeader("g2-domain");
+            Assert.notNull(domain,"domain not exist");
             log.info("proxy g2-domain: {}, uri: {}, queryString {}", domain, uri, queryString);
 
             ProxyDto proxyDto = proxyAService.fetchByDomain(domain);
             Assert.notNull(proxyDto, "domain not found: {}", domain);
 
-            ProxyEndpointDto endpointDto = proxyEndpointAService.fetchByProxyIdAndLocation(proxyDto.getId(), uri);
+            endpointDto = proxyEndpointAService.fetchByProxyIdAndLocation(proxyDto.getId(), uri);
             Assert.notNull(endpointDto, "path not found: {}", uri);
-            proxyEndpointCallDto.setEndpointId(endpointDto.getId());
+        } catch(Exception e) {
+            String errorMessage = e.getMessage();
+            if(StrUtil.isBlank(errorMessage)) {
+                errorMessage = e.toString();
+            }
+            ServletUtil.write(response, errorMessage, ContentType.TEXT_PLAIN.getValue());
+            return;
+        }
 
+        RepeatReadHttpRequest repeatReadHttpRequest = new RepeatReadHttpRequest(request);
+        ProxyEndpointCallDto proxyEndpointCallDto = new ProxyEndpointCallDto();
+        proxyEndpointCallDto.setEndpointId(endpointDto.getId());
+        // 更新 endpoint call dto
+        updateProxyEndpointCallDto(proxyEndpointCallDto, repeatReadHttpRequest);
+
+        try {
             Integer backendType = endpointDto.getBackendType();
             String backendConfig = endpointDto.getBackendConfig();
 
@@ -111,27 +125,29 @@ public class ReverseProxyServlet extends ProxyServlet {
                     && !NumberUtil.equals(backendType, ProxyConst.BACKEND_TYPE__SERVER)) {
                 throw new RuntimeException("backend type not support: " + endpointDto.getBackendType());
             }
-            // 更新 endpoint call dto
-            updateFrom(proxyEndpointCallDto, request);
 
             if (NumberUtil.equals(endpointDto.getBackendType(), ProxyConst.BACKEND_TYPE__SERVER)) {
                 ProxyEndpointServerBo config = proxyEndpointAService.parseServerConfig(backendConfig);
-                forward(request, response, config);
+                forward(repeatReadHttpRequest, response, config);
             } else {
                 ProxyEndpointSceneBo config = proxyEndpointSceneAService.parseConfig(backendConfig);
-                callProcess(request, response, config);
+                callProcess(repeatReadHttpRequest, response, config);
             }
 
             proxyEndpointCallDto.setExecuteStatus("success");
         } catch (Exception e) {
             log.error("ReverseProxyServlet.service error", e);
-            proxyEndpointCallDto.setExecuteStatus("false");
-            proxyEndpointCallDto.setErrorMessage(e.getMessage());
+            proxyEndpointCallDto.setExecuteStatus(ProxyConst.CALL_EXECUTE_STATUS__FAIL);
             response.setStatus(HttpStatus.HTTP_INTERNAL_ERROR);
-            ServletUtil.write(response, e.getMessage(), ContentType.JSON.getValue());
+            String errorMessage = e.getMessage();
+            if(StrUtil.isBlank(errorMessage)) {
+                errorMessage = e.toString();
+            }
+            proxyEndpointCallDto.setErrorMessage(e.getMessage());
+            ServletUtil.write(response, errorMessage, ContentType.TEXT_PLAIN.getValue());
         } finally {
             if (proxyEndpointCallDto.getEndpointId() != null) {
-                long time = LocalDateTimeUtil.between(startTime, LocalDateTime.now()).toMillis();
+                long time = LocalDateTimeUtil.between(proxyEndpointCallDto.getStartTime(), LocalDateTime.now()).toMillis();
                 proxyEndpointCallDto.setTimeConsuming((int)time);
                 proxyEndpointCallAService.save(proxyEndpointCallDto);
             }
@@ -140,9 +156,15 @@ public class ReverseProxyServlet extends ProxyServlet {
     }
 
     @SneakyThrows
-    private void updateFrom(ProxyEndpointCallDto dto, HttpServletRequest request) {
-        String userAgent = request.getHeader("User-Agent");
+    private void updateProxyEndpointCallDto(ProxyEndpointCallDto dto, HttpServletRequest request) {
+        LocalDateTime startTime = LocalDateTime.now();
         String httpMethod = request.getMethod();
+        dto.setStartTime(startTime);
+        String clientIp = ServletUtil.getClientIP(request);
+        dto.setIpAddress(clientIp);
+        dto.setHttpMethod(httpMethod);
+        dto.setUserAgent(request.getHeader("User-Agent"));
+        dto.setRequestQuery(request.getQueryString());
         if(!StrUtil.equalsAny(httpMethod, Method.POST.name(), Method.GET.name())) {
             throw new RuntimeException("http method not support: " + httpMethod);
         }
@@ -152,16 +174,8 @@ public class ReverseProxyServlet extends ProxyServlet {
             String contentType = request.getHeader("Content-Type");
             Assert.isTrue(StrUtil.equals(contentType, "application/json"), "Content-Type must be application/json");
             body = ServletUtil.getBody(request);
-            // reset reader
-            request.getReader().reset();
         }
-
-        String queryString = request.getQueryString();
-
-        dto.setUserAgent(userAgent);
-        dto.setHttpMethod(httpMethod);
-        dto.setRequestBody(queryString);
-        dto.setRequestQuery(body);
+        dto.setRequestBody(body);
     }
 
     private void callProcess(HttpServletRequest request, HttpServletResponse response, ProxyEndpointSceneBo config) {

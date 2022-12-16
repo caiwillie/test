@@ -11,6 +11,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.constant.ProxyConst;
+import com.brandnewdata.mop.poc.proxy.bo.ProxyFilter;
 import com.brandnewdata.mop.poc.proxy.cache.ProxyCache;
 import com.brandnewdata.mop.poc.proxy.converter.ProxyDtoConverter;
 import com.brandnewdata.mop.poc.proxy.converter.ProxyPoConverter;
@@ -48,34 +49,52 @@ public class ProxyAService implements IProxyAService {
     }
 
     @Override
-    public Page<ProxyGroupDto> pageGroupByName(Integer pageNum, Integer pageSize,
-                                               String name, String tags) {
+    public Page<ProxyGroupDto> fetchPageGroupByName(Integer pageNum, Integer pageSize,
+                                                    String name, String tags) {
         Assert.notNull(pageNum > 0, "pageNum must be greater than 0");
         Assert.notNull(pageSize > 0, "pageSize must be greater than 0");
 
-        Map<String, List<ProxyDto>> proxyDtoMap = new LinkedHashMap<>();
+        ProxyFilter proxyFilter = new ProxyFilter().setName(name).setTags(tags);
+        List<ProxyDto> proxyDtoList = fetchListByFilter(proxyFilter);
 
-        // 根据 name 分组
-        proxyCache.asMap().values().stream().sorted(Comparator.comparing(ProxyDto::getUpdateTime))
+        Map<String, List<ProxyDto>> proxyDtoListMap = new LinkedHashMap<>();
+        proxyDtoList.stream().sorted(Comparator.comparing(ProxyDto::getUpdateTime))
                 .collect(Collectors.groupingBy(ProxyDto::getName,
                         CollectorsUtil.toSortedList((o1, o2) -> o2.getUpdateTime().compareTo(o1.getUpdateTime()))))
                 .entrySet().stream()
                 .sorted((o1, o2) -> o2.getValue().get(0).getUpdateTime().compareTo(o1.getValue().get(0).getUpdateTime()))
-                .forEach(entry -> proxyDtoMap.put(entry.getKey(), entry.getValue()));
+                .forEach(entry -> proxyDtoListMap.put(entry.getKey(), entry.getValue()));
 
         PageUtil.setFirstPageNo(1);
-        List<String> nameList = PageEnhancedUtil.slice(pageNum, pageSize, ListUtil.toList(proxyDtoMap.keySet()));
+        List<String> nameList = PageEnhancedUtil.slice(pageNum, pageSize, ListUtil.toList(proxyDtoListMap.keySet()));
 
         // 组装结果
         List<ProxyGroupDto> ret = new ArrayList<>();
         for (String _name : nameList) {
             ProxyGroupDto proxyGroupDto = new ProxyGroupDto();
             proxyGroupDto.setName(_name);
-            proxyGroupDto.setProxyDtoList(proxyDtoMap.get(_name));
+            proxyGroupDto.setProxyDtoList(proxyDtoListMap.get(_name));
             ret.add(proxyGroupDto);
         }
 
-        return new Page<>(proxyDtoMap.size(), ret);
+        return new Page<>(proxyDtoListMap.size(), ret);
+    }
+
+    @Override
+    public List<ProxyDto> fetchListByFilter(ProxyFilter filter) {
+        String name = filter.getName();
+        String version = filter.getVersion();
+        String tags = filter.getTags();
+
+        // filter
+        return proxyCache.asMap().values().stream().filter(proxyDto -> {
+            if (StrUtil.isBlank(name)) return true;
+            if (!StrUtil.equals(proxyDto.getName(), name)) return false;
+            if (StrUtil.isBlank(version)) return true;
+            if (!StrUtil.equals(proxyDto.getVersion(), version)) return false;
+            if (StrUtil.isBlank(tags)) return true;
+            return StrUtil.contains(tags, proxyDto.getTag());
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -114,7 +133,9 @@ public class ProxyAService implements IProxyAService {
             Assert.isTrue(StrUtil.equals(oldProxyDto.getName(), name), "API名称不能修改");
             Assert.isTrue(StrUtil.equals(oldProxyDto.getVersion(), version), "API版本不能修改");
 
-            ProxyPoConverter.updateFrom(oldProxyDto, oldProxyDto);
+            ProxyPoConverter.updateFrom(oldProxyDto, proxyDto);
+            // 注意需要将domain设置成null
+            oldProxyDto.setDomain(null);
             proxyDao.updateById(ProxyPoConverter.createFrom(oldProxyDto));
 
             return oldProxyDto;

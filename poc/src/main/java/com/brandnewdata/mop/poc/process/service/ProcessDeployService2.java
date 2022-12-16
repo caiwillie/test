@@ -41,6 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -161,7 +162,7 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
 
         String processId = bpmnXmlDto.getProcessId();
         String expression = parseResponseExpression(bpmnXmlDto, bizType);
-
+        log.info("process {} expresssion: {}", processId, expression);
         ZeebeClient zeebeClient = zeebeClientManager.getByEnvId(envId);
 
         ProcessInstanceResult result = zeebeClient.newCreateInstanceCommand()
@@ -172,25 +173,22 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
                 .send()
                 .join();
 
-        Map<String, Object> resultVariables = result.getVariablesAsMap();
-        log.info("start process result variables: {}", JacksonUtil.to(resultVariables));
+        long processInstanceId = result.getProcessInstanceKey();
+        Map<String, Object> processVariables = result.getVariablesAsMap();
+        log.info("process instance {} result variables: {}", processInstanceId, JacksonUtil.to(processVariables));
 
-        Object response = null;
+        Map<String, Object> resultMap = Opt.ofNullable(processVariables).orElse(new HashMap<>());
         if(StrUtil.isNotBlank(expression)) {
-            response = FeelUtil.evalExpression(expression, resultVariables);
-        } else {
-            // 如果表达式为空就返回特定字段的内容
-            response = resultVariables;
+            Object expressionResult = FeelUtil.evalExpression(expression, processVariables);
+            Map<String, Object> computeExpressResult = FeelUtil.convertMap(expressionResult);
+            // 更新表达式计算结果
+            if(computeExpressResult != null) resultMap.putAll(computeExpressResult);
         }
 
-        log.info("start process synchronously: {}, response expression eval: {}", processId, JacksonUtil.to(response));
+        log.info("start process synchronously: {}, resultMap: {}, envId {}",
+                processId, JacksonUtil.to(resultMap), envId);
 
-        if(response == null) {
-            return null;
-        } else {
-            // 转换成string，再反序列化成map
-            return JacksonUtil.fromMap(JacksonUtil.to(response));
-        }
+        return Opt.ofNullable(resultMap).orElse(MapUtil.empty());
     }
 
     @Override
@@ -206,7 +204,7 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
                 .withResult()
                 .send();
 
-        log.info("start process asynchronously: {}", processId);
+        log.info("start process asynchronously: {}, envId {}", processId, envId);
     }
 
     private String parseResponseExpression(BpmnXmlDto bpmnXmlDto, String bizType) {
@@ -257,8 +255,8 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
     }
 
     private synchronized ZeebeDeployBo zeebeDeploy(String zeebeXml, String name, Long envId) {
-        log.info("zeebe deploy name {} env {}", name, envId);
-        ThreadUtil.sleep(1000);
+        // 防止发送过快，导致超出zeebe最大请求数
+        ThreadUtil.sleep(3000);
         ZeebeDeployBo ret = new ZeebeDeployBo();
         ZeebeClient zeebeClient = zeebeClientManager.getByEnvId(envId);
 
