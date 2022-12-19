@@ -1,6 +1,8 @@
 package com.brandnewdata.mop.poc.operate.manager;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.lang.Opt;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
@@ -21,7 +23,6 @@ import com.google.common.cache.LoadingCache;
 import lombok.SneakyThrows;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -32,26 +33,22 @@ public class ElasticsearchManager {
 
     private final IEnvService envService;
 
+    private final Map<String, Integer> debugServicePortMap;
+
     private final LoadingCache<Long, ElasticsearchClient> cache;
+
 
     public ElasticsearchManager(IEnvService envService,
                                 CloudNativeConfigure cloudNativeConfigure) {
         this.envService = envService;
+        this.debugServicePortMap = Opt.ofNullable(cloudNativeConfigure)
+                .map(CloudNativeConfigure::getDebugServicePort).orElse(MapUtil.empty());
         this.cache = CacheBuilder.newBuilder().build(getCacheLoader());
     }
 
     @SneakyThrows
     public ElasticsearchClient getByEnvId(Long envId) {
         return cache.get(envId);
-    }
-
-    private ObjectMapper initJackson() {
-        ObjectMapper objectMapper = JsonMapper.builder().build();
-        // 自动发现注册引入的模块
-        objectMapper.findAndRegisterModules();
-        // 设置 unknow properties 时不报错
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        return objectMapper;
     }
 
     private CacheLoader<Long, ElasticsearchClient> getCacheLoader() {
@@ -68,8 +65,12 @@ public class ElasticsearchManager {
 
                 EnvServiceDto envServiceDto = serviceOpt.get();
 
-                HttpHost httpHost = HttpHostUtil.createHttpHost(StrUtil.format("{}.{}:{}",
-                        envServiceDto.getName(), envDto.getNamespace(), envServiceDto.getPorts()));
+                // service domain port
+                String serviceDomain = StrUtil.format("{}.{}", envServiceDto.getName(), envDto.getNamespace());
+                Integer port = Opt.ofNullable(debugServicePortMap.get(serviceDomain))
+                        .orElseGet(() -> Integer.parseInt(envServiceDto.getPorts()));
+
+                HttpHost httpHost = HttpHostUtil.createHttpHost(StrUtil.format("{}:{}", serviceDomain, port));
 
                 // Create the low-level client
                 RestClient restClient = RestClient.builder(new HttpHost[]{httpHost}).build();

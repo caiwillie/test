@@ -1,7 +1,10 @@
 package com.brandnewdata.mop.poc.process.manager;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.lang.Opt;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
+import com.brandnewdata.mop.poc.env.config.CloudNativeConfigure;
 import com.brandnewdata.mop.poc.env.dto.EnvDto;
 import com.brandnewdata.mop.poc.env.dto.EnvServiceDto;
 import com.brandnewdata.mop.poc.env.service.IEnvService;
@@ -13,6 +16,7 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Component
@@ -20,10 +24,15 @@ public class ZeebeClientManager {
 
     private final IEnvService envService;
 
+    private final Map<String, Integer> debugServicePortMap;
+
     private final LoadingCache<Long, ZeebeClient> cache;
 
-    public ZeebeClientManager(IEnvService envService) {
+    public ZeebeClientManager(IEnvService envService,
+                              CloudNativeConfigure cloudNativeConfigure) {
         this.envService = envService;
+        this.debugServicePortMap = Opt.ofNullable(cloudNativeConfigure)
+                .map(CloudNativeConfigure::getDebugServicePort).orElse(MapUtil.empty());
         this.cache = CacheBuilder.newBuilder().build(getCacheLoader());
     }
 
@@ -43,11 +52,14 @@ public class ZeebeClientManager {
                         .findFirst();
                 Assert.isTrue(serviceOpt.isPresent(), "环境信息配置有误");
                 EnvServiceDto envServiceDto = serviceOpt.get();
-                String serviceName = envServiceDto.getName();
-                String ports = envServiceDto.getPorts();
-                String namespace = envDto.getNamespace();
+
+                // service domain port
+                String serviceDomain = StrUtil.format("{}.{}", envServiceDto.getName(), envDto.getNamespace());
+                Integer port = Opt.ofNullable(debugServicePortMap.get(serviceDomain))
+                        .orElseGet(() -> Integer.parseInt(envServiceDto.getPorts()));
+
                 ZeebeClient client = ZeebeClient.newClientBuilder()
-                        .gatewayAddress(StrUtil.format("{}.{}:{}", serviceName, namespace, ports))
+                        .gatewayAddress(StrUtil.format("{}:{}", serviceDomain, port))
                         .usePlaintext()
                         .build();
                 return client;
