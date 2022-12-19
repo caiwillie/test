@@ -1,6 +1,8 @@
 package com.brandnewdata.mop.poc.bff.vo.homepage;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 运行中场景(列表内实体)
@@ -8,6 +10,8 @@ import lombok.Data;
  * @author jekyll 2022-12-14 10:42
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class SceneListBriefVo {
 
     private String id;
@@ -21,6 +25,9 @@ public class SceneListBriefVo {
      * */
     private String state;
 
+
+    private String updateTime;
+
     /**
      * 7日运行总数描述
      * * */
@@ -29,6 +36,6 @@ public class SceneListBriefVo {
     /**
      * 7日失败总数描述
      * */
-    private Integer totalFailDesc;
+    private String totalFailDesc;
 
 }
