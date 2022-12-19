@@ -1,8 +1,6 @@
 package com.brandnewdata.mop.poc.lock;
 
-import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.NumberUtil;
 import com.caiwillie.util.lock.DatabaseDistributedLock;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

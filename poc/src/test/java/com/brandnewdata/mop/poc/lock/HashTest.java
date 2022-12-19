@@ -2,7 +2,6 @@ package com.brandnewdata.mop.poc.lock;
 
 import cn.hutool.core.util.HashUtil;
 import cn.hutool.crypto.digest.DigestUtil;
-import cn.hutool.crypto.digest.MD5;
 import org.junit.jupiter.api.Test;
 
 public class HashTest {

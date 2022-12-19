@@ -22,8 +22,7 @@ public class ZeebeClientManager {
 
     private final LoadingCache<Long, ZeebeClient> cache;
 
-    public ZeebeClientManager(IEnvService envService,
-                              @Value("${brandnewdata.cloud-native.zeebe.zeebe-gateway.grpc-port}") Integer grpcPort) {
+    public ZeebeClientManager(IEnvService envService) {
         this.envService = envService;
         this.cache = CacheBuilder.newBuilder().build(getCacheLoader());
     }

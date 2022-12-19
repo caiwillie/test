@@ -6,6 +6,7 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
+import com.brandnewdata.mop.poc.env.config.CloudNativeConfigure;
 import com.brandnewdata.mop.poc.env.dto.EnvDto;
 import com.brandnewdata.mop.poc.env.dto.EnvServiceDto;
 import com.brandnewdata.mop.poc.env.service.IEnvService;
@@ -23,6 +24,7 @@ import org.elasticsearch.client.RestClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Component
@@ -30,14 +32,11 @@ public class ElasticsearchManager {
 
     private final IEnvService envService;
 
-    private final ObjectMapper objectMapper;
-
     private final LoadingCache<Long, ElasticsearchClient> cache;
 
     public ElasticsearchManager(IEnvService envService,
-                                @Value("${brandnewdata.cloud-native.elasticsearch.http-port}") Integer port) {
+                                CloudNativeConfigure cloudNativeConfigure) {
         this.envService = envService;
-        this.objectMapper = initJackson();
         this.cache = CacheBuilder.newBuilder().build(getCacheLoader());
     }
 
