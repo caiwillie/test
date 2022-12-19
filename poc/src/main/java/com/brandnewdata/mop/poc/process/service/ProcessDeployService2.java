@@ -117,10 +117,15 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
             QueryWrapper<ProcessSnapshotDeployPo> query = new QueryWrapper<>();
             query.eq(ProcessSnapshotDeployPo.ENV_ID, envId);
             query.eq(ProcessSnapshotDeployPo.PROCESS_ID, processId);
-            query.eq(ProcessSnapshotDeployPo.PROCESS_DIGEST, processDigest);
-            ProcessSnapshotDeployPo po = snapshotDeployDao.selectOne(query);
+            query.orderByDesc(ProcessSnapshotDeployPo.PROCESS_ZEEBE_VERSION);
+            List<ProcessSnapshotDeployPo> processSnapshotDeployPoList = snapshotDeployDao.selectList(query);
             // 如果已经部署过，就直接跳过
-            if(po != null) return;
+            if(CollUtil.isNotEmpty(processSnapshotDeployPoList)) {
+                if(StrUtil.equals(processSnapshotDeployPoList.get(0).getProcessDigest(), processDigest)) {
+                    // 如果最新部署的版本和当前版本一致，就不需要部署了
+                    return;
+                }
+            }
 
             QueryWrapper<ProcessDeployTaskPo> query2 = new QueryWrapper<>();
             query2.eq(ProcessDeployTaskPo.PROCESS_ID, processId);
