@@ -14,7 +14,7 @@ public class ProcessSnapshotDeployPoConverter {
         return po;
     }
 
-    public static void updateFrom(Long envId, String processXml, ProcessSnapshotDeployPo po) {
+    public static void updateFrom(ProcessSnapshotDeployPo po, Long envId, String digest, String processXml) {
         po.setEnvId(envId);
         po.setProcessXml(processXml);
     }

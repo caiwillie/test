@@ -11,6 +11,8 @@ public interface IProcessDeployService2 {
 
     void snapshotDeploy(BpmnXmlDto bpmnXmlDto, Long envId, String bizType);
 
+    void snapshotDeploy2(BpmnXmlDto bpmnXmlDto, Long envId, String bizType);
+
     void releaseDeploy(BpmnXmlDto bpmnXmlDto, List<Long> envIdList, String bizType);
 
     // todo caiwillie 可以优化，可选择是否获取xml

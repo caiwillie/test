@@ -169,7 +169,7 @@ public class ProcessDefinitionParser implements
         clearNamespace();
         clearServiceTask();
         // 打xml日志
-        logXML();
+        serializeXml();
         Step1Result ret = new Step1Result();
         ret.setProcessId(processId);
         ret.setProcessName(name);
@@ -659,13 +659,13 @@ public class ProcessDefinitionParser implements
     /**
      * 打印xml
      */
-    private void logXML() {
+    private void serializeXml() {
         originalDocumentStr = serialize(originalDocument);
         zeebeDocumentStr = serialize(zeebeDocument);
         String TEMPLATE =
                 "\n======================= original xml =======================\n{}" +
                         "\n======================= zeebe xml =======================\n{}";
-        log.info(StrUtil.format(TEMPLATE, originalDocumentStr, zeebeDocumentStr));
+        log.debug(StrUtil.format(TEMPLATE, originalDocumentStr, zeebeDocumentStr));
     }
 
     /**

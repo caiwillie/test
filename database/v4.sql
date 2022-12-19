@@ -6,9 +6,10 @@ CREATE TABLE `mop_lock` (
     `update_time` datetime NOT NULL,
     `resource_digest` varchar(64) NOT NULL,
     `resource_content` varchar(1024) NOT NULL,
-    `lock_status` tinyint(1) NOT NULL,
+    `lock_status` varchar(64) NOT NULL,
     `lock_version` bigint(20) NOT NULL,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `resource_digest_uni` (`resource_digest`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `mop_process_deploy_task` (
