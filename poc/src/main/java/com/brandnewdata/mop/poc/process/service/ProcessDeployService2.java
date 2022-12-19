@@ -333,15 +333,6 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
     }
 
     private synchronized ZeebeDeployBo zeebeDeploy(String zeebeXml, String processId, String name, Long envId) {
-        Long envLockVersion = envLock.lock(envId);
-        Assert.notNull(envLockVersion, "env lock compete fail. {}", envId);
-        Long processEnvLock = this.processEnvLock.lock(processId, envId);
-        if(processEnvLock == null) {
-            envLock.unlock(envId, envLockVersion);
-            throw new RuntimeException(StrUtil.format("process env lock compete fail. process {}, env {}", processId, envId));
-        }
-
-
         // 防止发送过快，导致超出zeebe最大请求数
         ThreadUtil.sleep(3000);
         ZeebeDeployBo ret = new ZeebeDeployBo();
