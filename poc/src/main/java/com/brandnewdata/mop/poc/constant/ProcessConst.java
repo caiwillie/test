@@ -16,4 +16,8 @@ public interface ProcessConst {
 
     String PROCESS_RESPONSE_VARIABLE_NAME = "resp";
 
+    int PROCESS_DEPLOY_STATUS__UNDEPLOY = 0;
+
+    int PROCESS_DEPLOY_STATUS__DEPLOYED = 1;
+
 }

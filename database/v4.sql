@@ -19,6 +19,7 @@ CREATE TABLE `mop_process_deploy_task` (
     `process_id` varchar(256) NOT NULL,
     `process_name` varchar(64) NOT NULL,
     `process_xml` longtext NOT NULL,
+    `process_zeebe_xml` longtext NOT NULL,
     `process_digest` varchar(64) NOT NULL,
     `env_id` bigint(20) NOT NULL,
     `deploy_status` int(11) NOT NULL,

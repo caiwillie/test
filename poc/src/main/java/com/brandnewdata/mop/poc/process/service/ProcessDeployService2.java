@@ -13,10 +13,8 @@ import com.brandnewdata.mop.poc.constant.ProcessConst;
 import com.brandnewdata.mop.poc.env.lock.EnvLock;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.process.bo.ZeebeDeployBo;
-import com.brandnewdata.mop.poc.process.converter.ProcessReleaseDeployDtoConverter;
-import com.brandnewdata.mop.poc.process.converter.ProcessReleaseDeployPoConverter;
-import com.brandnewdata.mop.poc.process.converter.ProcessSnapshotDeployDtoConverter;
-import com.brandnewdata.mop.poc.process.converter.ProcessSnapshotDeployPoConverter;
+import com.brandnewdata.mop.poc.process.converter.*;
+import com.brandnewdata.mop.poc.process.dao.ProcessDeployTaskDao;
 import com.brandnewdata.mop.poc.process.dao.ProcessReleaseDeployDao;
 import com.brandnewdata.mop.poc.process.dao.ProcessSnapshotDeployDao;
 import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
@@ -31,6 +29,7 @@ import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParseStep2;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParser;
 import com.brandnewdata.mop.poc.process.parser.dto.Step1Result;
 import com.brandnewdata.mop.poc.process.parser.dto.Step2Result;
+import com.brandnewdata.mop.poc.process.po.ProcessDeployTaskPo;
 import com.brandnewdata.mop.poc.process.po.ProcessReleaseDeployPo;
 import com.brandnewdata.mop.poc.process.po.ProcessSnapshotDeployPo;
 import com.brandnewdata.mop.poc.process.util.ProcessUtil;
@@ -42,6 +41,7 @@ import io.camunda.zeebe.client.api.response.Process;
 import io.camunda.zeebe.client.api.response.ProcessInstanceResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -59,6 +59,9 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
 
     @Resource
     private ProcessReleaseDeployDao releaseDeployDao;
+
+    @Resource
+    private ProcessDeployTaskDao processDeployTaskDao;
 
     private final ZeebeClientManager zeebeClientManager;
 
@@ -94,19 +97,20 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
     }
 
     @Override
+    @Transactional
     public void snapshotDeploy2(BpmnXmlDto bpmnXmlDto, Long envId, String bizType) {
         Assert.notNull(envId);
+        Step2Result step2Result = parseBpmnXmlDto(bpmnXmlDto, envId, bizType);
         String processXml = bpmnXmlDto.getProcessXml();
-        Step1Result step1Result = ProcessDefinitionParser.step1(bpmnXmlDto.getProcessId(),
-                bpmnXmlDto.getProcessName(), processXml).step1Result();
-
-        String processId = step1Result.getProcessId();
+        String processId = step2Result.getProcessId();
+        String processName = step2Result.getProcessName();
+        String zeebeXml = step2Result.getZeebeXml();
         Long version = null;
         try {
             do {
                 version = processEnvLock.lock(processId, envId);
                 // 一直等待到
-                ThreadUtil.sleep(1000);
+                ThreadUtil.sleep(400);
             } while(version != null);
 
             String processDigest = DigestUtil.md5Hex(processXml);
@@ -118,7 +122,17 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
             // 如果已经部署过，就直接跳过
             if(po != null) return;
 
+            QueryWrapper<ProcessDeployTaskPo> query2 = new QueryWrapper<>();
+            query2.eq(ProcessDeployTaskPo.PROCESS_ID, processId);
+            query2.eq(ProcessDeployTaskPo.ENV_ID, envId);
+            query2.eq(ProcessDeployTaskPo.DEPLOY_STATUS, ProcessConst.PROCESS_DEPLOY_STATUS__UNDEPLOY);
+            ProcessDeployTaskPo oldProcessDeployTaskPo = processDeployTaskDao.selectOne(query2);
+            // delete old process deploy task
+            if(oldProcessDeployTaskPo != null) processDeployTaskDao.deleteById(oldProcessDeployTaskPo.getId());
 
+            // add new process deploy task
+            ProcessDeployTaskPo processDeployTaskPo = ProcessDeployTaskPoConverter.createFrom(processId, processName, processXml, zeebeXml);
+            processDeployTaskDao.insert(processDeployTaskPo);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         } finally {
@@ -296,6 +310,26 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
         Step2Result step2Result = step2.step2Result();
 
         return zeebeDeploy(step2Result.getZeebeXml(), step2Result.getProcessId(), step2Result.getProcessName(), envId);
+    }
+
+    private Step2Result parseBpmnXmlDto(BpmnXmlDto bpmnXmlDto, Long envId, String bizType) {
+        Assert.notNull(envId, "环境id不能为空");
+        Assert.notNull(bizType, "环境类型不能为空");
+        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.step1(bpmnXmlDto.getProcessId(),
+                bpmnXmlDto.getProcessName(), bpmnXmlDto.getProcessXml());
+        ProcessDefinitionParseStep2 step2 = step1.replServiceTask(true, connectorManager).replAttr().step2();
+
+        if(StrUtil.equals(bizType, ProcessConst.PROCESS_BIZ_TYPE__SCENE)) {
+            step2.replEleSceneSe(connectorManager);
+        } else if (StrUtil.equals(bizType, ProcessConst.PROCESS_BIZ_TYPE__TRIGGER)) {
+            step2.replEleTriggerSe(connectorManager);
+        } else if (StrUtil.equals(bizType, ProcessConst.PROCESS_BIZ_TYPE__OPERATE)) {
+            step2.replEleOperateSe();
+        } else {
+            throw new RuntimeException(ErrorMessage.CHECK_ERROR("业务类型不支持", null));
+        }
+
+        return step2.step2Result();
     }
 
     private synchronized ZeebeDeployBo zeebeDeploy(String zeebeXml, String processId, String name, Long envId) {
