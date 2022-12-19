@@ -39,8 +39,6 @@ public class ProcessDeployTaskPo implements Serializable {
 
     private String processZeebeXml;
 
-    private String processDigest;
-
     private Long envId;
 
     private Integer deployStatus;
@@ -61,8 +59,6 @@ public class ProcessDeployTaskPo implements Serializable {
     public static final String PROCESS_XML = "process_xml";
 
     public static final String PROCESS_ZEEBE_XML = "process_zeebe_xml";
-
-    public static final String PROCESS_DIGEST = "process_digest";
 
     public static final String ENV_ID = "env_id";
 
