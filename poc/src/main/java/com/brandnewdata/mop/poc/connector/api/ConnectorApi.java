@@ -124,7 +124,7 @@ public class ConnectorApi implements IConnectorApi {
                         bpmnXmlDto.setProcessId(ProcessUtil.convertProcessId(operate.getModelKey()));
                         bpmnXmlDto.setProcessName(StrUtil.format("【操作】{}", operate.getName()));
                         bpmnXmlDto.setProcessXml(operate.getEditorXML());
-                        processDeployService2.snapshotDeploy2(bpmnXmlDto, envIdList, ProcessConst.PROCESS_BIZ_TYPE__OPERATE);
+                        processDeployService2.snapshotDeploy2(bpmnXmlDto, envId, ProcessConst.PROCESS_BIZ_TYPE__OPERATE);
                     } catch (Exception e) {
                         throw new RuntimeException(StrUtil.format("【操作】{} 部署异常: {}", operate.getName(), e.getMessage()));
                     }
