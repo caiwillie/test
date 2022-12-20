@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.api.connector.IConnectorApi;
 import com.brandnewdata.mop.api.connector.dto.BPMNResource;
+import com.brandnewdata.mop.api.connector.dto.ConnectorDeployProgressDto;
 import com.brandnewdata.mop.api.connector.dto.ConnectorResource;
 import com.brandnewdata.mop.poc.constant.ProcessConst;
 import com.brandnewdata.mop.poc.env.dto.EnvDto;
@@ -100,14 +101,16 @@ public class ConnectorApi implements IConnectorApi {
         // 部署触发器
         if(CollUtil.isNotEmpty(triggers)) {
             for (BPMNResource trigger : triggers) {
-                try {
-                    BpmnXmlDto bpmnXmlDto = new BpmnXmlDto();
-                    bpmnXmlDto.setProcessId(ProcessUtil.convertProcessId(trigger.getModelKey()));
-                    bpmnXmlDto.setProcessName(StrUtil.format("【触发器】{}", trigger.getName()));
-                    bpmnXmlDto.setProcessXml(trigger.getEditorXML());
-                    processDeployService2.snapshotDeploy2(bpmnXmlDto, envIdList, ProcessConst.PROCESS_BIZ_TYPE__TRIGGER);
-                } catch (Exception e) {
-                    throw new RuntimeException(StrUtil.format("【触发器】{} 部署异常: {}", trigger.getName(), e.getMessage()));
+                for (Long envId : envIdList) {
+                    try {
+                        BpmnXmlDto bpmnXmlDto = new BpmnXmlDto();
+                        bpmnXmlDto.setProcessId(ProcessUtil.convertProcessId(trigger.getModelKey()));
+                        bpmnXmlDto.setProcessName(StrUtil.format("【触发器】{}", trigger.getName()));
+                        bpmnXmlDto.setProcessXml(trigger.getEditorXML());
+                        processDeployService2.snapshotDeploy2(bpmnXmlDto, envId, ProcessConst.PROCESS_BIZ_TYPE__TRIGGER);
+                    } catch (Exception e) {
+                        throw new RuntimeException(StrUtil.format("【触发器】{} 部署异常: {}", trigger.getName(), e.getMessage()));
+                    }
                 }
             }
         }
@@ -115,14 +118,16 @@ public class ConnectorApi implements IConnectorApi {
         // 部署操作
         if(CollUtil.isNotEmpty(operates)) {
             for (BPMNResource operate : operates) {
-                try {
-                    BpmnXmlDto bpmnXmlDto = new BpmnXmlDto();
-                    bpmnXmlDto.setProcessId(ProcessUtil.convertProcessId(operate.getModelKey()));
-                    bpmnXmlDto.setProcessName(StrUtil.format("【操作】{}", operate.getName()));
-                    bpmnXmlDto.setProcessXml(operate.getEditorXML());
-                    processDeployService2.snapshotDeploy2(bpmnXmlDto, envIdList, ProcessConst.PROCESS_BIZ_TYPE__OPERATE);
-                } catch (Exception e) {
-                    throw new RuntimeException(StrUtil.format("【操作】{} 部署异常: {}", operate.getName(), e.getMessage()));
+                for (Long envId : envIdList) {
+                    try {
+                        BpmnXmlDto bpmnXmlDto = new BpmnXmlDto();
+                        bpmnXmlDto.setProcessId(ProcessUtil.convertProcessId(operate.getModelKey()));
+                        bpmnXmlDto.setProcessName(StrUtil.format("【操作】{}", operate.getName()));
+                        bpmnXmlDto.setProcessXml(operate.getEditorXML());
+                        processDeployService2.snapshotDeploy2(bpmnXmlDto, envIdList, ProcessConst.PROCESS_BIZ_TYPE__OPERATE);
+                    } catch (Exception e) {
+                        throw new RuntimeException(StrUtil.format("【操作】{} 部署异常: {}", operate.getName(), e.getMessage()));
+                    }
                 }
             }
         }
@@ -150,14 +155,16 @@ public class ConnectorApi implements IConnectorApi {
         // 部署触发器
         if(CollUtil.isNotEmpty(triggers)) {
             for (BPMNResource trigger : triggers) {
-                try {
-                    BpmnXmlDto bpmnXmlDto = new BpmnXmlDto();
-                    bpmnXmlDto.setProcessId(ProcessUtil.convertProcessId(trigger.getModelKey()));
-                    bpmnXmlDto.setProcessName(StrUtil.format("【触发器】{}", trigger.getName()));
-                    bpmnXmlDto.setProcessXml(trigger.getEditorXML());
-                    processDeployService2.releaseDeploy2(bpmnXmlDto, envIdList, ProcessConst.PROCESS_BIZ_TYPE__TRIGGER);
-                } catch (Exception e) {
-                    throw new RuntimeException(StrUtil.format("【触发器】{} 部署异常: {}", trigger.getName(), e.getMessage()));
+                for (Long envId : envIdList) {
+                    try {
+                        BpmnXmlDto bpmnXmlDto = new BpmnXmlDto();
+                        bpmnXmlDto.setProcessId(ProcessUtil.convertProcessId(trigger.getModelKey()));
+                        bpmnXmlDto.setProcessName(StrUtil.format("【触发器】{}", trigger.getName()));
+                        bpmnXmlDto.setProcessXml(trigger.getEditorXML());
+                        processDeployService2.releaseDeploy2(bpmnXmlDto, envId, ProcessConst.PROCESS_BIZ_TYPE__TRIGGER);
+                    } catch (Exception e) {
+                        throw new RuntimeException(StrUtil.format("【触发器】{} 部署异常: {}", trigger.getName(), e.getMessage()));
+                    }
                 }
             }
         }
@@ -165,19 +172,31 @@ public class ConnectorApi implements IConnectorApi {
         // 部署操作
         if(CollUtil.isNotEmpty(operates)) {
             for (BPMNResource operate : operates) {
-                try {
-                    BpmnXmlDto bpmnXmlDto = new BpmnXmlDto();
-                    bpmnXmlDto.setProcessId(ProcessUtil.convertProcessId(operate.getModelKey()));
-                    bpmnXmlDto.setProcessName(StrUtil.format("【操作】{}", operate.getName()));
-                    bpmnXmlDto.setProcessXml(operate.getEditorXML());
-                    processDeployService2.releaseDeploy2(bpmnXmlDto, envIdList, ProcessConst.PROCESS_BIZ_TYPE__OPERATE);
-                } catch (Exception e) {
-                    throw new RuntimeException(StrUtil.format("【操作】{} 部署异常: {}", operate.getName(), e.getMessage()));
+                for (Long envId : envIdList) {
+                    try {
+                        BpmnXmlDto bpmnXmlDto = new BpmnXmlDto();
+                        bpmnXmlDto.setProcessId(ProcessUtil.convertProcessId(operate.getModelKey()));
+                        bpmnXmlDto.setProcessName(StrUtil.format("【操作】{}", operate.getName()));
+                        bpmnXmlDto.setProcessXml(operate.getEditorXML());
+                        processDeployService2.releaseDeploy2(bpmnXmlDto, envId, ProcessConst.PROCESS_BIZ_TYPE__OPERATE);
+                    } catch (Exception e) {
+                        throw new RuntimeException(StrUtil.format("【操作】{} 部署异常: {}", operate.getName(), e.getMessage()));
+                    }
                 }
             }
         }
 
         return Result.OK();
+    }
+
+    @Override
+    public Result<ConnectorDeployProgressDto> fetchSnapshotDeployProgress(ConnectorResource resource) {
+        return null;
+    }
+
+    @Override
+    public Result<ConnectorDeployProgressDto> fetchReleaseDeployProgress(ConnectorResource resource) {
+        return null;
     }
 
 }

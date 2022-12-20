@@ -1,6 +1,7 @@
 package com.brandnewdata.mop.api.connector;
 
 import com.brandnewdata.common.webresult.Result;
+import com.brandnewdata.mop.api.connector.dto.ConnectorDeployProgressDto;
 import com.brandnewdata.mop.api.connector.dto.ConnectorResource;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,5 +23,11 @@ public interface IConnectorApi {
 
     @RequestMapping("/api/connector/releaseDeploy")
     Result releaseDeploy(@RequestBody ConnectorResource resource);
+
+    @RequestMapping("/api/connector/fetchSnapshotDeployProgress")
+    Result<ConnectorDeployProgressDto> fetchSnapshotDeployProgress(@RequestBody ConnectorResource resource);
+
+    @RequestMapping("/api/connector/fetchReleaseDeployProgress")
+    Result<ConnectorDeployProgressDto> fetchReleaseDeployProgress(@RequestBody ConnectorResource resource);
 
 }
