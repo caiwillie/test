@@ -20,4 +20,6 @@ public interface ProcessConst {
 
     int PROCESS_DEPLOY_STATUS__DEPLOYED = 1;
 
+    int PROCESS_DEPLOY_STATUS__EXCEPTION = 2;
+
 }

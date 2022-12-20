@@ -1,22 +1,29 @@
 package com.brandnewdata.mop.poc.connector.api;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.lang.Opt;
 import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.api.connector.IConnectorApi;
 import com.brandnewdata.mop.api.connector.dto.BPMNResource;
+import com.brandnewdata.mop.api.connector.dto.ConnectorDeployProgressDto;
+import com.brandnewdata.mop.api.connector.dto.ConnectorProcessDeployStatusDto;
 import com.brandnewdata.mop.api.connector.dto.ConnectorResource;
 import com.brandnewdata.mop.poc.constant.ProcessConst;
 import com.brandnewdata.mop.poc.env.dto.EnvDto;
 import com.brandnewdata.mop.poc.env.service.IEnvService;
 import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
+import com.brandnewdata.mop.poc.process.dto.DeployStatusDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
 import com.brandnewdata.mop.poc.process.util.ProcessUtil;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @RestController
 public class ConnectorApi implements IConnectorApi {
@@ -79,6 +86,186 @@ public class ConnectorApi implements IConnectorApi {
         }
 
         return Result.OK();
+    }
+
+    @Override
+    @Transactional
+    public Result snapshotDeploy(ConnectorResource resource) {
+        checkConnectorResource(resource);
+        List<BPMNResource> triggers = Opt.ofNullable(resource.getTriggers()).orElse(ListUtil.empty());
+        List<BPMNResource> operates = Opt.ofNullable(resource.getOperates()).orElse(ListUtil.empty());
+
+        List<EnvDto> envDtoList = getEnvDtoList(true);
+        List<Long> envIdList = envDtoList.stream().map(EnvDto::getId).collect(Collectors.toList());
+
+        // 部署触发器
+        for (BPMNResource trigger : triggers) {
+            for (Long envId : envIdList) {
+                try {
+                    BpmnXmlDto bpmnXmlDto = getBpmnXmlDto(trigger, true);
+                    processDeployService2.snapshotDeploy2(bpmnXmlDto, envId, ProcessConst.PROCESS_BIZ_TYPE__TRIGGER);
+                } catch (Exception e) {
+                    throw new RuntimeException(StrUtil.format("【触发器】{} 部署异常: {}", trigger.getName(), e.getMessage()));
+                }
+            }
+        }
+
+        // 部署操作
+        for (BPMNResource operate : operates) {
+            for (Long envId : envIdList) {
+                try {
+                    BpmnXmlDto bpmnXmlDto = getBpmnXmlDto(operate, false);
+                    processDeployService2.snapshotDeploy2(bpmnXmlDto, envId, ProcessConst.PROCESS_BIZ_TYPE__OPERATE);
+                } catch (Exception e) {
+                    throw new RuntimeException(StrUtil.format("【操作】{} 部署异常: {}", operate.getName(), e.getMessage()));
+                }
+            }
+        }
+
+        return Result.OK();
+    }
+
+    @Override
+    @Transactional
+    public Result releaseDeploy(ConnectorResource resource) {
+        checkConnectorResource(resource);
+        List<BPMNResource> triggers = Opt.ofNullable(resource.getTriggers()).orElse(ListUtil.empty());
+        List<BPMNResource> operates = Opt.ofNullable(resource.getOperates()).orElse(ListUtil.empty());
+
+        List<EnvDto> envDtoList = getEnvDtoList(false);
+        List<Long> envIdList = envDtoList.stream().map(EnvDto::getId).collect(Collectors.toList());
+
+        // 部署触发器
+        for (BPMNResource trigger : triggers) {
+            for (Long envId : envIdList) {
+                try {
+                    BpmnXmlDto bpmnXmlDto = getBpmnXmlDto(trigger, true);
+                    processDeployService2.releaseDeploy2(bpmnXmlDto, envId, ProcessConst.PROCESS_BIZ_TYPE__TRIGGER);
+                } catch (Exception e) {
+                    throw new RuntimeException(StrUtil.format("【触发器】{} 部署异常: {}", trigger.getName(), e.getMessage()));
+                }
+            }
+        }
+
+        // 部署操作
+        for (BPMNResource operate : operates) {
+            for (Long envId : envIdList) {
+                try {
+                    BpmnXmlDto bpmnXmlDto = getBpmnXmlDto(operate, false);
+                    processDeployService2.releaseDeploy2(bpmnXmlDto, envId, ProcessConst.PROCESS_BIZ_TYPE__OPERATE);
+                } catch (Exception e) {
+                    throw new RuntimeException(StrUtil.format("【操作】{} 部署异常: {}", operate.getName(), e.getMessage()));
+                }
+            }
+        }
+
+        return Result.OK();
+    }
+
+    @Override
+    public Result<ConnectorDeployProgressDto> fetchSnapshotDeployProgress(ConnectorResource resource) {
+        checkConnectorResource(resource);
+        List<BPMNResource> triggerList = resource.getTriggers();
+        List<BPMNResource> operateList = resource.getOperates();
+
+        List<EnvDto> envDtoList = getEnvDtoList(true);
+        List<Long> envIdList = envDtoList.stream().map(EnvDto::getId).collect(Collectors.toList());
+
+        ConnectorDeployProgressDto connectorDeployProgressDto = assembleConnectorDeployProgressDto(triggerList, operateList, envIdList);
+
+        return Result.OK(connectorDeployProgressDto);
+    }
+
+    @Override
+    public Result<ConnectorDeployProgressDto> fetchReleaseDeployProgress(ConnectorResource resource) {
+        checkConnectorResource(resource);
+        List<BPMNResource> triggerList = resource.getTriggers();
+        List<BPMNResource> operateList = resource.getOperates();
+
+        List<EnvDto> envDtoList = getEnvDtoList(false);
+        List<Long> envIdList = envDtoList.stream().map(EnvDto::getId).collect(Collectors.toList());
+
+        ConnectorDeployProgressDto connectorDeployProgressDto = assembleConnectorDeployProgressDto(triggerList, operateList, envIdList);
+
+        return Result.OK(connectorDeployProgressDto);
+    }
+
+    private void checkConnectorResource(ConnectorResource resource) {
+        Assert.notNull(resource, "连接器资源为空");
+
+        List<BPMNResource> operates = resource.getOperates();
+        List<BPMNResource> triggers = resource.getTriggers();
+        Assert.isFalse(CollUtil.isEmpty(operates) && CollUtil.isEmpty(triggers),
+                "操作和触发器不能都为空");
+    }
+
+    private List<EnvDto> getEnvDtoList(boolean isDebug) {
+        List<EnvDto> envDtoList = envService.fetchEnvList();
+        List<Long> envIdList = new ArrayList<>();
+        envDtoList.forEach(envDto -> envIdList.add(envDto.getId()));
+
+        if(isDebug) {
+            EnvDto debugEnvDto = envService.fetchDebugEnv();
+            envIdList.add(debugEnvDto.getId());
+        }
+        return envDtoList;
+    }
+
+    private BpmnXmlDto getBpmnXmlDto(BPMNResource resource, boolean isTrigger) {
+        BpmnXmlDto ret = new BpmnXmlDto();
+        ret.setProcessId(ProcessUtil.convertProcessId(resource.getModelKey()));
+        if(isTrigger) {
+            ret.setProcessName(StrUtil.format("【触发器】{}", resource.getName()));
+        } else {
+            ret.setProcessName(StrUtil.format("【操作】{}", resource.getName()));
+        }
+        ret.setProcessXml(resource.getEditorXML());
+        return ret;
+    }
+
+    private ConnectorDeployProgressDto assembleConnectorDeployProgressDto(List<BPMNResource> triggerList,
+                                                                          List<BPMNResource> operateList,
+                                                                          List<Long> envIdList) {
+        Map<String, ConnectorProcessDeployStatusDto> triggerDeployStatusMap = getResourceDeployStatusMap(triggerList, envIdList);
+        Map<String, ConnectorProcessDeployStatusDto> operateDeployStatusMap = getResourceDeployStatusMap(operateList, envIdList);
+
+        ConnectorDeployProgressDto ret = new ConnectorDeployProgressDto();
+        ret.setTriggerDeployStatusMap(triggerDeployStatusMap);
+        ret.setOperateDeployStatusMap(operateDeployStatusMap);
+        return ret;
+    }
+
+    private Map<String, ConnectorProcessDeployStatusDto> getResourceDeployStatusMap(List<BPMNResource> resourceList, List<Long> envIdList) {
+
+        Map<String, String> triggerProcessIdMap = Opt.ofNullable(resourceList).orElse(ListUtil.empty()).stream()
+                .map(BPMNResource::getModelKey).collect(Collectors.toMap(ProcessUtil::convertProcessId, Function.identity()));
+
+        Map<String, ConnectorProcessDeployStatusDto> resourceDeployStatusMap = new HashMap<>();
+
+        for (Long envId : Opt.ofNullable(envIdList).orElse(ListUtil.empty())) {
+            Map<String, DeployStatusDto> deployStatusDtoMap = processDeployService2.fetchDeployStatus(ListUtil.toList(triggerProcessIdMap.keySet()), envId);
+            for (Map.Entry<String, DeployStatusDto> entry : deployStatusDtoMap.entrySet()) {
+                String processId = entry.getKey();
+                DeployStatusDto _deployStatusDto = entry.getValue();
+                String _modelKey = triggerProcessIdMap.get(processId);
+                ConnectorProcessDeployStatusDto connectorProcessDeployStatusDto =
+                        resourceDeployStatusMap.computeIfAbsent(_modelKey, key -> new ConnectorProcessDeployStatusDto());
+                // 默认赋值为 1
+                if(Opt.ofNullable(connectorProcessDeployStatusDto.getStatus()).orElse(1) == 1) {
+                    // 如果之前是成功部署的，则当前环境状态可以直接覆盖总状态
+                    connectorProcessDeployStatusDto.setStatus(_deployStatusDto.getStatus());
+                }
+
+                if(_deployStatusDto.getStatus() == 2) {
+                    EnvDto envDto = envService.fetchOne(envId);
+                    Map<String, String> messageMap = Opt.ofNullable(connectorProcessDeployStatusDto.getMessageMap()).orElse(new LinkedHashMap<>());
+                    messageMap.put(envDto.getName(), _deployStatusDto.getMessage());
+                    connectorProcessDeployStatusDto.setMessageMap(messageMap);
+                }
+            }
+        }
+
+        return resourceDeployStatusMap;
     }
 
 }
