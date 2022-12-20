@@ -71,22 +71,34 @@ public class DeployManager {
         List<ProcessDeployTaskPo> processDeployTaskPoList = processDeployTaskDao.selectList(query);
         if(CollUtil.isEmpty(processDeployTaskPoList)) return;
         for (ProcessDeployTaskPo processDeployTaskPo : processDeployTaskPoList) {
-            Long envId = processDeployTaskPo.getEnvId();
-            String processId = processDeployTaskPo.getProcessId();
+            Long envId = null;
+            String processId = null;
+            Long envLockVersion = null;
+            Long processEnvLockVersion = null;
+            try {
+                envId = processDeployTaskPo.getEnvId();
+                processId = processDeployTaskPo.getProcessId();
+                Assert.notNull(envId);
+                Assert.notNull(processId);
 
-            // 获取环境锁
-            Long envLockVersion = envLock.lock(envId);
-            if(envLockVersion == null) {
-                log.warn("env lock compete fail. {}", envId);
-                continue;
+                // 获取环境锁
+                envLockVersion = envLock.lock(envId);
+                if(envLockVersion == null) {
+                    log.warn("env lock compete fail. {}", envId);
+                    continue;
+                }
+
+                // 获取流程锁
+                processEnvLockVersion = this.processEnvLock.lock(processId, envId);
+                if(processEnvLockVersion == null) {
+                    log.warn("process env lock compete fail. process {}, env {}", processId, envId);
+                    envLock.unlock(envId, envLockVersion);
+                    continue;
+                }
+            } catch (Exception e) {
+                log.error("get lock exception", e);
             }
-            // 获取流程锁
-            Long processEnvLockVersion = this.processEnvLock.lock(processId, envId);
-            if(processEnvLockVersion == null) {
-                log.warn("process env lock compete fail. process {}, env {}", processId, envId);
-                envLock.unlock(envId, envLockVersion);
-                continue;
-            }
+
 
             try {
                 EnvDto envDto = envService.fetchOne(envId);

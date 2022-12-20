@@ -118,13 +118,12 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
             query.eq(ProcessSnapshotDeployPo.ENV_ID, envId);
             query.eq(ProcessSnapshotDeployPo.PROCESS_ID, processId);
             query.orderByDesc(ProcessSnapshotDeployPo.PROCESS_ZEEBE_VERSION);
-            List<ProcessSnapshotDeployPo> processSnapshotDeployPoList = snapshotDeployDao.selectList(query);
-            // 如果已经部署过，就直接跳过
-            if(CollUtil.isNotEmpty(processSnapshotDeployPoList)) {
-                if(StrUtil.equals(processSnapshotDeployPoList.get(0).getProcessDigest(), processDigest)) {
-                    // 如果最新部署的版本和当前版本一致，就不需要部署了
-                    return;
-                }
+            query.last("limit 1");
+            ProcessSnapshotDeployPo latestProcessSnapshotDeployPo = snapshotDeployDao.selectOne(query);
+
+            if(latestProcessSnapshotDeployPo != null && StrUtil.equals(latestProcessSnapshotDeployPo.getProcessDigest(), processDigest)) {
+                // 如果最新部署的版本和当前版本一致，就不需要部署了
+                return;
             }
 
             QueryWrapper<ProcessDeployTaskPo> query2 = new QueryWrapper<>();
@@ -132,7 +131,7 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
             query2.eq(ProcessDeployTaskPo.ENV_ID, envId);
             query2.eq(ProcessDeployTaskPo.DEPLOY_STATUS, ProcessConst.PROCESS_DEPLOY_STATUS__UNDEPLOY);
             ProcessDeployTaskPo oldProcessDeployTaskPo = processDeployTaskDao.selectOne(query2);
-            // delete old process deploy task
+            // delete old process undeploy task
             if(oldProcessDeployTaskPo != null) processDeployTaskDao.deleteById(oldProcessDeployTaskPo.getId());
 
             // add new process deploy task
@@ -145,8 +144,6 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
                 processEnvLock.unlock(processId, envId, version);
             }
         }
-
-
     }
 
     @Override
