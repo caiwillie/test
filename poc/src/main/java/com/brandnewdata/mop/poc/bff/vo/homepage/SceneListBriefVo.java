@@ -38,4 +38,8 @@ public class SceneListBriefVo {
      * */
     private String totalFailDesc;
 
+    private String name;
+
+    private String env;
+
 }

@@ -27,30 +27,32 @@ public class HomepageController {
 
     @GetMapping("/statistic/info")
     public Result<DataBriefVo> dataInfo() {
-        DataBriefVo datum = new DataBriefVo(1,2,3,4,5,6,7,8);
-        return Result.OK(datum);
+//        DataBriefVo datum = new DataBriefVo(1,2,3,4,5,6,7,8);
+//        return Result.OK(datum);
 
-      //  return Result.OK(homepageService.getDataBrief());
+        return Result.OK(homepageService.getDataBrief());
     }
 
     @GetMapping("/list/scene")
     public Result<List<SceneListBriefVo>> sceneInfo() {
-        List<SceneListBriefVo> res = new ArrayList<>();
-        SceneListBriefVo sc = new SceneListBriefVo("这是id","这是场景版本描述","这是场景状态","时间","7日运行总数","7日失败次数");
-        res.add(sc);
-        return Result.OK(res);
+//        List<SceneListBriefVo> res = new ArrayList<>();
+//        SceneListBriefVo sc = new SceneListBriefVo("这是id","这是场景版本描述","这是场景状态","时间","7日运行总数","7日失败次数");
+//        res.add(sc);
+//        return Result.OK(res);
 
-       // return Result.OK(homepageService.getRemoteSceneInfo());
+        return Result.OK(homepageService.getRemoteSceneInfo());
     }
 
     @GetMapping("/list/connector")
     public Result<List<ConnectorIndexVo>> connectorInfo(Integer size) {
-        List<ConnectorIndexVo> res = new ArrayList<>();
-        ConnectorIndexVo connectorIndexVo = new ConnectorIndexVo("id","name","v3","4.png","brandData");
-        res.add(connectorIndexVo);
-        return Result.OK(res);
-
-      //  return Result.OK(homepageService.getRemoteConnectorInfo(size));
+//        List<ConnectorIndexVo> res = new ArrayList<>();
+//        ConnectorIndexVo connectorIndexVo = new ConnectorIndexVo("id","name","v3","4.png","brandData");
+//        res.add(connectorIndexVo);
+//        return Result.OK(res);
+        if(null == size){
+            size=8;
+        }
+        return Result.OK(homepageService.getRemoteConnectorInfo(size));
     }
 
 }

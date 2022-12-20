@@ -3,7 +3,11 @@ package com.brandnewdata.mop.poc.bff.service.homepage;
 import com.brandnewdata.connector.api.IConnectorBasicInfoFeign;
 import com.brandnewdata.connector.dto.ConnectorBasicListInfoDTO;
 import com.brandnewdata.connector.dto.ConnectorCountDTO;
+import com.brandnewdata.mop.api.bff.home.IHomeApi;
+import com.brandnewdata.mop.api.bff.home.dto.HomeSceneDto;
+import com.brandnewdata.mop.api.bff.home.dto.HomeStaticOverviewCountDto;
 import com.brandnewdata.mop.poc.bff.converter.homepage.ConnectorIndexVoConverter;
+import com.brandnewdata.mop.poc.bff.converter.homepage.SceneIndexVoConverter;
 import com.brandnewdata.mop.poc.bff.vo.homepage.ConnectorIndexVo;
 import com.brandnewdata.mop.poc.bff.vo.homepage.DataBriefVo;
 import com.brandnewdata.mop.poc.bff.vo.homepage.SceneListBriefVo;
@@ -26,6 +30,9 @@ public class HomepageService {
     @Resource
     IConnectorBasicInfoFeign connectorBasicInfoFeign;
 
+    @Resource
+    IHomeApi iHomeApi;
+
 
     public DataBriefVo getDataBrief() {
 
@@ -37,8 +44,22 @@ public class HomepageService {
             res.setConnectorDevCount(connectorCountDTO.getCustomCount());
         } catch (Exception e) {
             log.error("", e);
-            res.setConnectorBaseCount(0);
-            res.setConnectorDevCount(0);
+            throw e;
+//            res.setConnectorBaseCount(0);
+//            res.setConnectorDevCount(0);
+        }
+
+        try{
+            HomeStaticOverviewCountDto apiDto = iHomeApi.staticOverviewCount();
+            res.setSceneInProgress(apiDto.getSceneRunningCount());
+            res.setSceneTotal(apiDto.getSceneCount());
+            res.setWeeklyRuntimeTotal(apiDto.getProcessInstanceCount());
+            res.setWeeklyRuntimeFail(apiDto.getProcessInstanceFailCount());
+            res.setApiServiceCount(apiDto.getApiCount());
+            res.setApiPathCount(apiDto.getApiPathCount());
+        }catch (Exception e2){
+            log.error("",e2);
+            throw e2;
         }
 
 
@@ -61,8 +82,15 @@ public class HomepageService {
     }
 
     public List<SceneListBriefVo> getRemoteSceneInfo() {
+        List<SceneListBriefVo> res = new ArrayList<>();
 
 
-        return new ArrayList<>();
+        List<HomeSceneDto> resApi = iHomeApi.sceneList();
+
+        resApi.forEach(data->{
+            res.add(SceneIndexVoConverter.createForm(data));
+        });
+
+        return res;
     }
 }
