@@ -100,8 +100,10 @@ public class DeployManager {
                 continue;
             }
 
-
             try {
+                // 暂停一段时间， 控制部署速率
+                ThreadUtil.sleep(3000);
+
                 EnvDto envDto = envService.fetchOne(envId);
                 Assert.notNull(envDto, "env not found");
                 Integer type = envDto.getType();
@@ -144,14 +146,18 @@ public class DeployManager {
 
                 // 更新流程部署状态
                 processDeployTaskPo.setDeployStatus(ProcessConst.PROCESS_DEPLOY_STATUS__DEPLOYED);
-                int update = processDeployTaskDao.updateById(processDeployTaskPo);
-                if(update == 0) throw new RuntimeException(
-                        StrUtil.format("update process deploy status fail"));
-                // 暂停一段时间， 控制部署速率
-                ThreadUtil.sleep(3000);
             } catch (Exception e) {
                 log.error("deploy process fail. processId: {}, envId: {}", processId, envId, e);
+                // 更新流程部署状态
+                processDeployTaskPo.setDeployStatus(ProcessConst.PROCESS_DEPLOY_STATUS__EXCEPTION);
+                processDeployTaskPo.setErrorMessage(e.getMessage());
             } finally {
+                try {
+                    processDeployTaskDao.updateById(processDeployTaskPo);
+                } catch (Exception e) {
+                    log.error("update process deploy task exception. id {}", processDeployTaskPo.getId());
+                }
+
                 // 释放流程锁
                 processEnvLock.unlock(processId, envId, processEnvLockVersion);
                 // 释放环境锁

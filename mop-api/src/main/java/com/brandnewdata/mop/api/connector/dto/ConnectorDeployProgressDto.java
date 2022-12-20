@@ -8,7 +8,7 @@ import java.util.Map;
 @Getter
 @Setter
 public class ConnectorDeployProgressDto {
-    private Map<String, DeployProgressDto> triggerProgressMap;
+    private Map<String, ConnectorProcessDeployStatusDto> triggerDeployStatusMap;
 
-    private Map<String, DeployProgressDto> operateProgressMap;
+    private Map<String, ConnectorProcessDeployStatusDto> operateDeployStatusMap;
 }

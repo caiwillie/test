@@ -18,6 +18,7 @@ import com.brandnewdata.mop.poc.process.dao.ProcessDeployTaskDao;
 import com.brandnewdata.mop.poc.process.dao.ProcessReleaseDeployDao;
 import com.brandnewdata.mop.poc.process.dao.ProcessSnapshotDeployDao;
 import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
+import com.brandnewdata.mop.poc.process.dto.DeployStatusDto;
 import com.brandnewdata.mop.poc.process.dto.ProcessReleaseDeployDto;
 import com.brandnewdata.mop.poc.process.dto.ProcessSnapshotDeployDto;
 import com.brandnewdata.mop.poc.process.lock.ProcessEnvLock;
@@ -222,6 +223,33 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
                 processEnvLock.unlock(processId, envId, version);
             }
         }
+    }
+
+    @Override
+    public Map<String, DeployStatusDto> fetchDeployStatus(List<String> processIdList, Long envId) {
+        if(CollUtil.isEmpty(processIdList)) return MapUtil.empty();
+        Assert.isTrue(CollUtil.hasNull(processIdList), "process id must not null");
+        Assert.notNull(envId);
+
+        QueryWrapper<ProcessDeployTaskPo> query = new QueryWrapper<>();
+        query.in(ProcessDeployTaskPo.PROCESS_ID, processIdList);
+        query.eq(ProcessDeployTaskPo.ENV_ID, envId);
+        query.groupBy(ProcessDeployTaskPo.PROCESS_ID);
+        query.select("max(id) as id");
+        List<Map<String, Object>> records = processDeployTaskDao.selectMaps(query);
+        List<Long> idList = records.stream().map(map -> (Long) map.get("id")).collect(Collectors.toList());
+
+        if(CollUtil.isEmpty(idList)) return MapUtil.empty();
+        QueryWrapper<ProcessDeployTaskPo> query2 = new QueryWrapper<>();
+        query2.in(ProcessDeployTaskPo.ID, idList);
+        List<ProcessDeployTaskPo> processDeployTaskPoList = processDeployTaskDao.selectList(query2);
+
+        return processDeployTaskPoList.stream().collect(Collectors.toMap(ProcessDeployTaskPo::getProcessId, po -> {
+            DeployStatusDto dto = new DeployStatusDto();
+            dto.setStatus(po.getDeployStatus());
+            dto.setMessage(po.getErrorMessage());
+            return dto;
+        }));
     }
 
     @Override
