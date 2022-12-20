@@ -97,6 +97,7 @@ public class DeployManager {
                 }
             } catch (Exception e) {
                 log.error("get lock exception", e);
+                continue;
             }
 
 
