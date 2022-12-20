@@ -30,7 +30,7 @@ public class HomepageService {
     @Resource
     IConnectorBasicInfoFeign connectorBasicInfoFeign;
 
-    @Resource
+    // @Resource
     IHomeApi iHomeApi;
 
 
