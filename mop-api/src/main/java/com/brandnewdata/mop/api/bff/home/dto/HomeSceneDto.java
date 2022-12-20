@@ -35,10 +35,10 @@ public class HomeSceneDto {
     /**
      * 场景7日运行数量-总数
      */
-    private int processInstanceCount;
+    private String processInstanceCount;
 
     /**
      * 场景7日运行数量-失败数
      */
-    private int processInstanceFailCount;
+    private String processInstanceFailCount;
 }
