@@ -46,8 +46,8 @@ public class HomepageController {
     @GetMapping("/list/connector")
     public Result<List<ConnectorIndexVo>> connectorInfo(Integer size) {
         List<ConnectorIndexVo> res = new ArrayList<>();
-
-
+        ConnectorIndexVo connectorIndexVo = new ConnectorIndexVo("id","name","v3","4.png","brandData");
+        res.add(connectorIndexVo);
         return Result.OK(res);
 
       //  return Result.OK(homepageService.getRemoteConnectorInfo(size));

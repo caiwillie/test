@@ -26,6 +26,7 @@ public class HomepageService {
     @Resource
     IConnectorBasicInfoFeign connectorBasicInfoFeign;
 
+
     public DataBriefVo getDataBrief() {
 
         DataBriefVo res = new DataBriefVo();
