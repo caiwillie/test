@@ -7,7 +7,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-@FeignClient(name = "poc", contextId = "mopProcess")
+@FeignClient(name = "poc", contextId = "processApi")
 public interface IProcessApi {
     @RequestMapping("/api/process/sendMessage")
     Result<MessageDto> sendMessage(@RequestBody SendMessageDto req);

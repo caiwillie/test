@@ -125,7 +125,7 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
 
                 if(latestProcessSnapshotDeployPo != null && StrUtil.equals(latestProcessSnapshotDeployPo.getProcessDigest(), processDigest)) {
                     // 如果最新部署的版本和当前版本一致，就不需要部署了
-                    return;
+                    continue;
                 }
 
                 QueryWrapper<ProcessDeployTaskPo> query2 = new QueryWrapper<>();
@@ -182,8 +182,52 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
     }
 
     @Override
+    @Transactional
     public void releaseDeploy2(BpmnXmlDto bpmnXmlDto, List<Long> envIdList, String bizType) {
+        if(CollUtil.isEmpty(envIdList)) return;
+        for (Long envId : envIdList) {
+            Assert.notNull(envId);
+            Step2Result step2Result = parseBpmnXmlDto(bpmnXmlDto, envId, bizType);
+            String processXml = bpmnXmlDto.getProcessXml();
+            String processId = step2Result.getProcessId();
+            String processName = step2Result.getProcessName();
+            String zeebeXml = step2Result.getZeebeXml();
+            Long version = null;
+            try {
+                do {
+                    version = processEnvLock.lock(processId, envId);
+                    // 一直等待到
+                    ThreadUtil.sleep(400);
+                } while(version != null);
 
+                QueryWrapper<ProcessReleaseDeployPo> query = new QueryWrapper<>();
+                query.eq(ProcessReleaseDeployPo.PROCESS_ID, processId);
+                query.eq(ProcessReleaseDeployPo.ENV_ID, envId);
+                ProcessReleaseDeployPo po = releaseDeployDao.selectOne(query);
+                if(po != null) {
+                    // 如果最新部署的版本和当前版本一致，就不需要部署了
+                    continue;
+                }
+
+                QueryWrapper<ProcessDeployTaskPo> query2 = new QueryWrapper<>();
+                query2.eq(ProcessDeployTaskPo.PROCESS_ID, processId);
+                query2.eq(ProcessDeployTaskPo.ENV_ID, envId);
+                query2.eq(ProcessDeployTaskPo.DEPLOY_STATUS, ProcessConst.PROCESS_DEPLOY_STATUS__UNDEPLOY);
+                ProcessDeployTaskPo oldProcessDeployTaskPo = processDeployTaskDao.selectOne(query2);
+                // delete old process undeploy task
+                if(oldProcessDeployTaskPo != null) processDeployTaskDao.deleteById(oldProcessDeployTaskPo.getId());
+
+                // add new process deploy task
+                ProcessDeployTaskPo processDeployTaskPo = ProcessDeployTaskPoConverter.createFrom(processId, processName, processXml, zeebeXml);
+                processDeployTaskDao.insert(processDeployTaskPo);
+            } catch (Exception e) {
+                throw new RuntimeException(e.getMessage());
+            } finally {
+                if(version != null) {
+                    processEnvLock.unlock(processId, envId, version);
+                }
+            }
+        }
     }
 
     @Override

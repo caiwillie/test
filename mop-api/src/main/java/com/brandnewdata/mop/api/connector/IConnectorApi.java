@@ -17,4 +17,10 @@ public interface IConnectorApi {
     @RequestMapping("/api/connector/deploy")
     Result deploy(@RequestBody ConnectorResource resource);
 
+    @RequestMapping("/api/connector/snapshotDeploy")
+    Result snapshotDeploy(@RequestBody ConnectorResource resource);
+
+    @RequestMapping("/api/connector/releaseDeploy")
+    Result releaseDeploy(@RequestBody ConnectorResource resource);
+
 }
