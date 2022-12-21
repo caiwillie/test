@@ -250,17 +250,18 @@ public class ConnectorApi implements IConnectorApi {
                 String _modelKey = triggerProcessIdMap.get(processId);
                 ConnectorProcessDeployStatusDto connectorProcessDeployStatusDto =
                         resourceDeployStatusMap.computeIfAbsent(_modelKey, key -> new ConnectorProcessDeployStatusDto());
-                // 默认赋值为 1
-                if(Opt.ofNullable(connectorProcessDeployStatusDto.getStatus()).orElse(1) == 1) {
-                    // 如果之前是成功部署的，则当前环境状态可以直接覆盖总状态
+                if(_deployStatusDto.getStatus() == ProcessConst.PROCESS_DEPLOY_STATUS__EXCEPTION) {
+                    // 如果当前部署是失败，则不管之前是什么状态，都修改为失败
                     connectorProcessDeployStatusDto.setStatus(_deployStatusDto.getStatus());
-                }
 
-                if(_deployStatusDto.getStatus() == 2) {
+                    // 记录异常结果
                     EnvDto envDto = envService.fetchOne(envId);
                     Map<String, String> messageMap = Opt.ofNullable(connectorProcessDeployStatusDto.getMessageMap()).orElse(new LinkedHashMap<>());
                     messageMap.put(envDto.getName(), _deployStatusDto.getMessage());
                     connectorProcessDeployStatusDto.setMessageMap(messageMap);
+                } else if (Opt.ofNullable(connectorProcessDeployStatusDto.getStatus()).orElse(1) == 1) { // 默认赋值为 1
+                    // 如果之前是成功部署的，则当前环境状态可以直接覆盖总状态
+                    connectorProcessDeployStatusDto.setStatus(_deployStatusDto.getStatus());
                 }
             }
         }
