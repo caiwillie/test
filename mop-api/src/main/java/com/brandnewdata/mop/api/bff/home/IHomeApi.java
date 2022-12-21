@@ -2,7 +2,6 @@ package com.brandnewdata.mop.api.bff.home;
 
 import com.brandnewdata.mop.api.bff.home.dto.HomeSceneDto;
 import com.brandnewdata.mop.api.bff.home.dto.HomeStaticOverviewCountDto;
-import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
