@@ -72,7 +72,6 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
 
     private final ProcessEnvLock processEnvLock;
 
-
     public ProcessDeployService2(ZeebeClientManager zeebeClientManager,
                                  ConnectorManager connectorManager, EnvLock envLock, ProcessEnvLock processEnvLock) {
         this.zeebeClientManager = zeebeClientManager;
