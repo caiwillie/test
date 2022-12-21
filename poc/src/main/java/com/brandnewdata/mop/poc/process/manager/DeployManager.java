@@ -93,14 +93,14 @@ public class DeployManager {
                     // 获取环境锁
                     envLockVersion = envLock.lock(envId);
                     if(envLockVersion == null) {
-                        log.warn("env lock compete fail. {}", envId);
+                        log.debug("env lock compete fail. {}", envId);
                         continue;
                     }
 
                     // 获取流程锁
                     processEnvLockVersion = this.processEnvLock.lock(processId, envId);
                     if(processEnvLockVersion == null) {
-                        log.warn("process env lock compete fail. process {}, env {}", processId, envId);
+                        log.debug("process env lock compete fail. process {}, env {}", processId, envId);
                         envLock.unlock(envId, envLockVersion);
                         continue;
                     }
@@ -114,13 +114,11 @@ public class DeployManager {
                 }
             }
 
-            // 如果没有竞争到
-            if(envLockVersion == null || processEnvLockVersion == null) {
-                continue;
-            }
+            // 如果遍历了所有待部署的资源，没有竞争到任何其中之一, 就放弃本轮
+            if(envLockVersion == null || processEnvLockVersion == null) break;
 
             try {
-                log.info("thread group {}, name {}, envLockVersion {}, processEnvLockVersion {}, task id {}",
+                log.info("deploy resource. thread group {}, name {}, envLockVersion {}, processEnvLockVersion {}, task id {}",
                         ThreadUtil.currentThreadGroup().getName(), Thread.currentThread().getName(),
                         envLockVersion, processEnvLockVersion, processDeployTaskPo.getId());
                 // 暂停一段时间， 控制部署速率
