@@ -5,8 +5,10 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.caiwillie.util.lock.DatabaseDistributedLock;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.util.Date;
 import java.util.HashMap;
@@ -17,7 +19,8 @@ public class ProcessEnvLock {
 
     private static final String RESOURCE_CONTENT_TEMPLATE = "processId_{};env_{}";
 
-    private static final long EXPIRATION = 10000;
+    @Value("${brandnewdata.distribute-lock.expiration-time.env-process}")
+    private long EXPIRATION;
 
     private final DatabaseDistributedLock<String, String> distributedLock;
 
@@ -25,6 +28,11 @@ public class ProcessEnvLock {
         distributedLock = new DatabaseDistributedLock<>(dataSource, "mop_lock", "resource_digest",
                 "lock_status", "lock_version", "update_time", EXPIRATION,
                 status -> StrUtil.equals(status, StringPool.TRUE), () -> StringPool.TRUE, () -> StringPool.FALSE);
+    }
+
+    @PostConstruct
+    public void init() {
+        return;
     }
 
     public Long lock(String processId, Long envId) {

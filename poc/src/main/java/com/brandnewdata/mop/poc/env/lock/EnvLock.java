@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.caiwillie.util.lock.DatabaseDistributedLock;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
@@ -17,7 +18,8 @@ public class EnvLock {
 
     private static final String RESOURCE_CONTENT_TEMPLATE = "env_{}";
 
-    private static final long EXPIRATION = 10000;
+    @Value("${brandnewdata.distribute-lock.expiration-time.env}")
+    private long EXPIRATION;
 
     private final DatabaseDistributedLock<String, String> distributedLock;
 
