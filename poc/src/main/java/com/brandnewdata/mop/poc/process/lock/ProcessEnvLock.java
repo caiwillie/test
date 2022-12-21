@@ -30,11 +30,6 @@ public class ProcessEnvLock {
                 status -> StrUtil.equals(status, StringPool.TRUE), () -> StringPool.TRUE, () -> StringPool.FALSE);
     }
 
-    @PostConstruct
-    public void init() {
-        return;
-    }
-
     public Long lock(String processId, Long envId) {
         String resourceContent = StrUtil.format(RESOURCE_CONTENT_TEMPLATE, processId, envId);
         String resourceDigest = DigestUtil.md5Hex(resourceContent);

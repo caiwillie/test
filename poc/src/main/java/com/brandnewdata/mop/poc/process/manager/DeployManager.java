@@ -62,7 +62,7 @@ public class DeployManager {
         Scheduler scheduler = new Scheduler();
         scheduler.setMatchSecond(true);
         scheduler.schedule("0/2 * * * * ?", (Runnable) this::scan);
-        scheduler.start();
+        // scheduler.start();
     }
 
     private void scan() {
