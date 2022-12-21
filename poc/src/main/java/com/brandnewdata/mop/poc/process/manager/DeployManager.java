@@ -27,6 +27,7 @@ import io.camunda.zeebe.client.ZeebeClient;
 import io.camunda.zeebe.client.api.response.DeploymentEvent;
 import io.camunda.zeebe.client.api.response.Process;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -54,15 +55,17 @@ public class DeployManager {
     private ProcessReleaseDeployDao processReleaseDeployDao;
 
     public DeployManager(IEnvService envService, EnvLock envLock,
-                         ProcessEnvLock processEnvLock, ZeebeClientManager zeebeClientManager) {
+                         ProcessEnvLock processEnvLock, ZeebeClientManager zeebeClientManager,
+                         @Value("${brandnewdata.deploy-schedule.enable}") boolean enable) {
         this.envService = envService;
         this.envLock = envLock;
         this.processEnvLock = processEnvLock;
         this.zeebeClientManager = zeebeClientManager;
+        if(!enable) return;
         Scheduler scheduler = new Scheduler();
         scheduler.setMatchSecond(true);
         scheduler.schedule("0/2 * * * * ?", (Runnable) this::scan);
-        // scheduler.start();
+        scheduler.start();
     }
 
     private void scan() {
@@ -102,7 +105,7 @@ public class DeployManager {
 
             try {
                 // 暂停一段时间， 控制部署速率
-                ThreadUtil.sleep(3000);
+                ThreadUtil.sleep(5000);
 
                 EnvDto envDto = envService.fetchOne(envId);
                 Assert.notNull(envDto, "env not found");
