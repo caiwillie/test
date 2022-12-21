@@ -10,7 +10,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.constant.ProcessConst;
-import com.brandnewdata.mop.poc.env.lock.EnvLock;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.process.bo.ZeebeDeployBo;
 import com.brandnewdata.mop.poc.process.converter.*;
@@ -68,15 +67,13 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
 
     private final ConnectorManager connectorManager;
 
-    private final EnvLock envLock;
-
     private final ProcessEnvLock processEnvLock;
 
     public ProcessDeployService2(ZeebeClientManager zeebeClientManager,
-                                 ConnectorManager connectorManager, EnvLock envLock, ProcessEnvLock processEnvLock) {
+                                 ConnectorManager connectorManager,
+                                 ProcessEnvLock processEnvLock) {
         this.zeebeClientManager = zeebeClientManager;
         this.connectorManager = connectorManager;
-        this.envLock = envLock;
         this.processEnvLock = processEnvLock;
     }
 
