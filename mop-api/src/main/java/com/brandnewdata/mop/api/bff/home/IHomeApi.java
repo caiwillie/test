@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
-@FeignClient(name = "poc", contextId = "bffHomeApi")
+// @FeignClient(name = "poc", contextId = "bffHomeApi")
 public interface IHomeApi {
 
     @RequestMapping("/api/bff/home/staticOverviewCount")
