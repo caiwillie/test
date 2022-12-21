@@ -6,10 +6,12 @@ import com.brandnewdata.mop.poc.process.po.ProcessDeployTaskPo;
 
 public class ProcessDeployTaskPoConverter {
 
-    public static ProcessDeployTaskPo createFrom(String processId, String processName,
-                                          String processXml, String zeebeXml) {
+    public static ProcessDeployTaskPo createFrom(Long envId,
+                                                 String processId, String processName,
+                                                 String processXml, String zeebeXml) {
         ProcessDeployTaskPo po = new ProcessDeployTaskPo();
         po.setId(IdUtil.getSnowflakeNextId());
+        po.setEnvId(envId);
         po.setProcessId(processId);
         po.setProcessName(processName);
         po.setProcessXml(processXml);

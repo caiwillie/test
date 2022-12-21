@@ -112,7 +112,7 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
                 version = processEnvLock.lock(processId, envId);
                 // 一直等待到
                 ThreadUtil.sleep(400);
-            } while(version != null);
+            } while(version == null);
 
             String processDigest = DigestUtil.md5Hex(processXml);
             QueryWrapper<ProcessSnapshotDeployPo> query = new QueryWrapper<>();
@@ -136,7 +136,7 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
             if(oldProcessDeployTaskPo != null) processDeployTaskDao.deleteById(oldProcessDeployTaskPo.getId());
 
             // add new process deploy task
-            ProcessDeployTaskPo processDeployTaskPo = ProcessDeployTaskPoConverter.createFrom(processId, processName, processXml, zeebeXml);
+            ProcessDeployTaskPo processDeployTaskPo = ProcessDeployTaskPoConverter.createFrom(envId, processId, processName, processXml, zeebeXml);
             processDeployTaskDao.insert(processDeployTaskPo);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
@@ -214,7 +214,7 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
             if(oldProcessDeployTaskPo != null) processDeployTaskDao.deleteById(oldProcessDeployTaskPo.getId());
 
             // add new process deploy task
-            ProcessDeployTaskPo processDeployTaskPo = ProcessDeployTaskPoConverter.createFrom(processId, processName, processXml, zeebeXml);
+            ProcessDeployTaskPo processDeployTaskPo = ProcessDeployTaskPoConverter.createFrom(envId, processId, processName, processXml, zeebeXml);
             processDeployTaskDao.insert(processDeployTaskPo);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
