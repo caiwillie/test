@@ -145,7 +145,6 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
                 processEnvLock.unlock(processId, envId, version);
             }
         }
-        return;
     }
 
     @Override
