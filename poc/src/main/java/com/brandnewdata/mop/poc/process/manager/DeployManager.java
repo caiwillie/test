@@ -29,9 +29,7 @@ import io.camunda.zeebe.client.api.response.Process;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.List;
 
@@ -126,7 +124,7 @@ public class DeployManager {
                         ThreadUtil.currentThreadGroup().getName(), Thread.currentThread().getName(),
                         envLockVersion, processEnvLockVersion, processDeployTaskPo.getId());
                 // 暂停一段时间， 控制部署速率
-                ThreadUtil.sleep(5000);
+                ThreadUtil.sleep(3000);
 
                 EnvDto envDto = envService.fetchOne(envId);
                 Assert.notNull(envDto, "env not found");
