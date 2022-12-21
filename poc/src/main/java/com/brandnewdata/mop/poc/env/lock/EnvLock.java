@@ -18,14 +18,12 @@ public class EnvLock {
 
     private static final String RESOURCE_CONTENT_TEMPLATE = "env_{}";
 
-    @Value("${brandnewdata.distribute-lock.expiration-time.env}")
-    private long EXPIRATION;
-
     private final DatabaseDistributedLock<String, String> distributedLock;
 
-    public EnvLock(DataSource dataSource) {
+    public EnvLock(DataSource dataSource,
+                   @Value("${brandnewdata.distribute-lock.expiration-time.env}") long expiration) {
         distributedLock = new DatabaseDistributedLock<>(dataSource, "mop_lock", "resource_digest",
-                "lock_status", "lock_version", "update_time", EXPIRATION,
+                "lock_status", "lock_version", "update_time", expiration,
                 status -> StrUtil.equals(status, StringPool.TRUE), () -> StringPool.TRUE, () -> StringPool.FALSE);
     }
 

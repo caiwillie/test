@@ -29,7 +29,9 @@ import io.camunda.zeebe.client.api.response.Process;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.List;
 
@@ -68,42 +70,66 @@ public class DeployManager {
         scheduler.start();
     }
 
-    private void scan() {
-        QueryWrapper<ProcessDeployTaskPo> query = new QueryWrapper<>();
-        query.eq(ProcessDeployTaskPo.DEPLOY_STATUS, ProcessConst.PROCESS_DEPLOY_STATUS__UNDEPLOY);
-        List<ProcessDeployTaskPo> processDeployTaskPoList = processDeployTaskDao.selectList(query);
-        if(CollUtil.isEmpty(processDeployTaskPoList)) return;
-        for (ProcessDeployTaskPo processDeployTaskPo : processDeployTaskPoList) {
-            Long envId = null;
-            String processId = null;
+    @PostConstruct
+    void test1() {
+        // scan();
+    }
+
+    protected void scan() {
+        List<ProcessDeployTaskPo> processDeployTaskPoList = null;
+        do {
+            QueryWrapper<ProcessDeployTaskPo> query = new QueryWrapper<>();
+            query.eq(ProcessDeployTaskPo.DEPLOY_STATUS, ProcessConst.PROCESS_DEPLOY_STATUS__UNDEPLOY);
+            query.last("limit 10");
+            processDeployTaskPoList = processDeployTaskDao.selectList(query);
+            if(CollUtil.isEmpty(processDeployTaskPoList)) break;
+
             Long envLockVersion = null;
             Long processEnvLockVersion = null;
-            try {
-                envId = processDeployTaskPo.getEnvId();
-                processId = processDeployTaskPo.getProcessId();
-                Assert.notNull(envId);
-                Assert.notNull(processId);
+            ProcessDeployTaskPo processDeployTaskPo = null;
+            Long envId = null;
+            String processId = null;
+            for (int i = 0; i < processDeployTaskPoList.size(); i++) {
+                try {
+                    processDeployTaskPo = processDeployTaskPoList.get(i);
+                    envId = processDeployTaskPo.getEnvId();
+                    processId = processDeployTaskPo.getProcessId();
+                    Assert.notNull(envId);
+                    Assert.notNull(processId);
 
-                // 获取环境锁
-                envLockVersion = envLock.lock(envId);
-                if(envLockVersion == null) {
-                    log.warn("env lock compete fail. {}", envId);
-                    continue;
-                }
+                    // 获取环境锁
+                    envLockVersion = envLock.lock(envId);
+                    if(envLockVersion == null) {
+                        log.warn("env lock compete fail. {}", envId);
+                        continue;
+                    }
 
-                // 获取流程锁
-                processEnvLockVersion = this.processEnvLock.lock(processId, envId);
-                if(processEnvLockVersion == null) {
-                    log.warn("process env lock compete fail. process {}, env {}", processId, envId);
-                    envLock.unlock(envId, envLockVersion);
-                    continue;
+                    // 获取流程锁
+                    processEnvLockVersion = this.processEnvLock.lock(processId, envId);
+                    if(processEnvLockVersion == null) {
+                        log.warn("process env lock compete fail. process {}, env {}", processId, envId);
+                        envLock.unlock(envId, envLockVersion);
+                        continue;
+                    }
+
+                    // 再次校验是否处于待发布状态, 如果任是待部署状态，就返回
+                    if(NumberUtil.equals(processDeployTaskDao.selectById(processDeployTaskPo.getId()).getDeployStatus(),
+                            ProcessConst.PROCESS_DEPLOY_STATUS__UNDEPLOY)) break;
+                } catch (Exception e) {
+                    log.error("get lock exception", e);
+                    break;
                 }
-            } catch (Exception e) {
-                log.error("get lock exception", e);
+            }
+
+            // 如果没有竞争到
+            if(envLockVersion == null || processEnvLockVersion == null) {
                 continue;
             }
 
             try {
+                log.info("thread group {}, name {}, envLockVersion {}, processEnvLockVersion {}, task id {}",
+                        ThreadUtil.currentThreadGroup().getName(), Thread.currentThread().getName(),
+                        envLockVersion, processEnvLockVersion, processDeployTaskPo.getId());
                 // 暂停一段时间， 控制部署速率
                 ThreadUtil.sleep(5000);
 
@@ -166,7 +192,8 @@ public class DeployManager {
                 // 释放环境锁
                 envLock.unlock(envId, envLockVersion);
             }
-        }
+
+        } while(true);
     }
 
 }
