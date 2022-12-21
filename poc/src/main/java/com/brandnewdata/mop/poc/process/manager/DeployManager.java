@@ -70,11 +70,6 @@ public class DeployManager {
         scheduler.start();
     }
 
-    @PostConstruct
-    void test1() {
-        // scan();
-    }
-
     protected void scan() {
         List<ProcessDeployTaskPo> processDeployTaskPoList = null;
         do {
