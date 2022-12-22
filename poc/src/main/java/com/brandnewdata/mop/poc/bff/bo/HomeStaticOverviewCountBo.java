@@ -1,11 +1,11 @@
-package com.brandnewdata.mop.api.bff.home.dto;
+package com.brandnewdata.mop.poc.bff.bo;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class HomeStaticOverviewCountDto {
+public class HomeStaticOverviewCountBo {
 
     /**
      * 场景集成数量-总数

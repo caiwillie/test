@@ -1,6 +1,6 @@
 package com.brandnewdata.mop.poc.bff.converter.homepage;
 
-import com.brandnewdata.mop.api.bff.home.dto.HomeSceneDto;
+import com.brandnewdata.mop.poc.bff.bo.HomeSceneBo;
 import com.brandnewdata.mop.poc.bff.vo.homepage.SceneListBriefVo;
 
 /**
@@ -8,7 +8,7 @@ import com.brandnewdata.mop.poc.bff.vo.homepage.SceneListBriefVo;
  */
 public class SceneIndexVoConverter {
 
-    public static SceneListBriefVo createForm(HomeSceneDto dto){
+    public static SceneListBriefVo createForm(HomeSceneBo dto) {
         SceneListBriefVo vo = new SceneListBriefVo();
         vo.setState(dto.getStatus());
         vo.setTotalFailDesc(dto.getProcessInstanceFailCount()+"");

@@ -1,11 +1,11 @@
-package com.brandnewdata.mop.api.bff.home.dto;
+package com.brandnewdata.mop.poc.bff.bo;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class HomeSceneDto {
+public class HomeSceneBo {
 
     /**
      * 场景名称

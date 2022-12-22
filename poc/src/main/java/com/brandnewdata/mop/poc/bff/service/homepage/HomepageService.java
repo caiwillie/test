@@ -3,9 +3,8 @@ package com.brandnewdata.mop.poc.bff.service.homepage;
 import com.brandnewdata.connector.api.IConnectorBasicInfoFeign;
 import com.brandnewdata.connector.dto.ConnectorBasicListInfoDTO;
 import com.brandnewdata.connector.dto.ConnectorCountDTO;
-import com.brandnewdata.mop.api.bff.home.IHomeApi;
-import com.brandnewdata.mop.api.bff.home.dto.HomeSceneDto;
-import com.brandnewdata.mop.api.bff.home.dto.HomeStaticOverviewCountDto;
+import com.brandnewdata.mop.poc.bff.bo.HomeSceneBo;
+import com.brandnewdata.mop.poc.bff.bo.HomeStaticOverviewCountBo;
 import com.brandnewdata.mop.poc.bff.converter.homepage.ConnectorIndexVoConverter;
 import com.brandnewdata.mop.poc.bff.converter.homepage.SceneIndexVoConverter;
 import com.brandnewdata.mop.poc.bff.vo.homepage.ConnectorIndexVo;
@@ -30,10 +29,6 @@ public class HomepageService {
     @Resource
     IConnectorBasicInfoFeign connectorBasicInfoFeign;
 
-    // @Resource
-    IHomeApi iHomeApi;
-
-
     public DataBriefVo getDataBrief() {
 
         DataBriefVo res = new DataBriefVo();
@@ -50,13 +45,13 @@ public class HomepageService {
         }
 
         try{
-            HomeStaticOverviewCountDto apiDto = iHomeApi.staticOverviewCount();
-            res.setSceneInProgress(apiDto.getSceneRunningCount());
-            res.setSceneTotal(apiDto.getSceneCount());
-            res.setWeeklyRuntimeTotal(apiDto.getProcessInstanceCount());
-            res.setWeeklyRuntimeFail(apiDto.getProcessInstanceFailCount());
-            res.setApiServiceCount(apiDto.getApiCount());
-            res.setApiPathCount(apiDto.getApiPathCount());
+            HomeStaticOverviewCountBo staticOverviewCountBo = staticOverviewCount();
+            res.setSceneInProgress(staticOverviewCountBo.getSceneRunningCount());
+            res.setSceneTotal(staticOverviewCountBo.getSceneCount());
+            res.setWeeklyRuntimeTotal(staticOverviewCountBo.getProcessInstanceCount());
+            res.setWeeklyRuntimeFail(staticOverviewCountBo.getProcessInstanceFailCount());
+            res.setApiServiceCount(staticOverviewCountBo.getApiCount());
+            res.setApiPathCount(staticOverviewCountBo.getApiPathCount());
         }catch (Exception e2){
             log.error("",e2);
             throw e2;
@@ -65,7 +60,6 @@ public class HomepageService {
 
         return res;
     }
-
 
     public List<ConnectorIndexVo> getRemoteConnectorInfo(Integer size) {
         List<ConnectorIndexVo> res = new ArrayList<>();
@@ -85,12 +79,20 @@ public class HomepageService {
         List<SceneListBriefVo> res = new ArrayList<>();
 
 
-        List<HomeSceneDto> resApi = iHomeApi.sceneList();
+        List<HomeSceneBo> resApi = sceneList();
 
         resApi.forEach(data->{
             res.add(SceneIndexVoConverter.createForm(data));
         });
 
         return res;
+    }
+
+    HomeStaticOverviewCountBo staticOverviewCount() {
+        return null;
+    }
+
+    List<HomeSceneBo> sceneList() {
+        return null;
     }
 }
