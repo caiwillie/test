@@ -4,9 +4,11 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Opt;
+import cn.hutool.core.math.MathUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
+import com.brandnewdata.common.pojo.BasePageResult;
 import com.brandnewdata.common.webresult.Result;
-import com.brandnewdata.mop.api.common.PageResult;
 import com.brandnewdata.mop.api.connector.IConnectorApi;
 import com.brandnewdata.mop.api.connector.dto.*;
 import com.brandnewdata.mop.poc.constant.ProcessConst;
@@ -189,7 +191,7 @@ public class ConnectorApi implements IConnectorApi {
     }
 
     @Override
-    public Result<PageResult<ProcessInstanceDto>> fetchSnapshotProcessInstancePage(ConnectorResource resource) {
+    public Result<BasePageResult<ProcessInstanceDto>> fetchSnapshotProcessInstancePage(ConnectorResource resource) {
         return null;
     }
 
@@ -242,14 +244,36 @@ public class ConnectorApi implements IConnectorApi {
         Map<String, ConnectorProcessDeployStatusDto> triggerDeployStatusMap = getResourceDeployStatusMap(triggerList, envIdList);
         Map<String, ConnectorProcessDeployStatusDto> operateDeployStatusMap = getResourceDeployStatusMap(operateList, envIdList);
 
-        int status = 0;
-        int total = 0;
-        int success = 0;
+        int status = 1;
+        int totalCount = 0;
+        int successCount = 0;
+        List<String> errorMessages = new ArrayList<>();
         Collection<ConnectorProcessDeployStatusDto> allStatus = CollUtil.toCollection(triggerDeployStatusMap.values());
         allStatus.addAll(operateDeployStatusMap.values());
 
+        for (ConnectorProcessDeployStatusDto statusDto : allStatus) {
+            int _status = statusDto.getStatus();
+            if(NumberUtil.equals(_status, ProcessConst.PROCESS_DEPLOY_STATUS__EXCEPTION)) {
+                status = _status;
+
+                Map<String, String> _errorMessageMap = statusDto.getErrorMessageMap();
+                _errorMessageMap.forEach((envName, message) -> {
+                    errorMessages.add(StrUtil.format("{}: {}", envName, message));
+                });
+            } else if (NumberUtil.equals(status, ProcessConst.PROCESS_DEPLOY_STATUS__DEPLOYED)) {
+                status = _status;
+            }
+
+            totalCount++;
+            if(NumberUtil.equals(_status, ProcessConst.PROCESS_DEPLOY_STATUS__DEPLOYED)) {
+                successCount++;
+            }
+        }
 
         ConnectorDeployProgressDto ret = new ConnectorDeployProgressDto();
+        ret.setStatus(status);
+        ret.setErrorMessage(StrUtil.join("; ", errorMessages));
+        ret.setProgressPercentage(NumberUtil.div(totalCount, successCount, 2));
         ret.setTriggerDeployStatusMap(triggerDeployStatusMap);
         ret.setOperateDeployStatusMap(operateDeployStatusMap);
         return ret;

@@ -1,8 +1,8 @@
 package com.brandnewdata.mop.api.connector;
 
 
+import com.brandnewdata.common.pojo.BasePageResult;
 import com.brandnewdata.common.webresult.Result;
-import com.brandnewdata.mop.api.common.PageResult;
 import com.brandnewdata.mop.api.connector.dto.*;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -66,7 +66,7 @@ public interface IConnectorApi {
      * @param resource the resource
      */
     @RequestMapping("/api/connector/fetchSnapshotProcessInstancePage")
-    Result<PageResult<ProcessInstanceDto>> fetchSnapshotProcessInstancePage(@RequestBody ConnectorResource resource);
+    Result<BasePageResult<ProcessInstanceDto>> fetchSnapshotProcessInstancePage(@RequestBody ConnectorResource resource);
 
     /**
      * 获取调试部署的流程定义
