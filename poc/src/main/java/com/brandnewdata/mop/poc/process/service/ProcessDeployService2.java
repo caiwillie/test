@@ -224,7 +224,7 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
     @Override
     public Map<String, DeployStatusDto> fetchDeployStatus(List<String> processIdList, Long envId) {
         if(CollUtil.isEmpty(processIdList)) return MapUtil.empty();
-        Assert.isTrue(CollUtil.hasNull(processIdList), "process id must not null");
+        Assert.isFalse(CollUtil.hasNull(processIdList), "process id must not null");
         Assert.notNull(envId);
 
         QueryWrapper<ProcessDeployTaskPo> query = new QueryWrapper<>();
