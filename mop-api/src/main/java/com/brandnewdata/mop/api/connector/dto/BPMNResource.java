@@ -2,6 +2,8 @@ package com.brandnewdata.mop.api.connector.dto;
 
 import lombok.Data;
 
+import java.util.Map;
+
 /**
  * 流程资源实体
  */
@@ -22,4 +24,9 @@ public class BPMNResource {
      * 流程XML
      */
     private String editorXML;
+
+    /**
+     * 流程变量
+     */
+    private Map<String, Object> variables;
 }
