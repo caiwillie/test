@@ -72,10 +72,10 @@ public interface IConnectorApi {
     /**
      * 获取调试部署的流程定义
      *
-     * @param snapDeployId the snap deploy id
+     * @param snapshotDeployId the snap deploy id
      */
     @RequestMapping("/api/connector/fetchSnapshotProcessDefinition")
-    Result<ProcessDefinitionDto> fetchSnapshotProcessDefinition(@RequestParam Long snapDeployId);
+    Result<String> fetchSnapshotProcessDefinition(@RequestParam Long snapshotDeployId);
 
     /**
      * 触发新的调试
@@ -83,6 +83,6 @@ public interface IConnectorApi {
      * @param resource the resource
      */
     @RequestMapping("/api/connector/startSnapshotProcessInstance")
-    Result fetchSnapshotProcessDefinition(@RequestBody BPMNResource resource);
+    Result startSnapshotProcessInstance(@RequestBody BPMNResource resource);
 
 }

@@ -4,12 +4,14 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Opt;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.common.pojo.BasePageResult;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.api.connector.IConnectorApi;
 import com.brandnewdata.mop.api.connector.dto.*;
+import com.brandnewdata.mop.poc.bff.converter.process.ProcessDefinitionVoConverter;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.connector.converter.ProcessInstanceDtoConverter;
 import com.brandnewdata.mop.poc.constant.ProcessConst;
@@ -243,13 +245,23 @@ public class ConnectorApi implements IConnectorApi {
     }
 
     @Override
-    public Result<ProcessDefinitionDto> fetchSnapshotProcessDefinition(Long snapDeployId) {
-        return null;
+    public Result<String> fetchSnapshotProcessDefinition(Long snapshotDeployId) {
+
+        Assert.notNull(snapshotDeployId, "部署id不能为空");
+        ProcessSnapshotDeployDto processSnapshotDeployDto =
+                processDeployService.listSnapshotById(ListUtil.of(snapshotDeployId)).get(snapshotDeployId);
+        Assert.notNull(processSnapshotDeployDto, "部署id不存在: {}", snapshotDeployId);
+
+        // 获取流程定义
+        return Result.OK(processSnapshotDeployDto.getProcessXml());
     }
 
     @Override
-    public Result fetchSnapshotProcessDefinition(BPMNResource resource) {
-        return null;
+    public Result startSnapshotProcessInstance(BPMNResource resource) {
+        Long envId = envService.fetchDebugEnv().getId();
+        String processId = ProcessUtil.convertProcessId(resource.getModelKey());
+        processDeployService.startAsync(processId, Opt.ofNullable(resource.getVariables()).orElse(MapUtil.empty()), envId);
+        return Result.OK();
     }
 
     private void checkConnectorResource(ConnectorResource resource) {
