@@ -6,11 +6,9 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Opt;
 import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.common.webresult.Result;
+import com.brandnewdata.mop.api.common.PageResult;
 import com.brandnewdata.mop.api.connector.IConnectorApi;
-import com.brandnewdata.mop.api.connector.dto.BPMNResource;
-import com.brandnewdata.mop.api.connector.dto.ConnectorDeployProgressDto;
-import com.brandnewdata.mop.api.connector.dto.ConnectorProcessDeployStatusDto;
-import com.brandnewdata.mop.api.connector.dto.ConnectorResource;
+import com.brandnewdata.mop.api.connector.dto.*;
 import com.brandnewdata.mop.poc.constant.ProcessConst;
 import com.brandnewdata.mop.poc.env.dto.EnvDto;
 import com.brandnewdata.mop.poc.env.service.IEnvService;
@@ -190,6 +188,21 @@ public class ConnectorApi implements IConnectorApi {
         return Result.OK(connectorDeployProgressDto);
     }
 
+    @Override
+    public Result<PageResult<ProcessInstanceDto>> fetchSnapshotProcessInstancePage(ConnectorResource resource) {
+        return null;
+    }
+
+    @Override
+    public Result<ProcessDefinitionDto> fetchSnapshotProcessDefinition(Long snapDeployId) {
+        return null;
+    }
+
+    @Override
+    public Result fetchSnapshotProcessDefinition(BPMNResource resource) {
+        return null;
+    }
+
     private void checkConnectorResource(ConnectorResource resource) {
         Assert.notNull(resource, "连接器资源为空");
 
@@ -256,9 +269,10 @@ public class ConnectorApi implements IConnectorApi {
 
                     // 记录异常结果
                     EnvDto envDto = envService.fetchOne(envId);
-                    Map<String, String> messageMap = Opt.ofNullable(connectorProcessDeployStatusDto.getMessageMap()).orElse(new LinkedHashMap<>());
+                    Map<String, String> messageMap =
+                            Opt.ofNullable(connectorProcessDeployStatusDto.getErrorMessageMap()).orElse(new LinkedHashMap<>());
                     messageMap.put(envDto.getName(), _deployStatusDto.getMessage());
-                    connectorProcessDeployStatusDto.setMessageMap(messageMap);
+                    connectorProcessDeployStatusDto.setErrorMessageMap(messageMap);
                 } else if (Opt.ofNullable(connectorProcessDeployStatusDto.getStatus()).orElse(1) == 1) { // 默认赋值为 1
                     // 如果之前是成功部署的，则当前环境状态可以直接覆盖总状态
                     connectorProcessDeployStatusDto.setStatus(_deployStatusDto.getStatus());

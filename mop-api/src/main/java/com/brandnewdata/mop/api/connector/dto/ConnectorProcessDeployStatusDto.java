@@ -9,7 +9,13 @@ import java.util.Map;
 @Setter
 public class ConnectorProcessDeployStatusDto {
 
+    /**
+     * 0 待部署，1 部署成功，2 部署异常
+     */
     private int status;
 
-    private Map<String, String> messageMap;
+    /**
+     *
+     */
+    private Map<String, String> errorMessageMap;
 }

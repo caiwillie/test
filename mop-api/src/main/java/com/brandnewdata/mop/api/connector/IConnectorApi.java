@@ -1,9 +1,9 @@
 package com.brandnewdata.mop.api.connector;
 
+
 import com.brandnewdata.common.webresult.Result;
-import com.brandnewdata.mop.api.connector.dto.BPMNResource;
-import com.brandnewdata.mop.api.connector.dto.ConnectorDeployProgressDto;
-import com.brandnewdata.mop.api.connector.dto.ConnectorResource;
+import com.brandnewdata.mop.api.common.PageResult;
+import com.brandnewdata.mop.api.connector.dto.*;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -66,7 +66,7 @@ public interface IConnectorApi {
      * @param resource the resource
      */
     @RequestMapping("/api/connector/fetchSnapshotProcessInstancePage")
-    void fetchSnapshotProcessInstancePage(@RequestBody ConnectorResource resource);
+    Result<PageResult<ProcessInstanceDto>> fetchSnapshotProcessInstancePage(@RequestBody ConnectorResource resource);
 
     /**
      * 获取调试部署的流程定义
@@ -74,7 +74,7 @@ public interface IConnectorApi {
      * @param snapDeployId the snap deploy id
      */
     @RequestMapping("/api/connector/fetchSnapshotProcessDefinition")
-    void fetchSnapshotProcessDefinition(@RequestParam Long snapDeployId);
+    Result<ProcessDefinitionDto> fetchSnapshotProcessDefinition(@RequestParam Long snapDeployId);
 
     /**
      * 触发新的调试
@@ -82,6 +82,6 @@ public interface IConnectorApi {
      * @param resource the resource
      */
     @RequestMapping("/api/connector/startSnapshotProcessInstance")
-    void fetchSnapshotProcessDefinition(@RequestBody BPMNResource resource);
+    Result fetchSnapshotProcessDefinition(@RequestBody BPMNResource resource);
 
 }
