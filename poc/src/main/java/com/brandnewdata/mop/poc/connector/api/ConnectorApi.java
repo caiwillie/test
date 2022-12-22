@@ -273,14 +273,13 @@ public class ConnectorApi implements IConnectorApi {
     }
 
     private List<EnvDto> getEnvDtoList(boolean isDebug) {
-        List<EnvDto> envDtoList = envService.fetchEnvList();
-        List<Long> envIdList = new ArrayList<>();
-        envDtoList.forEach(envDto -> envIdList.add(envDto.getId()));
-
-        if(isDebug) {
-            EnvDto debugEnvDto = envService.fetchDebugEnv();
-            envIdList.add(debugEnvDto.getId());
+        List<EnvDto> envDtoList = new ArrayList<>();
+        if(!isDebug) {
+            envDtoList.addAll(envService.fetchEnvList());
         }
+
+        EnvDto debugEnvDto = envService.fetchDebugEnv();
+        envDtoList.add(debugEnvDto);
         return envDtoList;
     }
 
@@ -306,7 +305,7 @@ public class ConnectorApi implements IConnectorApi {
         int totalCount = 0;
         int successCount = 0;
         List<String> errorMessages = new ArrayList<>();
-        Collection<ConnectorProcessDeployStatusDto> allStatus = CollUtil.toCollection(triggerDeployStatusMap.values());
+        List<ConnectorProcessDeployStatusDto> allStatus = CollUtil.newArrayList(triggerDeployStatusMap.values());
         allStatus.addAll(operateDeployStatusMap.values());
 
         for (ConnectorProcessDeployStatusDto statusDto : allStatus) {
@@ -331,7 +330,7 @@ public class ConnectorApi implements IConnectorApi {
         ConnectorDeployProgressDto ret = new ConnectorDeployProgressDto();
         ret.setStatus(status);
         ret.setErrorMessage(StrUtil.join("; ", errorMessages));
-        ret.setProgressPercentage(NumberUtil.div(totalCount, successCount, 2));
+        ret.setProgressPercentage(NumberUtil.div(100 * successCount, totalCount, 2));
         ret.setTriggerDeployStatusMap(triggerDeployStatusMap);
         ret.setOperateDeployStatusMap(operateDeployStatusMap);
         return ret;
@@ -341,6 +340,8 @@ public class ConnectorApi implements IConnectorApi {
 
         Map<String, String> triggerProcessIdMap = Opt.ofNullable(resourceList).orElse(ListUtil.empty()).stream()
                 .map(BPMNResource::getModelKey).collect(Collectors.toMap(ProcessUtil::convertProcessId, Function.identity()));
+
+        if(CollUtil.isEmpty(triggerProcessIdMap)) return MapUtil.empty();
 
         Map<String, ConnectorProcessDeployStatusDto> resourceDeployStatusMap = new HashMap<>();
 
@@ -354,7 +355,8 @@ public class ConnectorApi implements IConnectorApi {
                 DeployStatusDto _deployStatusDto = entry.getValue();
                 String _modelKey = triggerProcessIdMap.get(processId);
                 ConnectorProcessDeployStatusDto connectorProcessDeployStatusDto =
-                        resourceDeployStatusMap.computeIfAbsent(_modelKey, key -> new ConnectorProcessDeployStatusDto());
+                        resourceDeployStatusMap.computeIfAbsent(_modelKey, key -> new ConnectorProcessDeployStatusDto(1, new HashMap<>()));
+
                 if(_deployStatusDto.getStatus() == ProcessConst.PROCESS_DEPLOY_STATUS__EXCEPTION) {
                     // 如果当前部署是失败，则不管之前是什么状态，都修改为失败
                     connectorProcessDeployStatusDto.setStatus(_deployStatusDto.getStatus());
@@ -365,7 +367,7 @@ public class ConnectorApi implements IConnectorApi {
                             Opt.ofNullable(connectorProcessDeployStatusDto.getErrorMessageMap()).orElse(new LinkedHashMap<>());
                     messageMap.put(envDto.getName(), _deployStatusDto.getMessage());
                     connectorProcessDeployStatusDto.setErrorMessageMap(messageMap);
-                } else if (Opt.ofNullable(connectorProcessDeployStatusDto.getStatus()).orElse(1) == 1) { // 默认赋值为 1
+                } else if (connectorProcessDeployStatusDto.getStatus() == 1) { // 默认赋值为 1
                     // 如果之前是成功部署的，则当前环境状态可以直接覆盖总状态
                     connectorProcessDeployStatusDto.setStatus(_deployStatusDto.getStatus());
                 }

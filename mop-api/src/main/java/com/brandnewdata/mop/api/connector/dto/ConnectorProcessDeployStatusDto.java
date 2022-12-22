@@ -18,4 +18,9 @@ public class ConnectorProcessDeployStatusDto {
      *
      */
     private Map<String, String> errorMessageMap;
+
+    public ConnectorProcessDeployStatusDto(int status, Map<String, String> errorMessageMap) {
+        this.status = status;
+        this.errorMessageMap = errorMessageMap;
+    }
 }
