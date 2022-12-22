@@ -242,6 +242,13 @@ public class ConnectorApi implements IConnectorApi {
         Map<String, ConnectorProcessDeployStatusDto> triggerDeployStatusMap = getResourceDeployStatusMap(triggerList, envIdList);
         Map<String, ConnectorProcessDeployStatusDto> operateDeployStatusMap = getResourceDeployStatusMap(operateList, envIdList);
 
+        int status = 0;
+        int total = 0;
+        int success = 0;
+        Collection<ConnectorProcessDeployStatusDto> allStatus = CollUtil.toCollection(triggerDeployStatusMap.values());
+        allStatus.addAll(operateDeployStatusMap.values());
+
+
         ConnectorDeployProgressDto ret = new ConnectorDeployProgressDto();
         ret.setTriggerDeployStatusMap(triggerDeployStatusMap);
         ret.setOperateDeployStatusMap(operateDeployStatusMap);
@@ -256,7 +263,10 @@ public class ConnectorApi implements IConnectorApi {
         Map<String, ConnectorProcessDeployStatusDto> resourceDeployStatusMap = new HashMap<>();
 
         for (Long envId : Opt.ofNullable(envIdList).orElse(ListUtil.empty())) {
-            Map<String, DeployStatusDto> deployStatusDtoMap = processDeployService2.fetchDeployStatus(ListUtil.toList(triggerProcessIdMap.keySet()), envId);
+            Map<String, DeployStatusDto> deployStatusDtoMap =
+                    processDeployService2.fetchDeployStatus(ListUtil.toList(triggerProcessIdMap.keySet()), envId);
+            Assert.isTrue(deployStatusDtoMap.size() == resourceList.size(), "资源尚未部署，无法查询状态");
+
             for (Map.Entry<String, DeployStatusDto> entry : deployStatusDtoMap.entrySet()) {
                 String processId = entry.getKey();
                 DeployStatusDto _deployStatusDto = entry.getValue();

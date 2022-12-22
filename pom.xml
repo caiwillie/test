@@ -226,18 +226,7 @@
                     </executions>
                 </plugin>
 
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <version>${plugin.java.source.version}</version>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>jar</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
+
             </plugins>
         </pluginManagement>
     </build>
