@@ -3,7 +3,6 @@ package com.brandnewdata.mop.poc.connector.converter;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Opt;
 import com.brandnewdata.mop.api.connector.dto.ProcessInstanceDto;
-import com.brandnewdata.mop.poc.bff.vo.scene.DebugProcessInstanceVo;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.process.dto.ProcessSnapshotDeployDto;
 

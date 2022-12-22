@@ -8,7 +8,6 @@ import com.caiwillie.util.lock.DatabaseDistributedLock;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.util.Date;
 import java.util.HashMap;
