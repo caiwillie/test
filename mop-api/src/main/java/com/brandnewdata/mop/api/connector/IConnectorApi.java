@@ -63,10 +63,11 @@ public interface IConnectorApi {
     /**
      * 获取调试记录
      *
-     * @param resource the resource
+     * @param queryDto the query dto
+     * @return the result
      */
     @RequestMapping("/api/connector/fetchSnapshotProcessInstancePage")
-    Result<BasePageResult<ProcessInstanceDto>> fetchSnapshotProcessInstancePage(@RequestBody ConnectorResource resource);
+    Result<BasePageResult<ProcessInstanceDto>> fetchSnapshotProcessInstancePage(@RequestBody ProcessInstanceQueryDto queryDto);
 
     /**
      * 获取调试部署的流程定义

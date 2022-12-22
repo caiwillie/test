@@ -4,18 +4,22 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Opt;
-import cn.hutool.core.math.MathUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.common.pojo.BasePageResult;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.api.connector.IConnectorApi;
 import com.brandnewdata.mop.api.connector.dto.*;
+import com.brandnewdata.mop.poc.common.dto.Page;
+import com.brandnewdata.mop.poc.connector.converter.ProcessInstanceDtoConverter;
 import com.brandnewdata.mop.poc.constant.ProcessConst;
 import com.brandnewdata.mop.poc.env.dto.EnvDto;
 import com.brandnewdata.mop.poc.env.service.IEnvService;
+import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
+import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService2;
 import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
 import com.brandnewdata.mop.poc.process.dto.DeployStatusDto;
+import com.brandnewdata.mop.poc.process.dto.ProcessSnapshotDeployDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
 import com.brandnewdata.mop.poc.process.util.ProcessUtil;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,12 +34,16 @@ public class ConnectorApi implements IConnectorApi {
 
     private final IEnvService envService;
 
-    private final IProcessDeployService2 processDeployService2;
+    private final IProcessDeployService2 processDeployService;
+
+    private final IProcessInstanceService2 processInstanceService;
 
     public ConnectorApi(IEnvService envService,
-                        IProcessDeployService2 processDeployService2) {
+                        IProcessDeployService2 processDeployService,
+                        IProcessInstanceService2 processInstanceService) {
         this.envService = envService;
-        this.processDeployService2 = processDeployService2;
+        this.processDeployService = processDeployService;
+        this.processInstanceService = processInstanceService;
     }
 
     @Override
@@ -62,7 +70,7 @@ public class ConnectorApi implements IConnectorApi {
                     bpmnXmlDto.setProcessId(ProcessUtil.convertProcessId(trigger.getModelKey()));
                     bpmnXmlDto.setProcessName(StrUtil.format("【触发器】{}", trigger.getName()));
                     bpmnXmlDto.setProcessXml(trigger.getEditorXML());
-                    processDeployService2.releaseDeploy(bpmnXmlDto, envIdList, ProcessConst.PROCESS_BIZ_TYPE__TRIGGER);
+                    processDeployService.releaseDeploy(bpmnXmlDto, envIdList, ProcessConst.PROCESS_BIZ_TYPE__TRIGGER);
                 } catch (Exception e) {
                     throw new RuntimeException(StrUtil.format("【触发器】{} 部署异常: {}", trigger.getName(), e.getMessage()));
                 }
@@ -78,7 +86,7 @@ public class ConnectorApi implements IConnectorApi {
                     bpmnXmlDto.setProcessId(ProcessUtil.convertProcessId(operate.getModelKey()));
                     bpmnXmlDto.setProcessName(StrUtil.format("【操作】{}", operate.getName()));
                     bpmnXmlDto.setProcessXml(operate.getEditorXML());
-                    processDeployService2.releaseDeploy(bpmnXmlDto, envIdList, ProcessConst.PROCESS_BIZ_TYPE__OPERATE);
+                    processDeployService.releaseDeploy(bpmnXmlDto, envIdList, ProcessConst.PROCESS_BIZ_TYPE__OPERATE);
                 } catch (Exception e) {
                     throw new RuntimeException(StrUtil.format("【操作】{} 部署异常: {}", operate.getName(), e.getMessage()));
                 }
@@ -103,7 +111,7 @@ public class ConnectorApi implements IConnectorApi {
             for (Long envId : envIdList) {
                 try {
                     BpmnXmlDto bpmnXmlDto = getBpmnXmlDto(trigger, true);
-                    processDeployService2.snapshotDeploy2(bpmnXmlDto, envId, ProcessConst.PROCESS_BIZ_TYPE__TRIGGER);
+                    processDeployService.snapshotDeploy2(bpmnXmlDto, envId, ProcessConst.PROCESS_BIZ_TYPE__TRIGGER);
                 } catch (Exception e) {
                     throw new RuntimeException(StrUtil.format("【触发器】{} 部署异常: {}", trigger.getName(), e.getMessage()));
                 }
@@ -115,7 +123,7 @@ public class ConnectorApi implements IConnectorApi {
             for (Long envId : envIdList) {
                 try {
                     BpmnXmlDto bpmnXmlDto = getBpmnXmlDto(operate, false);
-                    processDeployService2.snapshotDeploy2(bpmnXmlDto, envId, ProcessConst.PROCESS_BIZ_TYPE__OPERATE);
+                    processDeployService.snapshotDeploy2(bpmnXmlDto, envId, ProcessConst.PROCESS_BIZ_TYPE__OPERATE);
                 } catch (Exception e) {
                     throw new RuntimeException(StrUtil.format("【操作】{} 部署异常: {}", operate.getName(), e.getMessage()));
                 }
@@ -140,7 +148,7 @@ public class ConnectorApi implements IConnectorApi {
             for (Long envId : envIdList) {
                 try {
                     BpmnXmlDto bpmnXmlDto = getBpmnXmlDto(trigger, true);
-                    processDeployService2.releaseDeploy2(bpmnXmlDto, envId, ProcessConst.PROCESS_BIZ_TYPE__TRIGGER);
+                    processDeployService.releaseDeploy2(bpmnXmlDto, envId, ProcessConst.PROCESS_BIZ_TYPE__TRIGGER);
                 } catch (Exception e) {
                     throw new RuntimeException(StrUtil.format("【触发器】{} 部署异常: {}", trigger.getName(), e.getMessage()));
                 }
@@ -152,7 +160,7 @@ public class ConnectorApi implements IConnectorApi {
             for (Long envId : envIdList) {
                 try {
                     BpmnXmlDto bpmnXmlDto = getBpmnXmlDto(operate, false);
-                    processDeployService2.releaseDeploy2(bpmnXmlDto, envId, ProcessConst.PROCESS_BIZ_TYPE__OPERATE);
+                    processDeployService.releaseDeploy2(bpmnXmlDto, envId, ProcessConst.PROCESS_BIZ_TYPE__OPERATE);
                 } catch (Exception e) {
                     throw new RuntimeException(StrUtil.format("【操作】{} 部署异常: {}", operate.getName(), e.getMessage()));
                 }
@@ -191,8 +199,47 @@ public class ConnectorApi implements IConnectorApi {
     }
 
     @Override
-    public Result<BasePageResult<ProcessInstanceDto>> fetchSnapshotProcessInstancePage(ConnectorResource resource) {
-        return null;
+    public Result<BasePageResult<ProcessInstanceDto>> fetchSnapshotProcessInstancePage(ProcessInstanceQueryDto queryDto) {
+        BasePageResult<ProcessInstanceDto> ret = new BasePageResult<>();
+        List<String> modelKeyList = queryDto.getModelKeyList();
+        if(CollUtil.isEmpty(modelKeyList)) return Result.OK(ret);
+
+        int pageNum = queryDto.getPageNum();
+        int pageSize = queryDto.getPageSize();
+        Assert.notNull(pageNum);
+        Assert.notNull(pageSize);
+        Assert.isFalse(CollUtil.hasNull(modelKeyList));
+
+        Long envId = envService.fetchDebugEnv().getId();
+        Map<String, String> processIdMap = modelKeyList.stream().collect(Collectors.toMap(ProcessUtil::convertProcessId, Function.identity()));
+
+        // 获取流程定义
+        Map<String, List<ProcessSnapshotDeployDto>> snapshotDeployMap =
+                processDeployService.listSnapshotByEnvIdAndProcessId(envId, ListUtil.toList(processIdMap.keySet()));
+        Map<Long, ProcessSnapshotDeployDto> processSnapshotDeployDtoMap = snapshotDeployMap.values().stream()
+                .flatMap(Collection::stream).collect(Collectors.toMap(ProcessSnapshotDeployDto::getProcessZeebeKey, Function.identity()));
+
+        // 根据流程定义去查询流程实例
+        Page<ListViewProcessInstanceDto> page =
+                processInstanceService.pageProcessInstanceByZeebeKey(
+                        envId, ListUtil.toList(processSnapshotDeployDtoMap.keySet()), pageNum, pageSize, new HashMap<>());
+
+        List<ProcessInstanceDto> dtoList = new ArrayList<>();
+        for (ListViewProcessInstanceDto listViewProcessInstanceDto : page.getRecords()) {
+            ProcessInstanceDto processInstanceDto = ProcessInstanceDtoConverter.createFrom(listViewProcessInstanceDto);
+            Long zeebeKey = listViewProcessInstanceDto.getProcessId();
+            String processId = listViewProcessInstanceDto.getBpmnProcessId();
+            String modelKey = processIdMap.get(processId);
+            // 连接器这边需要将 process id 转换为 model key
+            processInstanceDto.setProcessId(modelKey);
+            ProcessSnapshotDeployDto processSnapshotDeployDto = processSnapshotDeployDtoMap.get(zeebeKey);
+            ProcessInstanceDtoConverter.updateFrom(processInstanceDto, processSnapshotDeployDto);
+            dtoList.add(processInstanceDto);
+        }
+
+        ret.setTotal(page.getTotal());
+        ret.setRecords(dtoList);
+        return Result.OK(ret);
     }
 
     @Override
@@ -288,7 +335,7 @@ public class ConnectorApi implements IConnectorApi {
 
         for (Long envId : Opt.ofNullable(envIdList).orElse(ListUtil.empty())) {
             Map<String, DeployStatusDto> deployStatusDtoMap =
-                    processDeployService2.fetchDeployStatus(ListUtil.toList(triggerProcessIdMap.keySet()), envId);
+                    processDeployService.fetchDeployStatus(ListUtil.toList(triggerProcessIdMap.keySet()), envId);
             Assert.isTrue(deployStatusDtoMap.size() == resourceList.size(), "资源尚未部署，无法查询状态");
 
             for (Map.Entry<String, DeployStatusDto> entry : deployStatusDtoMap.entrySet()) {
