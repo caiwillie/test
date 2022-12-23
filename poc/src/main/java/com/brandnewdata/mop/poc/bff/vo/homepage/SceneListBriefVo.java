@@ -20,10 +20,11 @@ public class SceneListBriefVo {
      * *场景版本描述
      * */
     private String versionDesc;
+
     /**
      * *场景状态
      * */
-    private String state;
+    private Integer state;
 
 
     private String updateTime;

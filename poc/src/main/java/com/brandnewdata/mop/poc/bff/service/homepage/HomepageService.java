@@ -1,11 +1,14 @@
 package com.brandnewdata.mop.poc.bff.service.homepage;
 
+import cn.hutool.core.collection.CollUtil;
 import com.brandnewdata.connector.api.IConnectorBasicInfoFeign;
 import com.brandnewdata.connector.dto.ConnectorBasicListInfoDTO;
 import com.brandnewdata.connector.dto.ConnectorCountDTO;
 import com.brandnewdata.mop.poc.bff.bo.HomeApiStatisticCountBo;
+import com.brandnewdata.mop.poc.bff.bo.HomeSceneBo;
 import com.brandnewdata.mop.poc.bff.bo.HomeSceneStatisticCountBo;
 import com.brandnewdata.mop.poc.bff.converter.homepage.ConnectorIndexVoConverter;
+import com.brandnewdata.mop.poc.bff.converter.homepage.SceneIndexVoConverter;
 import com.brandnewdata.mop.poc.bff.vo.homepage.ConnectorIndexVo;
 import com.brandnewdata.mop.poc.bff.vo.homepage.DataBriefVo;
 import com.brandnewdata.mop.poc.bff.vo.homepage.SceneListBriefVo;
@@ -96,16 +99,13 @@ public class HomepageService {
         List<SceneListBriefVo> res = new ArrayList<>();
 
 
-        /*
-        List<HomeSceneBo> resApi = sceneList();
+        List<HomeSceneBo> homeSceneBoList = homeSceneStatisticService.sceneList();
 
-        if(!CollectionUtils.isEmpty(resApi)){
-            resApi.forEach(data->{
+        if(CollUtil.isNotEmpty(homeSceneBoList)){
+            homeSceneBoList.forEach(data->{
                 res.add(SceneIndexVoConverter.createForm(data));
             });
         }
-        */
-
 
         return res;
     }

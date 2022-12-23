@@ -15,7 +15,7 @@ public class HomeSceneBo {
     /**
      * 场景状态
      */
-    private String status;
+    private Integer status;
 
     /**
      * 版本
