@@ -3,10 +3,9 @@ package com.brandnewdata.mop.poc.bff.service.homepage;
 import com.brandnewdata.connector.api.IConnectorBasicInfoFeign;
 import com.brandnewdata.connector.dto.ConnectorBasicListInfoDTO;
 import com.brandnewdata.connector.dto.ConnectorCountDTO;
-import com.brandnewdata.mop.poc.bff.bo.HomeSceneBo;
-import com.brandnewdata.mop.poc.bff.bo.HomeStaticOverviewCountBo;
+import com.brandnewdata.mop.poc.bff.bo.HomeApiStatisticCountBo;
+import com.brandnewdata.mop.poc.bff.bo.HomeSceneStatisticCountBo;
 import com.brandnewdata.mop.poc.bff.converter.homepage.ConnectorIndexVoConverter;
-import com.brandnewdata.mop.poc.bff.converter.homepage.SceneIndexVoConverter;
 import com.brandnewdata.mop.poc.bff.vo.homepage.ConnectorIndexVo;
 import com.brandnewdata.mop.poc.bff.vo.homepage.DataBriefVo;
 import com.brandnewdata.mop.poc.bff.vo.homepage.SceneListBriefVo;
@@ -55,18 +54,22 @@ public class HomepageService {
         }
 
         try{
-            HomeStaticOverviewCountBo staticOverviewCountBo = staticOverviewCount();
+            HomeSceneStatisticCountBo homeSceneStatisticCountBo = homeSceneStatisticService.statisticCount();
 
-            if(null!= staticOverviewCountBo){
-                res.setSceneInProgress(staticOverviewCountBo.getSceneRunningCount());
-                res.setSceneTotal(staticOverviewCountBo.getSceneCount());
-                res.setWeeklyRuntimeTotal(staticOverviewCountBo.getProcessInstanceCount());
-                res.setWeeklyRuntimeFail(staticOverviewCountBo.getProcessInstanceFailCount());
-                res.setApiServiceCount(staticOverviewCountBo.getApiCount());
-                res.setApiPathCount(staticOverviewCountBo.getApiPathCount());
+            if(homeSceneStatisticCountBo != null){
+                res.setSceneInProgress(homeSceneStatisticCountBo.getSceneRunningCount());
+                res.setSceneTotal(homeSceneStatisticCountBo.getSceneCount());
+                res.setWeeklyRuntimeTotal(homeSceneStatisticCountBo.getProcessInstanceCount());
+                res.setWeeklyRuntimeFail(homeSceneStatisticCountBo.getProcessInstanceFailCount());
             }
 
-        }catch (Exception e2){
+            HomeApiStatisticCountBo homeApiStatisticCountBo = homeApiStatisticService.statisticCount();
+            if(homeApiStatisticCountBo != null) {
+                res.setApiServiceCount(homeApiStatisticCountBo.getApiCount());
+                res.setApiPathCount(homeApiStatisticCountBo.getApiPathCount());
+            }
+
+        }catch (Exception e2) {
             log.error("",e2);
             throw e2;
         }
@@ -93,6 +96,7 @@ public class HomepageService {
         List<SceneListBriefVo> res = new ArrayList<>();
 
 
+        /*
         List<HomeSceneBo> resApi = sceneList();
 
         if(!CollectionUtils.isEmpty(resApi)){
@@ -100,6 +104,7 @@ public class HomepageService {
                 res.add(SceneIndexVoConverter.createForm(data));
             });
         }
+        */
 
 
         return res;
