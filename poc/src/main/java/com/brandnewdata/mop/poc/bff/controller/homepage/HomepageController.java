@@ -24,6 +24,11 @@ public class HomepageController {
     @Resource
     HomepageService homepageService;
 
+    /**
+     * Data info result.
+     *
+     * @return the result
+     */
     @GetMapping("/statistic/info")
     public Result<DataBriefVo> dataInfo() {
 //        DataBriefVo datum = new DataBriefVo(1,2,3,4,5,6,7,8);
@@ -32,6 +37,11 @@ public class HomepageController {
         return Result.OK(homepageService.getDataBrief());
     }
 
+    /**
+     * Scene info result.
+     *
+     * @return the result
+     */
     @GetMapping("/list/scene")
     public Result<List<SceneListBriefVo>> sceneInfo() {
 //        List<SceneListBriefVo> res = new ArrayList<>();
@@ -42,6 +52,12 @@ public class HomepageController {
         return Result.OK(homepageService.getRemoteSceneInfo());
     }
 
+    /**
+     * Connector info result.
+     *
+     * @param size the size
+     * @return the result
+     */
     @GetMapping("/list/connector")
     public Result<List<ConnectorIndexVo>> connectorInfo(Integer size) {
 //        List<ConnectorIndexVo> res = new ArrayList<>();
