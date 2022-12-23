@@ -12,6 +12,7 @@ import com.brandnewdata.mop.poc.bff.vo.homepage.DataBriefVo;
 import com.brandnewdata.mop.poc.bff.vo.homepage.SceneListBriefVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -46,12 +47,16 @@ public class HomepageService {
 
         try{
             HomeStaticOverviewCountBo staticOverviewCountBo = staticOverviewCount();
-            res.setSceneInProgress(staticOverviewCountBo.getSceneRunningCount());
-            res.setSceneTotal(staticOverviewCountBo.getSceneCount());
-            res.setWeeklyRuntimeTotal(staticOverviewCountBo.getProcessInstanceCount());
-            res.setWeeklyRuntimeFail(staticOverviewCountBo.getProcessInstanceFailCount());
-            res.setApiServiceCount(staticOverviewCountBo.getApiCount());
-            res.setApiPathCount(staticOverviewCountBo.getApiPathCount());
+
+            if(null!= staticOverviewCountBo){
+                res.setSceneInProgress(staticOverviewCountBo.getSceneRunningCount());
+                res.setSceneTotal(staticOverviewCountBo.getSceneCount());
+                res.setWeeklyRuntimeTotal(staticOverviewCountBo.getProcessInstanceCount());
+                res.setWeeklyRuntimeFail(staticOverviewCountBo.getProcessInstanceFailCount());
+                res.setApiServiceCount(staticOverviewCountBo.getApiCount());
+                res.setApiPathCount(staticOverviewCountBo.getApiPathCount());
+            }
+
         }catch (Exception e2){
             log.error("",e2);
             throw e2;
@@ -81,9 +86,12 @@ public class HomepageService {
 
         List<HomeSceneBo> resApi = sceneList();
 
-        resApi.forEach(data->{
-            res.add(SceneIndexVoConverter.createForm(data));
-        });
+        if(!CollectionUtils.isEmpty(resApi)){
+            resApi.forEach(data->{
+                res.add(SceneIndexVoConverter.createForm(data));
+            });
+        }
+
 
         return res;
     }
