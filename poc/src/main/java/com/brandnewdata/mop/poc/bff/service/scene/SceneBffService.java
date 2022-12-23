@@ -27,10 +27,7 @@ import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
 import com.brandnewdata.mop.poc.scene.dto.SceneReleaseDeployDto;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
 import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
-import com.brandnewdata.mop.poc.scene.service.ISceneReleaseDeployService;
-import com.brandnewdata.mop.poc.scene.service.ISceneService2;
-import com.brandnewdata.mop.poc.scene.service.ISceneVersionService;
-import com.brandnewdata.mop.poc.scene.service.IVersionProcessService;
+import com.brandnewdata.mop.poc.scene.service.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -55,13 +52,16 @@ public class SceneBffService {
 
     private final ISceneReleaseDeployService sceneReleaseDeployService;
 
+    private final IDataExternalService2 dataExternalService;
+
     public SceneBffService(ISceneService2 sceneService,
                            ISceneVersionService sceneVersionService,
                            IVersionProcessService versionProcessService,
                            IEnvService envService,
                            IProcessDeployService2 processDeployService,
                            IProcessInstanceService2 processInstanceService,
-                           ISceneReleaseDeployService sceneReleaseDeployService) {
+                           ISceneReleaseDeployService sceneReleaseDeployService,
+                           IDataExternalService2 dataExternalService) {
         this.sceneService = sceneService;
         this.sceneVersionService = sceneVersionService;
         this.versionProcessService = versionProcessService;
@@ -69,6 +69,7 @@ public class SceneBffService {
         this.processDeployService = processDeployService;
         this.processInstanceService = processInstanceService;
         this.sceneReleaseDeployService = sceneReleaseDeployService;
+        this.dataExternalService = dataExternalService;
     }
 
     public Page<SceneVo> page(Integer pageNum, Integer pageSize, String name) {
