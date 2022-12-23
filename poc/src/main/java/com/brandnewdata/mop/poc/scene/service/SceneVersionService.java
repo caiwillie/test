@@ -78,7 +78,7 @@ public class SceneVersionService implements ISceneVersionService {
     @Override
     public Map<Long, SceneVersionDto> fetchLatestOneBySceneId(List<Long> sceneIdList, List<Integer> statusList) {
         if (CollUtil.isEmpty(sceneIdList)) return MapUtil.empty();
-        Map<Long, List<SceneVersionDto>> sceneVersionListMap = fetchSceneVersionListBySceneId(sceneIdList);
+        Map<Long, List<SceneVersionDto>> sceneVersionListMap = fetchListBySceneId(sceneIdList);
         Map<Long, SceneVersionDto> ret = new HashMap<>();
 
         for (Long sceneId : sceneIdList) {
@@ -99,7 +99,7 @@ public class SceneVersionService implements ISceneVersionService {
     }
 
     @Override
-    public Map<Long, List<SceneVersionDto>> fetchSceneVersionListBySceneId(List<Long> sceneIdList) {
+    public Map<Long, List<SceneVersionDto>> fetchListBySceneId(List<Long> sceneIdList) {
         if (CollUtil.isEmpty(sceneIdList)) return MapUtil.empty();
         long count = sceneIdList.stream().filter(Objects::isNull).count();
         Assert.isTrue(count == 0, "场景id列表不能存在空值");
@@ -107,15 +107,22 @@ public class SceneVersionService implements ISceneVersionService {
         query.in(SceneVersionPo.SCENE_ID, sceneIdList);
         List<SceneVersionPo> sceneVersionPos = sceneVersionDao.selectList(query);
         return sceneVersionPos.stream().collect(Collectors.groupingBy(SceneVersionPo::getSceneId,
-                Collectors.mapping(SceneVersionDtoConverter::from,
+                Collectors.mapping(SceneVersionDtoConverter::createFrom,
                         CollectorsUtil.toSortedList((o1, o2) -> o2.getUpdateTime().compareTo(o1.getUpdateTime())))));
+    }
+
+    @Override
+    public List<SceneVersionDto> fetchAll() {
+        QueryWrapper<SceneVersionPo> query = new QueryWrapper<>();
+        List<SceneVersionPo> sceneVersionPos = sceneVersionDao.selectList(query);
+        return sceneVersionPos.stream().map(SceneVersionDtoConverter::createFrom).collect(Collectors.toList());
     }
 
     @Override
     public SceneVersionDto save(SceneVersionDto sceneVersionDto) {
         SceneVersionPo sceneVersionPo = SceneVersionPoConverter.createFrom(sceneVersionDto);
         sceneVersionDao.insert(sceneVersionPo);
-        return SceneVersionDtoConverter.from(sceneVersionPo);
+        return SceneVersionDtoConverter.createFrom(sceneVersionPo);
     }
 
     @Override
@@ -313,7 +320,7 @@ public class SceneVersionService implements ISceneVersionService {
         QueryWrapper<SceneVersionPo> query = new QueryWrapper<>();
         query.in(SceneVersionPo.ID, idList);
         List<SceneVersionPo> sceneVersionPos = sceneVersionDao.selectList(query);
-        return sceneVersionPos.stream().map(SceneVersionDtoConverter::from)
+        return sceneVersionPos.stream().map(SceneVersionDtoConverter::createFrom)
                 .collect(Collectors.toMap(SceneVersionDto::getId, Function.identity()));
     }
 

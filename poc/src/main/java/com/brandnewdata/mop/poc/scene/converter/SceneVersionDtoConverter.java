@@ -6,7 +6,7 @@ import com.brandnewdata.mop.poc.scene.po.SceneVersionPo;
 
 public class SceneVersionDtoConverter {
 
-    public static SceneVersionDto from(SceneVersionPo po) {
+    public static SceneVersionDto createFrom(SceneVersionPo po) {
         SceneVersionDto dto = new SceneVersionDto();
         dto.setId(po.getId());
         dto.setCreateTime(LocalDateTimeUtil.of(po.getCreateTime()));

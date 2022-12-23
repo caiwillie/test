@@ -103,7 +103,7 @@ public class SceneBffService {
     public List<SceneVersionVo> versionList(Long sceneId) {
         Assert.notNull(sceneId, "场景id不能为空");
         List<SceneVersionDto> sceneVersionDtoList =
-                sceneVersionService.fetchSceneVersionListBySceneId(ListUtil.of(sceneId)).get(sceneId);
+                sceneVersionService.fetchListBySceneId(ListUtil.of(sceneId)).get(sceneId);
 
         // 查询环境信息
         List<Long> versionIdList = sceneVersionDtoList.stream().map(SceneVersionDto::getId).collect(Collectors.toList());

@@ -14,6 +14,8 @@ public interface IProxyAService {
 
     List<ProxyDto> fetchListByFilter(ProxyFilter filter);
 
+
+
     ProxyDto save(ProxyDto proxy, boolean imported);
 
     Map<Long, ProxyDto> fetchById(List<Long> idList);

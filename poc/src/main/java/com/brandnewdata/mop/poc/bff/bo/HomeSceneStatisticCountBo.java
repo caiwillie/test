@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class HomeStaticOverviewCountBo {
+public class HomeSceneStatisticCountBo {
 
     /**
      * 场景集成数量-总数
@@ -27,13 +27,5 @@ public class HomeStaticOverviewCountBo {
      */
     int processInstanceFailCount;
 
-    /**
-     * API 服务数
-     */
-    int apiCount;
 
-    /**
-     * API 路径数
-     */
-    int apiPathCount;
 }

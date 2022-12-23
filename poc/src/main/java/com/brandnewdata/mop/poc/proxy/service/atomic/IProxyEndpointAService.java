@@ -15,5 +15,6 @@ public interface IProxyEndpointAService {
 
     Map<Long, List<ProxyEndpointDto>> fetchListByProxyIdAndFilter(List<Long> proxyIdList, ProxyEndpointFilter filter);
 
+
     ProxyEndpointServerBo parseServerConfig(String config);
 }

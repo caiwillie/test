@@ -17,7 +17,9 @@ public interface ISceneVersionService {
      */
     Map<Long, SceneVersionDto> fetchLatestOneBySceneId(List<Long> sceneIdList, List<Integer> statusList);
 
-    Map<Long, List<SceneVersionDto>> fetchSceneVersionListBySceneId(List<Long> sceneIdList);
+    Map<Long, List<SceneVersionDto>> fetchListBySceneId(List<Long> sceneIdList);
+
+    List<SceneVersionDto> fetchAll();
 
     SceneVersionDto save(SceneVersionDto sceneVersionDto);
 

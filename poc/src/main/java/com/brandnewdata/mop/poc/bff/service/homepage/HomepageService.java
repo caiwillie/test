@@ -3,8 +3,9 @@ package com.brandnewdata.mop.poc.bff.service.homepage;
 import com.brandnewdata.connector.api.IConnectorBasicInfoFeign;
 import com.brandnewdata.connector.dto.ConnectorBasicListInfoDTO;
 import com.brandnewdata.connector.dto.ConnectorCountDTO;
+import com.brandnewdata.mop.poc.bff.bo.HomeApiStatisticCountBo;
 import com.brandnewdata.mop.poc.bff.bo.HomeSceneBo;
-import com.brandnewdata.mop.poc.bff.bo.HomeStaticOverviewCountBo;
+import com.brandnewdata.mop.poc.bff.bo.HomeSceneStatisticCountBo;
 import com.brandnewdata.mop.poc.bff.converter.homepage.ConnectorIndexVoConverter;
 import com.brandnewdata.mop.poc.bff.converter.homepage.SceneIndexVoConverter;
 import com.brandnewdata.mop.poc.bff.vo.homepage.ConnectorIndexVo;
@@ -29,6 +30,16 @@ public class HomepageService {
     @Resource
     IConnectorBasicInfoFeign connectorBasicInfoFeign;
 
+    private final HomeSceneStatisticService homeSceneStatisticService;
+
+    private final HomeApiStatisticService homeApiStatisticService;
+
+    public HomepageService(HomeSceneStatisticService homeSceneStatisticService,
+                           HomeApiStatisticService homeApiStatisticService) {
+        this.homeSceneStatisticService = homeSceneStatisticService;
+        this.homeApiStatisticService = homeApiStatisticService;
+    }
+
     public DataBriefVo getDataBrief() {
 
         DataBriefVo res = new DataBriefVo();
@@ -45,13 +56,14 @@ public class HomepageService {
         }
 
         try{
-            HomeStaticOverviewCountBo staticOverviewCountBo = staticOverviewCount();
+            HomeSceneStatisticCountBo staticOverviewCountBo = homeSceneStatisticService.statisticCount();
+            HomeApiStatisticCountBo homeApiStatisticCountBo = homeApiStatisticService.statisticCount();
             res.setSceneInProgress(staticOverviewCountBo.getSceneRunningCount());
             res.setSceneTotal(staticOverviewCountBo.getSceneCount());
             res.setWeeklyRuntimeTotal(staticOverviewCountBo.getProcessInstanceCount());
             res.setWeeklyRuntimeFail(staticOverviewCountBo.getProcessInstanceFailCount());
-            res.setApiServiceCount(staticOverviewCountBo.getApiCount());
-            res.setApiPathCount(staticOverviewCountBo.getApiPathCount());
+            res.setApiServiceCount(homeApiStatisticCountBo.getApiCount());
+            res.setApiPathCount(homeApiStatisticCountBo.getApiPathCount());
         }catch (Exception e2){
             log.error("",e2);
             throw e2;
@@ -88,11 +100,4 @@ public class HomepageService {
         return res;
     }
 
-    HomeStaticOverviewCountBo staticOverviewCount() {
-        return null;
-    }
-
-    List<HomeSceneBo> sceneList() {
-        return null;
-    }
 }

@@ -36,7 +36,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class SceneOperateBffService2 {
-
     private final int MAX_SIZE = 10;
     private final ISceneReleaseDeployService sceneReleaseDeployService;
 
