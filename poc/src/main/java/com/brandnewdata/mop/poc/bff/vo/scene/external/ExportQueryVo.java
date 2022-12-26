@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class ExportQuery {
+public class ExportQueryVo {
 
     /**
      * 版本id

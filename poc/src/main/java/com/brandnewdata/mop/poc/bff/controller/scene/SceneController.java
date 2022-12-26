@@ -10,11 +10,15 @@ import com.brandnewdata.mop.poc.bff.vo.scene.DebugProcessInstanceVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVersionVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.VersionProcessVo;
-import com.brandnewdata.mop.poc.bff.vo.scene.external.ExportQuery;
+import com.brandnewdata.mop.poc.bff.vo.scene.external.ExportQueryVo;
+import com.brandnewdata.mop.poc.bff.vo.scene.external.LoadVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.operate.SceneDeployVo;
 import com.brandnewdata.mop.poc.common.dto.Page;
+import lombok.SneakyThrows;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -76,25 +80,27 @@ public class SceneController {
     /**
      * 导出场景
      *
-     * @param exportQuery the export query
+     * @param exportQueryVo the export query
      */
     @PostMapping("/rest/scene/export")
-    public void export(@RequestBody ExportQuery exportQuery) {
-        return;
+    public void export(@RequestBody ExportQueryVo exportQueryVo, HttpServletResponse response) {
+        sceneBffService.export(exportQueryVo, response);
     }
 
     /**
      * 预备导入场景
      */
-    @PostMapping("/rest/scenne/load/prepare")
-    public void loadPrepare() {
-        return;
+    @SneakyThrows
+    @PostMapping("/rest/scene/load/prepare")
+    public Result<LoadVo> loadPrepare(@RequestParam MultipartFile file) {
+        byte[] bytes = file.getBytes();
+        return null;
     }
 
     /**
      * 确认导入场景
      */
-    @PostMapping("/rest/scenne/load/confirm")
+    @PostMapping("/rest/scene/load/confirm")
     public void loadConfirm() {
         return;
     }

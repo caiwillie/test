@@ -7,6 +7,7 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Opt;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
 import com.brandnewdata.mop.poc.constant.SceneConst;
@@ -19,21 +20,29 @@ import com.brandnewdata.mop.poc.process.util.ProcessUtil;
 import com.brandnewdata.mop.poc.scene.bo.export.ConfigExportBo;
 import com.brandnewdata.mop.poc.scene.bo.export.ConnectorExportBo;
 import com.brandnewdata.mop.poc.scene.bo.export.ProcessExportBo;
+import com.brandnewdata.mop.poc.scene.bo.export.SceneExportFileBo;
+import com.brandnewdata.mop.poc.scene.converter.ConnectorConfigDtoConverter;
+import com.brandnewdata.mop.poc.scene.dao.SceneLoadDao;
 import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionExportDto;
 import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
+import com.brandnewdata.mop.poc.scene.dto.external.ConnectorConfigDto;
+import com.brandnewdata.mop.poc.scene.dto.external.PrepareLoadDto;
+import com.brandnewdata.mop.poc.scene.po.SceneLoadPo;
 import com.dxy.library.json.jackson.JacksonUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class DataExternalService2 implements IDataExternalService2 {
@@ -48,6 +57,15 @@ public class DataExternalService2 implements IDataExternalService2 {
     private final IVersionProcessService versionProcessService;
 
     private final ConnectorManager connectorManager;
+
+    private static final ObjectMapper OM = JacksonUtil.getObjectMapper();
+
+    private static final CollectionType PROCESS_DEFINITION_TYPE = OM.getTypeFactory().constructCollectionType(List.class, ProcessExportBo.class);
+
+    private static final CollectionType CONNECTOR_CONFIG_TYPE = OM.getTypeFactory().constructCollectionType(List.class, ConnectorExportBo.class);
+
+    @Resource
+    private SceneLoadDao sceneLoadDao;
 
     public DataExternalService2(ISceneService2 sceneService,
                                 ISceneVersionService sceneVersionService,
@@ -113,9 +131,31 @@ public class DataExternalService2 implements IDataExternalService2 {
         return ret;
     }
 
-    @Override
-    public void importData() {
+    public Long saveBytes(byte[] bytes) {
+        SceneLoadPo sceneLoadPo = new SceneLoadPo();
+        sceneLoadPo.setId(IdUtil.getSnowflakeNextId());
+        sceneLoadPo.setZipBytes(bytes);
+        sceneLoadDao.insert(sceneLoadPo);
+        return sceneLoadPo.getId();
+    }
 
+    @Override
+    public PrepareLoadDto prepareLoad(byte[] bytes) {
+        PrepareLoadDto ret = new PrepareLoadDto();
+        Long id = saveBytes(bytes);
+        ret.setId(id);
+
+        SceneExportFileBo sceneExportFileBo = parseBytes(bytes);
+        List<ConnectorExportBo> connectorExportBoList = sceneExportFileBo.getConnectorExportBoList();
+        List<ConnectorConfigDto> connectorConfigDtos = new ArrayList<>();
+        for (ConnectorExportBo connectorExportBo : connectorExportBoList) {
+            for (ConfigExportBo configExportBo : connectorExportBo.getConfigurations()) {
+                ConnectorConfigDto configDto = ConnectorConfigDtoConverter.createFrom(connectorExportBo, configExportBo);
+                connectorConfigDtos.add(configDto);
+            }
+        }
+        ret.setConfigs(connectorConfigDtos);
+        return ret;
     }
 
     private void parseConfig(Map<ConnectorExportBo, Map<String, ConfigExportBo>> configMap, Map<String, String> configIdMap) {
@@ -129,6 +169,9 @@ public class DataExternalService2 implements IDataExternalService2 {
 
             ConnectorExportBo connectorExportBo = new ConnectorExportBo();
             ConfigExportBo configExportBo = new ConfigExportBo();
+            // 设置config id 和 name
+            configExportBo.setConfigId(configId);
+            configExportBo.setConfigName(configInfo.getConfigName());
             if(configInfo != null) {
                 Assert.isTrue(StrUtil.equals(action.getConnectorGroup(), configInfo.getConnectorGroup()));
                 Assert.isTrue(StrUtil.equals(action.getConnectorId(), configInfo.getConnectorId()));
@@ -136,17 +179,12 @@ public class DataExternalService2 implements IDataExternalService2 {
                 connectorExportBo.setConnectorGroup(configInfo.getConnectorGroup());
                 connectorExportBo.setConnectorId(configInfo.getConnectorId());
                 connectorExportBo.setConnectorVersion(configInfo.getConnectorVersion());
-                // todo caiwillie 名称待完善
-                connectorExportBo.setConnectorName(configId);
-
-                configExportBo.setConfigName(configInfo.getConfigName());
             } else {
                 connectorExportBo.setConnectorGroup(action.getConnectorGroup());
                 String connectorId = action.getConnectorId();
                 connectorExportBo.setConnectorId(connectorId);
                 connectorExportBo.setConnectorVersion(action.getConnectorVersion());
                 connectorExportBo.setConnectorName(connectorId);
-                configExportBo.setConfigName(configId);
             }
 
             Map<String, ConfigExportBo> configExportBoMap = configMap.computeIfAbsent(connectorExportBo, k -> new LinkedHashMap<>());
@@ -194,5 +232,44 @@ public class DataExternalService2 implements IDataExternalService2 {
         return dir;
     }
 
+    private SceneExportFileBo parseBytes(byte[] bytes) {
+        SceneExportFileBo ret = new SceneExportFileBo();
+
+        File dir = unzip(bytes);
+        File definitionFile = new File(dir, FILENAME__PROCESS_DEFINITION);
+        File configFile = new File(dir, FILENAME__CONFIG);
+        Assert.isTrue(fileExist(definitionFile), "process_definition.json 文件缺失");
+        Assert.isTrue(fileExist(configFile), "config.json 文件缺失");
+        try {
+            List<ProcessExportBo> list = OM.readValue(definitionFile, PROCESS_DEFINITION_TYPE);
+            ret.setProcessExportBoList(list);
+        } catch (IOException e) {
+            throw new RuntimeException("process_definition.json 文件格式异常", e);
+        }
+
+        try {
+            List<ConnectorExportBo> list = OM.readValue(configFile, CONNECTOR_CONFIG_TYPE);
+            ret.setConnectorExportBoList(list);
+        } catch (IOException e) {
+            throw new RuntimeException("config.json 文件格式异常", e);
+        }
+
+        return ret;
+    }
+
+    private File unzip(byte[] bytes) {
+        Path path = null;
+        try {
+            path = Files.createTempDirectory("");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        File unzip = ZipUtil.unzip(new ByteArrayInputStream(bytes), path.toFile(), StandardCharsets.UTF_8);
+        return unzip;
+    }
+
+    private boolean fileExist(File file) {
+        return file.exists() && file.isFile();
+    }
 
 }

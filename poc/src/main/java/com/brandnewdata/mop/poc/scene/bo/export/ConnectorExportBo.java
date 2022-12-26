@@ -13,6 +13,7 @@ public class ConnectorExportBo {
     private String connectorVersion;
 
     private String connectorName;
+
     private List<ConfigExportBo> configurations;
 
     @Override

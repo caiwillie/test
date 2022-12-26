@@ -5,6 +5,7 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Opt;
 import cn.hutool.core.util.NumberUtil;
+import cn.hutool.extra.servlet.ServletUtil;
 import com.brandnewdata.mop.poc.bff.converter.process.ProcessDefinitionVoConverter;
 import com.brandnewdata.mop.poc.bff.converter.scene.*;
 import com.brandnewdata.mop.poc.bff.vo.process.ProcessDefinitionVo;
@@ -12,6 +13,8 @@ import com.brandnewdata.mop.poc.bff.vo.scene.DebugProcessInstanceVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVersionVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.VersionProcessVo;
+import com.brandnewdata.mop.poc.bff.vo.scene.external.ExportQueryVo;
+import com.brandnewdata.mop.poc.bff.vo.scene.external.LoadVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.operate.SceneDeployVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.operate.SceneVersionDeployVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.operate.VersionProcessDeployVo;
@@ -23,13 +26,12 @@ import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService2;
 import com.brandnewdata.mop.poc.process.dto.ProcessSnapshotDeployDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
-import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
-import com.brandnewdata.mop.poc.scene.dto.SceneReleaseDeployDto;
-import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
-import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
+import com.brandnewdata.mop.poc.scene.dto.*;
 import com.brandnewdata.mop.poc.scene.service.*;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
@@ -140,6 +142,20 @@ public class SceneBffService {
     public SceneVo save(SceneVo vo) {
         SceneDto2 ret = sceneService.save(SceneDtoConverter.createFrom(vo));
         return vo.from(ret);
+    }
+
+    public void export(ExportQueryVo exportQueryVo, HttpServletResponse response) {
+        SceneVersionExportDto exportDto = dataExternalService.export(exportQueryVo.getVersionId(), exportQueryVo.getProcessIdList());
+        ServletUtil.write(response, new ByteArrayInputStream(exportDto.getBytes()), "application/zip", exportDto.getFileName());
+    }
+
+    public LoadVo loadPrepare(byte[] bytes) {
+        LoadVo ret = new LoadVo();
+        Long id = dataExternalService.saveBytes(bytes);
+        ret.setId(String.valueOf(id));
+
+        
+        return ret;
     }
 
     public VersionProcessVo processSave(VersionProcessVo vo) {

@@ -6,5 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ConfigExportBo {
+    private String configId;
     private String configName;
 }
