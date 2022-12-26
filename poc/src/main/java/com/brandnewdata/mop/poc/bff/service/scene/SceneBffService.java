@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 @Service
 public class SceneBffService {
 
-    private final ISceneService2 sceneService;
+    private final ISceneService sceneService;
 
     private final ISceneVersionService sceneVersionService;
 
@@ -60,16 +60,16 @@ public class SceneBffService {
 
     private final ISceneReleaseDeployService sceneReleaseDeployService;
 
-    private final IDataExternalService2 dataExternalService;
+    private final IDataExternalService dataExternalService;
 
-    public SceneBffService(ISceneService2 sceneService,
+    public SceneBffService(ISceneService sceneService,
                            ISceneVersionService sceneVersionService,
                            IVersionProcessService versionProcessService,
                            IEnvService envService,
                            IProcessDeployService2 processDeployService,
                            IProcessInstanceService2 processInstanceService,
                            ISceneReleaseDeployService sceneReleaseDeployService,
-                           IDataExternalService2 dataExternalService) {
+                           IDataExternalService dataExternalService) {
         this.sceneService = sceneService;
         this.sceneVersionService = sceneVersionService;
         this.versionProcessService = versionProcessService;
@@ -81,14 +81,14 @@ public class SceneBffService {
     }
 
     public Page<SceneVo> page(Integer pageNum, Integer pageSize, String name) {
-        Page<SceneDto2> page = sceneService.page(pageNum, pageSize, name);
-        List<SceneDto2> records = page.getRecords();
+        Page<SceneDto> page = sceneService.page(pageNum, pageSize, name);
+        List<SceneDto> records = page.getRecords();
 
         if(CollUtil.isEmpty(records)) return new Page<>(page.getTotal(), ListUtil.empty());
         List<SceneVo> sceneVos = new ArrayList<>();
 
         // 获取所有场景的最新版本
-        List<Long> sceneIdList = records.stream().map(SceneDto2::getId).collect(Collectors.toList());
+        List<Long> sceneIdList = records.stream().map(SceneDto::getId).collect(Collectors.toList());
         Map<Long, SceneVersionDto> sceneVersionDtoMap = sceneVersionService.fetchLatestOneBySceneId(sceneIdList, null);
         List<Long> versionIdList = sceneVersionDtoMap.values().stream().map(SceneVersionDto::getId).collect(Collectors.toList());
 
@@ -97,7 +97,7 @@ public class SceneBffService {
         // 获取某版本下的最新流程
         Map<Long, VersionProcessDto> processDtoMap = versionProcessService.fetchLatestOneByVersionId(versionIdList);
 
-        for (SceneDto2 sceneDto : records) {
+        for (SceneDto sceneDto : records) {
             SceneVo sceneVo = new SceneVo().from(sceneDto);
             Long versionId = sceneVersionDtoMap.get(sceneVo.getId()).getId();
             Integer count = Opt.ofNullable(countMap.get(versionId)).orElse(0);
@@ -146,7 +146,7 @@ public class SceneBffService {
     }
 
     public SceneVo save(SceneVo vo) {
-        SceneDto2 ret = sceneService.save(SceneDtoConverter.createFrom(vo));
+        SceneDto ret = sceneService.save(SceneDtoConverter.createFrom(vo));
         return vo.from(ret);
     }
 

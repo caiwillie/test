@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SceneProcessDto2 {
+public class SceneProcessDto {
 
     /**
      * id

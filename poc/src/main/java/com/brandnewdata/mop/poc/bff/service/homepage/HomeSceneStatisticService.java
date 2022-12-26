@@ -16,11 +16,11 @@ import com.brandnewdata.mop.poc.operate.dto.ProcessInstanceStateDto;
 import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService2;
 import com.brandnewdata.mop.poc.process.dto.ProcessReleaseDeployDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
-import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
+import com.brandnewdata.mop.poc.scene.dto.SceneDto;
 import com.brandnewdata.mop.poc.scene.dto.SceneReleaseDeployDto;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
 import com.brandnewdata.mop.poc.scene.service.ISceneReleaseDeployService;
-import com.brandnewdata.mop.poc.scene.service.ISceneService2;
+import com.brandnewdata.mop.poc.scene.service.ISceneService;
 import com.brandnewdata.mop.poc.scene.service.ISceneVersionService;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +36,7 @@ public class HomeSceneStatisticService {
 
     private final IEnvService envService;
 
-    private final ISceneService2 sceneService;
+    private final ISceneService sceneService;
 
     private final ISceneVersionService sceneVersionService;
 
@@ -48,7 +48,7 @@ public class HomeSceneStatisticService {
 
 
     public HomeSceneStatisticService(IEnvService envService,
-                                     ISceneService2 sceneService,
+                                     ISceneService sceneService,
                                      ISceneVersionService sceneVersionService,
                                      IProcessDeployService2 processDeployService,
                                      IProcessInstanceService2 processInstanceService,
@@ -84,7 +84,7 @@ public class HomeSceneStatisticService {
         List<HomeSceneBo> ret = new ArrayList<>();
         for (SceneVersionDto sceneVersionDto : filterSceneVersionList) {
             Long sceneId = sceneVersionDto.getSceneId();
-            SceneDto2 sceneDto = sceneService.fetchById(ListUtil.of(sceneId)).get(sceneId);
+            SceneDto sceneDto = sceneService.fetchById(ListUtil.of(sceneId)).get(sceneId);
             Long versionId = sceneVersionDto.getId();
             List<SceneReleaseDeployDto> sceneReleaseDeployDtoList = sceneReleaseDeployDtoMap.get(versionId);
             List<String> envList = new ArrayList<>();

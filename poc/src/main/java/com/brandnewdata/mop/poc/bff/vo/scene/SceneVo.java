@@ -1,6 +1,6 @@
 package com.brandnewdata.mop.poc.bff.vo.scene;
 
-import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
+import com.brandnewdata.mop.poc.scene.dto.SceneDto;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -41,7 +41,7 @@ public class SceneVo {
      */
     private Integer processCount;
 
-    public SceneVo from(SceneDto2 dto) {
+    public SceneVo from(SceneDto dto) {
         this.setId(dto.getId());
         this.setCreateTime(dto.getCreateTime());
         this.setUpdateTime(dto.getUpdateTime());

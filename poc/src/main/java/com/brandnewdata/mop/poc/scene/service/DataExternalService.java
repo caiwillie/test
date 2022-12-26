@@ -23,7 +23,7 @@ import com.brandnewdata.mop.poc.scene.bo.export.ProcessExportBo;
 import com.brandnewdata.mop.poc.scene.bo.export.SceneExportFileBo;
 import com.brandnewdata.mop.poc.scene.converter.ConnectorConfigDtoConverter;
 import com.brandnewdata.mop.poc.scene.dao.SceneLoadDao;
-import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
+import com.brandnewdata.mop.poc.scene.dto.SceneDto;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionExportDto;
 import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
@@ -46,7 +46,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 @Service
-public class DataExternalService2 implements IDataExternalService2 {
+public class DataExternalService implements IDataExternalService {
 
     private static final String FILENAME__PROCESS_DEFINITION = "process_definition.json";
 
@@ -54,7 +54,7 @@ public class DataExternalService2 implements IDataExternalService2 {
 
     private final IProcessDefinitionService2 processDefinitionService;
 
-    private final ISceneService2 sceneService;
+    private final ISceneService sceneService;
 
     private final ISceneVersionService sceneVersionService;
 
@@ -71,11 +71,11 @@ public class DataExternalService2 implements IDataExternalService2 {
     @Resource
     private SceneLoadDao sceneLoadDao;
 
-    public DataExternalService2(IProcessDefinitionService2 processDefinitionService,
-                                ISceneService2 sceneService,
-                                ISceneVersionService sceneVersionService,
-                                IVersionProcessService versionProcessService,
-                                ConnectorManager connectorManager) {
+    public DataExternalService(IProcessDefinitionService2 processDefinitionService,
+                               ISceneService sceneService,
+                               ISceneVersionService sceneVersionService,
+                               IVersionProcessService versionProcessService,
+                               ConnectorManager connectorManager) {
         this.processDefinitionService = processDefinitionService;
         this.sceneService = sceneService;
         this.sceneVersionService = sceneVersionService;
@@ -89,7 +89,7 @@ public class DataExternalService2 implements IDataExternalService2 {
                 SceneConst.SCENE_VERSION_STATUS__STOPPED});
 
         Long sceneId = sceneVersionDto.getSceneId();
-        SceneDto2 sceneDto = sceneService.fetchById(ListUtil.of(sceneId)).get(sceneId);
+        SceneDto sceneDto = sceneService.fetchById(ListUtil.of(sceneId)).get(sceneId);
 
         List<VersionProcessDto> versionProcessDtoList = versionProcessService
                 .fetchListByVersionId(ListUtil.of(sceneVersionDto.getId()), false).get(versionId);
@@ -167,7 +167,7 @@ public class DataExternalService2 implements IDataExternalService2 {
         SceneExportFileBo sceneExportFileBo = parseBytes(sceneLoadPo.getZipBytes());
 
         // 保存场景
-        SceneDto2 sceneDto = new SceneDto2();
+        SceneDto sceneDto = new SceneDto();
         sceneDto.setName(newSceneName);
         sceneDto = sceneService.save(sceneDto);
 

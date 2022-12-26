@@ -1,12 +1,12 @@
 package com.brandnewdata.mop.poc.bff.converter.scene;
 
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVo;
-import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
+import com.brandnewdata.mop.poc.scene.dto.SceneDto;
 
 public class SceneDtoConverter {
 
-    public static SceneDto2 createFrom(SceneVo vo) {
-        SceneDto2 dto = new SceneDto2();
+    public static SceneDto createFrom(SceneVo vo) {
+        SceneDto dto = new SceneDto();
         dto.setId(vo.getId());
         dto.setName(vo.getName());
         return dto;

@@ -1,7 +1,7 @@
 package com.brandnewdata.mop.poc.scene.service;
 
 import com.brandnewdata.mop.poc.common.dto.Page;
-import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
+import com.brandnewdata.mop.poc.scene.dto.SceneDto;
 
 import java.util.List;
 import java.util.Map;
@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * @author caiwillie
  */
-public interface ISceneService2 {
+public interface ISceneService {
 
     /**
      * 分页获取场景列表
@@ -18,9 +18,9 @@ public interface ISceneService2 {
      * @param name
      * @return
      */
-    Page<SceneDto2> page(int pageNum, int pageSize, String name);
+    Page<SceneDto> page(int pageNum, int pageSize, String name);
 
-    SceneDto2 save(SceneDto2 sceneDto);
+    SceneDto save(SceneDto sceneDto);
 
-    Map<Long, SceneDto2> fetchById(List<Long> idList);
+    Map<Long, SceneDto> fetchById(List<Long> idList);
 }

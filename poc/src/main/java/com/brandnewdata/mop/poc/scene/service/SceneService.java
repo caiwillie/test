@@ -13,7 +13,7 @@ import com.brandnewdata.mop.poc.constant.SceneConst;
 import com.brandnewdata.mop.poc.scene.converter.SceneDtoConverter;
 import com.brandnewdata.mop.poc.scene.converter.ScenePoConverter;
 import com.brandnewdata.mop.poc.scene.dao.SceneDao;
-import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
+import com.brandnewdata.mop.poc.scene.dto.SceneDto;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
 import com.brandnewdata.mop.poc.scene.po.ScenePo;
 import org.springframework.stereotype.Service;
@@ -27,19 +27,19 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-public class SceneService2 implements ISceneService2{
+public class SceneService implements ISceneService {
 
     @Resource
     private SceneDao sceneDao;
 
     private final ISceneVersionService sceneVersionService;
 
-    public SceneService2(ISceneVersionService sceneVersionService) {
+    public SceneService(ISceneVersionService sceneVersionService) {
         this.sceneVersionService = sceneVersionService;
     }
 
     @Override
-    public Page<SceneDto2> page(int pageNum, int pageSize, String name) {
+    public Page<SceneDto> page(int pageNum, int pageSize, String name) {
         com.baomidou.mybatisplus.extension.plugins.pagination.Page<ScenePo> page =
                 com.baomidou.mybatisplus.extension.plugins.pagination.Page.of(pageNum, pageSize);
         QueryWrapper<ScenePo> queryWrapper = new QueryWrapper<>();
@@ -47,13 +47,13 @@ public class SceneService2 implements ISceneService2{
         queryWrapper.orderByDesc(ScenePo.UPDATE_TIME);
         page = sceneDao.selectPage(page, queryWrapper);
         List<ScenePo> scenePoList = Optional.ofNullable(page.getRecords()).orElse(ListUtil.empty());
-        List<SceneDto2> records = scenePoList.stream().map(SceneDtoConverter::createFrom).collect(Collectors.toList());
+        List<SceneDto> records = scenePoList.stream().map(SceneDtoConverter::createFrom).collect(Collectors.toList());
         return new Page<>(page.getTotal(), records);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public SceneDto2 save(SceneDto2 sceneDto) {
+    public SceneDto save(SceneDto sceneDto) {
         Long sceneId = sceneDto.getId();
         ScenePo scenePo = null;
         if(sceneId == null) {
@@ -77,7 +77,7 @@ public class SceneService2 implements ISceneService2{
     }
 
     @Override
-    public Map<Long, SceneDto2> fetchById(List<Long> idList) {
+    public Map<Long, SceneDto> fetchById(List<Long> idList) {
         if(CollUtil.isEmpty(idList)) return MapUtil.empty();
         Assert.isFalse(CollUtil.hasNull(idList), "场景id不能包含空值");
 
@@ -85,7 +85,7 @@ public class SceneService2 implements ISceneService2{
         query.in(ScenePo.ID, idList);
 
         return sceneDao.selectList(query).stream().map(SceneDtoConverter::createFrom)
-                .collect(Collectors.toMap(SceneDto2::getId, Function.identity()));
+                .collect(Collectors.toMap(SceneDto::getId, Function.identity()));
     }
 
     private ScenePo getScenePoById(Long sceneId) {

@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class SceneDto2 {
+public class SceneDto {
     /**
      * 场景 id
      */
