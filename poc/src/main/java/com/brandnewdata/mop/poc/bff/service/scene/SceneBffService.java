@@ -8,13 +8,15 @@ import cn.hutool.core.util.NumberUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import com.brandnewdata.mop.poc.bff.converter.process.ProcessDefinitionVoConverter;
 import com.brandnewdata.mop.poc.bff.converter.scene.*;
+import com.brandnewdata.mop.poc.bff.converter.scene.external.ConnectorConfigVoConverter;
 import com.brandnewdata.mop.poc.bff.vo.process.ProcessDefinitionVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.DebugProcessInstanceVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVersionVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.VersionProcessVo;
+import com.brandnewdata.mop.poc.bff.vo.scene.external.ConnectorConfigVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.external.ExportQueryVo;
-import com.brandnewdata.mop.poc.bff.vo.scene.external.LoadVo;
+import com.brandnewdata.mop.poc.bff.vo.scene.external.PrepareLoadVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.operate.SceneDeployVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.operate.SceneVersionDeployVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.operate.VersionProcessDeployVo;
@@ -27,6 +29,8 @@ import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService2;
 import com.brandnewdata.mop.poc.process.dto.ProcessSnapshotDeployDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
 import com.brandnewdata.mop.poc.scene.dto.*;
+import com.brandnewdata.mop.poc.scene.dto.external.ConnectorConfigDto;
+import com.brandnewdata.mop.poc.scene.dto.external.PrepareLoadDto;
 import com.brandnewdata.mop.poc.scene.service.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
@@ -153,8 +157,13 @@ public class SceneBffService {
         ServletUtil.write(response, new ByteArrayInputStream(exportDto.getBytes()), "application/zip", exportDto.getFileName());
     }
 
-    public LoadVo loadPrepare(byte[] bytes) {
-        LoadVo ret = new LoadVo();
+    public PrepareLoadVo prepareLoad(byte[] bytes) {
+        PrepareLoadVo ret = new PrepareLoadVo();
+        PrepareLoadDto prepareLoadDto = dataExternalService.prepareLoad(bytes);
+        ret.setId(String.valueOf(prepareLoadDto.getId()));
+        List<ConnectorConfigDto> configs = prepareLoadDto.getConfigs();
+        List<ConnectorConfigVo> configVos = configs.stream().map(ConnectorConfigVoConverter::createFrom).collect(Collectors.toList());
+        ret.setConfigureList(configVos);
         return ret;
     }
 

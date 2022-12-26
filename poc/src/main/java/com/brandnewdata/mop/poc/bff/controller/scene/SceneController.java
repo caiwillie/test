@@ -11,7 +11,7 @@ import com.brandnewdata.mop.poc.bff.vo.scene.SceneVersionVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.VersionProcessVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.external.ExportQueryVo;
-import com.brandnewdata.mop.poc.bff.vo.scene.external.LoadVo;
+import com.brandnewdata.mop.poc.bff.vo.scene.external.PrepareLoadVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.operate.SceneDeployVo;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import lombok.SneakyThrows;
@@ -92,9 +92,10 @@ public class SceneController {
      */
     @SneakyThrows
     @PostMapping("/rest/scene/load/prepare")
-    public Result<LoadVo> loadPrepare(@RequestParam MultipartFile file) {
+    public Result<PrepareLoadVo> loadPrepare(@RequestParam MultipartFile file) {
         byte[] bytes = file.getBytes();
-        return null;
+        PrepareLoadVo ret = sceneBffService.prepareLoad(bytes);
+        return Result.OK(ret);
     }
 
     /**
