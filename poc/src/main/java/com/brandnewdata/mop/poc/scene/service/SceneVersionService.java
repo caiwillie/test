@@ -7,6 +7,7 @@ import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Opt;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
@@ -20,6 +21,7 @@ import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionParseDto;
 import com.brandnewdata.mop.poc.process.manager.ConnectorManager;
 import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService2;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
+import com.brandnewdata.mop.poc.process.util.ProcessUtil;
 import com.brandnewdata.mop.poc.scene.bo.SceneReleaseVersionBo;
 import com.brandnewdata.mop.poc.scene.converter.SceneReleaseDeployDtoConverter;
 import com.brandnewdata.mop.poc.scene.converter.SceneVersionDtoConverter;
@@ -367,10 +369,10 @@ public class SceneVersionService implements ISceneVersionService {
         // build new version process
         for (VersionProcessDto versionProcessDto : versionProcessDtoList) {
             BpmnXmlDto bpmnXmlDto = new BpmnXmlDto();
-            bpmnXmlDto.setProcessId(versionProcessDto.getProcessId());
+            bpmnXmlDto.setProcessId(ProcessUtil.generateProcessId());
             bpmnXmlDto.setProcessName(versionProcessDto.getProcessName());
             bpmnXmlDto.setProcessXml(versionProcessDto.getProcessXml());
-            BpmnXmlDto newBpmnXmlDto = processDefinitionService.replaceProcessId(bpmnXmlDto);
+            BpmnXmlDto newBpmnXmlDto = processDefinitionService.baseCheck(bpmnXmlDto);
             VersionProcessDto newVersionProcessDto = VersionProcessDtoConverter
                     .createFrom(latestVersionId, newBpmnXmlDto, versionProcessDto.getProcessImg());
             versionProcessService.save(newVersionProcessDto);

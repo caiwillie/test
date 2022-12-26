@@ -21,4 +21,11 @@ public class VersionProcessPoConverter {
         return po;
     }
 
+    public static void updateFrom(VersionProcessPo po, String processId, String processName, String processXml, String processImg) {
+        po.setProcessId(processId);
+        po.setProcessName(processName);
+        po.setProcessXml(processXml);
+        po.setProcessImg(processImg);
+    }
+
 }

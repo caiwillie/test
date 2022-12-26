@@ -8,7 +8,6 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
-import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionParseDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService2;
 import com.brandnewdata.mop.poc.scene.converter.VersionProcessDtoConverter;
 import com.brandnewdata.mop.poc.scene.converter.VersionProcessPoConverter;
@@ -120,26 +119,22 @@ public class VersionProcessService implements IVersionProcessService {
 
     @Override
     public VersionProcessDto save(VersionProcessDto versionProcessDto) {
-
-        BpmnXmlDto bpmnXmlDto = new BpmnXmlDto();
-        bpmnXmlDto.setProcessId(versionProcessDto.getProcessId());
-        bpmnXmlDto.setProcessName(versionProcessDto.getProcessName());
-        bpmnXmlDto.setProcessXml(versionProcessDto.getProcessXml());
-        bpmnXmlDto = processDefinitionService.replaceProcessId(bpmnXmlDto);
+        BpmnXmlDto bpmnXmlDto = new BpmnXmlDto(versionProcessDto.getProcessId(), versionProcessDto.getProcessName(), versionProcessDto.getProcessXml());
+        bpmnXmlDto = processDefinitionService.baseCheck(bpmnXmlDto);
 
         String processId = bpmnXmlDto.getProcessId();
-        String name = bpmnXmlDto.getProcessName();
+        String processName = bpmnXmlDto.getProcessName();
         String processXml = bpmnXmlDto.getProcessXml();
+        String processImg = versionProcessDto.getProcessImg();
 
         Long id = versionProcessDto.getId();
 
         if(id == null) {
             // 手动指定
             versionProcessDto.setId(IdUtil.getSnowflakeNextId());
-            versionProcessDto.setProcessId(processId);
-            versionProcessDto.setProcessName(name);
 
             VersionProcessPo versionProcessPo = VersionProcessPoConverter.createFrom(versionProcessDto);
+            VersionProcessPoConverter.updateFrom(versionProcessPo,processId, processName, processXml, processImg);
             versionProcessPo.setProcessXml(processXml);
             versionProcessDao.insert(versionProcessPo);
         } else {
@@ -148,12 +143,9 @@ public class VersionProcessService implements IVersionProcessService {
             if(!StrUtil.equals(versionProcessDto.getProcessId(), processId)) {
                 throw new RuntimeException("流程id不能改变");
             }
-            versionProcessDto.setProcessName(name);
-            versionProcessDto.setProcessXml(processXml);
-            versionProcessDto.setProcessImg(updateContent.getProcessImg());
 
             VersionProcessPo versionProcessPo = VersionProcessPoConverter.createFrom(versionProcessDto);
-            versionProcessPo.setProcessXml(processXml);
+            VersionProcessPoConverter.updateFrom(versionProcessPo,processId, processName, processXml, processImg);
             versionProcessDao.updateById(versionProcessPo);
         }
 

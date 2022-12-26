@@ -29,6 +29,7 @@ import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService2;
 import com.brandnewdata.mop.poc.process.dto.ProcessSnapshotDeployDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
 import com.brandnewdata.mop.poc.scene.dto.*;
+import com.brandnewdata.mop.poc.scene.dto.external.ConfirmLoadDto;
 import com.brandnewdata.mop.poc.scene.dto.external.ConnectorConfigDto;
 import com.brandnewdata.mop.poc.scene.dto.external.PrepareLoadDto;
 import com.brandnewdata.mop.poc.scene.service.*;
@@ -180,6 +181,12 @@ public class SceneBffService {
             configMap.put(configureId, newConfigureId);
         }
 
+        ConfirmLoadDto confirmLoadDto = new ConfirmLoadDto();
+        confirmLoadDto.setId(Long.parseLong(id));
+        confirmLoadDto.setNewSceneName(sceneName);
+        confirmLoadDto.setConfigMap(configMap);
+        SceneVersionDto sceneVersionDto = dataExternalService.confirmLoad(confirmLoadDto);
+        return SceneVersionVoConverter.createFrom(sceneVersionDto);
     }
 
     public VersionProcessVo processSave(VersionProcessVo vo) {

@@ -188,10 +188,7 @@ public class ReverseProxyServlet extends ProxyServlet {
         Assert.notNull(versionProcessDto, "process not found: {}", processId);
         String processXml = versionProcessDto.getProcessXml();
 
-        BpmnXmlDto bpmnXmlDto = new BpmnXmlDto();
-        bpmnXmlDto.setProcessId(processId);
-        bpmnXmlDto.setProcessName(processName);
-        bpmnXmlDto.setProcessXml(processXml);
+        BpmnXmlDto bpmnXmlDto = new BpmnXmlDto(processId, processName, processXml);
 
         Map<String, Object> result = deployService2.startSync(bpmnXmlDto, variables, envId, ProcessConst.PROCESS_BIZ_TYPE__SCENE);
         ServletUtil.write(response, JacksonUtil.to(result), "application/json;charset=utf-8");

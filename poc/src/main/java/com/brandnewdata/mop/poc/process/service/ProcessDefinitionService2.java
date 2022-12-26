@@ -1,8 +1,6 @@
 package com.brandnewdata.mop.poc.process.service;
 
 import cn.hutool.core.lang.Opt;
-import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionParseDto;
 import com.brandnewdata.mop.poc.process.manager.ConnectorManager;
@@ -14,6 +12,8 @@ import com.brandnewdata.mop.poc.process.parser.dto.Step2Result;
 import com.dxy.library.json.jackson.JacksonUtil;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 public class ProcessDefinitionService2 implements IProcessDefinitionService2{
 
@@ -24,15 +24,23 @@ public class ProcessDefinitionService2 implements IProcessDefinitionService2{
     }
 
     @Override
-    public ProcessDefinitionParseDto parseIdAndName(BpmnXmlDto dto) {
+    public BpmnXmlDto baseCheck(BpmnXmlDto dto) {
         ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.step1(dto.getProcessId(),
                 dto.getProcessName(), dto.getProcessXml());
 
         Step1Result step1Result = step1.replServiceTask(false, null).replAttr().step1Result();
-        ProcessDefinitionParseDto ret = new ProcessDefinitionParseDto();
-        ret.setProcessId(step1Result.getProcessId());
-        ret.setName(step1Result.getProcessName());
+        BpmnXmlDto ret = new BpmnXmlDto(step1Result.getProcessId(), step1Result.getProcessName(), step1Result.getOriginalXml());
         return ret;
+    }
+
+    @Override
+    public Map<String, String> parseConfigMap(BpmnXmlDto dto) {
+        // 解析流程中用到的流程
+        Step1Result step1Result = ProcessDefinitionParser.step1(dto .getProcessId(), dto.getProcessName(), dto.getProcessXml())
+                .parseConfig().step1Result();
+
+        Map<String, String> configIdMap = step1Result.getConnectorConfigMap();
+        return null;
     }
 
     @Override
@@ -44,20 +52,6 @@ public class ProcessDefinitionService2 implements IProcessDefinitionService2{
         ret.setTriggerFullId(Opt.ofNullable(step2Result.getTrigger()).map(Action::getFullId).orElse(null));
         ret.setProtocol(step2Result.getProtocol());
         ret.setRequestParams(JacksonUtil.to(step2Result.getRequestParams()));
-        return ret;
-    }
-
-    @Override
-    public BpmnXmlDto replaceProcessId(BpmnXmlDto dto) {
-        ProcessDefinitionParseStep1 step1 = ProcessDefinitionParser.step1(dto.getProcessId(),
-                dto.getProcessName(), dto.getProcessXml());
-        String newProcessId = StrUtil.format("Process_{}", IdUtil.simpleUUID());
-        step1.replProcessId(newProcessId);
-        Step1Result step1Result = step1.step1Result();
-        BpmnXmlDto ret = new BpmnXmlDto();
-        ret.setProcessId(step1Result.getProcessId());
-        ret.setProcessName(step1Result.getProcessName());
-        ret.setProcessXml(step1Result.getOriginalXml());
         return ret;
     }
 }

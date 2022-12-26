@@ -1,6 +1,7 @@
 package com.brandnewdata.mop.poc.process.util;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
@@ -55,6 +56,11 @@ public class ProcessUtil {
         ret.setConnectorVersion(version);
 
         return ret;
+    }
+
+    public static String generateProcessId() {
+        String uuid = IdUtil.simpleUUID();
+        return StrUtil.format("Process_{}", uuid);
     }
 
 }

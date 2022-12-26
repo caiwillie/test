@@ -75,10 +75,7 @@ public class SceneApi implements ISceneApi {
         Map<String, Object> variables = Opt.ofNullable(JacksonUtil.fromMap(versionProcessStartDto.getContent())).orElse(MapUtil.empty());
 
         VersionProcessDto versionProcessDto = versionProcessService.fetchOneByProcessId(ListUtil.of(processId)).get(processId);
-        BpmnXmlDto bpmnXmlDto = new BpmnXmlDto();
-        bpmnXmlDto.setProcessId(versionProcessDto.getProcessId());
-        bpmnXmlDto.setProcessName(versionProcessDto.getProcessName());
-        bpmnXmlDto.setProcessXml(versionProcessDto.getProcessXml());
+        BpmnXmlDto bpmnXmlDto = new BpmnXmlDto(versionProcessDto.getProcessId(), versionProcessDto.getProcessName(), versionProcessDto.getProcessXml());
 
         Map<String, Object> data = processDeployService.startSync(bpmnXmlDto, variables, envId, ProcessConst.PROCESS_BIZ_TYPE__SCENE);
         return Result.OK(Opt.ofNullable(data).orElse(MapUtil.empty()));

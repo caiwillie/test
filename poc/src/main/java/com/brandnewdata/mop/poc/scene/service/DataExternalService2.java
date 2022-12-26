@@ -13,11 +13,11 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
 import com.brandnewdata.mop.poc.constant.SceneConst;
+import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
 import com.brandnewdata.mop.poc.process.manager.ConnectorManager;
 import com.brandnewdata.mop.poc.process.manager.dto.ConfigInfo;
-import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParser;
 import com.brandnewdata.mop.poc.process.parser.dto.Action;
-import com.brandnewdata.mop.poc.process.parser.dto.Step1Result;
+import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService2;
 import com.brandnewdata.mop.poc.process.util.ProcessUtil;
 import com.brandnewdata.mop.poc.scene.bo.export.ConfigExportBo;
 import com.brandnewdata.mop.poc.scene.bo.export.ConnectorExportBo;
@@ -54,7 +54,10 @@ public class DataExternalService2 implements IDataExternalService2 {
 
     private static final String FILENAME__CONFIG = "config.json";
 
+    private final IProcessDefinitionService2 processDefinitionService;
+
     private final ISceneService2 sceneService;
+
     private final ISceneVersionService sceneVersionService;
 
     private final IVersionProcessService versionProcessService;
@@ -70,10 +73,12 @@ public class DataExternalService2 implements IDataExternalService2 {
     @Resource
     private SceneLoadDao sceneLoadDao;
 
-    public DataExternalService2(ISceneService2 sceneService,
+    public DataExternalService2(IProcessDefinitionService2 processDefinitionService,
+                                ISceneService2 sceneService,
                                 ISceneVersionService sceneVersionService,
                                 IVersionProcessService versionProcessService,
                                 ConnectorManager connectorManager) {
+        this.processDefinitionService = processDefinitionService;
         this.sceneService = sceneService;
         this.sceneVersionService = sceneVersionService;
         this.versionProcessService = versionProcessService;
@@ -109,10 +114,8 @@ public class DataExternalService2 implements IDataExternalService2 {
                     processExportBoMap.put(processId, processExportBo);
 
                     // 解析流程中用到的流程
-                    Step1Result step1Result = ProcessDefinitionParser.step1(processId, processName, processXml)
-                            .parseConfig().step1Result();
-
-                    Map<String, String> configIdMap = step1Result.getConnectorConfigMap();
+                    Map<String, String> configIdMap = processDefinitionService
+                            .parseConfigMap(new BpmnXmlDto(processId, processName, processXml));
                     parseConfig(connectorConfigMap, configIdMap);
                 });
 
@@ -170,12 +173,9 @@ public class DataExternalService2 implements IDataExternalService2 {
         sceneDto.setName(newSceneName);
         sceneDto = sceneService.save(sceneDto);
 
-        // 新增初始化版本
-        SceneVersionDto sceneVersionDto = new SceneVersionDto();
-        sceneVersionDto.setSceneId(sceneDto.getId());
-        sceneVersionDto.setVersion(DateUtil.format(sceneDto.getCreateTime(), DatePattern.PURE_DATETIME_PATTERN));
-        sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__CONFIGURING);
-        sceneVersionService.save(sceneVersionDto);
+        // 获取最新的 scene version
+        SceneVersionDto sceneVersionDto = sceneVersionService.fetchListBySceneId(ListUtil.of(sceneDto.getId()))
+                .get(sceneDto.getId()).get(0);
 
         List<ProcessExportBo> processExportBoList = sceneExportFileBo.getProcessExportBoList();
         for (ProcessExportBo processExportBo : processExportBoList) {
@@ -184,7 +184,7 @@ public class DataExternalService2 implements IDataExternalService2 {
             VersionProcessDto versionProcessDto = new VersionProcessDto();
             versionProcessDto.setVersionId(sceneVersionDto.getId());
             // 随机生成一个 process id
-            versionProcessDto.setProcessId(IdUtil.randomUUID());
+            versionProcessDto.setProcessId(ProcessUtil.generateProcessId());
             versionProcessDto.setProcessName(processExportBo.getProcessName());
             versionProcessDto.setProcessXml(processExportBo.getProcessXml());
             versionProcessDto.setProcessImg(processExportBo.getProcessImg());

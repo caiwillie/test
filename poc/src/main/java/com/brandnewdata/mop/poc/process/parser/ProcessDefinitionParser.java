@@ -111,19 +111,6 @@ public class ProcessDefinitionParser implements
     }
 
     @Override
-    public ProcessDefinitionParseStep1 replProcessId(String processId) {
-        ProcessUtil.checkProcessId(processId);
-        this.processId = processId;
-
-        Element originalBpProcess = getOriginalBpProcess();
-        Element zeebeBpProcess = getBpProcess();
-
-        originalBpProcess.addAttribute(ID_ATTRIBUTE, processId);
-        zeebeBpProcess.addAttribute(ID_ATTRIBUTE, processId);
-        return this;
-    }
-
-    @Override
     public ProcessDefinitionParseStep1 replConfigId(Map<String, String> configMapping) {
         return null;
     }
@@ -263,7 +250,6 @@ public class ProcessDefinitionParser implements
         this.name = name;
         this.originalDocument = readRoot(xml);
         this.zeebeDocument = readRoot(xml);
-        log.info("\n======================== 转换前的xml =====================\n{}", serialize(originalDocument));
 
         // 转换namespace zeebe2 => zeebe
         replNsZeebe2();
@@ -344,6 +330,7 @@ public class ProcessDefinitionParser implements
      */
     private void parseIdName() {
         Element bpProcess = getBpProcess();
+        Element originalBpProcess = getOriginalBpProcess();
 
         if(processId == null) {
             processId = bpProcess.attributeValue(ID_ATTRIBUTE);
@@ -351,6 +338,9 @@ public class ProcessDefinitionParser implements
 
         processId = ProcessUtil.convertProcessId(processId);
         Assert.notEmpty(processId, "流程配置错误：流程id不能为空");
+
+        // 源文件也需要修改
+        originalBpProcess.addAttribute(ID_ATTRIBUTE, processId);
         bpProcess.addAttribute(ID_ATTRIBUTE, processId);
 
         if(name == null) {
@@ -361,6 +351,7 @@ public class ProcessDefinitionParser implements
             name = processId;
         }
 
+        originalBpProcess.addAttribute(ID_ATTRIBUTE, processId);
         bpProcess.addAttribute(NAME_ATTRIBUTE, name);
     }
 

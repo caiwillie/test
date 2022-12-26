@@ -98,17 +98,13 @@ public class SceneController {
         return Result.OK(ret);
     }
 
-    @PostMapping("/rest/scene/load/confirm")
-    public Result<SceneVersionVo> confirmLoad(@RequestBody PrepareLoadVo vo) {
-
-    }
-
     /**
      * 确认导入场景
      */
     @PostMapping("/rest/scene/load/confirm")
-    public void loadConfirm() {
-        return;
+    public Result<SceneVersionVo> confirmLoad(@RequestBody PrepareLoadVo vo) {
+        SceneVersionVo ret = sceneBffService.confirmLoad(vo);
+        return Result.OK(ret);
     }
 
     /**

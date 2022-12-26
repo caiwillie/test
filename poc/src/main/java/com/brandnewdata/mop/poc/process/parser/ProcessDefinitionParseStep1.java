@@ -8,7 +8,7 @@ import java.util.Map;
 public interface ProcessDefinitionParseStep1 {
 
     ProcessDefinitionParseStep1 parseConfig();
-    ProcessDefinitionParseStep1 replProcessId(String processId);
+
     ProcessDefinitionParseStep1 replConfigId(Map<String, String> configMapping);
 
     ProcessDefinitionParseStep1 replServiceTask(boolean replConfig, ConnectorManager manager);
