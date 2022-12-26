@@ -17,7 +17,7 @@ import com.brandnewdata.mop.poc.bff.vo.scene.operate.SceneStatistic;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.operate.dto.ProcessInstanceStateDto;
-import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService2;
+import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService;
 import com.brandnewdata.mop.poc.process.dto.ProcessReleaseDeployDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import com.brandnewdata.mop.poc.scene.dto.SceneReleaseDeployDto;
@@ -41,13 +41,13 @@ public class SceneOperateBffService2 {
 
     private final IProcessDeployService processDeployService;
 
-    private final IProcessInstanceService2 processInstanceService;
+    private final IProcessInstanceService processInstanceService;
 
     private final IVersionProcessService versionProcessService;
 
     public SceneOperateBffService2(ISceneReleaseDeployService sceneReleaseDeployService,
                                    IProcessDeployService processDeployService,
-                                   IProcessInstanceService2 processInstanceService,
+                                   IProcessInstanceService processInstanceService,
                                    IVersionProcessService versionProcessService) {
         this.sceneReleaseDeployService = sceneReleaseDeployService;
         this.processDeployService = processDeployService;

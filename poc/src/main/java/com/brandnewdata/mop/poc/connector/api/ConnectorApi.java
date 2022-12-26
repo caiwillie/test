@@ -17,7 +17,7 @@ import com.brandnewdata.mop.poc.constant.ProcessConst;
 import com.brandnewdata.mop.poc.env.dto.EnvDto;
 import com.brandnewdata.mop.poc.env.service.IEnvService;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
-import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService2;
+import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService;
 import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
 import com.brandnewdata.mop.poc.process.dto.DeployStatusDto;
 import com.brandnewdata.mop.poc.process.dto.ProcessSnapshotDeployDto;
@@ -37,11 +37,11 @@ public class ConnectorApi implements IConnectorApi {
 
     private final IProcessDeployService processDeployService;
 
-    private final IProcessInstanceService2 processInstanceService;
+    private final IProcessInstanceService processInstanceService;
 
     public ConnectorApi(IEnvService envService,
                         IProcessDeployService processDeployService,
-                        IProcessInstanceService2 processInstanceService) {
+                        IProcessInstanceService processInstanceService) {
         this.envService = envService;
         this.processDeployService = processDeployService;
         this.processInstanceService = processInstanceService;

@@ -5,7 +5,7 @@ import com.brandnewdata.mop.poc.operate.dto.FlowNodeInstanceTreeNodeDto;
 
 import java.util.List;
 
-public interface IFlowNodeInstanceService2 {
+public interface IFlowNodeInstanceService {
 
     List<FlowNodeInstanceTreeNodeDto> list(Long envId, String processInstanceId);
 

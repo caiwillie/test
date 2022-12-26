@@ -34,11 +34,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-public class FlowNodeInstanceService2 implements IFlowNodeInstanceService2 {
+public class FlowNodeInstanceService implements IFlowNodeInstanceService {
 
     private final DaoManager daoManager;
 
-    public FlowNodeInstanceService2(DaoManager daoManager) {
+    public FlowNodeInstanceService(DaoManager daoManager) {
         this.daoManager = daoManager;
     }
 

@@ -35,13 +35,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class ProcessInstanceService2 implements IProcessInstanceService2 {
+public class ProcessInstanceService implements IProcessInstanceService {
 
     private final DaoManager daoManager;
 
     private final ProcessInstanceCache processInstanceCache;
 
-    public ProcessInstanceService2(DaoManager daoManager, ProcessInstanceCache processInstanceCache) {
+    public ProcessInstanceService(DaoManager daoManager, ProcessInstanceCache processInstanceCache) {
         this.daoManager = daoManager;
         this.processInstanceCache = processInstanceCache;
     }

@@ -8,7 +8,7 @@ import com.brandnewdata.mop.poc.operate.dto.SequenceFlowDto;
 import java.util.List;
 import java.util.Map;
 
-public interface IProcessInstanceService2 {
+public interface IProcessInstanceService {
 
     Page<ListViewProcessInstanceDto> pageProcessInstanceByZeebeKey(
             Long envId,

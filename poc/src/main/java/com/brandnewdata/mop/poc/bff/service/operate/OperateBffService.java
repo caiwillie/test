@@ -8,9 +8,9 @@ import com.brandnewdata.mop.poc.bff.vo.operate.process.ProcessInstanceVo;
 import com.brandnewdata.mop.poc.bff.vo.operate.process.SequenceFlowVo;
 import com.brandnewdata.mop.poc.bff.vo.operate.process.VariableVo;
 import com.brandnewdata.mop.poc.operate.dto.*;
-import com.brandnewdata.mop.poc.operate.service.IFlowNodeInstanceService2;
-import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService2;
-import com.brandnewdata.mop.poc.operate.service.IVariableService2;
+import com.brandnewdata.mop.poc.operate.service.IFlowNodeInstanceService;
+import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService;
+import com.brandnewdata.mop.poc.operate.service.IVariableService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,15 +22,15 @@ import java.util.stream.Collectors;
 @Service
 public class OperateBffService {
 
-    private final IProcessInstanceService2 processInstanceService;
+    private final IProcessInstanceService processInstanceService;
 
-    private final IVariableService2 variableService;
+    private final IVariableService variableService;
 
-    private final IFlowNodeInstanceService2 flowNodeInstanceService;
+    private final IFlowNodeInstanceService flowNodeInstanceService;
 
-    public OperateBffService(IProcessInstanceService2 processInstanceService,
-                             IVariableService2 variableService,
-                             IFlowNodeInstanceService2 flowNodeInstanceService) {
+    public OperateBffService(IProcessInstanceService processInstanceService,
+                             IVariableService variableService,
+                             IFlowNodeInstanceService flowNodeInstanceService) {
         this.processInstanceService = processInstanceService;
         this.variableService = variableService;
         this.flowNodeInstanceService = flowNodeInstanceService;

@@ -1,4 +1,4 @@
 package com.brandnewdata.mop.poc.operate.service;
 
-public interface IIncidentService2 {
+public interface IIncidentService {
 }

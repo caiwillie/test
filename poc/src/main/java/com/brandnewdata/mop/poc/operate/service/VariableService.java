@@ -18,11 +18,11 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class VariableService2 implements IVariableService2 {
+public class VariableService implements IVariableService {
 
     private final DaoManager daoManager;
 
-    public VariableService2(DaoManager daoManager) {
+    public VariableService(DaoManager daoManager) {
         this.daoManager = daoManager;
     }
 
