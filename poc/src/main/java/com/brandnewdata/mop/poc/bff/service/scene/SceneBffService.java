@@ -151,10 +151,6 @@ public class SceneBffService {
 
     public LoadVo loadPrepare(byte[] bytes) {
         LoadVo ret = new LoadVo();
-        Long id = dataExternalService.saveBytes(bytes);
-        ret.setId(String.valueOf(id));
-
-        
         return ret;
     }
 
