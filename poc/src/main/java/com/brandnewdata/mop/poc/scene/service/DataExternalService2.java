@@ -25,7 +25,10 @@ import com.brandnewdata.mop.poc.scene.bo.export.ProcessExportBo;
 import com.brandnewdata.mop.poc.scene.bo.export.SceneExportFileBo;
 import com.brandnewdata.mop.poc.scene.converter.ConnectorConfigDtoConverter;
 import com.brandnewdata.mop.poc.scene.dao.SceneLoadDao;
-import com.brandnewdata.mop.poc.scene.dto.*;
+import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
+import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
+import com.brandnewdata.mop.poc.scene.dto.SceneVersionExportDto;
+import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
 import com.brandnewdata.mop.poc.scene.dto.external.ConfirmLoadDto;
 import com.brandnewdata.mop.poc.scene.dto.external.ConnectorConfigDto;
 import com.brandnewdata.mop.poc.scene.dto.external.PrepareLoadDto;
@@ -188,7 +191,7 @@ public class DataExternalService2 implements IDataExternalService2 {
             versionProcessService.save(versionProcessDto);
         }
 
-        return null;
+        return sceneVersionDto;
     }
 
     private Long saveBytes(byte[] bytes) {
