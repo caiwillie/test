@@ -149,6 +149,7 @@ public class SceneBffService {
         SceneVersionExportDto exportDto = dataExternalService.export(exportQueryVo.getVersionId(), exportQueryVo.getProcessIdList());
         // 还要通过额外的响应头 Access-Control-Expose-Headers 声明其可以被外部访问
         response.setHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
+        response.setCharacterEncoding("UTF-8");
         ServletUtil.write(response, new ByteArrayInputStream(exportDto.getBytes()), "application/zip", exportDto.getFileName());
     }
 
