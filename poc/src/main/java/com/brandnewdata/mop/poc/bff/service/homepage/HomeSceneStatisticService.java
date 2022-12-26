@@ -15,7 +15,7 @@ import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.operate.dto.ProcessInstanceStateDto;
 import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService2;
 import com.brandnewdata.mop.poc.process.dto.ProcessReleaseDeployDto;
-import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
+import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import com.brandnewdata.mop.poc.scene.dto.SceneDto;
 import com.brandnewdata.mop.poc.scene.dto.SceneReleaseDeployDto;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
@@ -40,7 +40,7 @@ public class HomeSceneStatisticService {
 
     private final ISceneVersionService sceneVersionService;
 
-    private final IProcessDeployService2 processDeployService;
+    private final IProcessDeployService processDeployService;
 
     private final IProcessInstanceService2 processInstanceService;
 
@@ -50,7 +50,7 @@ public class HomeSceneStatisticService {
     public HomeSceneStatisticService(IEnvService envService,
                                      ISceneService sceneService,
                                      ISceneVersionService sceneVersionService,
-                                     IProcessDeployService2 processDeployService,
+                                     IProcessDeployService processDeployService,
                                      IProcessInstanceService2 processInstanceService,
                                      ISceneReleaseDeployService sceneReleaseDeployService) {
         this.sceneService = sceneService;

@@ -52,7 +52,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class ProcessDeployService2 implements IProcessDeployService2 {
+public class ProcessDeployService implements IProcessDeployService {
 
     @Resource
     private ProcessSnapshotDeployDao snapshotDeployDao;
@@ -69,9 +69,9 @@ public class ProcessDeployService2 implements IProcessDeployService2 {
 
     private final ProcessEnvLock processEnvLock;
 
-    public ProcessDeployService2(ZeebeClientManager zeebeClientManager,
-                                 ConnectorManager connectorManager,
-                                 ProcessEnvLock processEnvLock) {
+    public ProcessDeployService(ZeebeClientManager zeebeClientManager,
+                                ConnectorManager connectorManager,
+                                ProcessEnvLock processEnvLock) {
         this.zeebeClientManager = zeebeClientManager;
         this.connectorManager = connectorManager;
         this.processEnvLock = processEnvLock;

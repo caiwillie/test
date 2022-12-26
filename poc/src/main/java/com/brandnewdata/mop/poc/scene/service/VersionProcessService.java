@@ -8,7 +8,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
-import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService2;
+import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService;
 import com.brandnewdata.mop.poc.scene.converter.VersionProcessDtoConverter;
 import com.brandnewdata.mop.poc.scene.converter.VersionProcessPoConverter;
 import com.brandnewdata.mop.poc.scene.dao.VersionProcessDao;
@@ -36,9 +36,9 @@ public class VersionProcessService implements IVersionProcessService {
     @Resource
     private VersionProcessDao versionProcessDao;
 
-    private final IProcessDefinitionService2 processDefinitionService;
+    private final IProcessDefinitionService processDefinitionService;
 
-    public VersionProcessService(IProcessDefinitionService2 processDefinitionService) {
+    public VersionProcessService(IProcessDefinitionService processDefinitionService) {
         this.processDefinitionService = processDefinitionService;
     }
 

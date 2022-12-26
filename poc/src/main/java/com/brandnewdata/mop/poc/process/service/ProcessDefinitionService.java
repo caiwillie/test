@@ -15,11 +15,11 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 
 @Service
-public class ProcessDefinitionService2 implements IProcessDefinitionService2{
+public class ProcessDefinitionService implements IProcessDefinitionService {
 
     private final ConnectorManager connectorManager;
 
-    public ProcessDefinitionService2(ConnectorManager connectorManager) {
+    public ProcessDefinitionService(ConnectorManager connectorManager) {
         this.connectorManager = connectorManager;
     }
 

@@ -15,7 +15,7 @@ import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
 import com.brandnewdata.mop.poc.process.manager.ConnectorManager;
 import com.brandnewdata.mop.poc.process.manager.dto.ConfigInfo;
 import com.brandnewdata.mop.poc.process.parser.dto.Action;
-import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService2;
+import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService;
 import com.brandnewdata.mop.poc.process.util.ProcessUtil;
 import com.brandnewdata.mop.poc.scene.bo.export.ConfigExportBo;
 import com.brandnewdata.mop.poc.scene.bo.export.ConnectorExportBo;
@@ -52,7 +52,7 @@ public class DataExternalService implements IDataExternalService {
 
     private static final String FILENAME__CONFIG = "config.json";
 
-    private final IProcessDefinitionService2 processDefinitionService;
+    private final IProcessDefinitionService processDefinitionService;
 
     private final ISceneService sceneService;
 
@@ -71,7 +71,7 @@ public class DataExternalService implements IDataExternalService {
     @Resource
     private SceneLoadDao sceneLoadDao;
 
-    public DataExternalService(IProcessDefinitionService2 processDefinitionService,
+    public DataExternalService(IProcessDefinitionService processDefinitionService,
                                ISceneService sceneService,
                                ISceneVersionService sceneVersionService,
                                IVersionProcessService versionProcessService,

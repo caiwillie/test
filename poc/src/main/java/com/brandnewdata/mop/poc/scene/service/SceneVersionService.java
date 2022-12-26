@@ -18,8 +18,8 @@ import com.brandnewdata.mop.poc.env.service.IEnvService;
 import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionParseDto;
 import com.brandnewdata.mop.poc.process.manager.ConnectorManager;
-import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService2;
-import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
+import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService;
+import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import com.brandnewdata.mop.poc.process.util.ProcessUtil;
 import com.brandnewdata.mop.poc.scene.bo.SceneReleaseVersionBo;
 import com.brandnewdata.mop.poc.scene.converter.SceneReleaseDeployDtoConverter;
@@ -55,18 +55,18 @@ public class SceneVersionService implements ISceneVersionService {
 
     private final ISceneReleaseDeployService sceneReleaseDeployService;
 
-    private final IProcessDeployService2 processDeployService;
+    private final IProcessDeployService processDeployService;
 
-    private final IProcessDefinitionService2 processDefinitionService;
+    private final IProcessDefinitionService processDefinitionService;
 
     private final ConnectorManager connectorManager;
 
 
     public SceneVersionService(IEnvService envService,
                                IVersionProcessService versionProcessService,
-                               IProcessDeployService2 processDeployService,
+                               IProcessDeployService processDeployService,
                                ISceneReleaseDeployService sceneReleaseDeployService,
-                               IProcessDefinitionService2 processDefinitionService,
+                               IProcessDefinitionService processDefinitionService,
                                ConnectorManager connectorManager) {
         this.envService = envService;
         this.versionProcessService = versionProcessService;

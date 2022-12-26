@@ -1,32 +1,34 @@
 package com.brandnewdata.mop.poc.process.service;
 
-import com.brandnewdata.mop.poc.common.dto.Page;
-import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDto;
-import com.brandnewdata.mop.poc.process.dto.ProcessDeployDto;
+import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
+import com.brandnewdata.mop.poc.process.dto.DeployStatusDto;
+import com.brandnewdata.mop.poc.process.dto.ProcessReleaseDeployDto;
+import com.brandnewdata.mop.poc.process.dto.ProcessSnapshotDeployDto;
 
 import java.util.List;
 import java.util.Map;
 
 public interface IProcessDeployService {
 
-    /**
-     * 部署流程
-     *
-     * @param processDefinitionDTO the process definition
-     * @param type              1 场景，2 操作，3 触发器
-     * @return process definition
-     */
-    ProcessDeployDto deploy(ProcessDefinitionDto processDefinitionDTO, int type);
+    void snapshotDeploy(BpmnXmlDto bpmnXmlDto, Long envId, String bizType);
 
-    List<ProcessDeployDto> listByType(int type);
+    void snapshotDeploy2(BpmnXmlDto bpmnXmlDto, Long envId, String bizType);
 
-    List<ProcessDeployDto> listByIdList(List<Long> idList);
+    void releaseDeploy(BpmnXmlDto bpmnXmlDto, List<Long> envIdList, String bizType);
 
-    Page<ProcessDeployDto> page(int pageNum, int pageSize);
+    void releaseDeploy2(BpmnXmlDto bpmnXmlDto, Long envId, String bizType);
 
-    Map<String, Object> startWithResult(String processId, Map<String, Object> values);
+    Map<String, DeployStatusDto> fetchDeployStatus(List<String> processIdList, Long envId);
 
-    Map<String, Object> startWithResultTest(String processId, Map<String, Object> values);
+    // todo caiwillie 可以优化，可选择是否获取xml
+    Map<String, List<ProcessSnapshotDeployDto>> listSnapshotByEnvIdAndProcessId(Long envId, List<String> processIdList);
 
-    ProcessDeployDto getOne(long deployId);
+    Map<Long, ProcessSnapshotDeployDto> listSnapshotById(List<Long> idList);
+
+    Map<String, ProcessReleaseDeployDto> fetchReleaseByEnvIdAndProcessId(Long envId, List<String> processIdList);
+
+    Map<String, Object> startSync(BpmnXmlDto bpmnXmlDto, Map<String, Object> values, Long envId, String bizType);
+
+    void startAsync(String processId, Map<String, Object> values, Long envId);
+
 }

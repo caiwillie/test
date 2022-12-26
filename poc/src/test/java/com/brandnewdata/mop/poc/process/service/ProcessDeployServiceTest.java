@@ -7,10 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ProcessDeployService2Test {
+class ProcessDeployServiceTest {
 
     @Autowired
-    private IProcessDeployService2 processDeployService;
+    private IProcessDeployService processDeployService;
 
     @Test
     void test() {

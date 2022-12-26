@@ -13,7 +13,7 @@ import cn.hutool.http.Method;
 import com.brandnewdata.mop.poc.constant.ProcessConst;
 import com.brandnewdata.mop.poc.constant.ProxyConst;
 import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
-import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
+import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import com.brandnewdata.mop.poc.proxy.bo.ProxyEndpointSceneBo;
 import com.brandnewdata.mop.poc.proxy.bo.ProxyEndpointServerBo;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
@@ -54,7 +54,7 @@ public class ReverseProxyServlet extends ProxyServlet {
 
     private final IProxyEndpointCallAService proxyEndpointCallAService;
 
-    private final IProcessDeployService2 deployService2;
+    private final IProcessDeployService deployService2;
 
     private final IVersionProcessService processService;
 
@@ -68,7 +68,7 @@ public class ReverseProxyServlet extends ProxyServlet {
                                IProxyEndpointAService proxyEndpointAService,
                                IProxyEndpointSceneAService proxyEndpointSceneAService,
                                IProxyEndpointCallAService proxyEndpointCallAService,
-                               IProcessDeployService2 deployService2,
+                               IProcessDeployService deployService2,
                                IVersionProcessService processService) {
         this.proxyAService = proxyAService;
         this.proxyEndpointAService = proxyEndpointAService;

@@ -21,7 +21,7 @@ import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService2;
 import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
 import com.brandnewdata.mop.poc.process.dto.DeployStatusDto;
 import com.brandnewdata.mop.poc.process.dto.ProcessSnapshotDeployDto;
-import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
+import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import com.brandnewdata.mop.poc.process.util.ProcessUtil;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,12 +35,12 @@ public class ConnectorApi implements IConnectorApi {
 
     private final IEnvService envService;
 
-    private final IProcessDeployService2 processDeployService;
+    private final IProcessDeployService processDeployService;
 
     private final IProcessInstanceService2 processInstanceService;
 
     public ConnectorApi(IEnvService envService,
-                        IProcessDeployService2 processDeployService,
+                        IProcessDeployService processDeployService,
                         IProcessInstanceService2 processInstanceService) {
         this.envService = envService;
         this.processDeployService = processDeployService;

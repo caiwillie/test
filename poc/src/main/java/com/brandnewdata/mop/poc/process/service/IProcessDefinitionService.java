@@ -1,22 +1,14 @@
 package com.brandnewdata.mop.poc.process.service;
 
-import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionDto;
+import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
+import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionParseDto;
+
+import java.util.Map;
 
 public interface IProcessDefinitionService {
+    BpmnXmlDto baseCheck(BpmnXmlDto dto);
 
+    Map<String, String> parseConfigMap(BpmnXmlDto dto);
 
-    /**
-     * 保存流程定义
-     *
-     * @param processDefinitionDTO the process definition
-     * @return the process definition
-     */
-    ProcessDefinitionDto save(ProcessDefinitionDto processDefinitionDTO);
-
-
-
-
-
-
-
+    ProcessDefinitionParseDto parseSceneTrigger(BpmnXmlDto dto);
 }

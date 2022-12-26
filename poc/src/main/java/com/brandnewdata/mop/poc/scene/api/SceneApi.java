@@ -11,7 +11,7 @@ import com.brandnewdata.mop.api.scene.dto.SceneQuery;
 import com.brandnewdata.mop.api.scene.dto.VersionProcessStartDto;
 import com.brandnewdata.mop.poc.constant.ProcessConst;
 import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
-import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
+import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import com.brandnewdata.mop.poc.scene.dto.SceneReleaseDeployDto;
 import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
 import com.brandnewdata.mop.poc.scene.service.IVersionProcessService;
@@ -26,10 +26,10 @@ public class SceneApi implements ISceneApi {
 
     private final IVersionProcessService versionProcessService;
 
-    private final IProcessDeployService2 processDeployService;
+    private final IProcessDeployService processDeployService;
 
     public SceneApi(IVersionProcessService versionProcessService,
-                    IProcessDeployService2 processDeployService) {
+                    IProcessDeployService processDeployService) {
         this.versionProcessService = versionProcessService;
         this.processDeployService = processDeployService;
     }

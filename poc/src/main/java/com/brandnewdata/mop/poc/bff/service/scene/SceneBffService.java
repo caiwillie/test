@@ -27,7 +27,7 @@ import com.brandnewdata.mop.poc.env.service.IEnvService;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService2;
 import com.brandnewdata.mop.poc.process.dto.ProcessSnapshotDeployDto;
-import com.brandnewdata.mop.poc.process.service.IProcessDeployService2;
+import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import com.brandnewdata.mop.poc.scene.dto.*;
 import com.brandnewdata.mop.poc.scene.dto.external.ConfirmLoadDto;
 import com.brandnewdata.mop.poc.scene.dto.external.ConnectorConfigDto;
@@ -54,7 +54,7 @@ public class SceneBffService {
 
     private final IEnvService envService;
 
-    private final IProcessDeployService2 processDeployService;
+    private final IProcessDeployService processDeployService;
 
     private final IProcessInstanceService2 processInstanceService;
 
@@ -66,7 +66,7 @@ public class SceneBffService {
                            ISceneVersionService sceneVersionService,
                            IVersionProcessService versionProcessService,
                            IEnvService envService,
-                           IProcessDeployService2 processDeployService,
+                           IProcessDeployService processDeployService,
                            IProcessInstanceService2 processInstanceService,
                            ISceneReleaseDeployService sceneReleaseDeployService,
                            IDataExternalService dataExternalService) {
