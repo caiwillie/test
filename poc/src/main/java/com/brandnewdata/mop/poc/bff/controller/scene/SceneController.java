@@ -92,10 +92,15 @@ public class SceneController {
      */
     @SneakyThrows
     @PostMapping("/rest/scene/load/prepare")
-    public Result<PrepareLoadVo> loadPrepare(@RequestParam MultipartFile file) {
+    public Result<PrepareLoadVo> prepareLoad(@RequestParam MultipartFile file) {
         byte[] bytes = file.getBytes();
         PrepareLoadVo ret = sceneBffService.prepareLoad(bytes);
         return Result.OK(ret);
+    }
+
+    @PostMapping("/rest/scene/load/confirm")
+    public Result<SceneVersionVo> confirmLoad(@RequestBody PrepareLoadVo vo) {
+
     }
 
     /**

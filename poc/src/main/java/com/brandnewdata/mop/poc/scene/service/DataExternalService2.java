@@ -2,6 +2,8 @@ package com.brandnewdata.mop.poc.scene.service;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.Assert;
@@ -23,10 +25,8 @@ import com.brandnewdata.mop.poc.scene.bo.export.ProcessExportBo;
 import com.brandnewdata.mop.poc.scene.bo.export.SceneExportFileBo;
 import com.brandnewdata.mop.poc.scene.converter.ConnectorConfigDtoConverter;
 import com.brandnewdata.mop.poc.scene.dao.SceneLoadDao;
-import com.brandnewdata.mop.poc.scene.dto.SceneDto2;
-import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
-import com.brandnewdata.mop.poc.scene.dto.SceneVersionExportDto;
-import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
+import com.brandnewdata.mop.poc.scene.dto.*;
+import com.brandnewdata.mop.poc.scene.dto.external.ConfirmLoadDto;
 import com.brandnewdata.mop.poc.scene.dto.external.ConnectorConfigDto;
 import com.brandnewdata.mop.poc.scene.dto.external.PrepareLoadDto;
 import com.brandnewdata.mop.poc.scene.po.SceneLoadPo;
@@ -131,14 +131,6 @@ public class DataExternalService2 implements IDataExternalService2 {
         return ret;
     }
 
-    public Long saveBytes(byte[] bytes) {
-        SceneLoadPo sceneLoadPo = new SceneLoadPo();
-        sceneLoadPo.setId(IdUtil.getSnowflakeNextId());
-        sceneLoadPo.setZipBytes(bytes);
-        sceneLoadDao.insert(sceneLoadPo);
-        return sceneLoadPo.getId();
-    }
-
     @Override
     public PrepareLoadDto prepareLoad(byte[] bytes) {
         PrepareLoadDto ret = new PrepareLoadDto();
@@ -156,6 +148,54 @@ public class DataExternalService2 implements IDataExternalService2 {
         }
         ret.setConfigs(connectorConfigDtos);
         return ret;
+    }
+
+    @Override
+    public SceneVersionDto confirmLoad(ConfirmLoadDto confirmLoadDto) {
+        Long id = confirmLoadDto.getId();
+        String newSceneName = confirmLoadDto.getNewSceneName();
+        Assert.notNull(id);
+        Assert.notNull(newSceneName);
+
+        // 保存场景下的流程
+        SceneLoadPo sceneLoadPo = sceneLoadDao.selectById(id);
+        Assert.notNull(sceneLoadPo);
+        SceneExportFileBo sceneExportFileBo = parseBytes(sceneLoadPo.getZipBytes());
+
+        // 保存场景
+        SceneDto2 sceneDto = new SceneDto2();
+        sceneDto.setName(newSceneName);
+        sceneDto = sceneService.save(sceneDto);
+
+        // 新增初始化版本
+        SceneVersionDto sceneVersionDto = new SceneVersionDto();
+        sceneVersionDto.setSceneId(sceneDto.getId());
+        sceneVersionDto.setVersion(DateUtil.format(sceneDto.getCreateTime(), DatePattern.PURE_DATETIME_PATTERN));
+        sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__CONFIGURING);
+        sceneVersionService.save(sceneVersionDto);
+
+        List<ProcessExportBo> processExportBoList = sceneExportFileBo.getProcessExportBoList();
+        for (ProcessExportBo processExportBo : processExportBoList) {
+
+            // 保存流程
+            VersionProcessDto versionProcessDto = new VersionProcessDto();
+            versionProcessDto.setVersionId(sceneVersionDto.getId());
+            versionProcessDto.setProcessId(IdUtil.randomUUID());
+            versionProcessDto.setProcessName(processExportBo.getProcessName());
+            versionProcessDto.setProcessXml(processExportBo.getProcessXml());
+            versionProcessDto.setProcessImg(processExportBo.getProcessImg());
+            versionProcessService.save(versionProcessDto);
+        }
+
+        return null;
+    }
+
+    private Long saveBytes(byte[] bytes) {
+        SceneLoadPo sceneLoadPo = new SceneLoadPo();
+        sceneLoadPo.setId(IdUtil.getSnowflakeNextId());
+        sceneLoadPo.setZipBytes(bytes);
+        sceneLoadDao.insert(sceneLoadPo);
+        return sceneLoadPo.getId();
     }
 
     private void parseConfig(Map<ConnectorExportBo, Map<String, ConfigExportBo>> configMap, Map<String, String> configIdMap) {

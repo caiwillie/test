@@ -108,6 +108,7 @@ public class DataExternalService {
 
             SceneProcessDto sceneProcessDto = new SceneProcessDto();
             // 随机生成新的流程id
+
             sceneProcessDto.setProcessId(IdUtil.randomUUID());
             sceneProcessDto.setName(processDefinitionExternal.getName());
             sceneProcessDto.setXml(processDefinitionExternal.getXml());

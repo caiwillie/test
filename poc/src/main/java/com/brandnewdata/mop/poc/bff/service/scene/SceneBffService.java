@@ -167,6 +167,21 @@ public class SceneBffService {
         return ret;
     }
 
+    public SceneVersionVo confirmLoad(PrepareLoadVo vo) {
+        String id = vo.getId();
+        String sceneName = vo.getSceneName();
+        Map<String, String> configMap = new HashMap<>();
+        for (ConnectorConfigVo connectorConfigVo : Opt.ofNullable(vo.getConfigureList()).orElse(ListUtil.empty())) {
+            String configureId = connectorConfigVo.getConfigureId();
+            String newConfigureId = connectorConfigVo.getNewConfigureId();
+
+            Assert.notNull(configureId);
+            Assert.notNull(newConfigureId);
+            configMap.put(configureId, newConfigureId);
+        }
+
+    }
+
     public VersionProcessVo processSave(VersionProcessVo vo) {
         VersionProcessDto dto = sceneVersionService.saveProcess(VersionProcessDtoConverter.createFrom(vo));
         return VersionProcessVoConverter.createFrom(dto);

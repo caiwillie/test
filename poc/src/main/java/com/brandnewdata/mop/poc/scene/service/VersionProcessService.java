@@ -120,25 +120,28 @@ public class VersionProcessService implements IVersionProcessService {
 
     @Override
     public VersionProcessDto save(VersionProcessDto versionProcessDto) {
-        String processXml = versionProcessDto.getProcessXml();
-        Assert.notNull(processXml, "流程定义不能为空");
 
         BpmnXmlDto bpmnXmlDto = new BpmnXmlDto();
         bpmnXmlDto.setProcessId(versionProcessDto.getProcessId());
         bpmnXmlDto.setProcessName(versionProcessDto.getProcessName());
-        bpmnXmlDto.setProcessXml(processXml);
-        ProcessDefinitionParseDto processDefinitionParseDto = processDefinitionService.parseIdAndName(bpmnXmlDto);
+        bpmnXmlDto.setProcessXml(versionProcessDto.getProcessXml());
+        bpmnXmlDto = processDefinitionService.replaceProcessId(bpmnXmlDto);
 
-        String processId = processDefinitionParseDto.getProcessId();
-        String name = processDefinitionParseDto.getName();
+        String processId = bpmnXmlDto.getProcessId();
+        String name = bpmnXmlDto.getProcessName();
+        String processXml = bpmnXmlDto.getProcessXml();
 
         Long id = versionProcessDto.getId();
+
         if(id == null) {
             // 手动指定
             versionProcessDto.setId(IdUtil.getSnowflakeNextId());
             versionProcessDto.setProcessId(processId);
             versionProcessDto.setProcessName(name);
-            versionProcessDao.insert(VersionProcessPoConverter.createFrom(versionProcessDto));
+
+            VersionProcessPo versionProcessPo = VersionProcessPoConverter.createFrom(versionProcessDto);
+            versionProcessPo.setProcessXml(processXml);
+            versionProcessDao.insert(versionProcessPo);
         } else {
             VersionProcessDto updateContent = versionProcessDto;
             versionProcessDto = fetchOneById(ListUtil.of(id)).get(id);
@@ -146,9 +149,12 @@ public class VersionProcessService implements IVersionProcessService {
                 throw new RuntimeException("流程id不能改变");
             }
             versionProcessDto.setProcessName(name);
-            versionProcessDto.setProcessXml(updateContent.getProcessXml());
+            versionProcessDto.setProcessXml(processXml);
             versionProcessDto.setProcessImg(updateContent.getProcessImg());
-            versionProcessDao.updateById(VersionProcessPoConverter.createFrom(versionProcessDto));
+
+            VersionProcessPo versionProcessPo = VersionProcessPoConverter.createFrom(versionProcessDto);
+            versionProcessPo.setProcessXml(processXml);
+            versionProcessDao.updateById(versionProcessPo);
         }
 
         return versionProcessDto;
