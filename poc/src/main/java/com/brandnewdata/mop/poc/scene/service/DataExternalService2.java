@@ -180,6 +180,7 @@ public class DataExternalService2 implements IDataExternalService2 {
             // 保存流程
             VersionProcessDto versionProcessDto = new VersionProcessDto();
             versionProcessDto.setVersionId(sceneVersionDto.getId());
+            // 随机生成一个 process id
             versionProcessDto.setProcessId(IdUtil.randomUUID());
             versionProcessDto.setProcessName(processExportBo.getProcessName());
             versionProcessDto.setProcessXml(processExportBo.getProcessXml());
