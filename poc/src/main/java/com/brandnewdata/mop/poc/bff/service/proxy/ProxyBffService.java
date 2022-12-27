@@ -69,6 +69,11 @@ public class ProxyBffService {
         proxyCService.deleteById(id);
     }
 
+    public ProxyVo changeProxyState(ProxyDto dto) {
+        ProxyDto proxyDto = proxyAService.changeState(dto);
+        return ProxyVoConverter.createFrom(proxyDto);
+    }
+
     public ProxyEndpointVo saveEndpoint(ProxyEndpointVo vo) {
         ProxyEndpointDto dto = proxyEndpointCService.save(ProxyEndpointDtoConverter.createFrom(vo));
         return ProxyEndpointVoConverter.createFrom(dto);

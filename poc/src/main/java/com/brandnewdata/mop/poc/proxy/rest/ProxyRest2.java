@@ -70,7 +70,7 @@ public class ProxyRest2 {
      * @param req the proxy req
      * @return the result
      */
-    @PostMapping("/rest/reverseProxy/changeState")
+    // @PostMapping("/rest/reverseProxy/changeState")
     public Result changeState(@RequestBody ProxyReq req) {
         Long id = req.getId();
         Integer state = req.getState();

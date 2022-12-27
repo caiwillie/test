@@ -1,12 +1,14 @@
 package com.brandnewdata.mop.poc.bff.controller.proxy;
 
 import com.brandnewdata.common.webresult.Result;
+import com.brandnewdata.mop.poc.bff.converter.proxy.ProxyDtoConverter;
 import com.brandnewdata.mop.poc.bff.service.proxy.ProxyBffService;
 import com.brandnewdata.mop.poc.bff.vo.proxy.ProxyEndpointVo;
 import com.brandnewdata.mop.poc.bff.vo.proxy.ProxyGroupVo;
 import com.brandnewdata.mop.poc.bff.vo.proxy.ProxyVo;
 import com.brandnewdata.mop.poc.bff.vo.proxy.SimpleProxyGroupVo;
 import com.brandnewdata.mop.poc.common.dto.Page;
+import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -48,6 +50,13 @@ public class ProxyController {
         Long id = proxyVo.getId();
         proxyBffService.deleteProxy(id);
         return Result.OK();
+    }
+
+    @PostMapping("/rest/reverseProxy/changeState")
+    public Result changeState(@RequestBody ProxyVo proxyVo) {
+        ProxyDto dto = ProxyDtoConverter.createFrom(proxyVo);
+        ProxyVo ret = proxyBffService.changeProxyState(dto);
+        return Result.OK(ret);
     }
 
     /**

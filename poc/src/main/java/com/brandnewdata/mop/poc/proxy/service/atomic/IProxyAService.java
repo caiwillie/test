@@ -20,4 +20,6 @@ public interface IProxyAService {
 
     ProxyDto fetchByDomain(String domain);
 
+    ProxyDto changeState(ProxyDto proxyDto);
+
 }

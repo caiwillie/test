@@ -166,6 +166,21 @@ public class ProxyAService implements IProxyAService {
         return ProxyDtoConverter.createFrom(proxyPo, domainRegEx);
     }
 
+    @Override
+    public ProxyDto changeState(ProxyDto proxyDto) {
+        Long id = proxyDto.getId();
+        Assert.notNull(id, "api id must not null");
+        ProxyPo proxyPo = proxyDao.selectById(id);
+        Assert.notNull(proxyPo, "api id is not exist");
+        Integer state = proxyPo.getState();
+        Assert.isTrue(state != null
+                        && (state == ProxyConst.PROXY_STATE__STOPPED || state == ProxyConst.PROXY_STATE__RUNNING),
+                "状态不能为空，且只能是 停止或运行");
+        proxyPo.setState(proxyDto.getState());
+        proxyDao.updateById(proxyPo);
+        return ProxyDtoConverter.createFrom(proxyPo, domainPattern);
+    }
+
     private List<ProxyDto> fetchListByFilter(ProxyFilter filter) {
         String name = filter.getName();
         String version = filter.getVersion();
