@@ -159,9 +159,10 @@ public class ProxyAService implements IProxyAService {
     public ProxyDto fetchByDomain(String domain) {
         // 解析domain，获取正则表达式中的第一个括号中的内容
         String identity = ReUtil.getGroup1(domainRegEx, domain);
-        QueryWrapper<ProxyPo> queryWrapper1 = new QueryWrapper<>();
-        queryWrapper1.eq(ProxyPo.DOMAIN, identity);
-        ProxyPo proxyPo = proxyDao.selectOne(queryWrapper1);
+        QueryWrapper<ProxyPo> query = new QueryWrapper<>();
+        query.eq(ProxyPo.DOMAIN, identity);
+        query.isNull(ProxyPo.DELETE_FLAG);
+        ProxyPo proxyPo = proxyDao.selectOne(query);
         return ProxyDtoConverter.createFrom(proxyPo, domainRegEx);
     }
 
@@ -177,6 +178,7 @@ public class ProxyAService implements IProxyAService {
         if(version != null) {
             query.eq(ProxyPo.VERSION, version);
         }
+        query.isNull(ProxyPo.DELETE_FLAG);
         List<ProxyPo> proxyPoList = proxyDao.selectList(query);
 
         return proxyPoList.stream().filter(po -> {

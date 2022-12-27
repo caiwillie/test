@@ -36,6 +36,7 @@ public class ProxyEndpoingAService implements IProxyEndpointAService {
         QueryWrapper<ProxyEndpointPo> query = new QueryWrapper<>();
         query.eq(ProxyEndpointPo.PROXY_ID, proxyId);
         query.eq(ProxyEndpointPo.LOCATION, location);
+        query.isNull(ProxyEndpointPo.DELETE_FLAG);
 
         ProxyEndpointPo proxyEndpointPo = proxyEndpointDao.selectOne(query);
         return proxyEndpointPo == null ? null : ProxyEndpointDtoConverter.createFrom(proxyEndpointPo);
@@ -48,6 +49,7 @@ public class ProxyEndpoingAService implements IProxyEndpointAService {
 
         QueryWrapper<ProxyEndpointPo> query = new QueryWrapper<>();
         query.in(ProxyEndpointPo.ID, idList);
+        query.isNull(ProxyEndpointPo.DELETE_FLAG);
         List<ProxyEndpointPo> proxyEndpointPos = proxyEndpointDao.selectList(query);
 
         return proxyEndpointPos.stream().map(ProxyEndpointDtoConverter::createFrom)
@@ -61,10 +63,12 @@ public class ProxyEndpoingAService implements IProxyEndpointAService {
 
         QueryWrapper<ProxyEndpointPo> query = new QueryWrapper<>();
         query.in(ProxyEndpointPo.PROXY_ID, proxyIdList);
+        query.isNull(ProxyEndpointPo.DELETE_FLAG);
         String location = filter.getLocation();
         if(StrUtil.isNotBlank(location)) {
             query.eq(ProxyEndpointPo.LOCATION, location);
         }
+
 
         List<ProxyEndpointPo> list = proxyEndpointDao.selectList(query);
         return list.stream().map(ProxyEndpointDtoConverter::createFrom)

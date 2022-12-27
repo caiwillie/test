@@ -8,8 +8,6 @@ import com.brandnewdata.mop.poc.bff.vo.proxy.ProxyGroupVo;
 import com.brandnewdata.mop.poc.bff.vo.proxy.ProxyVo;
 import com.brandnewdata.mop.poc.bff.vo.proxy.SimpleProxyGroupVo;
 import com.brandnewdata.mop.poc.common.dto.Page;
-import com.brandnewdata.mop.poc.proxy.req.EndpointReq;
-import com.brandnewdata.mop.poc.proxy.req.ProxyReq;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,13 +41,13 @@ public class ProxyController {
     /**
      * 删除API
      *
-     * @param proxyReq the proxy req
+     * @param proxyVo the proxy vo
      * @return the result
      */
     @PostMapping("/rest/reverseProxy/delete")
-    public Result delete(@RequestBody ProxyReq proxyReq) {
-        Long id = proxyReq.getId();
-        // proxyService.delete(id);
+    public Result delete(@RequestBody ProxyVo proxyVo) {
+        Long id = proxyVo.getId();
+        proxyBffService.deleteProxy(id);
         return Result.OK();
     }
 
@@ -87,16 +85,17 @@ public class ProxyController {
     /**
      * 删除Endpoint
      *
-     * @param req the req
+     * @param vo the vo
      * @return the result
      */
     @PostMapping("/rest/reverseProxy/deleteEndpoint")
-    public Result deleteEndpoint(@RequestBody EndpointReq req) {
-        Long id = req.getId();
+    public Result deleteEndpoint(@RequestBody ProxyEndpointVo vo) {
+        Long id = vo.getId();
         Assert.notNull(id, "路径 id 不能为空");
         // endpointService.deleteByIdList(ListUtil.of(id));
         return Result.OK();
     }
+
 
     /**
      * 获取所有 api-版本-路径

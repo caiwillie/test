@@ -9,6 +9,7 @@ import com.brandnewdata.mop.poc.proxy.dao.ProxyDao;
 import com.brandnewdata.mop.poc.proxy.po.ProxyPo;
 import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyEndpointAService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
@@ -24,7 +25,9 @@ public class ProxyCService implements IProxyCService {
         this.proxyEndpointAService = proxyEndpointAService;
     }
 
+
     @Override
+    @Transactional
     public void deleteById(Long id) {
         Assert.notNull(id, "proxy id must not null");
         ProxyPo proxyPo = proxyDao.selectById(id);

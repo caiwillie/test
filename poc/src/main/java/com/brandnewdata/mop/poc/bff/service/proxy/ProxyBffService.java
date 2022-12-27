@@ -15,6 +15,7 @@ import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyGroupDto;
 import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyAService;
 import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyEndpointAService;
+import com.brandnewdata.mop.poc.proxy.service.combined.IProxyCService;
 import com.brandnewdata.mop.poc.proxy.service.combined.IProxyEndpointCService;
 import org.springframework.stereotype.Service;
 
@@ -29,17 +30,17 @@ public class ProxyBffService {
 
     private final IProxyEndpointAService proxyEndpointAService;
 
-    private final IProxyEndpointCService proxyEndpointService;
+    private final IProxyCService proxyCService;
 
     private final IProxyAService proxyAService;
 
     public ProxyBffService(IProxyEndpointCService proxyEndpointCService,
                            IProxyEndpointAService proxyEndpointAService,
-                           IProxyEndpointCService proxyEndpointService,
+                           IProxyCService proxyCService,
                            IProxyAService proxyAService) {
         this.proxyEndpointCService = proxyEndpointCService;
         this.proxyEndpointAService = proxyEndpointAService;
-        this.proxyEndpointService = proxyEndpointService;
+        this.proxyCService = proxyCService;
         this.proxyAService = proxyAService;
     }
 
@@ -62,6 +63,10 @@ public class ProxyBffService {
 
     public void saveProxy(ProxyVo proxyVo) {
         proxyAService.save(ProxyDtoConverter.createFrom(proxyVo), false);
+    }
+
+    public void deleteProxy(Long id) {
+        proxyCService.deleteById(id);
     }
 
     public ProxyEndpointVo saveEndpoint(ProxyEndpointVo vo) {
