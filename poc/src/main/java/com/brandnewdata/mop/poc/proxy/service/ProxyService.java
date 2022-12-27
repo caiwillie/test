@@ -53,16 +53,6 @@ public class ProxyService {
         return toDTO(entity);
     }
 
-    public void changeState(Long id, Integer state) {
-        Assert.notNull(id, "api id 不能为空");
-        Assert.isTrue(state != null
-                && (state == ProxyConst.PROXY_STATE__STOPPED || state == ProxyConst.PROXY_STATE__RUNNING),
-                "状态不能为空，且只能是 停止或运行");
-        ProxyPo oldEntity = proxyDao.selectById(id);
-        oldEntity.setState(state);
-        proxyDao.updateById(oldEntity);
-    }
-
     public List<String> listTags() {
         // return proxyDao.listTags();
         return null;

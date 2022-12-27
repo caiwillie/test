@@ -62,24 +62,6 @@ public class ProxyRest2 {
         return Result.OK();
     }
 
-
-
-    /**
-     * 更改API的状态
-     *
-     * @param req the proxy req
-     * @return the result
-     */
-    // @PostMapping("/rest/reverseProxy/changeState")
-    public Result changeState(@RequestBody ProxyReq req) {
-        Long id = req.getId();
-        Integer state = req.getState();
-        proxyService.changeState(id, state);
-        return Result.OK();
-    }
-
-
-
     /**
      * 查看描述文件
      *
