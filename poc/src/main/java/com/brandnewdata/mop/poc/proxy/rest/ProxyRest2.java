@@ -77,6 +77,4 @@ public class ProxyRest2 {
         ret.setContent(content);
         return Result.OK(ret);
     }
-
-
 }
