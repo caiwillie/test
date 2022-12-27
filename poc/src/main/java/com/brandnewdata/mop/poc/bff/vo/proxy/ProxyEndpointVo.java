@@ -2,6 +2,8 @@ package com.brandnewdata.mop.poc.bff.vo.proxy;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 public class ProxyEndpointVo {
 
@@ -53,4 +55,6 @@ public class ProxyEndpointVo {
      * 分组
      */
     private String tag;
+
+    private LocalDateTime updateTime;
 }
