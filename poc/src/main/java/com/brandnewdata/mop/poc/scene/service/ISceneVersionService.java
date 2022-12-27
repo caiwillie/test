@@ -8,20 +8,9 @@ import java.util.Map;
 
 public interface ISceneVersionService {
 
-    /**
-     * Fetch latest one by scene id map.
-     *
-     * @param sceneIdList the scene id list
-     * @param statusList  筛选状态
-     * @return the map
-     */
-    Map<Long, SceneVersionDto> fetchLatestOneBySceneId(List<Long> sceneIdList, List<Integer> statusList);
+    /*VersionProcessDto saveProcess(VersionProcessDto dto);
 
-    SceneVersionDto save(SceneVersionDto sceneVersionDto);
-
-    VersionProcessDto saveProcess(VersionProcessDto dto);
-
-    void deleteProcess(VersionProcessDto dto);
+    void deleteProcess(VersionProcessDto dto);*/
 
     void processDebug(VersionProcessDto dto, Map<String, Object> variables);
 
@@ -37,7 +26,5 @@ public interface ISceneVersionService {
 
     SceneVersionDto copyToNew(Long id);
 
-    boolean checkNewReleaseVersion(Long sceneId, String version);
-
-    SceneVersionDto fetchOneByIdAndCheckStatus(Long id, int[] statusArr);
+    /*SceneVersionDto fetchOneByIdAndCheckStatus(Long id, int[] statusArr);*/
 }

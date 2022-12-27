@@ -4,17 +4,14 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService;
 import com.brandnewdata.mop.poc.scene.converter.VersionProcessDtoConverter;
-import com.brandnewdata.mop.poc.scene.converter.VersionProcessPoConverter;
 import com.brandnewdata.mop.poc.scene.dao.VersionProcessDao;
 import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
-import com.brandnewdata.mop.poc.scene.manager.JooqManager;
 import com.brandnewdata.mop.poc.scene.po.VersionProcessPo;
+import com.brandnewdata.mop.poc.scene.service.atomic.IVersionProcessAService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -31,15 +28,13 @@ import java.util.stream.Collectors;
 public class VersionProcessService implements IVersionProcessService {
 
     @Resource
-    private JooqManager jooqManager;
-
-    @Resource
     private VersionProcessDao versionProcessDao;
 
-    private final IProcessDefinitionService processDefinitionService;
+    private final IVersionProcessAService versionProcessAService;
 
-    public VersionProcessService(IProcessDefinitionService processDefinitionService) {
-        this.processDefinitionService = processDefinitionService;
+    public VersionProcessService(IVersionProcessAService versionProcessAService,
+                                 IProcessDefinitionService processDefinitionService) {
+        this.versionProcessAService = versionProcessAService;
     }
 
     @Override
@@ -57,20 +52,6 @@ public class VersionProcessService implements IVersionProcessService {
 
         return versionProcessPos.stream().collect(Collectors.groupingBy(VersionProcessPo::getVersionId,
                 Collectors.mapping(VersionProcessDtoConverter::createFrom, Collectors.toList())));
-    }
-
-    @Override
-    public Map<Long, VersionProcessDto> fetchOneById(List<Long> idList) {
-        if(CollUtil.isEmpty(idList)) return MapUtil.empty();
-        Assert.isFalse(CollUtil.hasNull(idList), "版本id列表不能含有空值");
-
-        QueryWrapper<VersionProcessPo> query = new QueryWrapper<>();
-        query.in(VersionProcessPo.ID, idList);
-
-        List<VersionProcessPo> versionProcessPos = versionProcessDao.selectList(query);
-
-        return versionProcessPos.stream().map(VersionProcessDtoConverter::createFrom)
-                .collect(Collectors.toMap(VersionProcessDto::getId, Function.identity()));
     }
 
     @Override
@@ -113,43 +94,8 @@ public class VersionProcessService implements IVersionProcessService {
             return versionProcessDtos.stream().max(Comparator.comparing(VersionProcessDto::getUpdateTime))
                     .map(VersionProcessDto::getId).orElse(-1L);
         }));
-        Map<Long, VersionProcessDto> versionProcessMap = fetchOneById(ListUtil.toList(idMap.values()));
+        Map<Long, VersionProcessDto> versionProcessMap = versionProcessAService.fetchOneById(ListUtil.toList(idMap.values()));
         return idMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> versionProcessMap.get(entry.getValue())));
-    }
-
-    @Override
-    public VersionProcessDto save(VersionProcessDto versionProcessDto) {
-        BpmnXmlDto bpmnXmlDto = new BpmnXmlDto(versionProcessDto.getProcessId(), versionProcessDto.getProcessName(), versionProcessDto.getProcessXml());
-        bpmnXmlDto = processDefinitionService.baseCheck(bpmnXmlDto);
-
-        String processId = bpmnXmlDto.getProcessId();
-        String processName = bpmnXmlDto.getProcessName();
-        String processXml = bpmnXmlDto.getProcessXml();
-        String processImg = versionProcessDto.getProcessImg();
-
-        Long id = versionProcessDto.getId();
-
-        if(id == null) {
-            // 手动指定
-            versionProcessDto.setId(IdUtil.getSnowflakeNextId());
-
-            VersionProcessPo versionProcessPo = VersionProcessPoConverter.createFrom(versionProcessDto);
-            VersionProcessPoConverter.updateFrom(versionProcessPo,processId, processName, processXml, processImg);
-            versionProcessPo.setProcessXml(processXml);
-            versionProcessDao.insert(versionProcessPo);
-        } else {
-            VersionProcessDto updateContent = versionProcessDto;
-            versionProcessDto = fetchOneById(ListUtil.of(id)).get(id);
-            if(!StrUtil.equals(versionProcessDto.getProcessId(), processId)) {
-                throw new RuntimeException("流程id不能改变");
-            }
-
-            VersionProcessPo versionProcessPo = VersionProcessPoConverter.createFrom(versionProcessDto);
-            VersionProcessPoConverter.updateFrom(versionProcessPo,processId, processName, processXml, processImg);
-            versionProcessDao.updateById(versionProcessPo);
-        }
-
-        return versionProcessDto;
     }
 
     @Override

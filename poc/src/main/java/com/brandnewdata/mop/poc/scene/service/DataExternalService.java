@@ -32,6 +32,7 @@ import com.brandnewdata.mop.poc.scene.dto.external.ConnectorConfigDto;
 import com.brandnewdata.mop.poc.scene.dto.external.PrepareLoadDto;
 import com.brandnewdata.mop.poc.scene.po.SceneLoadPo;
 import com.brandnewdata.mop.poc.scene.service.atomic.ISceneVersionAService;
+import com.brandnewdata.mop.poc.scene.service.combine.IVersionProcessCService;
 import com.dxy.library.json.jackson.JacksonUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
@@ -57,11 +58,11 @@ public class DataExternalService implements IDataExternalService {
 
     private final ISceneService sceneService;
 
-    private final ISceneVersionService sceneVersionService;
-
     private final ISceneVersionAService sceneVersionAService;
 
     private final IVersionProcessService versionProcessService;
+
+    private final IVersionProcessCService versionProcessCService;
 
     private final ConnectorManager connectorManager;
 
@@ -76,21 +77,21 @@ public class DataExternalService implements IDataExternalService {
 
     public DataExternalService(IProcessDefinitionService processDefinitionService,
                                ISceneService sceneService,
-                               ISceneVersionService sceneVersionService,
                                ISceneVersionAService sceneVersionAService,
                                IVersionProcessService versionProcessService,
+                               IVersionProcessCService versionProcessCService,
                                ConnectorManager connectorManager) {
         this.processDefinitionService = processDefinitionService;
         this.sceneService = sceneService;
-        this.sceneVersionService = sceneVersionService;
         this.sceneVersionAService = sceneVersionAService;
         this.versionProcessService = versionProcessService;
+        this.versionProcessCService = versionProcessCService;
         this.connectorManager = connectorManager;
     }
 
     @Override
     public SceneVersionExportDto export(Long versionId, List<String> processIdList) {
-        SceneVersionDto sceneVersionDto = sceneVersionService.fetchOneByIdAndCheckStatus(versionId, new int[]{SceneConst.SCENE_VERSION_STATUS__RUNNING,
+        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchOneByIdAndCheckStatus(versionId, new int[]{SceneConst.SCENE_VERSION_STATUS__RUNNING,
                 SceneConst.SCENE_VERSION_STATUS__STOPPED});
 
         Long sceneId = sceneVersionDto.getSceneId();
@@ -191,7 +192,7 @@ public class DataExternalService implements IDataExternalService {
             versionProcessDto.setProcessName(processExportBo.getProcessName());
             versionProcessDto.setProcessXml(processExportBo.getProcessXml());
             versionProcessDto.setProcessImg(processExportBo.getProcessImg());
-            versionProcessService.save(versionProcessDto);
+            versionProcessCService.save(versionProcessDto);
         }
 
         return sceneVersionDto;

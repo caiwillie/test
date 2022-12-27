@@ -21,7 +21,6 @@ class SceneVersionServiceTest {
         dto.setProcessName("caiwillie测试流程2");
         dto.setVersionId(3L);
         dto.setProcessXml(xml);
-        sceneVersionService.saveProcess(dto);
     }
 
     @Test

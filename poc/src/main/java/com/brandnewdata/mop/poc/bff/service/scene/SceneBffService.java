@@ -38,6 +38,7 @@ import com.brandnewdata.mop.poc.scene.service.ISceneVersionService;
 import com.brandnewdata.mop.poc.scene.service.IVersionProcessService;
 import com.brandnewdata.mop.poc.scene.service.atomic.ISceneReleaseDeployAService;
 import com.brandnewdata.mop.poc.scene.service.atomic.ISceneVersionAService;
+import com.brandnewdata.mop.poc.scene.service.combine.IVersionProcessCService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
@@ -59,6 +60,8 @@ public class SceneBffService {
 
     private final IVersionProcessService versionProcessService;
 
+    private final IVersionProcessCService versionProcessCService;
+
     private final IEnvService envService;
 
     private final IProcessDeployService processDeployService;
@@ -73,7 +76,7 @@ public class SceneBffService {
                            ISceneVersionService sceneVersionService,
                            ISceneVersionAService sceneVersionAService,
                            IVersionProcessService versionProcessService,
-                           IEnvService envService,
+                           IVersionProcessCService versionProcessCService, IEnvService envService,
                            IProcessDeployService processDeployService,
                            IProcessInstanceService processInstanceService,
                            ISceneReleaseDeployAService sceneReleaseDeployService,
@@ -82,6 +85,7 @@ public class SceneBffService {
         this.sceneVersionService = sceneVersionService;
         this.sceneVersionAService = sceneVersionAService;
         this.versionProcessService = versionProcessService;
+        this.versionProcessCService = versionProcessCService;
         this.envService = envService;
         this.processDeployService = processDeployService;
         this.processInstanceService = processInstanceService;
@@ -98,7 +102,7 @@ public class SceneBffService {
 
         // 获取所有场景的最新版本
         List<Long> sceneIdList = records.stream().map(SceneDto::getId).collect(Collectors.toList());
-        Map<Long, SceneVersionDto> sceneVersionDtoMap = sceneVersionService.fetchLatestOneBySceneId(sceneIdList, null);
+        Map<Long, SceneVersionDto> sceneVersionDtoMap = sceneVersionAService.fetchLatestOneBySceneId(sceneIdList, null);
         List<Long> versionIdList = sceneVersionDtoMap.values().stream().map(SceneVersionDto::getId).collect(Collectors.toList());
 
         // 获取某版本下的流程个数
@@ -199,7 +203,7 @@ public class SceneBffService {
     }
 
     public VersionProcessVo processSave(VersionProcessVo vo) {
-        VersionProcessDto dto = sceneVersionService.saveProcess(VersionProcessDtoConverter.createFrom(vo));
+        VersionProcessDto dto = versionProcessCService.save(VersionProcessDtoConverter.createFrom(vo));
         return VersionProcessVoConverter.createFrom(dto);
     }
 
@@ -222,7 +226,7 @@ public class SceneBffService {
     }
 
     public boolean checkNewReleaseName(Long sceneId, String releaseName) {
-        return sceneVersionService.checkNewReleaseVersion(sceneId, releaseName);
+        return sceneVersionAService.checkNewReleaseVersion(sceneId, releaseName);
     }
 
     public SceneVersionVo deployVersion(Long versionId, List<Long> envIdList, String version) {

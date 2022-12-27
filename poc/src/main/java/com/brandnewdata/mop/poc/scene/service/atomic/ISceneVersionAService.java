@@ -13,5 +13,13 @@ public interface ISceneVersionAService {
 
     Map<Long, List<SceneVersionDto>> fetchListBySceneId(List<Long> sceneIdList);
 
+    Map<Long, SceneVersionDto> fetchLatestOneBySceneId(List<Long> sceneIdList, List<Integer> statusList);
+
     List<SceneVersionDto> fetchAll();
+
+    SceneVersionDto save(SceneVersionDto sceneVersionDto);
+
+    boolean checkNewReleaseVersion(Long sceneId, String version);
+
+    SceneVersionDto fetchOneByIdAndCheckStatus(Long id, int[] statusArr);
 }

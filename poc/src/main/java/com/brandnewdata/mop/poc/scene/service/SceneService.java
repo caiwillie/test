@@ -16,6 +16,7 @@ import com.brandnewdata.mop.poc.scene.dao.SceneDao;
 import com.brandnewdata.mop.poc.scene.dto.SceneDto;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
 import com.brandnewdata.mop.poc.scene.po.ScenePo;
+import com.brandnewdata.mop.poc.scene.service.atomic.ISceneVersionAService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,10 +33,10 @@ public class SceneService implements ISceneService {
     @Resource
     private SceneDao sceneDao;
 
-    private final ISceneVersionService sceneVersionService;
+    private final ISceneVersionAService sceneVersionAService;
 
-    public SceneService(ISceneVersionService sceneVersionService) {
-        this.sceneVersionService = sceneVersionService;
+    public SceneService(ISceneVersionAService sceneVersionAService) {
+        this.sceneVersionAService = sceneVersionAService;
     }
 
     @Override
@@ -66,7 +67,7 @@ public class SceneService implements ISceneService {
             sceneVersionDto.setSceneId(scenePo.getId());
             sceneVersionDto.setVersion(DateUtil.format(scenePo.getCreateTime(), DatePattern.PURE_DATETIME_PATTERN));
             sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__CONFIGURING);
-            sceneVersionService.save(sceneVersionDto);
+            sceneVersionAService.save(sceneVersionDto);
 
         } else {
             scenePo = getScenePoById(sceneId);
