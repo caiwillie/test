@@ -58,7 +58,8 @@ public class ProxyService {
         List<Endpoint> endpoints = endpointService.listByProxyIdList(ListUtil.of(id));
         List<Long> endpointIdList = endpoints.stream().map(endpoint -> Long.parseLong(endpoint.getId())).collect(Collectors.toList());
         endpointService.deleteByIdList(endpointIdList);
-        proxyDao.deleteById(id);
+
+
     }
 
     public void changeState(Long id, Integer state) {
