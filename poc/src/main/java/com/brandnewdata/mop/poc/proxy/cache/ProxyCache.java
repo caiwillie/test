@@ -37,6 +37,7 @@ public class ProxyCache {
     private BiConsumer<List<Entity>, Cache<Long, ProxyDto>> getConsume() {
         return (entities, cache) -> {
             for (Entity entity : entities) {
+
                 ProxyDto dto = toDto(entity);
                 cache.put(dto.getId(), dto);
             }

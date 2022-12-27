@@ -25,3 +25,5 @@ CREATE TABLE `mop_process_deploy_task` (
     `error_message` text,
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+ALTER TABLE `mop`.`mop_reverse_proxy` ADD COLUMN `delete_flag` bigint(20) NULL;

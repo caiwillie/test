@@ -240,6 +240,11 @@ public class SceneController {
         return Result.OK(ret);
     }
 
+    @PostMapping(value = "/rest/scene/version/delete")
+    public Result deleteVersion(@RequestBody SceneVersionVo oldVersion) {
+        return Result.OK();
+    }
+
     /**
      * 触发新的调试
      *
