@@ -64,7 +64,7 @@ public class ProxyOperateBffService {
 
         // 查询proxy
         ProxyFilter proxyFilter = new ProxyFilter().setName(proxyName).setVersion(version);
-        List<ProxyDto> proxyDtoList = proxyAtomicService.fetchListByFilter(proxyFilter);
+        List<ProxyDto> proxyDtoList = proxyAtomicService.fetchCacheListByFilter(proxyFilter);
         Map<Long, ProxyDto> proxyDtoMap = proxyDtoList.stream().collect(Collectors.toMap(ProxyDto::getId, Function.identity()));
 
         // 查询 proxyEndpoint
@@ -98,7 +98,7 @@ public class ProxyOperateBffService {
 
         // 查询proxy
         ProxyFilter proxyFilter = new ProxyFilter().setName(proxyName).setVersion(version);
-        List<ProxyDto> proxyDtoList = proxyAtomicService.fetchListByFilter(proxyFilter);
+        List<ProxyDto> proxyDtoList = proxyAtomicService.fetchCacheListByFilter(proxyFilter);
         Map<Long, ProxyDto> proxyDtoMap = proxyDtoList.stream().collect(Collectors.toMap(ProxyDto::getId, Function.identity()));
 
         // 查询 proxyEndpoint

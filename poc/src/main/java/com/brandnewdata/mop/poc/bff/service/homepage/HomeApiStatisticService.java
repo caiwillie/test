@@ -29,7 +29,7 @@ public class HomeApiStatisticService {
 
     public HomeApiStatisticCountBo statisticCount() {
         HomeApiStatisticCountBo ret = new HomeApiStatisticCountBo(0, 0);
-        List<ProxyDto> proxyDtoList = proxyAService.fetchListByFilter(new ProxyFilter());
+        List<ProxyDto> proxyDtoList = proxyAService.fetchCacheListByFilter(new ProxyFilter());
         if(CollUtil.isEmpty(proxyDtoList)) return ret;
         List<Long> proxyIdList = proxyDtoList.stream().map(ProxyDto::getId).collect(Collectors.toList());
         int proxyCount = proxyIdList.size();

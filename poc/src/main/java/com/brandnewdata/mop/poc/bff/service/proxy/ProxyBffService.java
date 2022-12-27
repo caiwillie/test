@@ -71,7 +71,7 @@ public class ProxyBffService {
 
     public List<SimpleProxyGroupVo> getAllProxy() {
         // fetch proxy
-        List<ProxyDto> proxyDtoList = proxyAService.fetchListByFilter(new ProxyFilter());
+        List<ProxyDto> proxyDtoList = proxyAService.fetchCacheListByFilter(new ProxyFilter());
         Map<Long, ProxyDto> proxyDtoMap = proxyDtoList.stream().collect(Collectors.toMap(ProxyDto::getId, Function.identity()));
 
         // fetch proxy endpoint

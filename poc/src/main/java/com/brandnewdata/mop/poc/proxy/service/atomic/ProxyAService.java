@@ -81,7 +81,7 @@ public class ProxyAService implements IProxyAService {
     }
 
     @Override
-    public List<ProxyDto> fetchListByFilter(ProxyFilter filter) {
+    public List<ProxyDto> fetchCacheListByFilter(ProxyFilter filter) {
         String name = filter.getName();
         String version = filter.getVersion();
         String tags = filter.getTags();
@@ -163,6 +163,29 @@ public class ProxyAService implements IProxyAService {
         queryWrapper1.eq(ProxyPo.DOMAIN, identity);
         ProxyPo proxyPo = proxyDao.selectOne(queryWrapper1);
         return ProxyDtoConverter.createFrom(proxyPo, domainRegEx);
+    }
+
+    private List<ProxyDto> fetchListByFilter(ProxyFilter filter) {
+        String name = filter.getName();
+        String version = filter.getVersion();
+        String tags = filter.getTags();
+
+        QueryWrapper<ProxyPo> query = new QueryWrapper<>();
+        if(name != null) {
+            query.eq(ProxyPo.NAME, name);
+        }
+        if(version != null) {
+            query.eq(ProxyPo.VERSION, version);
+        }
+        List<ProxyPo> proxyPoList = proxyDao.selectList(query);
+
+        return proxyPoList.stream().filter(po -> {
+            if (tags != null && !StrUtil.contains(tags, po.getTag())) {
+                return false;
+            }
+            return true;
+        }).map(po -> ProxyDtoConverter.createFrom(po, domainPattern)).collect(Collectors.toList());
+
     }
 
     private boolean existByNameAndVersion(String name, String version) {

@@ -12,7 +12,7 @@ public interface IProxyAService {
 
     Page<ProxyGroupDto> fetchPageGroupByName(Integer pageNum, Integer pageSize, String name, String tags);
 
-    List<ProxyDto> fetchListByFilter(ProxyFilter filter);
+    List<ProxyDto> fetchCacheListByFilter(ProxyFilter filter);
 
     ProxyDto save(ProxyDto proxy, boolean imported);
 
