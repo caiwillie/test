@@ -13,7 +13,7 @@ import java.util.Date;
  * </p>
  *
  * @author caiwillie
- * @since 2022-09-26
+ * @since 2022-12-27
  */
 @Getter
 @Setter
@@ -41,12 +41,14 @@ public class ProxyPo implements Serializable {
 
     private String domain;
 
-    private String tag;
-
     /**
      * 状态：1 停止，2 运行
      */
     private Integer state;
+
+    private String tag;
+
+    private Long deleteFlag;
 
 
     public static final String ID = "id";
@@ -65,8 +67,10 @@ public class ProxyPo implements Serializable {
 
     public static final String DOMAIN = "domain";
 
+    public static final String STATE = "state";
+
     public static final String TAG = "tag";
 
-    public static final String STATE = "state";
+    public static final String DELETE_FLAG = "delete_flag";
 
 }

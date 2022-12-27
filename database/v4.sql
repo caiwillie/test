@@ -27,3 +27,5 @@ CREATE TABLE `mop_process_deploy_task` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE `mop`.`mop_reverse_proxy` ADD COLUMN `delete_flag` bigint(20) NULL;
+
+ALTER TABLE `mop`.`mop_reverse_proxy_endpoint` ADD COLUMN `delete_flag` bigint(20) NULL;

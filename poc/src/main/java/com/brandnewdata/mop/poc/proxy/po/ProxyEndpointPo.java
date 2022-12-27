@@ -13,7 +13,7 @@ import java.util.Date;
  * </p>
  *
  * @author caiwillie
- * @since 2022-10-11
+ * @since 2022-12-27
  */
 @Getter
 @Setter
@@ -43,6 +43,9 @@ public class ProxyEndpointPo implements Serializable {
 
     private String tag;
 
+    private Long deleteFlag;
+
+
     public static final String ID = "id";
 
     public static final String CREATE_TIME = "create_time";
@@ -60,5 +63,7 @@ public class ProxyEndpointPo implements Serializable {
     public static final String BACKEND_CONFIG = "backend_config";
 
     public static final String TAG = "tag";
+
+    public static final String DELETE_FLAG = "delete_flag";
 
 }

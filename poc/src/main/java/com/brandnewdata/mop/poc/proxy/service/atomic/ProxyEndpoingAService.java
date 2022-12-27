@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.brandnewdata.mop.poc.proxy.bo.ProxyEndpointFilter;
 import com.brandnewdata.mop.poc.proxy.bo.ProxyEndpointServerBo;
 import com.brandnewdata.mop.poc.proxy.converter.ProxyEndpointDtoConverter;
@@ -75,5 +76,14 @@ public class ProxyEndpoingAService implements IProxyEndpointAService {
         ProxyEndpointServerBo bo = JacksonUtil.from(config, ProxyEndpointServerBo.class);
         Assert.notNull(bo.getBaseUrl(), "服务地址不能为空");
         return bo;
+    }
+
+    @Override
+    public void deleteByProxyId(Long proxyId) {
+        Assert.notNull(proxyId, "proxyId must not null");
+        UpdateWrapper<ProxyEndpointPo> update = new UpdateWrapper<>();
+        update.setSql(StrUtil.format("{} = {}", ProxyEndpointPo.DELETE_FLAG, ProxyEndpointPo.ID));
+        update.eq(ProxyEndpointPo.PROXY_ID, proxyId);
+        proxyEndpointDao.update(null, update);
     }
 }

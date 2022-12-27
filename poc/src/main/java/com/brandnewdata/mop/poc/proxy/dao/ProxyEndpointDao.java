@@ -9,7 +9,7 @@ import com.brandnewdata.mop.poc.proxy.po.ProxyEndpointPo;
  * </p>
  *
  * @author caiwillie
- * @since 2022-10-11
+ * @since 2022-12-27
  */
 public interface ProxyEndpointDao extends BaseMapper<ProxyEndpointPo> {
 

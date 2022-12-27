@@ -73,7 +73,8 @@ public class ProxyService {
     }
 
     public List<String> listTags() {
-        return proxyDao.listTags();
+        // return proxyDao.listTags();
+        return null;
     }
 
     public List<String> listEndpointTags(Long proxyId) {

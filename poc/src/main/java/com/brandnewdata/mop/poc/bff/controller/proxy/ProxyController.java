@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.poc.bff.controller.proxy;
 
+import cn.hutool.core.lang.Assert;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.bff.service.proxy.ProxyBffService;
 import com.brandnewdata.mop.poc.bff.vo.proxy.ProxyEndpointVo;
@@ -7,6 +8,8 @@ import com.brandnewdata.mop.poc.bff.vo.proxy.ProxyGroupVo;
 import com.brandnewdata.mop.poc.bff.vo.proxy.ProxyVo;
 import com.brandnewdata.mop.poc.bff.vo.proxy.SimpleProxyGroupVo;
 import com.brandnewdata.mop.poc.common.dto.Page;
+import com.brandnewdata.mop.poc.proxy.req.EndpointReq;
+import com.brandnewdata.mop.poc.proxy.req.ProxyReq;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,6 +37,19 @@ public class ProxyController {
     @PostMapping("/rest/reverseProxy/save")
     public Result save(@RequestBody ProxyVo proxyVo) {
         proxyBffService.saveProxy(proxyVo);
+        return Result.OK();
+    }
+
+    /**
+     * 删除API
+     *
+     * @param proxyReq the proxy req
+     * @return the result
+     */
+    @PostMapping("/rest/reverseProxy/delete")
+    public Result delete(@RequestBody ProxyReq proxyReq) {
+        Long id = proxyReq.getId();
+        // proxyService.delete(id);
         return Result.OK();
     }
 
@@ -66,6 +82,20 @@ public class ProxyController {
     public Result<ProxyEndpointVo> saveEndpoint(@RequestBody ProxyEndpointVo vo) {
         ProxyEndpointVo ret = proxyBffService.saveEndpoint(vo);
         return Result.OK(ret);
+    }
+
+    /**
+     * 删除Endpoint
+     *
+     * @param req the req
+     * @return the result
+     */
+    @PostMapping("/rest/reverseProxy/deleteEndpoint")
+    public Result deleteEndpoint(@RequestBody EndpointReq req) {
+        Long id = req.getId();
+        Assert.notNull(id, "路径 id 不能为空");
+        // endpointService.deleteByIdList(ListUtil.of(id));
+        return Result.OK();
     }
 
     /**

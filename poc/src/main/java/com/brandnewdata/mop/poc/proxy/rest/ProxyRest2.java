@@ -1,9 +1,6 @@
 package com.brandnewdata.mop.poc.proxy.rest;
 
-import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.lang.Assert;
 import com.brandnewdata.common.webresult.Result;
-import com.brandnewdata.mop.poc.proxy.req.EndpointReq;
 import com.brandnewdata.mop.poc.proxy.req.ImportFromFileReq;
 import com.brandnewdata.mop.poc.proxy.req.ProxyReq;
 import com.brandnewdata.mop.poc.proxy.resp.ApiResp;
@@ -65,18 +62,7 @@ public class ProxyRest2 {
         return Result.OK();
     }
 
-    /**
-     * 删除API
-     *
-     * @param proxyReq the proxy req
-     * @return the result
-     */
-    @PostMapping("/rest/reverseProxy/delete")
-    public Result delete(@RequestBody ProxyReq proxyReq) {
-        Long id = proxyReq.getId();
-        proxyService.delete(id);
-        return Result.OK();
-    }
+
 
     /**
      * 更改API的状态
@@ -92,19 +78,7 @@ public class ProxyRest2 {
         return Result.OK();
     }
 
-    /**
-     * 删除Endpoint
-     *
-     * @param req the req
-     * @return the result
-     */
-    @PostMapping("/rest/reverseProxy/deleteEndpoint")
-    public Result deleteEndpoint(@RequestBody EndpointReq req) {
-        Long id = req.getId();
-        Assert.notNull(id, "路径 id 不能为空");
-        endpointService.deleteByIdList(ListUtil.of(id));
-        return Result.OK();
-    }
+
 
     /**
      * 查看描述文件

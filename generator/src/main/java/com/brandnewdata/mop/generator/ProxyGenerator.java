@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class ProxyGenerator {
 
-    private static final String IP = "10.101.53.4";
+    private static final String IP = "10.101.3.39";
 
     private static final String PORT = "3306";
 
@@ -26,7 +26,7 @@ public class ProxyGenerator {
 
     private static final String USERNAME = "root";
 
-    private static final String PASSWORD = "Brand@123456";
+    private static final String PASSWORD = "test123456";
 
     private static final String OUTPUT = "poc/src/main/java";
 
@@ -62,7 +62,7 @@ public class ProxyGenerator {
                 // 策略配置
                 .strategyConfig((scanner, builder) -> builder
                         .addInclude(getTables(scanner.apply("请输入表名，多个英文逗号分隔？所有输入 all")))
-                        .addTablePrefix("mop_")
+                        .addTablePrefix("mop_reverse_")
 
                         // 实体类的配置
                         .entityBuilder()
