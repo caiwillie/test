@@ -90,4 +90,13 @@ public class ProxyEndpoingAService implements IProxyEndpointAService {
         update.eq(ProxyEndpointPo.PROXY_ID, proxyId);
         proxyEndpointDao.update(null, update);
     }
+
+    @Override
+    public void deleteById(Long id) {
+        Assert.notNull(id, "id must not null");
+        UpdateWrapper<ProxyEndpointPo> update = new UpdateWrapper<>();
+        update.setSql(StrUtil.format("{} = {}", ProxyEndpointPo.DELETE_FLAG, ProxyEndpointPo.ID));
+        update.eq(ProxyEndpointPo.ID, id);
+        proxyEndpointDao.update(null, update);
+    }
 }

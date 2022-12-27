@@ -74,6 +74,10 @@ public class ProxyBffService {
         return ProxyEndpointVoConverter.createFrom(dto);
     }
 
+    public void deleteEndpoint(Long id) {
+        proxyEndpointAService.deleteById(id);
+    }
+
     public List<SimpleProxyGroupVo> getAllProxy() {
         // fetch proxy
         List<ProxyDto> proxyDtoList = proxyAService.fetchCacheListByFilter(new ProxyFilter());

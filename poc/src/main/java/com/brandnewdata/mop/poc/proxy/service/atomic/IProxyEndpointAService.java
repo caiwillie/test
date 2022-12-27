@@ -18,4 +18,6 @@ public interface IProxyEndpointAService {
     ProxyEndpointServerBo parseServerConfig(String config);
 
     void deleteByProxyId(Long proxyId);
+
+    void deleteById(Long id);
 }
