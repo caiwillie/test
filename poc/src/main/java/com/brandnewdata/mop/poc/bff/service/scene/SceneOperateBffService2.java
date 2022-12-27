@@ -22,8 +22,8 @@ import com.brandnewdata.mop.poc.process.dto.ProcessReleaseDeployDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import com.brandnewdata.mop.poc.scene.dto.SceneReleaseDeployDto;
 import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
-import com.brandnewdata.mop.poc.scene.service.ISceneReleaseDeployService;
 import com.brandnewdata.mop.poc.scene.service.IVersionProcessService;
+import com.brandnewdata.mop.poc.scene.service.atomic.ISceneReleaseDeployAService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 @Service
 public class SceneOperateBffService2 {
     private final int MAX_SIZE = 10;
-    private final ISceneReleaseDeployService sceneReleaseDeployService;
+    private final ISceneReleaseDeployAService sceneReleaseDeployService;
 
     private final IProcessDeployService processDeployService;
 
@@ -45,7 +45,7 @@ public class SceneOperateBffService2 {
 
     private final IVersionProcessService versionProcessService;
 
-    public SceneOperateBffService2(ISceneReleaseDeployService sceneReleaseDeployService,
+    public SceneOperateBffService2(ISceneReleaseDeployAService sceneReleaseDeployService,
                                    IProcessDeployService processDeployService,
                                    IProcessInstanceService processInstanceService,
                                    IVersionProcessService versionProcessService) {

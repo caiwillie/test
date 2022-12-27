@@ -1,11 +1,11 @@
-package com.brandnewdata.mop.poc.scene.service;
+package com.brandnewdata.mop.poc.scene.service.atomic;
 
 import com.brandnewdata.mop.poc.scene.dto.SceneReleaseDeployDto;
 
 import java.util.List;
 import java.util.Map;
 
-public interface ISceneReleaseDeployService {
+public interface ISceneReleaseDeployAService {
 
     SceneReleaseDeployDto save(SceneReleaseDeployDto dto);
 

@@ -17,10 +17,6 @@ public interface ISceneVersionService {
      */
     Map<Long, SceneVersionDto> fetchLatestOneBySceneId(List<Long> sceneIdList, List<Integer> statusList);
 
-    Map<Long, List<SceneVersionDto>> fetchListBySceneId(List<Long> sceneIdList);
-
-    List<SceneVersionDto> fetchAll();
-
     SceneVersionDto save(SceneVersionDto sceneVersionDto);
 
     VersionProcessDto saveProcess(VersionProcessDto dto);
@@ -38,10 +34,6 @@ public interface ISceneVersionService {
     SceneVersionDto resume(Long id, List<Long> envIdList);
 
     SceneVersionDto deploy(Long id, String sceneName, List<Long> envIdList, String version);
-
-    Map<Long, Long> countById(List<Long> sceneIdList);
-
-    Map<Long, SceneVersionDto> fetchById(List<Long> idList);
 
     SceneVersionDto copyToNew(Long id);
 

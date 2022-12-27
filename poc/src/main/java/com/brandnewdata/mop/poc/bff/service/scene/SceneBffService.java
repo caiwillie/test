@@ -32,7 +32,12 @@ import com.brandnewdata.mop.poc.scene.dto.*;
 import com.brandnewdata.mop.poc.scene.dto.external.ConfirmLoadDto;
 import com.brandnewdata.mop.poc.scene.dto.external.ConnectorConfigDto;
 import com.brandnewdata.mop.poc.scene.dto.external.PrepareLoadDto;
-import com.brandnewdata.mop.poc.scene.service.*;
+import com.brandnewdata.mop.poc.scene.service.IDataExternalService;
+import com.brandnewdata.mop.poc.scene.service.ISceneService;
+import com.brandnewdata.mop.poc.scene.service.ISceneVersionService;
+import com.brandnewdata.mop.poc.scene.service.IVersionProcessService;
+import com.brandnewdata.mop.poc.scene.service.atomic.ISceneReleaseDeployAService;
+import com.brandnewdata.mop.poc.scene.service.atomic.ISceneVersionAService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +55,8 @@ public class SceneBffService {
 
     private final ISceneVersionService sceneVersionService;
 
+    private final ISceneVersionAService sceneVersionAService;
+
     private final IVersionProcessService versionProcessService;
 
     private final IEnvService envService;
@@ -58,20 +65,22 @@ public class SceneBffService {
 
     private final IProcessInstanceService processInstanceService;
 
-    private final ISceneReleaseDeployService sceneReleaseDeployService;
+    private final ISceneReleaseDeployAService sceneReleaseDeployService;
 
     private final IDataExternalService dataExternalService;
 
     public SceneBffService(ISceneService sceneService,
                            ISceneVersionService sceneVersionService,
+                           ISceneVersionAService sceneVersionAService,
                            IVersionProcessService versionProcessService,
                            IEnvService envService,
                            IProcessDeployService processDeployService,
                            IProcessInstanceService processInstanceService,
-                           ISceneReleaseDeployService sceneReleaseDeployService,
+                           ISceneReleaseDeployAService sceneReleaseDeployService,
                            IDataExternalService dataExternalService) {
         this.sceneService = sceneService;
         this.sceneVersionService = sceneVersionService;
+        this.sceneVersionAService = sceneVersionAService;
         this.versionProcessService = versionProcessService;
         this.envService = envService;
         this.processDeployService = processDeployService;
@@ -112,7 +121,7 @@ public class SceneBffService {
     public List<SceneVersionVo> versionList(Long sceneId) {
         Assert.notNull(sceneId, "场景id不能为空");
         List<SceneVersionDto> sceneVersionDtoList =
-                sceneVersionService.fetchListBySceneId(ListUtil.of(sceneId)).get(sceneId);
+                sceneVersionAService.fetchListBySceneId(ListUtil.of(sceneId)).get(sceneId);
 
         // 查询环境信息
         List<Long> versionIdList = sceneVersionDtoList.stream().map(SceneVersionDto::getId).collect(Collectors.toList());
@@ -218,7 +227,7 @@ public class SceneBffService {
 
     public SceneVersionVo deployVersion(Long versionId, List<Long> envIdList, String version) {
         // 查询 scene name 传递给下层服务
-        Long sceneId = sceneVersionService.fetchById(ListUtil.of(versionId)).get(versionId).getSceneId();
+        Long sceneId = sceneVersionAService.fetchById(ListUtil.of(versionId)).get(versionId).getSceneId();
         String sceneName = sceneService.fetchById(ListUtil.of(sceneId)).get(sceneId).getName();
         SceneVersionDto sceneVersionDto = sceneVersionService.deploy(versionId, sceneName, envIdList, version);
         return SceneVersionVoConverter.createFrom(sceneVersionDto);
@@ -242,7 +251,7 @@ public class SceneBffService {
 
     public Page<DebugProcessInstanceVo> listDebugProcessInstance(Integer pageNum, Integer pageSize, Long versionId) {
         Assert.notNull(versionId, "版本id不能为空");
-        SceneVersionDto sceneVersionDto = sceneVersionService.fetchById(ListUtil.of(versionId)).get(versionId);
+        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchById(ListUtil.of(versionId)).get(versionId);
         Assert.notNull(sceneVersionDto, "版本不存在。version id：{}", versionId);
         Assert.isTrue(NumberUtil.equals(sceneVersionDto.getStatus(), SceneConst.SCENE_VERSION_STATUS__DEBUGGING)
                 || NumberUtil.equals(sceneVersionDto.getStatus(), SceneConst.SCENE_VERSION_STATUS__CONFIGURING),

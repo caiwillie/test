@@ -9,8 +9,6 @@ import com.brandnewdata.mop.poc.bff.vo.proxy.ProxyVo;
 import com.brandnewdata.mop.poc.bff.vo.proxy.SimpleProxyGroupVo;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
-import com.brandnewdata.mop.poc.proxy.dto.old.Endpoint;
-import com.brandnewdata.mop.poc.proxy.dto.old.Proxy;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

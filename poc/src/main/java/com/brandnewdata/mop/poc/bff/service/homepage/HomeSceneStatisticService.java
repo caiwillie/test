@@ -19,9 +19,9 @@ import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import com.brandnewdata.mop.poc.scene.dto.SceneDto;
 import com.brandnewdata.mop.poc.scene.dto.SceneReleaseDeployDto;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
-import com.brandnewdata.mop.poc.scene.service.ISceneReleaseDeployService;
 import com.brandnewdata.mop.poc.scene.service.ISceneService;
-import com.brandnewdata.mop.poc.scene.service.ISceneVersionService;
+import com.brandnewdata.mop.poc.scene.service.atomic.ISceneReleaseDeployAService;
+import com.brandnewdata.mop.poc.scene.service.atomic.ISceneVersionAService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -38,25 +38,25 @@ public class HomeSceneStatisticService {
 
     private final ISceneService sceneService;
 
-    private final ISceneVersionService sceneVersionService;
+    private final ISceneVersionAService sceneVersionAService;
 
     private final IProcessDeployService processDeployService;
 
     private final IProcessInstanceService processInstanceService;
 
-    private final ISceneReleaseDeployService sceneReleaseDeployService;
+    private final ISceneReleaseDeployAService sceneReleaseDeployService;
 
 
     public HomeSceneStatisticService(IEnvService envService,
                                      ISceneService sceneService,
-                                     ISceneVersionService sceneVersionService,
+                                     ISceneVersionAService sceneVersionAService,
                                      IProcessDeployService processDeployService,
                                      IProcessInstanceService processInstanceService,
-                                     ISceneReleaseDeployService sceneReleaseDeployService) {
+                                     ISceneReleaseDeployAService sceneReleaseDeployService) {
         this.sceneService = sceneService;
+        this.sceneVersionAService = sceneVersionAService;
         this.processInstanceService = processInstanceService;
         this.envService = envService;
-        this.sceneVersionService = sceneVersionService;
         this.processDeployService = processDeployService;
         this.sceneReleaseDeployService = sceneReleaseDeployService;
     }
@@ -72,7 +72,7 @@ public class HomeSceneStatisticService {
     }
 
     public List<HomeSceneBo> sceneList() {
-        List<SceneVersionDto> sceneVersionDtoList = sceneVersionService.fetchAll();
+        List<SceneVersionDto> sceneVersionDtoList = sceneVersionAService.fetchAll();
         List<SceneVersionDto> filterSceneVersionList = sceneVersionDtoList.stream()
                 .filter(sceneVersionDto -> NumberUtil.equals(sceneVersionDto.getStatus(), SceneConst.SCENE_VERSION_STATUS__RUNNING))
                 .limit(10).collect(Collectors.toList());
@@ -120,7 +120,7 @@ public class HomeSceneStatisticService {
     }
 
     private void assembleSceneCount(HomeSceneStatisticCountBo bo) {
-        List<SceneVersionDto> sceneVersionDtoList = sceneVersionService.fetchAll();
+        List<SceneVersionDto> sceneVersionDtoList = sceneVersionAService.fetchAll();
         int total = 0;
         int running = 0;
         for (SceneVersionDto sceneVersionDto : sceneVersionDtoList) {

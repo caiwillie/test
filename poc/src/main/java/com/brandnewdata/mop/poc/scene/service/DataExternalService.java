@@ -31,6 +31,7 @@ import com.brandnewdata.mop.poc.scene.dto.external.ConfirmLoadDto;
 import com.brandnewdata.mop.poc.scene.dto.external.ConnectorConfigDto;
 import com.brandnewdata.mop.poc.scene.dto.external.PrepareLoadDto;
 import com.brandnewdata.mop.poc.scene.po.SceneLoadPo;
+import com.brandnewdata.mop.poc.scene.service.atomic.ISceneVersionAService;
 import com.dxy.library.json.jackson.JacksonUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
@@ -58,6 +59,8 @@ public class DataExternalService implements IDataExternalService {
 
     private final ISceneVersionService sceneVersionService;
 
+    private final ISceneVersionAService sceneVersionAService;
+
     private final IVersionProcessService versionProcessService;
 
     private final ConnectorManager connectorManager;
@@ -74,11 +77,13 @@ public class DataExternalService implements IDataExternalService {
     public DataExternalService(IProcessDefinitionService processDefinitionService,
                                ISceneService sceneService,
                                ISceneVersionService sceneVersionService,
+                               ISceneVersionAService sceneVersionAService,
                                IVersionProcessService versionProcessService,
                                ConnectorManager connectorManager) {
         this.processDefinitionService = processDefinitionService;
         this.sceneService = sceneService;
         this.sceneVersionService = sceneVersionService;
+        this.sceneVersionAService = sceneVersionAService;
         this.versionProcessService = versionProcessService;
         this.connectorManager = connectorManager;
     }
@@ -172,7 +177,7 @@ public class DataExternalService implements IDataExternalService {
         sceneDto = sceneService.save(sceneDto);
 
         // 获取最新的 scene version
-        SceneVersionDto sceneVersionDto = sceneVersionService.fetchListBySceneId(ListUtil.of(sceneDto.getId()))
+        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchListBySceneId(ListUtil.of(sceneDto.getId()))
                 .get(sceneDto.getId()).get(0);
 
         List<ProcessExportBo> processExportBoList = sceneExportFileBo.getProcessExportBoList();

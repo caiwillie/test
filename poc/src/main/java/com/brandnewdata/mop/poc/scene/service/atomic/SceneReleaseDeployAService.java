@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.scene.service;
+package com.brandnewdata.mop.poc.scene.service.atomic;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class SceneReleaseDeployService implements ISceneReleaseDeployService {
+public class SceneReleaseDeployAService implements ISceneReleaseDeployAService {
 
     @Resource
     private SceneReleaseDeployDao sceneReleaseDeployDao;
