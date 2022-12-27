@@ -78,6 +78,12 @@ public class ProxyBffService {
         proxyEndpointAService.deleteById(id);
     }
 
+    public Page<ProxyEndpointVo> pageEndpoint(Integer pageNum, Integer pageSize, Long proxyId) {
+        Page<ProxyEndpointDto> page = proxyEndpointAService.pageByProxyId(pageNum, pageSize, proxyId);
+        List<ProxyEndpointVo> voList = page.getRecords().stream().map(ProxyEndpointVoConverter::createFrom).collect(Collectors.toList());
+        return new Page<>(page.getTotal(), voList);
+    }
+
     public List<SimpleProxyGroupVo> getAllProxy() {
         // fetch proxy
         List<ProxyDto> proxyDtoList = proxyAService.fetchCacheListByFilter(new ProxyFilter());

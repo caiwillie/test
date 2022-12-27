@@ -5,7 +5,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.proxy.dao.ProxyEndpointDao;
 import com.brandnewdata.mop.poc.proxy.dto.old.Endpoint;
 import com.brandnewdata.mop.poc.proxy.po.ProxyEndpointPo;
@@ -55,27 +54,6 @@ public class EndpointService {
     public Endpoint getOne(long id) {
         ProxyEndpointPo entity = endpointDao.selectById(id);
         return Optional.ofNullable(entity).map(this::toDTO).orElse(null);
-    }
-
-    public Page<Endpoint> page(Long proxyId, int pageNum, int pageSize) {
-        Assert.isTrue(pageNum > 0);
-        Assert.isTrue(pageSize > 0);
-        com.baomidou.mybatisplus.extension.plugins.pagination.Page<ProxyEndpointPo> page =
-                new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(pageNum, pageSize);
-        QueryWrapper<ProxyEndpointPo> queryWrapper = new QueryWrapper<>();
-        if(proxyId != null) queryWrapper.eq(ProxyEndpointPo.PROXY_ID, proxyId);
-        page = endpointDao.selectPage(page, queryWrapper);
-        List<Endpoint> records = Optional.ofNullable(page.getRecords()).orElse(ListUtil.empty())
-                .stream().map(this::toDTO).collect(Collectors.toList());
-        return new Page<>(page.getTotal(), records);
-    }
-
-    public void deleteByIdList(List<Long> idList) {
-        if(CollUtil.isEmpty(idList)) {
-            return;
-        }
-        // 根据 id list 删除
-        endpointDao.deleteBatchIds(idList);
     }
 
     public List<Endpoint> listByProxyIdList(List<Long> proxyIdList) {

@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.poc.proxy.service.atomic;
 
+import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.proxy.bo.ProxyEndpointFilter;
 import com.brandnewdata.mop.poc.proxy.bo.ProxyEndpointServerBo;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto;
@@ -8,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface IProxyEndpointAService {
+
+    Page<ProxyEndpointDto> pageByProxyId(Integer pageNum, Integer pageSize, Long proxyId);
 
     ProxyEndpointDto fetchByProxyIdAndLocation(Long proxyId, String location);
 

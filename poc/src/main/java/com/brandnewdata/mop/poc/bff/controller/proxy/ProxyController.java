@@ -8,6 +8,7 @@ import com.brandnewdata.mop.poc.bff.vo.proxy.ProxyGroupVo;
 import com.brandnewdata.mop.poc.bff.vo.proxy.ProxyVo;
 import com.brandnewdata.mop.poc.bff.vo.proxy.SimpleProxyGroupVo;
 import com.brandnewdata.mop.poc.common.dto.Page;
+import com.brandnewdata.mop.poc.proxy.dto.old.Endpoint;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -93,6 +94,23 @@ public class ProxyController {
         String id = vo.getId();
         proxyBffService.deleteEndpoint(Long.valueOf(id));
         return Result.OK();
+    }
+
+    /**
+     * endpoint 分页列表
+     *
+     * @param proxyId  proxy id
+     * @param pageNum  分页码
+     * @param pageSize 分页大小
+     * @return the result
+     */
+    @GetMapping("/rest/reverseProxy/pageEndpoint")
+    public Result<Page<Endpoint>> pageEndpoint(
+            @RequestParam Long proxyId,
+            @RequestParam int pageNum,
+            @RequestParam int pageSize) {
+        Page<Endpoint> result = endpointService.page(proxyId, pageNum, pageSize);
+        return Result.OK(result);
     }
 
 

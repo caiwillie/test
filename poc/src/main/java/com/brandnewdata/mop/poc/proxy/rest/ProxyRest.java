@@ -50,22 +50,7 @@ public class ProxyRest {
         return Result.OK(result);
     }
 
-    /**
-     * endpoint 分页列表
-     *
-     * @param proxyId  proxy id
-     * @param pageNum  分页码
-     * @param pageSize 分页大小
-     * @return the result
-     */
-    @GetMapping("/rest/reverseProxy/pageEndpoint")
-    public Result<Page<Endpoint>> pageEndpoint(
-            @RequestParam Long proxyId,
-            @RequestParam int pageNum,
-            @RequestParam int pageSize) {
-        Page<Endpoint> result = endpointService.page(proxyId, pageNum, pageSize);
-        return Result.OK(result);
-    }
+
 
 
 }

@@ -1,11 +1,13 @@
 package com.brandnewdata.mop.poc.proxy.service.atomic;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.proxy.bo.ProxyEndpointFilter;
 import com.brandnewdata.mop.poc.proxy.bo.ProxyEndpointServerBo;
 import com.brandnewdata.mop.poc.proxy.converter.ProxyEndpointDtoConverter;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -28,11 +31,26 @@ public class ProxyEndpoingAService implements IProxyEndpointAService {
     private ProxyEndpointDao proxyEndpointDao;
 
     @Override
+    public Page<ProxyEndpointDto> pageByProxyId(Integer pageNum, Integer pageSize, Long proxyId) {
+        Assert.isTrue(pageNum > 0);
+        Assert.isTrue(pageSize > 0);
+        Assert.notNull(proxyId);
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<ProxyEndpointPo> page =
+                new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(pageNum, pageSize);
+        QueryWrapper<ProxyEndpointPo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(ProxyEndpointPo.PROXY_ID, proxyId);
+        queryWrapper.isNull(ProxyEndpointPo.DELETE_FLAG);
+        page = proxyEndpointDao.selectPage(page, queryWrapper);
+        List<ProxyEndpointDto> records = Optional.ofNullable(page.getRecords()).orElse(ListUtil.empty())
+                .stream().map(ProxyEndpointDtoConverter::createFrom).collect(Collectors.toList());
+        return new Page<>(page.getTotal(), records);
+    }
+
+    @Override
     public ProxyEndpointDto fetchByProxyIdAndLocation(Long proxyId, String location) {
         // proxy id not null
         Assert.notNull(proxyId, "proxy id not null");
         Assert.notNull(location, "location not null");
-
         QueryWrapper<ProxyEndpointPo> query = new QueryWrapper<>();
         query.eq(ProxyEndpointPo.PROXY_ID, proxyId);
         query.eq(ProxyEndpointPo.LOCATION, location);

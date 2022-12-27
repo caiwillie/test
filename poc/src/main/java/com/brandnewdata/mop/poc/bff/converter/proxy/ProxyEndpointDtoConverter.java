@@ -8,7 +8,7 @@ public class ProxyEndpointDtoConverter {
 
     public static ProxyEndpointDto createFrom(ProxyEndpointVo vo) {
         ProxyEndpointDto dto = new ProxyEndpointDto();
-        dto.setId(vo.getId());
+        dto.setId(Long.valueOf(vo.getId()));
         dto.setProxyId(vo.getProxyId());
         dto.setLocation(vo.getLocation());
         dto.setBackendType(vo.getBackendType());
