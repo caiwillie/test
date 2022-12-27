@@ -107,7 +107,7 @@ public class ProxyAService implements IProxyAService {
         Long id = proxyDto.getId();
         if(id == null) {
             // 名称和版本唯一
-            Assert.isFalse(existByNameAndVersion(name, version), "API名称和版本不能重复");
+            Assert.isFalse(existByNameAndVersion(name, version), "{} {} 已存在", name, version);
 
             // 生成唯一的域名标识
             String domainIdentifier = null;
