@@ -2,7 +2,6 @@ package com.brandnewdata.mop.poc.proxy.rest;
 
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.poc.proxy.req.ImportFromFileReq;
-import com.brandnewdata.mop.poc.proxy.req.ProxyReq;
 import com.brandnewdata.mop.poc.proxy.resp.ApiResp;
 import com.brandnewdata.mop.poc.proxy.resp.InspectResp;
 import com.brandnewdata.mop.poc.proxy.service.EndpointService;

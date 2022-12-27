@@ -9,6 +9,7 @@ import com.brandnewdata.mop.poc.bff.vo.proxy.ProxyVo;
 import com.brandnewdata.mop.poc.bff.vo.proxy.SimpleProxyGroupVo;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
+import com.brandnewdata.mop.poc.proxy.dto.old.Endpoint;
 import com.brandnewdata.mop.poc.proxy.dto.old.Proxy;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +41,7 @@ public class ProxyController {
         return Result.OK(ret);
     }
 
-    // @GetMapping("/rest/reverseProxy/detail")
+    @GetMapping("/rest/reverseProxy/detail")
     public Result<ProxyVo> detail(@RequestParam long id) {
         ProxyVo proxyVo = proxyBffService.detailProxy(id);
         return Result.OK(proxyVo);
@@ -94,6 +95,18 @@ public class ProxyController {
     @PostMapping("/rest/proxy/endpoint/save")
     public Result<ProxyEndpointVo> saveEndpoint(@RequestBody ProxyEndpointVo vo) {
         ProxyEndpointVo ret = proxyBffService.saveEndpoint(vo);
+        return Result.OK(ret);
+    }
+
+    /**
+     * endpoint 详情
+     *
+     * @param id endpoint 详情
+     * @return the result
+     */
+    @GetMapping("/rest/reverseProxy/detailEndpoint")
+    public Result<ProxyEndpointVo> detailEndpoint(@RequestParam String id) {
+        ProxyEndpointVo ret = proxyBffService.detailEndpoint(Long.valueOf(id));
         return Result.OK(ret);
     }
 

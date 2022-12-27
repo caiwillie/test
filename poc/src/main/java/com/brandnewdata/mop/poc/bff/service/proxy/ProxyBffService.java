@@ -85,6 +85,11 @@ public class ProxyBffService {
         return ProxyEndpointVoConverter.createFrom(dto);
     }
 
+    public ProxyEndpointVo detailEndpoint(Long id) {
+        ProxyEndpointDto proxyEndpointDto = proxyEndpointAService.fetchByIds(ListUtil.of(id)).get(id);
+        return ProxyEndpointVoConverter.createFrom(proxyEndpointDto);
+    }
+
     public void deleteEndpoint(Long id) {
         proxyEndpointAService.deleteById(id);
     }
