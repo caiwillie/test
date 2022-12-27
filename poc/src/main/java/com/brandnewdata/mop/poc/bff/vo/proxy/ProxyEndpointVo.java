@@ -8,7 +8,7 @@ public class ProxyEndpointVo {
     /**
      * id
      */
-    private Long id;
+    private String id;
 
     /**
      * api id

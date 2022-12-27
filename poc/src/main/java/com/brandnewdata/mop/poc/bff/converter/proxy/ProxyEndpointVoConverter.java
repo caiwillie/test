@@ -7,7 +7,7 @@ public class ProxyEndpointVoConverter {
 
     public static ProxyEndpointVo createFrom(ProxyEndpointDto dto) {
         ProxyEndpointVo vo = new ProxyEndpointVo();
-        vo.setId(dto.getId());
+        vo.setId(String.valueOf(dto.getId()));
         vo.setProxyId(dto.getProxyId());
         vo.setLocation(dto.getLocation());
         vo.setBackendType(dto.getBackendType());

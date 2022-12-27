@@ -90,9 +90,8 @@ public class ProxyController {
      */
     @PostMapping("/rest/reverseProxy/deleteEndpoint")
     public Result deleteEndpoint(@RequestBody ProxyEndpointVo vo) {
-        Long id = vo.getId();
-        Assert.notNull(id, "路径 id 不能为空");
-        // endpointService.deleteByIdList(ListUtil.of(id));
+        String id = vo.getId();
+        proxyBffService.deleteEndpoint(Long.valueOf(id));
         return Result.OK();
     }
 
