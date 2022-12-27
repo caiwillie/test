@@ -9,6 +9,7 @@ import com.brandnewdata.mop.poc.bff.vo.proxy.ProxyVo;
 import com.brandnewdata.mop.poc.bff.vo.proxy.SimpleProxyGroupVo;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
+import com.brandnewdata.mop.poc.proxy.dto.old.Proxy;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,9 +35,15 @@ public class ProxyController {
      * @return the result
      */
     @PostMapping("/rest/reverseProxy/save")
-    public Result save(@RequestBody ProxyVo proxyVo) {
-        proxyBffService.saveProxy(proxyVo);
-        return Result.OK();
+    public Result<ProxyVo> save(@RequestBody ProxyVo proxyVo) {
+        ProxyVo ret = proxyBffService.saveProxy(proxyVo);
+        return Result.OK(ret);
+    }
+
+    // @GetMapping("/rest/reverseProxy/detail")
+    public Result<ProxyVo> detail(@RequestParam long id) {
+        ProxyVo proxyVo = proxyBffService.detailProxy(id);
+        return Result.OK(proxyVo);
     }
 
     /**

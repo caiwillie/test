@@ -61,10 +61,16 @@ public class ProxyBffService {
         return new Page<>(proxyGroupDtoPage.getTotal(), voList);
     }
 
-    public void saveProxy(ProxyVo proxyVo) {
-        proxyAService.save(ProxyDtoConverter.createFrom(proxyVo), false);
+    public ProxyVo saveProxy(ProxyVo proxyVo) {
+        ProxyDto ret = proxyAService.save(ProxyDtoConverter.createFrom(proxyVo), false);
+        return ProxyVoConverter.createFrom(ret);
     }
 
+    public ProxyVo detailProxy(Long id) {
+        ProxyDto proxyDto = proxyAService.fetchById(ListUtil.of(id)).get(id);
+        return ProxyVoConverter.createFrom(proxyDto);
+    }
+    
     public void deleteProxy(Long id) {
         proxyCService.deleteById(id);
     }

@@ -32,7 +32,7 @@ public class ProxyRest {
      * @param id api id
      * @return the result
      */
-    @GetMapping("/rest/reverseProxy/detail")
+    // @GetMapping("/rest/reverseProxy/detail")
     public Result<Proxy> detail(@RequestParam long id) {
         Proxy result = proxyService.getOne(id);
         return Result.OK(result);
