@@ -38,6 +38,7 @@ public class SceneVersionAService implements ISceneVersionAService {
         if (CollUtil.isEmpty(idList)) return MapUtil.empty();
         Assert.isTrue(idList.stream().filter(Objects::isNull).count() == 0, "版本id不能为空");
         QueryWrapper<SceneVersionPo> query = new QueryWrapper<>();
+        query.isNull(SceneVersionPo.DELETE_FLAG);
         query.in(SceneVersionPo.ID, idList);
         query.select(SceneVersionPo.ID, "count(*) as num");
         query.groupBy(SceneVersionPo.ID);
@@ -55,6 +56,7 @@ public class SceneVersionAService implements ISceneVersionAService {
         if (CollUtil.isEmpty(idList)) return MapUtil.empty();
         Assert.isTrue(idList.stream().filter(Objects::isNull).count() == 0, "版本id不能为空");
         QueryWrapper<SceneVersionPo> query = new QueryWrapper<>();
+        query.isNull(SceneVersionPo.DELETE_FLAG);
         query.in(SceneVersionPo.ID, idList);
         List<SceneVersionPo> sceneVersionPos = sceneVersionDao.selectList(query);
         return sceneVersionPos.stream().map(SceneVersionDtoConverter::createFrom)
@@ -67,6 +69,7 @@ public class SceneVersionAService implements ISceneVersionAService {
         long count = sceneIdList.stream().filter(Objects::isNull).count();
         Assert.isTrue(count == 0, "场景id列表不能存在空值");
         QueryWrapper<SceneVersionPo> query = new QueryWrapper<>();
+        query.isNull(SceneVersionPo.DELETE_FLAG);
         query.in(SceneVersionPo.SCENE_ID, sceneIdList);
         List<SceneVersionPo> sceneVersionPos = sceneVersionDao.selectList(query);
         return sceneVersionPos.stream().collect(Collectors.groupingBy(SceneVersionPo::getSceneId,
@@ -77,6 +80,7 @@ public class SceneVersionAService implements ISceneVersionAService {
     @Override
     public List<SceneVersionDto> fetchAll() {
         QueryWrapper<SceneVersionPo> query = new QueryWrapper<>();
+        query.isNull(SceneVersionPo.DELETE_FLAG);
         List<SceneVersionPo> sceneVersionPos = sceneVersionDao.selectList(query);
         return sceneVersionPos.stream().map(SceneVersionDtoConverter::createFrom).collect(Collectors.toList());
     }
@@ -133,7 +137,7 @@ public class SceneVersionAService implements ISceneVersionAService {
     }
 
     @Override
-    public SceneVersionDto fetchByIdAndCheckStatus(Long id, int[] statusArr) {
+    public SceneVersionDto fetchOneByIdAndCheckStatus(Long id, int[] statusArr) {
         Assert.notNull(id, "版本ID不能为空");
 
         SceneVersionDto versionDto = fetchById(ListUtil.of(id)).get(id);

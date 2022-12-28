@@ -21,5 +21,5 @@ public interface ISceneVersionAService {
 
     boolean checkNewReleaseVersion(Long sceneId, String version);
 
-    SceneVersionDto fetchByIdAndCheckStatus(Long id, int[] statusArr);
+    SceneVersionDto fetchOneByIdAndCheckStatus(Long id, int[] statusArr);
 }

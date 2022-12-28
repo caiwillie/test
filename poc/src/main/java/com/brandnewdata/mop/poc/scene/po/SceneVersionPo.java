@@ -1,11 +1,14 @@
 package com.brandnewdata.mop.poc.scene.po;
 
-import com.baomidou.mybatisplus.annotation.*;
-import lombok.Getter;
-import lombok.Setter;
-
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * <p>
@@ -13,7 +16,7 @@ import java.util.Date;
  * </p>
  *
  * @author caiwillie
- * @since 2022-11-23
+ * @since 2022-12-28
  */
 @Getter
 @Setter
@@ -37,6 +40,8 @@ public class SceneVersionPo implements Serializable {
 
     private Integer status;
 
+    private Long deleteFlag;
+
 
     public static final String ID = "id";
 
@@ -49,5 +54,7 @@ public class SceneVersionPo implements Serializable {
     public static final String SCENE_ID = "scene_id";
 
     public static final String STATUS = "status";
+
+    public static final String DELETE_FLAG = "delete_flag";
 
 }

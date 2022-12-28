@@ -92,7 +92,7 @@ public class DataExternalService implements IDataExternalService {
 
     @Override
     public SceneVersionExportDto export(Long versionId, List<String> processIdList) {
-        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchByIdAndCheckStatus(versionId, new int[]{SceneConst.SCENE_VERSION_STATUS__RUNNING,
+        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchOneByIdAndCheckStatus(versionId, new int[]{SceneConst.SCENE_VERSION_STATUS__RUNNING,
                 SceneConst.SCENE_VERSION_STATUS__STOPPED});
 
         Long sceneId = sceneVersionDto.getSceneId();

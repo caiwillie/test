@@ -243,11 +243,12 @@ public class SceneController {
     /**
      * 删除版本
      *
-     * @param oldVersion the old version
+     * @param vo the old version
      * @return the result
      */
     @PostMapping(value = "/rest/scene/version/delete")
-    public Result deleteVersion(@RequestBody SceneVersionVo oldVersion) {
+    public Result deleteVersion(@RequestBody SceneVersionVo vo) {
+        sceneBffService.versionDelete(vo.getId());
         return Result.OK();
     }
 

@@ -3,6 +3,7 @@ package com.brandnewdata.mop.poc.scene.service;
 import cn.hutool.core.io.resource.ResourceUtil;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
 import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
+import com.brandnewdata.mop.poc.scene.service.combine.ISceneVersionCService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,7 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class SceneVersionServiceTest {
 
     @Autowired
-    private ISceneVersionService sceneVersionService;
+    private ISceneVersionCService sceneVersionService;
 
     @Test
     void testSaveProcess() {

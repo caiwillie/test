@@ -34,10 +34,10 @@ import com.brandnewdata.mop.poc.scene.dto.external.ConnectorConfigDto;
 import com.brandnewdata.mop.poc.scene.dto.external.PrepareLoadDto;
 import com.brandnewdata.mop.poc.scene.service.IDataExternalService;
 import com.brandnewdata.mop.poc.scene.service.ISceneService;
-import com.brandnewdata.mop.poc.scene.service.ISceneVersionService;
 import com.brandnewdata.mop.poc.scene.service.atomic.ISceneReleaseDeployAService;
 import com.brandnewdata.mop.poc.scene.service.atomic.ISceneVersionAService;
 import com.brandnewdata.mop.poc.scene.service.atomic.IVersionProcessAService;
+import com.brandnewdata.mop.poc.scene.service.combine.ISceneVersionCService;
 import com.brandnewdata.mop.poc.scene.service.combine.IVersionProcessCService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
@@ -54,7 +54,7 @@ public class SceneBffService {
 
     private final ISceneService sceneService;
 
-    private final ISceneVersionService sceneVersionService;
+    private final ISceneVersionCService sceneVersionCService;
 
     private final ISceneVersionAService sceneVersionAService;
 
@@ -73,7 +73,7 @@ public class SceneBffService {
     private final IDataExternalService dataExternalService;
 
     public SceneBffService(ISceneService sceneService,
-                           ISceneVersionService sceneVersionService,
+                           ISceneVersionCService sceneVersionCService,
                            ISceneVersionAService sceneVersionAService,
                            IVersionProcessAService versionProcessAService,
                            IVersionProcessCService versionProcessCService,
@@ -83,7 +83,7 @@ public class SceneBffService {
                            ISceneReleaseDeployAService sceneReleaseDeployService,
                            IDataExternalService dataExternalService) {
         this.sceneService = sceneService;
-        this.sceneVersionService = sceneVersionService;
+        this.sceneVersionCService = sceneVersionCService;
         this.sceneVersionAService = sceneVersionAService;
         this.versionProcessAService = versionProcessAService;
         this.versionProcessCService = versionProcessCService;
@@ -209,24 +209,24 @@ public class SceneBffService {
     }
 
     public void processDelete(Long id) {
-        versionProcessCService.deleteById(ListUtil.of(id));
+        versionProcessCService.deleteById(id);
     }
 
     public void processDebug(VersionProcessVo vo) {
-        sceneVersionService.processDebug(VersionProcessDtoConverter.createFrom(vo), vo.getVariables());
+        versionProcessCService.debug(VersionProcessDtoConverter.createFrom(vo), vo.getVariables());
     }
 
     public SceneVersionVo debugVersion(Long versionId) {
         Assert.notNull(versionId, "版本id不能为空");
         EnvDto debugEnv = envService.fetchDebugEnv();
-        SceneVersionDto sceneVersionDto = sceneVersionService.debug(versionId, debugEnv.getId());
+        SceneVersionDto sceneVersionDto = sceneVersionCService.debug(versionId, debugEnv.getId());
         return SceneVersionVoConverter.createFrom(sceneVersionDto);
     }
 
     public SceneVersionVo stopDebugVersion(Long versionId) {
         Assert.notNull(versionId, "版本id不能为空");
         EnvDto debugEnv = envService.fetchDebugEnv();
-        SceneVersionDto sceneVersionDto = sceneVersionService.stopDebug(versionId, debugEnv.getId());
+        SceneVersionDto sceneVersionDto = sceneVersionCService.stopDebug(versionId, debugEnv.getId());
         return SceneVersionVoConverter.createFrom(sceneVersionDto);
     }
 
@@ -238,23 +238,27 @@ public class SceneBffService {
         // 查询 scene name 传递给下层服务
         Long sceneId = sceneVersionAService.fetchById(ListUtil.of(versionId)).get(versionId).getSceneId();
         String sceneName = sceneService.fetchById(ListUtil.of(sceneId)).get(sceneId).getName();
-        SceneVersionDto sceneVersionDto = sceneVersionService.deploy(versionId, sceneName, envIdList, version);
+        SceneVersionDto sceneVersionDto = sceneVersionCService.deploy(versionId, sceneName, envIdList, version);
         return SceneVersionVoConverter.createFrom(sceneVersionDto);
     }
 
     public SceneVersionVo versionStop(Long versionId) {
-        SceneVersionDto sceneVersionDto = sceneVersionService.stop(versionId);
+        SceneVersionDto sceneVersionDto = sceneVersionCService.stop(versionId);
         return SceneVersionVoConverter.createFrom(sceneVersionDto);
     }
 
     public SceneVersionVo versionResume(Long versionId, List<Long> envIdList) {
-        SceneVersionDto dto = sceneVersionService.resume(versionId, envIdList);
+        SceneVersionDto dto = sceneVersionCService.resume(versionId, envIdList);
         return SceneVersionVoConverter.createFrom(dto);
     }
 
     public SceneVersionVo versionCopyToNew(SceneVersionVo oldSceneVersionVo) {
-        SceneVersionDto sceneVersionDto = sceneVersionService.copyToNew(oldSceneVersionVo.getId());
+        SceneVersionDto sceneVersionDto = sceneVersionCService.copyToNew(oldSceneVersionVo.getId());
         return SceneVersionVoConverter.createFrom(sceneVersionDto);
+    }
+
+    public void versionDelete(Long id) {
+        sceneVersionCService.delete(id);
     }
 
     public Page<DebugProcessInstanceVo> listDebugProcessInstance(Integer pageNum, Integer pageSize, Long versionId) {

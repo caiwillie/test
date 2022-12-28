@@ -1,17 +1,15 @@
-package com.brandnewdata.mop.poc.scene.service;
+package com.brandnewdata.mop.poc.scene.service.combine;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.lang.Opt;
-import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.brandnewdata.mop.poc.constant.ProcessConst;
 import com.brandnewdata.mop.poc.constant.SceneConst;
-import com.brandnewdata.mop.poc.env.dto.EnvDto;
 import com.brandnewdata.mop.poc.env.service.IEnvService;
 import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
 import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionParseDto;
@@ -30,7 +28,6 @@ import com.brandnewdata.mop.poc.scene.po.SceneVersionPo;
 import com.brandnewdata.mop.poc.scene.service.atomic.ISceneReleaseDeployAService;
 import com.brandnewdata.mop.poc.scene.service.atomic.IVersionProcessAService;
 import com.brandnewdata.mop.poc.scene.service.atomic.SceneVersionAService;
-import com.brandnewdata.mop.poc.scene.service.combine.IVersionProcessCService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,12 +35,10 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class SceneVersionService implements ISceneVersionService {
+public class SceneVersionCService implements ISceneVersionCService {
 
     @Resource
     private SceneVersionDao sceneVersionDao;
@@ -65,14 +60,14 @@ public class SceneVersionService implements ISceneVersionService {
     private final ConnectorManager connectorManager;
 
 
-    public SceneVersionService(SceneVersionAService sceneVersionAService,
-                               IEnvService envService,
-                               IVersionProcessAService versionProcessAService,
-                               IVersionProcessCService versionProcessCService,
-                               IProcessDeployService processDeployService,
-                               ISceneReleaseDeployAService sceneReleaseDeployService,
-                               IProcessDefinitionService processDefinitionService,
-                               ConnectorManager connectorManager) {
+    public SceneVersionCService(SceneVersionAService sceneVersionAService,
+                                IEnvService envService,
+                                IVersionProcessAService versionProcessAService,
+                                IVersionProcessCService versionProcessCService,
+                                IProcessDeployService processDeployService,
+                                ISceneReleaseDeployAService sceneReleaseDeployService,
+                                IProcessDefinitionService processDefinitionService,
+                                ConnectorManager connectorManager) {
         this.sceneVersionAService = sceneVersionAService;
         this.envService = envService;
         this.versionProcessAService = versionProcessAService;
@@ -81,32 +76,6 @@ public class SceneVersionService implements ISceneVersionService {
         this.sceneReleaseDeployService = sceneReleaseDeployService;
         this.processDefinitionService = processDefinitionService;
         this.connectorManager = connectorManager;
-    }
-
-
-
-    @Override
-    public void processDebug(VersionProcessDto dto, Map<String, Object> variables) {
-        Long versionId = dto.getVersionId();
-        Assert.notNull(versionId, "流程版本id不能为空");
-        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchById(ListUtil.of(versionId)).get(versionId);
-        Assert.notNull(sceneVersionDto, "版本不存在。version id：{}", versionId);
-        Assert.isTrue(NumberUtil.equals(sceneVersionDto.getStatus(), SceneConst.SCENE_VERSION_STATUS__DEBUGGING)
-                        || NumberUtil.equals(sceneVersionDto.getStatus(), SceneConst.SCENE_VERSION_STATUS__CONFIGURING),
-                "版本状态异常。仅支持以下状态：调试中");
-
-        // 查询流程
-        Long id = dto.getId();
-        Assert.notNull(id, "流程不能为空");
-        VersionProcessDto versionProcessDto = versionProcessAService.fetchOneById(ListUtil.of(id)).get(id);
-        Assert.notNull(versionProcessDto, "流程不存在: {}", id);
-
-        // 查询调试环境
-        EnvDto envDto = envService.fetchDebugEnv();
-        Assert.notNull(envDto, "调试环境不存在");
-        Long envId = envDto.getId();
-
-        processDeployService.startAsync(versionProcessDto.getProcessId(), Opt.ofNullable(variables).orElse(MapUtil.empty()), envId);
     }
 
     @Override
@@ -138,7 +107,7 @@ public class SceneVersionService implements ISceneVersionService {
 
     @Override
     public SceneVersionDto stopDebug(Long id, Long envId) {
-        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchByIdAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__DEBUGGING});
+        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchOneByIdAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__DEBUGGING});
 
         // 修改状态
         sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__CONFIGURING);
@@ -148,7 +117,7 @@ public class SceneVersionService implements ISceneVersionService {
 
     @Override
     public SceneVersionDto stop(Long id) {
-        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchByIdAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__RUNNING});
+        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchOneByIdAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__RUNNING});
 
         // stop process
         List<SceneReleaseDeployDto> sceneReleaseDeployDtoList =
@@ -165,7 +134,7 @@ public class SceneVersionService implements ISceneVersionService {
 
     @Override
     public SceneVersionDto resume(Long id, List<Long> envIdList) {
-        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchByIdAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__STOPPED});
+        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchOneByIdAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__STOPPED});
         Assert.notEmpty(envIdList, "环境列表不能为空");
 
         // resume process
@@ -184,7 +153,7 @@ public class SceneVersionService implements ISceneVersionService {
     @Override
     public SceneVersionDto deploy(Long id, String sceneName, List<Long> envIdList, String version) {
         // 配置中，和调试中均可以进行发布
-        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchByIdAndCheckStatus(id,
+        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchOneByIdAndCheckStatus(id,
                 new int[]{SceneConst.SCENE_VERSION_STATUS__CONFIGURING, SceneConst.SCENE_VERSION_STATUS__DEBUGGING});
         Assert.notEmpty(envIdList, "环境列表不能为空");
         Assert.notNull(version, "版本不能为空");
@@ -241,7 +210,7 @@ public class SceneVersionService implements ISceneVersionService {
     @Override
     @Transactional
     public SceneVersionDto copyToNew(Long id) {
-        SceneVersionDto oldSceneVersionDto = sceneVersionAService.fetchByIdAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__RUNNING,
+        SceneVersionDto oldSceneVersionDto = sceneVersionAService.fetchOneByIdAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__RUNNING,
                 SceneConst.SCENE_VERSION_STATUS__STOPPED});
 
         Long sceneId = oldSceneVersionDto.getSceneId();
@@ -271,12 +240,7 @@ public class SceneVersionService implements ISceneVersionService {
 
         // delete old version process
         Long latestVersionId = latestSceneVersionDto.getId();
-        List<VersionProcessDto> latestVersionProcessDtoList =
-                versionProcessAService.fetchListByVersionId(ListUtil.of(latestVersionId), true).get(latestVersionId);
-        if (CollUtil.isNotEmpty(latestVersionProcessDtoList)) {
-            List<Long> idList = latestVersionProcessDtoList.stream().map(VersionProcessDto::getId).collect(Collectors.toList());
-            versionProcessCService.deleteById(idList);
-        }
+        versionProcessCService.deleteById(latestVersionId);
 
         // build new version process
         for (VersionProcessDto versionProcessDto : versionProcessDtoList) {
@@ -293,6 +257,18 @@ public class SceneVersionService implements ISceneVersionService {
         return latestSceneVersionDto;
     }
 
+    @Override
+    @Transactional
+    public void delete(Long id) {
+        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchOneByIdAndCheckStatus(id,
+                new int[]{SceneConst.SCENE_VERSION_STATUS__CONFIGURING, SceneConst.SCENE_VERSION_STATUS__STOPPED});
+        versionProcessCService.deleteByVersionId(id);
+
+        UpdateWrapper<SceneVersionPo> update = new UpdateWrapper<>();
+        update.setSql(StrUtil.format("{}={}", SceneVersionPo.DELETE_FLAG, SceneVersionPo.ID));
+        update.eq(SceneVersionPo.ID, id);
+        sceneVersionDao.update(null, update);
+    }
 
 
 }
