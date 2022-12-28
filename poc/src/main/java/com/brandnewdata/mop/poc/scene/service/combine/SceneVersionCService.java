@@ -240,7 +240,7 @@ public class SceneVersionCService implements ISceneVersionCService {
 
         // delete old version process
         Long latestVersionId = latestSceneVersionDto.getId();
-        versionProcessCService.deleteById(latestVersionId);
+        versionProcessCService.deleteByVersionId(latestVersionId);
 
         // build new version process
         for (VersionProcessDto versionProcessDto : versionProcessDtoList) {
@@ -260,7 +260,7 @@ public class SceneVersionCService implements ISceneVersionCService {
     @Override
     @Transactional
     public void delete(Long id) {
-        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchOneByIdAndCheckStatus(id,
+        sceneVersionAService.fetchOneByIdAndCheckStatus(id,
                 new int[]{SceneConst.SCENE_VERSION_STATUS__CONFIGURING, SceneConst.SCENE_VERSION_STATUS__STOPPED});
         versionProcessCService.deleteByVersionId(id);
 
