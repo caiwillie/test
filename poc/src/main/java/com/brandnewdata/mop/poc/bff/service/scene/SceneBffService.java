@@ -35,7 +35,6 @@ import com.brandnewdata.mop.poc.scene.dto.external.PrepareLoadDto;
 import com.brandnewdata.mop.poc.scene.service.IDataExternalService;
 import com.brandnewdata.mop.poc.scene.service.ISceneService;
 import com.brandnewdata.mop.poc.scene.service.ISceneVersionService;
-import com.brandnewdata.mop.poc.scene.service.IVersionProcessService;
 import com.brandnewdata.mop.poc.scene.service.atomic.ISceneReleaseDeployAService;
 import com.brandnewdata.mop.poc.scene.service.atomic.ISceneVersionAService;
 import com.brandnewdata.mop.poc.scene.service.atomic.IVersionProcessAService;
@@ -59,8 +58,6 @@ public class SceneBffService {
 
     private final ISceneVersionAService sceneVersionAService;
 
-    private final IVersionProcessService versionProcessService;
-
     private final IVersionProcessAService versionProcessAService;
 
     private final IVersionProcessCService versionProcessCService;
@@ -78,7 +75,6 @@ public class SceneBffService {
     public SceneBffService(ISceneService sceneService,
                            ISceneVersionService sceneVersionService,
                            ISceneVersionAService sceneVersionAService,
-                           IVersionProcessService versionProcessService,
                            IVersionProcessAService versionProcessAService,
                            IVersionProcessCService versionProcessCService,
                            IEnvService envService,
@@ -89,7 +85,6 @@ public class SceneBffService {
         this.sceneService = sceneService;
         this.sceneVersionService = sceneVersionService;
         this.sceneVersionAService = sceneVersionAService;
-        this.versionProcessService = versionProcessService;
         this.versionProcessAService = versionProcessAService;
         this.versionProcessCService = versionProcessCService;
         this.envService = envService;
@@ -112,9 +107,9 @@ public class SceneBffService {
         List<Long> versionIdList = sceneVersionDtoMap.values().stream().map(SceneVersionDto::getId).collect(Collectors.toList());
 
         // 获取某版本下的流程个数
-        Map<Long, Integer> countMap = versionProcessService.fetchCountByVersionId(versionIdList);
+        Map<Long, Integer> countMap = versionProcessAService.fetchCountByVersionId(versionIdList);
         // 获取某版本下的最新流程
-        Map<Long, VersionProcessDto> processDtoMap = versionProcessService.fetchLatestOneByVersionId(versionIdList);
+        Map<Long, VersionProcessDto> processDtoMap = versionProcessAService.fetchLatestOneByVersionId(versionIdList);
 
         for (SceneDto sceneDto : records) {
             SceneVo sceneVo = new SceneVo().from(sceneDto);
@@ -252,7 +247,6 @@ public class SceneBffService {
         SceneVersionDto dto = sceneVersionService.resume(versionId, envIdList);
         return SceneVersionVoConverter.createFrom(dto);
     }
-
 
     public SceneVersionVo versionCopyToNew(SceneVersionVo oldSceneVersionVo) {
         SceneVersionDto sceneVersionDto = sceneVersionService.copyToNew(oldSceneVersionVo.getId());

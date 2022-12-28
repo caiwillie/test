@@ -279,7 +279,7 @@ public class SceneVersionService implements ISceneVersionService {
                 versionProcessAService.fetchListByVersionId(ListUtil.of(latestVersionId), true).get(latestVersionId);
         if (CollUtil.isNotEmpty(latestVersionProcessDtoList)) {
             List<Long> idList = latestVersionProcessDtoList.stream().map(VersionProcessDto::getId).collect(Collectors.toList());
-            versionProcessService.deleteById(idList);
+            versionProcessCService.deleteById(idList);
         }
 
         // build new version process

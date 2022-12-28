@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.poc.scene.service.combine;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
@@ -9,7 +10,6 @@ import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService;
 import com.brandnewdata.mop.poc.scene.converter.VersionProcessPoConverter;
 import com.brandnewdata.mop.poc.scene.dao.VersionProcessDao;
-import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
 import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
 import com.brandnewdata.mop.poc.scene.po.VersionProcessPo;
 import com.brandnewdata.mop.poc.scene.service.atomic.ISceneVersionAService;
@@ -17,6 +17,7 @@ import com.brandnewdata.mop.poc.scene.service.atomic.IVersionProcessAService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @Service
 public class VersionProcessCService implements IVersionProcessCService{
@@ -78,13 +79,13 @@ public class VersionProcessCService implements IVersionProcessCService{
     }
 
     @Override
-    public void deleteProcess(VersionProcessDto dto) {
-        Long versionId = dto.getVersionId();
-        Assert.notNull(versionId, "版本id不能为空");
-
-        SceneVersionDto versionDto = sceneVersionAService.fetchById(ListUtil.of(versionId)).get(versionId);
-        Assert.notNull(versionDto, "版本id不存在。id: {}", versionId);
-
-
+    public void deleteById(List<Long> idList) {
+        if(CollUtil.isEmpty(idList)) return;
+        Assert.isFalse(CollUtil.hasNull(idList), "版本id列表不能含有空值");
+        for (Long id : idList) {
+            versionProcessDao.deleteById(id);
+        }
     }
+
+
 }
