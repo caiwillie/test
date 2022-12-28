@@ -8,4 +8,8 @@ import java.util.Map;
 public interface IVersionProcessAService {
 
     Map<Long, VersionProcessDto> fetchOneById(List<Long> idList);
+
+    Map<Long, List<VersionProcessDto>> fetchListByVersionId(List<Long> versionIdList, boolean simple);
+
+    Map<String, VersionProcessDto> fetchOneByProcessId(List<String> processIdList);
 }

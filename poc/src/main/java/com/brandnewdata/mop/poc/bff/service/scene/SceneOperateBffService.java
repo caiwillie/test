@@ -24,6 +24,7 @@ import com.brandnewdata.mop.poc.scene.dto.SceneReleaseDeployDto;
 import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
 import com.brandnewdata.mop.poc.scene.service.IVersionProcessService;
 import com.brandnewdata.mop.poc.scene.service.atomic.ISceneReleaseDeployAService;
+import com.brandnewdata.mop.poc.scene.service.atomic.IVersionProcessAService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -35,7 +36,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-public class SceneOperateBffService2 {
+public class SceneOperateBffService {
     private final int MAX_SIZE = 10;
     private final ISceneReleaseDeployAService sceneReleaseDeployService;
 
@@ -45,14 +46,18 @@ public class SceneOperateBffService2 {
 
     private final IVersionProcessService versionProcessService;
 
-    public SceneOperateBffService2(ISceneReleaseDeployAService sceneReleaseDeployService,
-                                   IProcessDeployService processDeployService,
-                                   IProcessInstanceService processInstanceService,
-                                   IVersionProcessService versionProcessService) {
+    private final IVersionProcessAService versionProcessAService;
+
+    public SceneOperateBffService(ISceneReleaseDeployAService sceneReleaseDeployService,
+                                  IProcessDeployService processDeployService,
+                                  IProcessInstanceService processInstanceService,
+                                  IVersionProcessService versionProcessService,
+                                  IVersionProcessAService versionProcessAService) {
         this.sceneReleaseDeployService = sceneReleaseDeployService;
         this.processDeployService = processDeployService;
         this.processInstanceService = processInstanceService;
         this.versionProcessService = versionProcessService;
+        this.versionProcessAService = versionProcessAService;
     }
 
     public Page<OperateProcessInstanceVo> pageProcessInstance(SceneDeployFilter filter) {
@@ -93,7 +98,7 @@ public class SceneOperateBffService2 {
     public ProcessDefinitionVo definitionProcessInstance(OperateProcessInstanceVo vo) {
         String processId = vo.getProcessId();
         VersionProcessDto versionProcessDto =
-                versionProcessService.fetchOneByProcessId(ListUtil.of(vo.getProcessId())).get(processId);
+                versionProcessAService.fetchOneByProcessId(ListUtil.of(vo.getProcessId())).get(processId);
         Assert.notNull(versionProcessDto, "流程id不存在");
 
         return ProcessDefinitionVoConverter.createFrom(vo.getProcessId(), vo.getProcessName(), versionProcessDto.getProcessXml());

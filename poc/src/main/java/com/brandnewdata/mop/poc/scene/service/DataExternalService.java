@@ -32,6 +32,7 @@ import com.brandnewdata.mop.poc.scene.dto.external.ConnectorConfigDto;
 import com.brandnewdata.mop.poc.scene.dto.external.PrepareLoadDto;
 import com.brandnewdata.mop.poc.scene.po.SceneLoadPo;
 import com.brandnewdata.mop.poc.scene.service.atomic.ISceneVersionAService;
+import com.brandnewdata.mop.poc.scene.service.atomic.IVersionProcessAService;
 import com.brandnewdata.mop.poc.scene.service.combine.IVersionProcessCService;
 import com.dxy.library.json.jackson.JacksonUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -64,6 +65,8 @@ public class DataExternalService implements IDataExternalService {
 
     private final IVersionProcessCService versionProcessCService;
 
+    private final IVersionProcessAService versionProcessAService;
+
     private final ConnectorManager connectorManager;
 
     private static final ObjectMapper OM = JacksonUtil.getObjectMapper();
@@ -80,12 +83,14 @@ public class DataExternalService implements IDataExternalService {
                                ISceneVersionAService sceneVersionAService,
                                IVersionProcessService versionProcessService,
                                IVersionProcessCService versionProcessCService,
+                               IVersionProcessAService versionProcessAService,
                                ConnectorManager connectorManager) {
         this.processDefinitionService = processDefinitionService;
         this.sceneService = sceneService;
         this.sceneVersionAService = sceneVersionAService;
         this.versionProcessService = versionProcessService;
         this.versionProcessCService = versionProcessCService;
+        this.versionProcessAService = versionProcessAService;
         this.connectorManager = connectorManager;
     }
 
@@ -97,7 +102,7 @@ public class DataExternalService implements IDataExternalService {
         Long sceneId = sceneVersionDto.getSceneId();
         SceneDto sceneDto = sceneService.fetchById(ListUtil.of(sceneId)).get(sceneId);
 
-        List<VersionProcessDto> versionProcessDtoList = versionProcessService
+        List<VersionProcessDto> versionProcessDtoList = versionProcessAService
                 .fetchListByVersionId(ListUtil.of(sceneVersionDto.getId()), false).get(versionId);
 
         Map<String, File> fileMap = new HashMap<>();

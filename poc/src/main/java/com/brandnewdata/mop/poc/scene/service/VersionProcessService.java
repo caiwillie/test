@@ -32,40 +32,13 @@ public class VersionProcessService implements IVersionProcessService {
 
     private final IVersionProcessAService versionProcessAService;
 
-    public VersionProcessService(IVersionProcessAService versionProcessAService,
-                                 IProcessDefinitionService processDefinitionService) {
+    public VersionProcessService(IVersionProcessAService versionProcessAService) {
         this.versionProcessAService = versionProcessAService;
     }
 
-    @Override
-    public Map<Long, List<VersionProcessDto>> fetchListByVersionId(List<Long> versionIdList, boolean simple) {
-        if(CollUtil.isEmpty(versionIdList)) return MapUtil.empty();
 
-        QueryWrapper<VersionProcessPo> query = new QueryWrapper<>();
-        query.in(VersionProcessPo.VERSION_ID, versionIdList);
-        if(simple) {
-            // 不查询xml，img等特大字段
-            query.select(VersionProcessPo.class, tableFieldInfo ->
-                    !StrUtil.equalsAny(tableFieldInfo.getColumn(), VersionProcessPo.PROCESS_XML, VersionProcessPo.PROCESS_IMG));
-        }
-        List<VersionProcessPo> versionProcessPos = versionProcessDao.selectList(query);
 
-        return versionProcessPos.stream().collect(Collectors.groupingBy(VersionProcessPo::getVersionId,
-                Collectors.mapping(VersionProcessDtoConverter::createFrom, Collectors.toList())));
-    }
 
-    @Override
-    public Map<String, VersionProcessDto> fetchOneByProcessId(List<String> processIdList) {
-        if(CollUtil.isEmpty(processIdList)) return MapUtil.empty();
-        Assert.isFalse(CollUtil.hasNull(processIdList), "流程id列表不能含有空值");
-
-        QueryWrapper<VersionProcessPo> query = new QueryWrapper<>();
-        query.in(VersionProcessPo.PROCESS_ID, processIdList);
-
-        List<VersionProcessPo> versionProcessPos = versionProcessDao.selectList(query);
-        return versionProcessPos.stream().map(VersionProcessDtoConverter::createFrom)
-                .collect(Collectors.toMap(VersionProcessDto::getProcessId, Function.identity()));
-    }
 
     @Override
     public Map<Long, Integer> fetchCountByVersionId(List<Long> versionIdList) {
@@ -88,7 +61,7 @@ public class VersionProcessService implements IVersionProcessService {
 
     @Override
     public Map<Long, VersionProcessDto> fetchLatestOneByVersionId(List<Long> versionIdList) {
-        Map<Long, List<VersionProcessDto>> versionProcessListMap = fetchListByVersionId(versionIdList, true);
+        Map<Long, List<VersionProcessDto>> versionProcessListMap = versionProcessAService.fetchListByVersionId(versionIdList, true);
         Map<Long, Long> idMap = versionProcessListMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> {
             List<VersionProcessDto> versionProcessDtos = entry.getValue();
             return versionProcessDtos.stream().max(Comparator.comparing(VersionProcessDto::getUpdateTime))

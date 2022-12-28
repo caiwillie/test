@@ -24,7 +24,7 @@ import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyEndpointAService;
 import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyEndpointCallAService;
 import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyEndpointSceneAService;
 import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
-import com.brandnewdata.mop.poc.scene.service.IVersionProcessService;
+import com.brandnewdata.mop.poc.scene.service.atomic.IVersionProcessAService;
 import com.dxy.library.json.jackson.JacksonUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -54,9 +54,9 @@ public class ReverseProxyServlet extends ProxyServlet {
 
     private final IProxyEndpointCallAService proxyEndpointCallAService;
 
-    private final IProcessDeployService deployService2;
+    private final IProcessDeployService deployService;
 
-    private final IVersionProcessService processService;
+    private final IVersionProcessAService versionProcessAService;
 
     private static final String ATTR_TARGET_URI =
             ProxyServlet.class.getSimpleName() + ".targetUri";
@@ -68,14 +68,14 @@ public class ReverseProxyServlet extends ProxyServlet {
                                IProxyEndpointAService proxyEndpointAService,
                                IProxyEndpointSceneAService proxyEndpointSceneAService,
                                IProxyEndpointCallAService proxyEndpointCallAService,
-                               IProcessDeployService deployService2,
-                               IVersionProcessService processService) {
+                               IProcessDeployService deployService,
+                               IVersionProcessAService versionProcessAService) {
         this.proxyAService = proxyAService;
         this.proxyEndpointAService = proxyEndpointAService;
         this.proxyEndpointSceneAService = proxyEndpointSceneAService;
         this.proxyEndpointCallAService = proxyEndpointCallAService;
-        this.deployService2 = deployService2;
-        this.processService = processService;
+        this.deployService = deployService;
+        this.versionProcessAService = versionProcessAService;
     }
 
     @Override
@@ -184,13 +184,13 @@ public class ReverseProxyServlet extends ProxyServlet {
         Long envId = config.getEnvId();
         String processId = config.getProcessId();
         String processName = config.getProcessName();
-        VersionProcessDto versionProcessDto = processService.fetchOneByProcessId(ListUtil.of(processId)).get(processId);
+        VersionProcessDto versionProcessDto = versionProcessAService.fetchOneByProcessId(ListUtil.of(processId)).get(processId);
         Assert.notNull(versionProcessDto, "process not found: {}", processId);
         String processXml = versionProcessDto.getProcessXml();
 
         BpmnXmlDto bpmnXmlDto = new BpmnXmlDto(processId, processName, processXml);
 
-        Map<String, Object> result = deployService2.startSync(bpmnXmlDto, variables, envId, ProcessConst.PROCESS_BIZ_TYPE__SCENE);
+        Map<String, Object> result = deployService.startSync(bpmnXmlDto, variables, envId, ProcessConst.PROCESS_BIZ_TYPE__SCENE);
         ServletUtil.write(response, JacksonUtil.to(result), "application/json;charset=utf-8");
     }
 

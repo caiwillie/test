@@ -38,6 +38,7 @@ import com.brandnewdata.mop.poc.scene.service.ISceneVersionService;
 import com.brandnewdata.mop.poc.scene.service.IVersionProcessService;
 import com.brandnewdata.mop.poc.scene.service.atomic.ISceneReleaseDeployAService;
 import com.brandnewdata.mop.poc.scene.service.atomic.ISceneVersionAService;
+import com.brandnewdata.mop.poc.scene.service.atomic.IVersionProcessAService;
 import com.brandnewdata.mop.poc.scene.service.combine.IVersionProcessCService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
@@ -60,6 +61,8 @@ public class SceneBffService {
 
     private final IVersionProcessService versionProcessService;
 
+    private final IVersionProcessAService versionProcessAService;
+
     private final IVersionProcessCService versionProcessCService;
 
     private final IEnvService envService;
@@ -76,7 +79,9 @@ public class SceneBffService {
                            ISceneVersionService sceneVersionService,
                            ISceneVersionAService sceneVersionAService,
                            IVersionProcessService versionProcessService,
-                           IVersionProcessCService versionProcessCService, IEnvService envService,
+                           IVersionProcessAService versionProcessAService,
+                           IVersionProcessCService versionProcessCService,
+                           IEnvService envService,
                            IProcessDeployService processDeployService,
                            IProcessInstanceService processInstanceService,
                            ISceneReleaseDeployAService sceneReleaseDeployService,
@@ -85,6 +90,7 @@ public class SceneBffService {
         this.sceneVersionService = sceneVersionService;
         this.sceneVersionAService = sceneVersionAService;
         this.versionProcessService = versionProcessService;
+        this.versionProcessAService = versionProcessAService;
         this.versionProcessCService = versionProcessCService;
         this.envService = envService;
         this.processDeployService = processDeployService;
@@ -153,7 +159,7 @@ public class SceneBffService {
     public List<VersionProcessVo> processList(Long versionId) {
         Assert.notNull(versionId, "版本id不能为空");
         List<VersionProcessDto> versionProcessDtoList =
-                versionProcessService.fetchListByVersionId(ListUtil.of(versionId), false).get(versionId);
+                versionProcessAService.fetchListByVersionId(ListUtil.of(versionId), false).get(versionId);
         return Opt.ofNullable(versionProcessDtoList).orElse(ListUtil.empty()).stream()
                 .map(VersionProcessVoConverter::createFrom).collect(Collectors.toList());
     }
@@ -267,7 +273,7 @@ public class SceneBffService {
 
         // 获取该版本下当前的流程定义
         List<VersionProcessDto> versionProcessDtoList =
-                versionProcessService.fetchListByVersionId(ListUtil.of(versionId), true).get(versionId);
+                versionProcessAService.fetchListByVersionId(ListUtil.of(versionId), true).get(versionId);
         if(CollUtil.isEmpty(versionProcessDtoList)) return new Page<>(0, ListUtil.empty());
         Map<String, VersionProcessDto> versionProcessDtoMap =
                 versionProcessDtoList.stream().collect(Collectors.toMap(VersionProcessDto::getProcessId, Function.identity()));

@@ -15,6 +15,7 @@ import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import com.brandnewdata.mop.poc.scene.dto.SceneReleaseDeployDto;
 import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
 import com.brandnewdata.mop.poc.scene.service.IVersionProcessService;
+import com.brandnewdata.mop.poc.scene.service.atomic.IVersionProcessAService;
 import com.dxy.library.json.jackson.JacksonUtil;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,11 +27,15 @@ public class SceneApi implements ISceneApi {
 
     private final IVersionProcessService versionProcessService;
 
+    private final IVersionProcessAService versionProcessAService;
+
     private final IProcessDeployService processDeployService;
 
     public SceneApi(IVersionProcessService versionProcessService,
+                    IVersionProcessAService versionProcessAService,
                     IProcessDeployService processDeployService) {
         this.versionProcessService = versionProcessService;
+        this.versionProcessAService = versionProcessAService;
         this.processDeployService = processDeployService;
     }
 
@@ -74,7 +79,7 @@ public class SceneApi implements ISceneApi {
         Long envId = sceneReleaseDeployDto.getEnvId();
         Map<String, Object> variables = Opt.ofNullable(JacksonUtil.fromMap(versionProcessStartDto.getContent())).orElse(MapUtil.empty());
 
-        VersionProcessDto versionProcessDto = versionProcessService.fetchOneByProcessId(ListUtil.of(processId)).get(processId);
+        VersionProcessDto versionProcessDto = versionProcessAService.fetchOneByProcessId(ListUtil.of(processId)).get(processId);
         BpmnXmlDto bpmnXmlDto = new BpmnXmlDto(versionProcessDto.getProcessId(), versionProcessDto.getProcessName(), versionProcessDto.getProcessXml());
 
         Map<String, Object> data = processDeployService.startSync(bpmnXmlDto, variables, envId, ProcessConst.PROCESS_BIZ_TYPE__SCENE);

@@ -121,7 +121,7 @@ public class SceneVersionService implements ISceneVersionService {
 
         // 获取版本下的流程
         List<VersionProcessDto> versionProcessDtoList =
-                versionProcessService.fetchListByVersionId(ListUtil.of(id), false).get(id);
+                versionProcessAService.fetchListByVersionId(ListUtil.of(id), false).get(id);
         Assert.isTrue(CollUtil.isNotEmpty(versionProcessDtoList), "该版本下至少需要配置一个流程");
 
         Assert.notNull(envId, "环境id不能为空");
@@ -197,7 +197,7 @@ public class SceneVersionService implements ISceneVersionService {
 
         // 查询版本下的流程
         List<VersionProcessDto> versionProcessDtoList =
-                versionProcessService.fetchListByVersionId(ListUtil.of(id), false).get(id);
+                versionProcessAService.fetchListByVersionId(ListUtil.of(id), false).get(id);
         Assert.isTrue(CollUtil.isNotEmpty(versionProcessDtoList), "该版本下至少需要配置一个流程");
 
         // 发布到zeebe
@@ -271,12 +271,12 @@ public class SceneVersionService implements ISceneVersionService {
 
         // 查询版本下的流程
         List<VersionProcessDto> versionProcessDtoList =
-                versionProcessService.fetchListByVersionId(ListUtil.of(id), false).get(id);
+                versionProcessAService.fetchListByVersionId(ListUtil.of(id), false).get(id);
 
         // delete old version process
         Long latestVersionId = latestSceneVersionDto.getId();
         List<VersionProcessDto> latestVersionProcessDtoList =
-                versionProcessService.fetchListByVersionId(ListUtil.of(latestVersionId), true).get(latestVersionId);
+                versionProcessAService.fetchListByVersionId(ListUtil.of(latestVersionId), true).get(latestVersionId);
         if (CollUtil.isNotEmpty(latestVersionProcessDtoList)) {
             List<Long> idList = latestVersionProcessDtoList.stream().map(VersionProcessDto::getId).collect(Collectors.toList());
             versionProcessService.deleteById(idList);
