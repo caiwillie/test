@@ -283,6 +283,7 @@ public class SceneController {
      */
     @PostMapping(value = "/rest/scene/version/process/delete")
     public Result processDelete(@RequestBody VersionProcessVo versionProcessVo) {
+        sceneBffService.processDelete(Long.valueOf(versionProcessVo.getId()));
         return Result.OK();
     }
 

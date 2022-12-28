@@ -32,6 +32,7 @@ public class VersionProcessAService implements IVersionProcessAService {
         Assert.isFalse(CollUtil.hasNull(idList), "版本id列表不能含有空值");
 
         QueryWrapper<VersionProcessPo> query = new QueryWrapper<>();
+        query.isNull(VersionProcessPo.DELETE_FLAG);
         query.in(VersionProcessPo.ID, idList);
 
         List<VersionProcessPo> versionProcessPos = versionProcessDao.selectList(query);
@@ -45,6 +46,7 @@ public class VersionProcessAService implements IVersionProcessAService {
         if(CollUtil.isEmpty(versionIdList)) return MapUtil.empty();
 
         QueryWrapper<VersionProcessPo> query = new QueryWrapper<>();
+        query.isNull(VersionProcessPo.DELETE_FLAG);
         query.in(VersionProcessPo.VERSION_ID, versionIdList);
         if(simple) {
             // 不查询xml，img等特大字段
@@ -63,6 +65,7 @@ public class VersionProcessAService implements IVersionProcessAService {
         Assert.isFalse(CollUtil.hasNull(processIdList), "流程id列表不能含有空值");
 
         QueryWrapper<VersionProcessPo> query = new QueryWrapper<>();
+        query.isNull(VersionProcessPo.DELETE_FLAG);
         query.in(VersionProcessPo.PROCESS_ID, processIdList);
 
         List<VersionProcessPo> versionProcessPos = versionProcessDao.selectList(query);
@@ -75,6 +78,7 @@ public class VersionProcessAService implements IVersionProcessAService {
         if(CollUtil.isEmpty(versionIdList)) return MapUtil.empty();
         Map<Long, Integer> ret = new HashMap<>();
         QueryWrapper<VersionProcessPo> query = new QueryWrapper<>();
+        query.isNull(VersionProcessPo.DELETE_FLAG);
         query.in(VersionProcessPo.VERSION_ID, versionIdList);
         query.select(VersionProcessPo.VERSION_ID, "count(*) as num");
         query.groupBy(VersionProcessPo.VERSION_ID);

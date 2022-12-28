@@ -208,6 +208,10 @@ public class SceneBffService {
         return VersionProcessVoConverter.createFrom(dto);
     }
 
+    public void processDelete(Long id) {
+        versionProcessCService.deleteById(ListUtil.of(id));
+    }
+
     public void processDebug(VersionProcessVo vo) {
         sceneVersionService.processDebug(VersionProcessDtoConverter.createFrom(vo), vo.getVariables());
     }

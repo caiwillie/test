@@ -22,7 +22,6 @@ import com.brandnewdata.mop.poc.process.dto.ProcessReleaseDeployDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import com.brandnewdata.mop.poc.scene.dto.SceneReleaseDeployDto;
 import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
-import com.brandnewdata.mop.poc.scene.service.IVersionProcessService;
 import com.brandnewdata.mop.poc.scene.service.atomic.ISceneReleaseDeployAService;
 import com.brandnewdata.mop.poc.scene.service.atomic.IVersionProcessAService;
 import org.springframework.stereotype.Service;
@@ -44,19 +43,15 @@ public class SceneOperateBffService {
 
     private final IProcessInstanceService processInstanceService;
 
-    private final IVersionProcessService versionProcessService;
-
     private final IVersionProcessAService versionProcessAService;
 
     public SceneOperateBffService(ISceneReleaseDeployAService sceneReleaseDeployService,
                                   IProcessDeployService processDeployService,
                                   IProcessInstanceService processInstanceService,
-                                  IVersionProcessService versionProcessService,
                                   IVersionProcessAService versionProcessAService) {
         this.sceneReleaseDeployService = sceneReleaseDeployService;
         this.processDeployService = processDeployService;
         this.processInstanceService = processInstanceService;
-        this.versionProcessService = versionProcessService;
         this.versionProcessAService = versionProcessAService;
     }
 

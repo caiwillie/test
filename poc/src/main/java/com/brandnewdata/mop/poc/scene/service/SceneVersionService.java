@@ -52,8 +52,6 @@ public class SceneVersionService implements ISceneVersionService {
 
     private final IEnvService envService;
 
-    private final IVersionProcessService versionProcessService;
-
     private final IVersionProcessAService versionProcessAService;
 
     private final IVersionProcessCService versionProcessCService;
@@ -69,7 +67,6 @@ public class SceneVersionService implements ISceneVersionService {
 
     public SceneVersionService(SceneVersionAService sceneVersionAService,
                                IEnvService envService,
-                               IVersionProcessService versionProcessService,
                                IVersionProcessAService versionProcessAService,
                                IVersionProcessCService versionProcessCService,
                                IProcessDeployService processDeployService,
@@ -78,7 +75,6 @@ public class SceneVersionService implements ISceneVersionService {
                                ConnectorManager connectorManager) {
         this.sceneVersionAService = sceneVersionAService;
         this.envService = envService;
-        this.versionProcessService = versionProcessService;
         this.versionProcessAService = versionProcessAService;
         this.versionProcessCService = versionProcessCService;
         this.processDeployService = processDeployService;
@@ -142,7 +138,7 @@ public class SceneVersionService implements ISceneVersionService {
 
     @Override
     public SceneVersionDto stopDebug(Long id, Long envId) {
-        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchOneByIdAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__DEBUGGING});
+        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchByIdAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__DEBUGGING});
 
         // 修改状态
         sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__CONFIGURING);
@@ -152,7 +148,7 @@ public class SceneVersionService implements ISceneVersionService {
 
     @Override
     public SceneVersionDto stop(Long id) {
-        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchOneByIdAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__RUNNING});
+        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchByIdAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__RUNNING});
 
         // stop process
         List<SceneReleaseDeployDto> sceneReleaseDeployDtoList =
@@ -169,7 +165,7 @@ public class SceneVersionService implements ISceneVersionService {
 
     @Override
     public SceneVersionDto resume(Long id, List<Long> envIdList) {
-        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchOneByIdAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__STOPPED});
+        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchByIdAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__STOPPED});
         Assert.notEmpty(envIdList, "环境列表不能为空");
 
         // resume process
@@ -188,7 +184,7 @@ public class SceneVersionService implements ISceneVersionService {
     @Override
     public SceneVersionDto deploy(Long id, String sceneName, List<Long> envIdList, String version) {
         // 配置中，和调试中均可以进行发布
-        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchOneByIdAndCheckStatus(id,
+        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchByIdAndCheckStatus(id,
                 new int[]{SceneConst.SCENE_VERSION_STATUS__CONFIGURING, SceneConst.SCENE_VERSION_STATUS__DEBUGGING});
         Assert.notEmpty(envIdList, "环境列表不能为空");
         Assert.notNull(version, "版本不能为空");
@@ -245,7 +241,7 @@ public class SceneVersionService implements ISceneVersionService {
     @Override
     @Transactional
     public SceneVersionDto copyToNew(Long id) {
-        SceneVersionDto oldSceneVersionDto = sceneVersionAService.fetchOneByIdAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__RUNNING,
+        SceneVersionDto oldSceneVersionDto = sceneVersionAService.fetchByIdAndCheckStatus(id, new int[]{SceneConst.SCENE_VERSION_STATUS__RUNNING,
                 SceneConst.SCENE_VERSION_STATUS__STOPPED});
 
         Long sceneId = oldSceneVersionDto.getSceneId();

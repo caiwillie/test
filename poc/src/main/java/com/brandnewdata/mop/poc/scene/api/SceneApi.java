@@ -14,7 +14,6 @@ import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import com.brandnewdata.mop.poc.scene.dto.SceneReleaseDeployDto;
 import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
-import com.brandnewdata.mop.poc.scene.service.IVersionProcessService;
 import com.brandnewdata.mop.poc.scene.service.atomic.IVersionProcessAService;
 import com.dxy.library.json.jackson.JacksonUtil;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,16 +24,12 @@ import java.util.Map;
 @RestController
 public class SceneApi implements ISceneApi {
 
-    private final IVersionProcessService versionProcessService;
-
     private final IVersionProcessAService versionProcessAService;
 
     private final IProcessDeployService processDeployService;
 
-    public SceneApi(IVersionProcessService versionProcessService,
-                    IVersionProcessAService versionProcessAService,
+    public SceneApi(IVersionProcessAService versionProcessAService,
                     IProcessDeployService processDeployService) {
-        this.versionProcessService = versionProcessService;
         this.versionProcessAService = versionProcessAService;
         this.processDeployService = processDeployService;
     }

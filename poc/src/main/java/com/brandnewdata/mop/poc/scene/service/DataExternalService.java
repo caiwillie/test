@@ -61,8 +61,6 @@ public class DataExternalService implements IDataExternalService {
 
     private final ISceneVersionAService sceneVersionAService;
 
-    private final IVersionProcessService versionProcessService;
-
     private final IVersionProcessCService versionProcessCService;
 
     private final IVersionProcessAService versionProcessAService;
@@ -81,14 +79,12 @@ public class DataExternalService implements IDataExternalService {
     public DataExternalService(IProcessDefinitionService processDefinitionService,
                                ISceneService sceneService,
                                ISceneVersionAService sceneVersionAService,
-                               IVersionProcessService versionProcessService,
                                IVersionProcessCService versionProcessCService,
                                IVersionProcessAService versionProcessAService,
                                ConnectorManager connectorManager) {
         this.processDefinitionService = processDefinitionService;
         this.sceneService = sceneService;
         this.sceneVersionAService = sceneVersionAService;
-        this.versionProcessService = versionProcessService;
         this.versionProcessCService = versionProcessCService;
         this.versionProcessAService = versionProcessAService;
         this.connectorManager = connectorManager;
@@ -96,7 +92,7 @@ public class DataExternalService implements IDataExternalService {
 
     @Override
     public SceneVersionExportDto export(Long versionId, List<String> processIdList) {
-        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchOneByIdAndCheckStatus(versionId, new int[]{SceneConst.SCENE_VERSION_STATUS__RUNNING,
+        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchByIdAndCheckStatus(versionId, new int[]{SceneConst.SCENE_VERSION_STATUS__RUNNING,
                 SceneConst.SCENE_VERSION_STATUS__STOPPED});
 
         Long sceneId = sceneVersionDto.getSceneId();

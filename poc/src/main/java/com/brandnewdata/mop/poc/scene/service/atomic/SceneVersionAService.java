@@ -133,7 +133,7 @@ public class SceneVersionAService implements ISceneVersionAService {
     }
 
     @Override
-    public SceneVersionDto fetchOneByIdAndCheckStatus(Long id, int[] statusArr) {
+    public SceneVersionDto fetchByIdAndCheckStatus(Long id, int[] statusArr) {
         Assert.notNull(id, "版本ID不能为空");
 
         SceneVersionDto versionDto = fetchById(ListUtil.of(id)).get(id);
