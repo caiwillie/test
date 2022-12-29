@@ -14,6 +14,8 @@ public class ConnectorExportBo {
 
     private String connectorName;
 
+    private String connectorSmallIcon;
+
     private List<ConfigExportBo> configurations;
 
     @Override

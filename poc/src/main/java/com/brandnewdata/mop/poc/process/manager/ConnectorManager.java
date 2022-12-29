@@ -7,7 +7,6 @@ import com.brandnewdata.connector.api.IConnectorBasicInfoFeign;
 import com.brandnewdata.connector.api.IConnectorCommonTriggerProcessConfFeign;
 import com.brandnewdata.connector.api.IConnectorConfFeign;
 import com.brandnewdata.connector.api.ITriggerProtocolFeign;
-import com.brandnewdata.mop.poc.env.service.IEnvService;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.process.manager.dto.ConfigInfo;
 import com.brandnewdata.mop.poc.process.manager.dto.ConnectorBasicInfo;
@@ -37,12 +36,6 @@ public class ConnectorManager {
 
     @Resource
     private ITriggerProtocolFeign protocolClient;
-
-    private final IEnvService envService;
-
-    public ConnectorManager(IEnvService envService) {
-        this.envService = envService;
-    }
 
     public ConfigInfo getConfigInfo(String configId) {
         IConnectorConfFeign.ConnectorConfDTO configInfo = confClient.getConfigInfo(Long.parseLong(configId));

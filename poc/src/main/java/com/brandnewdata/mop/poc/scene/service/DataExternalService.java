@@ -14,6 +14,7 @@ import com.brandnewdata.mop.poc.constant.SceneConst;
 import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
 import com.brandnewdata.mop.poc.process.manager.ConnectorManager;
 import com.brandnewdata.mop.poc.process.manager.dto.ConfigInfo;
+import com.brandnewdata.mop.poc.process.manager.dto.ConnectorBasicInfo;
 import com.brandnewdata.mop.poc.process.parser.dto.Action;
 import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService;
 import com.brandnewdata.mop.poc.process.util.ProcessUtil;
@@ -207,41 +208,51 @@ public class DataExternalService implements IDataExternalService {
         return sceneLoadPo.getId();
     }
 
-    private void parseConfig(Map<ConnectorExportBo, Map<String, ConfigExportBo>> configMap, Map<String, String> configIdMap) {
+    private void parseConfig(Map<ConnectorExportBo, Map<String, ConfigExportBo>> connectorExportBoMapMap, Map<String, String> configIdMap) {
         if(CollUtil.isEmpty(configIdMap)) return;
-        Assert.isFalse(CollUtil.hasNull(configMap.keySet()), "配置ID不能为空");
+        Assert.isFalse(CollUtil.hasNull(configIdMap.keySet()), "配置ID不能为空");
         for (Map.Entry<String, String> entry : configIdMap.entrySet()) {
             String configId = entry.getKey();
             String type = entry.getValue();
             Action action = ProcessUtil.parseAction(type);
+            String connectorGroup = action.getConnectorGroup();
+            String connectorId = action.getConnectorId();
+            String connectorVersion = action.getConnectorVersion();
+
             ConfigInfo configInfo = connectorManager.getConfigInfo(configId);
+            Assert.notNull(configInfo, "config not exist. id: {}", configId);
+            String configName = configInfo.getConfigName();
+            Assert.notNull(configName, "config name must not null. id: {}", configId);
+            Assert.isTrue(StrUtil.equals(connectorGroup, configInfo.getConnectorGroup()));
+            Assert.isTrue(StrUtil.equals(connectorId, configInfo.getConnectorId()));
+            Assert.isTrue(StrUtil.equals(connectorVersion, configInfo.getConnectorVersion()));
+
+            Map<String, ConfigExportBo> configExportBoMap = null;
 
             ConnectorExportBo connectorExportBo = new ConnectorExportBo();
-            ConfigExportBo configExportBo = new ConfigExportBo();
-            // 设置config id 和 name
-            configExportBo.setConfigId(configId);
-            configExportBo.setConfigName(configInfo.getConfigName());
-            if(configInfo != null) {
-                Assert.isTrue(StrUtil.equals(action.getConnectorGroup(), configInfo.getConnectorGroup()));
-                Assert.isTrue(StrUtil.equals(action.getConnectorId(), configInfo.getConnectorId()));
-                Assert.isTrue(StrUtil.equals(action.getConnectorVersion(), configInfo.getConnectorVersion()));
-                connectorExportBo.setConnectorGroup(configInfo.getConnectorGroup());
-                connectorExportBo.setConnectorId(configInfo.getConnectorId());
-                connectorExportBo.setConnectorVersion(configInfo.getConnectorVersion());
+            connectorExportBo.setConnectorGroup(configInfo.getConnectorGroup());
+            connectorExportBo.setConnectorId(configInfo.getConnectorId());
+            connectorExportBo.setConnectorVersion(configInfo.getConnectorVersion());
+            if(!connectorExportBoMapMap.containsKey(connectorExportBo)) {
+                ConnectorBasicInfo connectorBasicInfo = connectorManager.getConnectorBasicInfo(connectorGroup,
+                        connectorId, connectorVersion);
+                Assert.notNull(connectorBasicInfo, "connector not exist. group: {}, id: {}, version: {}",
+                        connectorGroup, connectorId, connectorVersion);
+                connectorExportBo.setConnectorName(connectorBasicInfo.getConnectorName());
+                connectorExportBo.setConnectorSmallIcon(connectorBasicInfo.getConnectorSmallIcon());
+                configExportBoMap = new LinkedHashMap<>();
+                connectorExportBoMapMap.put(connectorExportBo, configExportBoMap);
             } else {
-                connectorExportBo.setConnectorGroup(action.getConnectorGroup());
-                String connectorId = action.getConnectorId();
-                connectorExportBo.setConnectorId(connectorId);
-                connectorExportBo.setConnectorVersion(action.getConnectorVersion());
-                connectorExportBo.setConnectorName(connectorId);
+                configExportBoMap = connectorExportBoMapMap.get(connectorExportBo);
             }
 
-            Map<String, ConfigExportBo> configExportBoMap = configMap.computeIfAbsent(connectorExportBo, k -> new LinkedHashMap<>());
-
-            if(!configExportBoMap.containsKey(configExportBo.getConfigName())) {
-                configExportBoMap.put(configExportBo.getConfigName(), configExportBo);
+            if(!configExportBoMap.containsKey(configName)) {
+                ConfigExportBo configExportBo = new ConfigExportBo();
+                // 设置config id 和 name
+                configExportBo.setConfigId(configId);
+                configExportBo.setConfigName(configName);
+                configExportBoMap.put(configName, configExportBo);
             }
-
         }
 
     }
