@@ -99,6 +99,14 @@ public class SceneController {
         return Result.OK(ret);
     }
 
+    /**
+     * 获取连接配置列表
+     *
+     * @param connectorGroup   连接器group
+     * @param connectorId      连接器id
+     * @param connectorVersion 连接器version
+     * @return the result
+     */
     @GetMapping("/rest/scene/load/connectorConfig/list")
     public Result<List<ConnectorConfigVo>> listConnectorConfig(@RequestParam String connectorGroup,
                                                      @RequestParam String connectorId,

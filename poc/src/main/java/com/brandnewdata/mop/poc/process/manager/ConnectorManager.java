@@ -41,14 +41,14 @@ public class ConnectorManager {
 
     public ConfigInfo getConfigInfo(String configId) {
         IConnectorConfFeign.ConnectorConfDTO configInfo = confClient.getConfigInfo(Long.parseLong(configId));
-        log.info("configId {}, data {}", configId, JacksonUtil.to(configInfo));
+        log.debug("[api] IConnectorConfFeign#getConfigInfo. configId: {}, result: {}", configId, JacksonUtil.to(configInfo));
         if(configInfo == null) return null;
         return createFrom(configInfo);
     }
 
     public List<ConfigInfo> listConfigInfo(String connectorGroup, String connectorId, String connectorVersion) {
         List<IConnectorConfFeign.ConnectorConfDTO> configInfoList = confClient.getConfigInfoList(connectorGroup, connectorId, connectorVersion);
-        log.info("[api] listConfigInfo: connectorGroup {}, connectorId {}, connectorVersion {}, data {}",
+        log.debug("[api] IConnectorConfFeign#getConfigInfoList: connectorGroup {}, connectorId {}, connectorVersion {}, result {}",
                 connectorGroup, connectorId, connectorVersion, JacksonUtil.to(configInfoList));
         if(CollUtil.isEmpty(configInfoList)) return null;
         return configInfoList.stream().map(this::createFrom).collect(Collectors.toList());
@@ -66,13 +66,17 @@ public class ConnectorManager {
     }
 
     public String getTriggerXML(Action trigger) {
-        IConnectorBasicInfoFeign.ConnectorBasicInfoDTO info =
-                basicInfoClient.getInfoById(trigger.getConnectorGroup(), trigger.getConnectorId(), trigger.getConnectorVersion());
+        String connectorGroup = trigger.getConnectorGroup();
+        String connectorId = trigger.getConnectorId();
+        String connectorVersion = trigger.getConnectorVersion();
+        IConnectorBasicInfoFeign.ConnectorBasicInfoDTO connectorBasicInfo =
+                basicInfoClient.getInfoById(connectorGroup, connectorId, connectorVersion);
+        log.debug("[api] IConnectorBasicInfoFeign#getInfoById: connectorGroup {}, connectorId {}, connectorVersion {}, result {}",
+                connectorGroup, connectorId, connectorVersion, JacksonUtil.to(connectorBasicInfo));
 
-        Assert.notNull(info, ErrorMessage.NOT_NULL("触发器"));
-
+        Assert.notNull(connectorBasicInfo, ErrorMessage.NOT_NULL("触发器"));
         List<TriggerInfo> triggerInfos = Optional
-                .ofNullable(JacksonUtil.fromList(info.getConnectorTriggers(), TriggerInfo.class))
+                .ofNullable(JacksonUtil.fromList(connectorBasicInfo.getConnectorTriggers(), TriggerInfo.class))
                 .orElse(ListUtil.empty());
 
         String triggerId = trigger.getActionId();
@@ -90,15 +94,18 @@ public class ConnectorManager {
         return xml;
     }
 
-    public ConnectorBasicInfo getConnectorBasicInfo(String group, String connectorId, String version) {
-        IConnectorBasicInfoFeign.ConnectorBasicInfoDTO info = basicInfoClient.getInfoById(group, connectorId, version);
-        if(info == null) return null;
+    public ConnectorBasicInfo getConnectorBasicInfo(String connectorGroup, String connectorId, String connectorVersion) {
+        IConnectorBasicInfoFeign.ConnectorBasicInfoDTO connectorBasicInfo = basicInfoClient.getInfoById(connectorGroup, connectorId, connectorVersion);
+        log.debug("[api] IConnectorBasicInfoFeign#getInfoById: connectorGroup {}, connectorId {}, connectorVersion {}, result {}",
+                connectorGroup, connectorId, connectorVersion, JacksonUtil.to(connectorBasicInfo));
+
+        if(connectorBasicInfo == null) return null;
         ConnectorBasicInfo ret = new ConnectorBasicInfo();
-        ret.setConnectorGroup(info.getConnectorGroup());
-        ret.setConnectorId(info.getConnectorId());
-        ret.setConnectorName(info.getConnectorName());
-        ret.setConnectorVersion(info.getConnectorVersion());
-        ret.setConnectorSmallIcon(info.getConnectorSmallIcon());
+        ret.setConnectorGroup(connectorBasicInfo.getConnectorGroup());
+        ret.setConnectorId(connectorBasicInfo.getConnectorId());
+        ret.setConnectorName(connectorBasicInfo.getConnectorName());
+        ret.setConnectorVersion(connectorBasicInfo.getConnectorVersion());
+        ret.setConnectorSmallIcon(connectorBasicInfo.getConnectorSmallIcon());
         return ret;
     }
 
@@ -124,12 +131,12 @@ public class ConnectorManager {
 
     public void resumeVersionProcess(SceneReleaseDeployDto dto) {
         // 1 是生效
-        triggerClient.onOrOff(String.valueOf(dto.getId()), 1);
+        Integer result = triggerClient.onOrOff(String.valueOf(dto.getId()), 1);
     }
 
     public void stopVersionProcess(SceneReleaseDeployDto dto) {
         // 2 是禁用
-        triggerClient.onOrOff(String.valueOf(dto.getId()), 0);
+        Integer result = triggerClient.onOrOff(String.valueOf(dto.getId()), 0);
     }
 
     public String getProtocol(String connectorId) {
