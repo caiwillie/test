@@ -39,8 +39,7 @@ public class ProcessDefinitionService implements IProcessDefinitionService {
         Step1Result step1Result = ProcessDefinitionParser.step1(dto .getProcessId(), dto.getProcessName(), dto.getProcessXml())
                 .parseConfig().step1Result();
 
-        Map<String, String> configIdMap = step1Result.getConnectorConfigMap();
-        return null;
+        return step1Result.getConnectorConfigMap();
     }
 
     @Override
