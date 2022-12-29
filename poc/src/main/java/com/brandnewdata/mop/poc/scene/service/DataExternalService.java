@@ -48,6 +48,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class DataExternalService implements IDataExternalService {
@@ -160,6 +161,13 @@ public class DataExternalService implements IDataExternalService {
         }
         ret.setConfigs(connectorConfigDtos);
         return ret;
+    }
+
+    @Override
+    public List<ConnectorConfigDto> fetchConnectorConfigList(String connectorGroup, String connectorId, String connectorVersion) {
+        List<ConfigInfo> configInfoList = connectorManager.listConfigInfo(connectorGroup, connectorId, connectorVersion);
+        if(CollUtil.isEmpty(configInfoList)) return ListUtil.empty();
+        return configInfoList.stream().map(ConnectorConfigDtoConverter::createFrom).collect(Collectors.toList());
     }
 
     @Override

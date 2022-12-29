@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.poc.process.manager;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -41,13 +43,25 @@ public class ConnectorManager {
         IConnectorConfFeign.ConnectorConfDTO configInfo = confClient.getConfigInfo(Long.parseLong(configId));
         log.info("configId {}, data {}", configId, JacksonUtil.to(configInfo));
         if(configInfo == null) return null;
+        return createFrom(configInfo);
+    }
+
+    public List<ConfigInfo> listConfigInfo(String connectorGroup, String connectorId, String connectorVersion) {
+        List<IConnectorConfFeign.ConnectorConfDTO> configInfoList = confClient.getConfigInfoList(connectorGroup, connectorId, connectorVersion);
+        log.info("[api] listConfigInfo: connectorGroup {}, connectorId {}, connectorVersion {}, data {}",
+                connectorGroup, connectorId, connectorVersion, JacksonUtil.to(configInfoList));
+        if(CollUtil.isEmpty(configInfoList)) return null;
+        return configInfoList.stream().map(this::createFrom).collect(Collectors.toList());
+    }
+
+    private  ConfigInfo createFrom(IConnectorConfFeign.ConnectorConfDTO dto) {
         ConfigInfo ret = new ConfigInfo();
-        ret.setId(configInfo.getId());
-        ret.setConnectorGroup(configInfo.getConnectorGroup());
-        ret.setConnectorId(configInfo.getConnectorId());
-        ret.setConnectorVersion(configInfo.getConnectorVersion());
-        ret.setConfigName(configInfo.getConfigName());
-        ret.setConfigs(configInfo.getConfigs());
+        ret.setId(dto.getId());
+        ret.setConnectorGroup(dto.getConnectorGroup());
+        ret.setConnectorId(dto.getConnectorId());
+        ret.setConnectorVersion(dto.getConnectorVersion());
+        ret.setConfigName(dto.getConfigName());
+        ret.setConfigs(dto.getConfigs());
         return ret;
     }
 

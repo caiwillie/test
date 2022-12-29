@@ -10,6 +10,7 @@ import com.brandnewdata.mop.poc.bff.vo.scene.DebugProcessInstanceVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVersionVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.SceneVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.VersionProcessVo;
+import com.brandnewdata.mop.poc.bff.vo.scene.external.ConnectorConfigVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.external.ExportQueryVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.external.PrepareLoadVo;
 import com.brandnewdata.mop.poc.bff.vo.scene.operate.SceneDeployVo;
@@ -95,6 +96,14 @@ public class SceneController {
     public Result<PrepareLoadVo> prepareLoad(@RequestParam MultipartFile file) {
         byte[] bytes = file.getBytes();
         PrepareLoadVo ret = sceneBffService.prepareLoad(bytes);
+        return Result.OK(ret);
+    }
+
+    @GetMapping("/rest/scene/load/connectorConfig/list")
+    public Result<List<ConnectorConfigVo>> listConnectorConfig(@RequestParam String connectorGroup,
+                                                     @RequestParam String connectorId,
+                                                     @RequestParam String connectorVersion) {
+        List<ConnectorConfigVo> ret = sceneBffService.listConnectorConfig(connectorGroup, connectorId, connectorVersion);
         return Result.OK(ret);
     }
 

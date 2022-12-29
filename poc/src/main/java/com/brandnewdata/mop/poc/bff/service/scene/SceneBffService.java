@@ -182,6 +182,11 @@ public class SceneBffService {
         return ret;
     }
 
+    public List<ConnectorConfigVo> listConnectorConfig(String connectorGroup, String connectorId, String connectorVersion) {
+        List<ConnectorConfigDto> configs = dataExternalService.fetchConnectorConfigList(connectorGroup, connectorId, connectorVersion);
+        return configs.stream().map(ConnectorConfigVoConverter::createFrom).collect(Collectors.toList());
+    }
+
     public SceneVersionVo confirmLoad(PrepareLoadVo vo) {
         String id = vo.getId();
         String sceneName = vo.getSceneName();
