@@ -106,6 +106,7 @@ public class ConnectorManager {
         ret.setConnectorName(connectorBasicInfo.getConnectorName());
         ret.setConnectorVersion(connectorBasicInfo.getConnectorVersion());
         ret.setConnectorSmallIcon(connectorBasicInfo.getConnectorSmallIcon());
+        ret.setConnectorType(connectorBasicInfo.getConnectorType());
         return ret;
     }
 

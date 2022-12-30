@@ -27,6 +27,8 @@ import com.brandnewdata.mop.poc.env.service.IEnvService;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService;
 import com.brandnewdata.mop.poc.process.dto.ProcessSnapshotDeployDto;
+import com.brandnewdata.mop.poc.process.manager.ConnectorManager;
+import com.brandnewdata.mop.poc.process.manager.dto.ConnectorBasicInfo;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import com.brandnewdata.mop.poc.scene.dto.*;
 import com.brandnewdata.mop.poc.scene.dto.external.ConfirmLoadDto;
@@ -72,6 +74,8 @@ public class SceneBffService {
 
     private final IDataExternalService dataExternalService;
 
+    private final ConnectorManager connectorManager;
+
     public SceneBffService(ISceneService sceneService,
                            ISceneVersionCService sceneVersionCService,
                            ISceneVersionAService sceneVersionAService,
@@ -81,7 +85,8 @@ public class SceneBffService {
                            IProcessDeployService processDeployService,
                            IProcessInstanceService processInstanceService,
                            ISceneReleaseDeployAService sceneReleaseDeployService,
-                           IDataExternalService dataExternalService) {
+                           IDataExternalService dataExternalService,
+                           ConnectorManager connectorManager) {
         this.sceneService = sceneService;
         this.sceneVersionCService = sceneVersionCService;
         this.sceneVersionAService = sceneVersionAService;
@@ -92,6 +97,7 @@ public class SceneBffService {
         this.processInstanceService = processInstanceService;
         this.sceneReleaseDeployService = sceneReleaseDeployService;
         this.dataExternalService = dataExternalService;
+        this.connectorManager = connectorManager;
     }
 
     public Page<SceneVo> page(Integer pageNum, Integer pageSize, String name) {
@@ -177,8 +183,14 @@ public class SceneBffService {
         PrepareLoadDto prepareLoadDto = dataExternalService.prepareLoad(bytes);
         ret.setId(String.valueOf(prepareLoadDto.getId()));
         List<ConnectorConfigDto> configs = prepareLoadDto.getConfigs();
-        List<ConnectorConfigVo> configVos = configs.stream().map(ConnectorConfigVoConverter::createFrom).collect(Collectors.toList());
-        ret.setConfigureList(configVos);
+        List<ConnectorConfigVo> configVoList = configs.stream().map(ConnectorConfigVoConverter::createFrom).collect(Collectors.toList());
+        for (ConnectorConfigVo connectorConfigVo : configVoList) {
+            ConnectorBasicInfo connectorBasicInfo = connectorManager.getConnectorBasicInfo(connectorConfigVo.getConnectorGroup(),
+                    connectorConfigVo.getConnectorId(), connectorConfigVo.getConnectorVersion());
+            if(connectorBasicInfo == null) continue;
+            connectorConfigVo.setConnectorType(connectorBasicInfo.getConnectorType());
+        }
+        ret.setConfigureList(configVoList);
         return ret;
     }
 

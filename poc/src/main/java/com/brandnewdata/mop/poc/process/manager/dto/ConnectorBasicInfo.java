@@ -11,4 +11,5 @@ public class ConnectorBasicInfo {
     private String connectorName;
     private String connectorVersion;
     private String connectorSmallIcon;
+    private Integer connectorType;
 }
