@@ -30,6 +30,8 @@ public class ConnectorConfigVo {
      */
     private String connectorVersion;
 
+    private Integer connectorType;
+
     /**
      * 连接器icon
      */
