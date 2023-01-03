@@ -12,4 +12,8 @@ public interface ISceneReleaseDeployAService {
     List<SceneReleaseDeployDto> fetchByEnvId(Long envId);
 
     Map<Long, List<SceneReleaseDeployDto>> fetchListByVersionId(List<Long> versionIdList);
+
+    void deleteByVersionId(Long versionId);
+
+    void deleteBySceneId(Long sceneId);
 }

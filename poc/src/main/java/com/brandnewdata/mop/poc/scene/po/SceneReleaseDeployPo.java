@@ -3,11 +3,10 @@ package com.brandnewdata.mop.poc.scene.po;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serializable;
 import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * <p>
@@ -15,7 +14,7 @@ import java.util.Date;
  * </p>
  *
  * @author caiwillie
- * @since 2022-11-30
+ * @since 2023-01-03
  */
 @Getter
 @Setter
@@ -46,6 +45,8 @@ public class SceneReleaseDeployPo implements Serializable {
 
     private Long envId;
 
+    private Long deleteFlag;
+
 
     public static final String ID = "id";
 
@@ -66,5 +67,7 @@ public class SceneReleaseDeployPo implements Serializable {
     public static final String PROCESS_NAME = "process_name";
 
     public static final String ENV_ID = "env_id";
+
+    public static final String DELETE_FLAG = "delete_flag";
 
 }

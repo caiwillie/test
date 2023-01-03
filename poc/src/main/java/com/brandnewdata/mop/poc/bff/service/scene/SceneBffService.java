@@ -170,6 +170,10 @@ public class SceneBffService {
         return vo.from(ret);
     }
 
+    public void delete(Long sceneId) {
+        sceneService.deleteById(sceneId);
+    }
+
     public void export(ExportQueryVo exportQueryVo, HttpServletResponse response) {
         SceneVersionExportDto exportDto = dataExternalService.export(exportQueryVo.getVersionId(), exportQueryVo.getProcessIdList());
         // 还要通过额外的响应头 Access-Control-Expose-Headers 声明其可以被外部访问

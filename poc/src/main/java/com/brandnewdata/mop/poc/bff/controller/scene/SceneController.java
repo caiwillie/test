@@ -75,6 +75,7 @@ public class SceneController {
      */
     @PostMapping(value = "/rest/scene/delete")
     public Result<SceneVo> delete(@RequestBody SceneVo sceneVo) {
+        sceneBffService.delete(sceneVo.getId());
         return Result.OK();
     }
 

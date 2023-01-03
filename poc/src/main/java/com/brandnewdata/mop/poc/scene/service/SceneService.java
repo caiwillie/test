@@ -50,10 +50,11 @@ public class SceneService implements ISceneService {
     public Page<SceneDto> page(int pageNum, int pageSize, String name) {
         com.baomidou.mybatisplus.extension.plugins.pagination.Page<ScenePo> page =
                 com.baomidou.mybatisplus.extension.plugins.pagination.Page.of(pageNum, pageSize);
-        QueryWrapper<ScenePo> queryWrapper = new QueryWrapper<>();
-        if(StrUtil.isNotBlank(name)) queryWrapper.like(ScenePo.NAME, name); // 设置名称
-        queryWrapper.orderByDesc(ScenePo.UPDATE_TIME);
-        page = sceneDao.selectPage(page, queryWrapper);
+        QueryWrapper<ScenePo> query = new QueryWrapper<>();
+        query.isNull(ScenePo.DELETE_FLAG);
+        if(StrUtil.isNotBlank(name)) query.like(ScenePo.NAME, name); // 设置名称
+        query.orderByDesc(ScenePo.UPDATE_TIME);
+        page = sceneDao.selectPage(page, query);
         List<ScenePo> scenePoList = Optional.ofNullable(page.getRecords()).orElse(ListUtil.empty());
         List<SceneDto> records = scenePoList.stream().map(SceneDtoConverter::createFrom).collect(Collectors.toList());
         return new Page<>(page.getTotal(), records);
@@ -90,6 +91,7 @@ public class SceneService implements ISceneService {
         Assert.isFalse(CollUtil.hasNull(idList), "场景id不能包含空值");
 
         QueryWrapper<ScenePo> query = new QueryWrapper<>();
+        query.isNull(ScenePo.DELETE_FLAG);
         query.in(ScenePo.ID, idList);
 
         return sceneDao.selectList(query).stream().map(SceneDtoConverter::createFrom)

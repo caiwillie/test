@@ -1,7 +1,7 @@
 package com.brandnewdata.mop.poc.scene.dao;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.brandnewdata.mop.poc.scene.po.SceneReleaseDeployPo;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * <p>
@@ -9,7 +9,7 @@ import com.brandnewdata.mop.poc.scene.po.SceneReleaseDeployPo;
  * </p>
  *
  * @author caiwillie
- * @since 2022-11-30
+ * @since 2023-01-03
  */
 public interface SceneReleaseDeployDao extends BaseMapper<SceneReleaseDeployPo> {
 
