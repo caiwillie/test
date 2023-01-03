@@ -306,20 +306,20 @@ public class DataExternalCService implements IDataExternalCService {
         File dir = unzip(bytes);
         File definitionFile = new File(dir, FILENAME__PROCESS_DEFINITION);
         File configFile = new File(dir, FILENAME__CONFIG);
-        Assert.isTrue(fileExist(definitionFile), "process_definition.json 文件缺失");
-        Assert.isTrue(fileExist(configFile), "config.json 文件缺失");
+        Assert.isTrue(fileExist(definitionFile), "应用压缩包文件解压缩失败，请检查后重新上");
+        Assert.isTrue(fileExist(configFile), "应用压缩包文件解压缩失败，请检查后重新上");
         try {
             List<ProcessExportBo> list = OM.readValue(definitionFile, PROCESS_DEFINITION_TYPE);
             ret.setProcessExportBoList(list);
         } catch (IOException e) {
-            throw new RuntimeException("process_definition.json 文件格式异常", e);
+            throw new RuntimeException("应用压缩包文件解压缩失败，请检查后重新上", e);
         }
 
         try {
             List<ConnectorExportBo> list = OM.readValue(configFile, CONNECTOR_CONFIG_TYPE);
             ret.setConnectorExportBoList(list);
         } catch (IOException e) {
-            throw new RuntimeException("config.json 文件格式异常", e);
+            throw new RuntimeException("应用压缩包文件解压缩失败，请检查后重新上", e);
         }
 
         return ret;
