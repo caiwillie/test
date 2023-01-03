@@ -45,8 +45,6 @@ public class SceneVersionCService implements ISceneVersionCService {
 
     private final SceneVersionAService sceneVersionAService;
 
-    private final IEnvService envService;
-
     private final IVersionProcessAService versionProcessAService;
 
     private final IVersionProcessCService versionProcessCService;
@@ -61,7 +59,6 @@ public class SceneVersionCService implements ISceneVersionCService {
 
 
     public SceneVersionCService(SceneVersionAService sceneVersionAService,
-                                IEnvService envService,
                                 IVersionProcessAService versionProcessAService,
                                 IVersionProcessCService versionProcessCService,
                                 IProcessDeployService processDeployService,
@@ -69,7 +66,6 @@ public class SceneVersionCService implements ISceneVersionCService {
                                 IProcessDefinitionService processDefinitionService,
                                 ConnectorManager connectorManager) {
         this.sceneVersionAService = sceneVersionAService;
-        this.envService = envService;
         this.versionProcessAService = versionProcessAService;
         this.versionProcessCService = versionProcessCService;
         this.processDeployService = processDeployService;
@@ -260,10 +256,14 @@ public class SceneVersionCService implements ISceneVersionCService {
     @Override
     @Transactional
     public void delete(Long id) {
-        sceneVersionAService.fetchOneByIdAndCheckStatus(id,
+        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchOneByIdAndCheckStatus(id,
                 new int[]{SceneConst.SCENE_VERSION_STATUS__CONFIGURING, SceneConst.SCENE_VERSION_STATUS__STOPPED});
-        versionProcessCService.deleteByVersionId(id);
+        Long count = sceneVersionAService.countById(ListUtil.of(id)).get(id);
+        Assert.isTrue(count > 1, "删除失败，最后一个版本无法删除");
 
+        // 删除版本下的流程
+        versionProcessCService.deleteByVersionId(id);
+        // 删除版本
         UpdateWrapper<SceneVersionPo> update = new UpdateWrapper<>();
         update.setSql(StrUtil.format("{}={}", SceneVersionPo.DELETE_FLAG, SceneVersionPo.ID));
         update.eq(SceneVersionPo.ID, id);
