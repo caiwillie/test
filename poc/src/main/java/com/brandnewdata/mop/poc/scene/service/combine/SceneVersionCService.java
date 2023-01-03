@@ -282,7 +282,7 @@ public class SceneVersionCService implements ISceneVersionCService {
             Integer status = sceneVersionDto.getStatus();
             if(NumberUtil.equals(status, SceneConst.SCENE_VERSION_STATUS__RUNNING)
                     || NumberUtil.equals(status, SceneConst.SCENE_VERSION_STATUS__DEBUGGING)) {
-                throw new RuntimeException(StrUtil.format("调试中和运行中的版本不能删除. 版本: {}", sceneVersionDto));
+                throw new RuntimeException(StrUtil.format("调试中和运行中的版本不能删除. 版本: {}", sceneVersionDto.getVersion()));
             }
         }
 
