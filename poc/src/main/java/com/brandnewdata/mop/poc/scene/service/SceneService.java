@@ -17,6 +17,7 @@ import com.brandnewdata.mop.poc.scene.dto.SceneDto;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
 import com.brandnewdata.mop.poc.scene.po.ScenePo;
 import com.brandnewdata.mop.poc.scene.service.atomic.ISceneVersionAService;
+import com.brandnewdata.mop.poc.scene.service.combine.ISceneVersionCService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,8 +36,12 @@ public class SceneService implements ISceneService {
 
     private final ISceneVersionAService sceneVersionAService;
 
-    public SceneService(ISceneVersionAService sceneVersionAService) {
+    private final ISceneVersionCService sceneVersionCService;
+
+    public SceneService(ISceneVersionAService sceneVersionAService,
+                        ISceneVersionCService sceneVersionCService) {
         this.sceneVersionAService = sceneVersionAService;
+        this.sceneVersionCService = sceneVersionCService;
     }
 
     @Override
@@ -92,8 +97,10 @@ public class SceneService implements ISceneService {
     @Override
     @Transactional
     public void deleteById(Long id) {
-        ScenePo scenePo = getScenePoById(id);
+        getScenePoById(id);
 
+        // 删除场景下的版本
+        sceneVersionCService.deleteBySceneId(id);
 
     }
 

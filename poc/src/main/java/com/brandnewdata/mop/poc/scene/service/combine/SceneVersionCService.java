@@ -271,6 +271,7 @@ public class SceneVersionCService implements ISceneVersionCService {
     }
 
     @Override
+    @Transactional
     public void deleteBySceneId(Long sceneId) {
         List<SceneVersionDto> sceneVersionDtoList = sceneVersionAService.fetchListBySceneId(ListUtil.of(sceneId)).get(sceneId);
         for (SceneVersionDto sceneVersionDto : sceneVersionDtoList) {
@@ -280,6 +281,18 @@ public class SceneVersionCService implements ISceneVersionCService {
                 throw new RuntimeException(StrUtil.format("调试中和运行中的版本不能删除. 版本: {}", sceneVersionDto));
             }
         }
+
+        for (SceneVersionDto sceneVersionDto : sceneVersionDtoList) {
+            // 删除版本下的流程
+            versionProcessCService.deleteByVersionId(sceneVersionDto.getId());
+        }
+
+        // 删除版本
+        UpdateWrapper<SceneVersionPo> update = new UpdateWrapper<>();
+        update.setSql(StrUtil.format("{}={}", SceneVersionPo.DELETE_FLAG, SceneVersionPo.ID));
+        update.eq(SceneVersionPo.SCENE_ID, sceneId);
+        sceneVersionDao.update(null, update);
+        sceneVersionDao.update(null, update);
     }
 
 
