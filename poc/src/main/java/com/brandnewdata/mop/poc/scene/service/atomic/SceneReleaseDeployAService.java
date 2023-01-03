@@ -32,6 +32,7 @@ public class SceneReleaseDeployAService implements ISceneReleaseDeployAService {
 
         // 判断是否存在
         QueryWrapper<SceneReleaseDeployPo> query = new QueryWrapper<>();
+        query.isNull(SceneReleaseDeployPo.DELETE_FLAG);
         query.eq(SceneReleaseDeployPo.ENV_ID, envId);
         query.eq(SceneReleaseDeployPo.PROCESS_ID, processId);
         SceneReleaseDeployPo sceneReleaseDeployPo = sceneReleaseDeployDao.selectOne(query);
@@ -41,10 +42,7 @@ public class SceneReleaseDeployAService implements ISceneReleaseDeployAService {
         } else {
             dto.setId(sceneReleaseDeployPo.getId());
             SceneReleaseDeployPoConverter.updateFrom(sceneReleaseDeployPo, dto);
-            UpdateWrapper<SceneReleaseDeployPo> update = new UpdateWrapper<>();
-            update.set(SceneReleaseDeployPo.DELETE_FLAG, null);
-            update.eq(SceneReleaseDeployPo.ID, sceneReleaseDeployPo.getId());
-            sceneReleaseDeployDao.update(sceneReleaseDeployPo, update);
+            sceneReleaseDeployDao.updateById(sceneReleaseDeployPo);
         }
 
         return dto;

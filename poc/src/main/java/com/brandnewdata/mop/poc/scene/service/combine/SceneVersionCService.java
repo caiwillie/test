@@ -263,6 +263,10 @@ public class SceneVersionCService implements ISceneVersionCService {
 
         // 删除版本下的流程
         versionProcessCService.deleteByVersionId(id);
+
+        // 删除已发布的记录
+        sceneReleaseDeployService.deleteByVersionId(id);
+
         // 删除版本
         UpdateWrapper<SceneVersionPo> update = new UpdateWrapper<>();
         update.setSql(StrUtil.format("{}={}", SceneVersionPo.DELETE_FLAG, SceneVersionPo.ID));

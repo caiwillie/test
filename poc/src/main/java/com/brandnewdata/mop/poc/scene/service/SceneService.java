@@ -17,7 +17,7 @@ import com.brandnewdata.mop.poc.scene.dao.SceneDao;
 import com.brandnewdata.mop.poc.scene.dto.SceneDto;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
 import com.brandnewdata.mop.poc.scene.po.ScenePo;
-import com.brandnewdata.mop.poc.scene.po.SceneVersionPo;
+import com.brandnewdata.mop.poc.scene.service.atomic.ISceneReleaseDeployAService;
 import com.brandnewdata.mop.poc.scene.service.atomic.ISceneVersionAService;
 import com.brandnewdata.mop.poc.scene.service.combine.ISceneVersionCService;
 import org.springframework.stereotype.Service;
@@ -40,10 +40,14 @@ public class SceneService implements ISceneService {
 
     private final ISceneVersionCService sceneVersionCService;
 
+    private final ISceneReleaseDeployAService sceneReleaseDeployAService;
+
     public SceneService(ISceneVersionAService sceneVersionAService,
-                        ISceneVersionCService sceneVersionCService) {
+                        ISceneVersionCService sceneVersionCService,
+                        ISceneReleaseDeployAService sceneReleaseDeployAService) {
         this.sceneVersionAService = sceneVersionAService;
         this.sceneVersionCService = sceneVersionCService;
+        this.sceneReleaseDeployAService = sceneReleaseDeployAService;
     }
 
     @Override
@@ -105,6 +109,9 @@ public class SceneService implements ISceneService {
 
         // 删除场景下的版本
         sceneVersionCService.deleteBySceneId(id);
+
+        // 删除已发布的记录
+        sceneReleaseDeployAService.deleteBySceneId(id);
 
         // 删除场景
         UpdateWrapper<ScenePo> update = new UpdateWrapper<>();
