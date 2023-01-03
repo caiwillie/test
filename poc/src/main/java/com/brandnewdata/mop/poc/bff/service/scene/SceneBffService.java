@@ -34,7 +34,7 @@ import com.brandnewdata.mop.poc.scene.dto.*;
 import com.brandnewdata.mop.poc.scene.dto.external.ConfirmLoadDto;
 import com.brandnewdata.mop.poc.scene.dto.external.ConnectorConfigDto;
 import com.brandnewdata.mop.poc.scene.dto.external.PrepareLoadDto;
-import com.brandnewdata.mop.poc.scene.service.IDataExternalService;
+import com.brandnewdata.mop.poc.scene.service.IDataExternalCService;
 import com.brandnewdata.mop.poc.scene.service.ISceneService;
 import com.brandnewdata.mop.poc.scene.service.atomic.ISceneReleaseDeployAService;
 import com.brandnewdata.mop.poc.scene.service.atomic.ISceneVersionAService;
@@ -72,7 +72,7 @@ public class SceneBffService {
 
     private final ISceneReleaseDeployAService sceneReleaseDeployService;
 
-    private final IDataExternalService dataExternalService;
+    private final IDataExternalCService dataExternalService;
 
     private final ConnectorManager connectorManager;
 
@@ -85,7 +85,7 @@ public class SceneBffService {
                            IProcessDeployService processDeployService,
                            IProcessInstanceService processInstanceService,
                            ISceneReleaseDeployAService sceneReleaseDeployService,
-                           IDataExternalService dataExternalService,
+                           IDataExternalCService dataExternalService,
                            ConnectorManager connectorManager) {
         this.sceneService = sceneService;
         this.sceneVersionCService = sceneVersionCService;

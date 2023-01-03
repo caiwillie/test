@@ -89,6 +89,14 @@ public class SceneService implements ISceneService {
                 .collect(Collectors.toMap(SceneDto::getId, Function.identity()));
     }
 
+    @Override
+    @Transactional
+    public void deleteById(Long id) {
+        ScenePo scenePo = getScenePoById(id);
+
+
+    }
+
     private ScenePo getScenePoById(Long sceneId) {
         Assert.notNull(sceneId, "场景id不能为空");
         ScenePo scenePo = sceneDao.selectById(sceneId);

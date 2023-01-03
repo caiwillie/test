@@ -51,7 +51,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class DataExternalService implements IDataExternalService {
+public class DataExternalCService implements IDataExternalCService {
 
     private static final String FILENAME__PROCESS_DEFINITION = "process_definition.json";
 
@@ -78,12 +78,12 @@ public class DataExternalService implements IDataExternalService {
     @Resource
     private SceneLoadDao sceneLoadDao;
 
-    public DataExternalService(IProcessDefinitionService processDefinitionService,
-                               ISceneService sceneService,
-                               ISceneVersionAService sceneVersionAService,
-                               IVersionProcessCService versionProcessCService,
-                               IVersionProcessAService versionProcessAService,
-                               ConnectorManager connectorManager) {
+    public DataExternalCService(IProcessDefinitionService processDefinitionService,
+                                ISceneService sceneService,
+                                ISceneVersionAService sceneVersionAService,
+                                IVersionProcessCService versionProcessCService,
+                                IVersionProcessAService versionProcessAService,
+                                ConnectorManager connectorManager) {
         this.processDefinitionService = processDefinitionService;
         this.sceneService = sceneService;
         this.sceneVersionAService = sceneVersionAService;

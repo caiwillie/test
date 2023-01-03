@@ -8,7 +8,7 @@ import com.brandnewdata.mop.poc.scene.dto.external.PrepareLoadDto;
 
 import java.util.List;
 
-public interface IDataExternalService {
+public interface IDataExternalCService {
 
     SceneVersionExportDto export(Long versionId, List<String> processIdList);
 

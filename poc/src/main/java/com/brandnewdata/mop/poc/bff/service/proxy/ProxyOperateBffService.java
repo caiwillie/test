@@ -204,7 +204,12 @@ public class ProxyOperateBffService {
         statistic.setTotalCount(totalCount);
         statistic.setSuccessCount(successCount);
         statistic.setFailCount(failCount);
-        statistic.setAverageTimeConsuming(NumberUtil.div(totalTimeConsuming * 1.0, totalCount, 2));
+        if(totalCount == 0) {
+            statistic.setAverageTimeConsuming(0.0);
+        } else {
+            statistic.setAverageTimeConsuming(NumberUtil.div(totalTimeConsuming * 1.0, totalCount, 2));
+        }
+
     }
 
     private void assembleCallCountProxyRanking(ProxyStatistic statistic,

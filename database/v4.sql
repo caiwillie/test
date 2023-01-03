@@ -33,3 +33,5 @@ ALTER TABLE `mop`.`mop_reverse_proxy_endpoint` ADD COLUMN `delete_flag` bigint(2
 ALTER TABLE `mop`.`mop_version_process` ADD COLUMN `delete_flag` bigint(20) NULL;
 
 ALTER TABLE `mop`.`mop_scene_version` ADD COLUMN `delete_flag` bigint(20) NULL;
+
+ALTER TABLE `mop`.`mop_scene` ADD COLUMN `delete_flag` bigint(20) NULL;

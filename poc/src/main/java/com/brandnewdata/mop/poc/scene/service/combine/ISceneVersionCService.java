@@ -19,4 +19,6 @@ public interface ISceneVersionCService {
     SceneVersionDto copyToNew(Long id);
 
     void delete(Long id);
+
+    void deleteBySceneId(Long sceneId);
 }

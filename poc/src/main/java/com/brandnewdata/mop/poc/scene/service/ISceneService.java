@@ -23,4 +23,6 @@ public interface ISceneService {
     SceneDto save(SceneDto sceneDto);
 
     Map<Long, SceneDto> fetchById(List<Long> idList);
+
+    void deleteById(Long id);
 }

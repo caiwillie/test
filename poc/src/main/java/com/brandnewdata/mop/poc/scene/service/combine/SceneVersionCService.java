@@ -256,7 +256,7 @@ public class SceneVersionCService implements ISceneVersionCService {
     @Override
     @Transactional
     public void delete(Long id) {
-        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchOneByIdAndCheckStatus(id,
+        sceneVersionAService.fetchOneByIdAndCheckStatus(id,
                 new int[]{SceneConst.SCENE_VERSION_STATUS__CONFIGURING, SceneConst.SCENE_VERSION_STATUS__STOPPED});
         Long count = sceneVersionAService.countById(ListUtil.of(id)).get(id);
         Assert.isTrue(count > 1, "删除失败，最后一个版本无法删除");
@@ -268,6 +268,18 @@ public class SceneVersionCService implements ISceneVersionCService {
         update.setSql(StrUtil.format("{}={}", SceneVersionPo.DELETE_FLAG, SceneVersionPo.ID));
         update.eq(SceneVersionPo.ID, id);
         sceneVersionDao.update(null, update);
+    }
+
+    @Override
+    public void deleteBySceneId(Long sceneId) {
+        List<SceneVersionDto> sceneVersionDtoList = sceneVersionAService.fetchListBySceneId(ListUtil.of(sceneId)).get(sceneId);
+        for (SceneVersionDto sceneVersionDto : sceneVersionDtoList) {
+            Integer status = sceneVersionDto.getStatus();
+            if(NumberUtil.equals(status, SceneConst.SCENE_VERSION_STATUS__RUNNING)
+                    || NumberUtil.equals(status, SceneConst.SCENE_VERSION_STATUS__DEBUGGING)) {
+                throw new RuntimeException(StrUtil.format("调试中和运行中的版本不能删除. 版本: {}", sceneVersionDto));
+            }
+        }
     }
 
 
