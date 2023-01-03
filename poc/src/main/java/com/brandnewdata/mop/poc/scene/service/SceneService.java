@@ -8,6 +8,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.constant.SceneConst;
 import com.brandnewdata.mop.poc.scene.converter.SceneDtoConverter;
@@ -16,6 +17,7 @@ import com.brandnewdata.mop.poc.scene.dao.SceneDao;
 import com.brandnewdata.mop.poc.scene.dto.SceneDto;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
 import com.brandnewdata.mop.poc.scene.po.ScenePo;
+import com.brandnewdata.mop.poc.scene.po.SceneVersionPo;
 import com.brandnewdata.mop.poc.scene.service.atomic.ISceneVersionAService;
 import com.brandnewdata.mop.poc.scene.service.combine.ISceneVersionCService;
 import org.springframework.stereotype.Service;
@@ -102,6 +104,11 @@ public class SceneService implements ISceneService {
         // 删除场景下的版本
         sceneVersionCService.deleteBySceneId(id);
 
+        // 删除场景
+        UpdateWrapper<ScenePo> update = new UpdateWrapper<>();
+        update.setSql(StrUtil.format("{}={}", ScenePo.DELETE_FLAG, ScenePo.ID));
+        update.eq(ScenePo.ID, id);
+        sceneDao.update(null, update);
     }
 
     private ScenePo getScenePoById(Long sceneId) {
