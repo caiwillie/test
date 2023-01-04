@@ -6,6 +6,4 @@ public interface IProxyEndpointCService {
 
     ProxyEndpointDto save(ProxyEndpointDto dto);
 
-
-
 }
