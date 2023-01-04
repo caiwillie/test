@@ -256,9 +256,10 @@ public class SceneVersionCService implements ISceneVersionCService {
     @Override
     @Transactional
     public void delete(Long id) {
-        sceneVersionAService.fetchOneByIdAndCheckStatus(id,
+        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchOneByIdAndCheckStatus(id,
                 new int[]{SceneConst.SCENE_VERSION_STATUS__CONFIGURING, SceneConst.SCENE_VERSION_STATUS__STOPPED});
-        Long count = sceneVersionAService.countById(ListUtil.of(id)).get(id);
+        Long sceneId = sceneVersionDto.getSceneId();
+        Long count = sceneVersionAService.countBySceneId(ListUtil.of(sceneId)).get(sceneId);
         Assert.isTrue(count > 1, "删除失败，最后一个版本无法删除");
 
         // 删除版本下的流程

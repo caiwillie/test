@@ -7,7 +7,7 @@ import java.util.Map;
 
 public interface ISceneVersionAService {
 
-    Map<Long, Long> countById(List<Long> sceneIdList);
+    Map<Long, Long> countBySceneId(List<Long> sceneIdList);
 
     Map<Long, SceneVersionDto> fetchById(List<Long> idList);
 

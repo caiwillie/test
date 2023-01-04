@@ -34,20 +34,20 @@ public class SceneVersionAService implements ISceneVersionAService {
     private SceneVersionDao sceneVersionDao;
 
     @Override
-    public Map<Long, Long> countById(List<Long> idList) {
-        if (CollUtil.isEmpty(idList)) return MapUtil.empty();
-        Assert.isTrue(idList.stream().filter(Objects::isNull).count() == 0, "版本id不能为空");
+    public Map<Long, Long> countBySceneId(List<Long> sceneIdList) {
+        if (CollUtil.isEmpty(sceneIdList)) return MapUtil.empty();
+        Assert.isTrue(sceneIdList.stream().filter(Objects::isNull).count() == 0, "scene id 不能为空");
         QueryWrapper<SceneVersionPo> query = new QueryWrapper<>();
         query.isNull(SceneVersionPo.DELETE_FLAG);
-        query.in(SceneVersionPo.ID, idList);
-        query.select(SceneVersionPo.ID, "count(*) as num");
-        query.groupBy(SceneVersionPo.ID);
+        query.in(SceneVersionPo.SCENE_ID, sceneIdList);
+        query.select(SceneVersionPo.SCENE_ID, "count(*) as num");
+        query.groupBy(SceneVersionPo.SCENE_ID);
         List<Map<String, Object>> maps = sceneVersionDao.selectMaps(query);
         Map<Long, Long> countMap = maps.stream().collect(
                 Collectors.toMap(map -> (Long) map.get(SceneVersionPo.ID), map -> (Long) map.get("num")));
 
         // 将未找到的scene id的个数设置为0
-        return idList.stream().collect(
+        return sceneIdList.stream().collect(
                 Collectors.toMap(Function.identity(), key -> Opt.ofNullable(countMap.get(key)).orElse(0L)));
     }
 
