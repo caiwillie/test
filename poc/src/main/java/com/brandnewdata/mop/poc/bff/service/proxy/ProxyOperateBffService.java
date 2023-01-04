@@ -44,7 +44,7 @@ public class ProxyOperateBffService {
 
     private final IProxyEndpointCallAService proxyEndpointCallService;
 
-    private final int MAX_SIZE = 10;
+    private final int MAX_SIZE = 5;
 
     public ProxyOperateBffService(IProxyEndpointAService proxyEndpointAService,
                                   IProxyAService proxyAtomicService,
