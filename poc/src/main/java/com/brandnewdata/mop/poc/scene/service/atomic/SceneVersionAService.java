@@ -44,7 +44,7 @@ public class SceneVersionAService implements ISceneVersionAService {
         query.groupBy(SceneVersionPo.SCENE_ID);
         List<Map<String, Object>> maps = sceneVersionDao.selectMaps(query);
         Map<Long, Long> countMap = maps.stream().collect(
-                Collectors.toMap(map -> (Long) map.get(SceneVersionPo.ID), map -> (Long) map.get("num")));
+                Collectors.toMap(map -> (Long) map.get(SceneVersionPo.SCENE_ID), map -> (Long) map.get("num")));
 
         // 将未找到的scene id的个数设置为0
         return sceneIdList.stream().collect(
