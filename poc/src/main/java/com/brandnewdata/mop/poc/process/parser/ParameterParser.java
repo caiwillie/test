@@ -1,7 +1,7 @@
 package com.brandnewdata.mop.poc.process.parser;
 
 import cn.hutool.core.util.StrUtil;
-import com.brandnewdata.mop.poc.common.Constants;
+import com.brandnewdata.mop.poc.constant.ProcessConst;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -63,13 +63,13 @@ public class ParameterParser {
     private Object parseEach(Element root) {
         Object ret = null;
         String type = root.attributeValue(typeAttribute);
-        if(StrUtil.equals(type, Constants.TYPE_STRUCT)) {
+        if(StrUtil.equals(type, ProcessConst.TYPE_STRUCT)) {
             ret = parseStruct(root);
-        } else if (StrUtil.equals(type, Constants.TYPE_LIST)) {
+        } else if (StrUtil.equals(type, ProcessConst.TYPE_LIST)) {
             ret = parseList(root);
-        } else if (StrUtil.equals(type, Constants.TYPE_DICT)) {
+        } else if (StrUtil.equals(type, ProcessConst.TYPE_DICT)) {
             ret = parseStruct(root);
-        } else if (StrUtil.equals(type, Constants.TYPE_ENUM)) {
+        } else if (StrUtil.equals(type, ProcessConst.TYPE_ENUM)) {
             ret = parseList(root);
         } else {
             String value = root.attributeValue(expressionAttribute);

@@ -2,19 +2,19 @@ package com.brandnewdata.mop.poc.constant;
 
 public interface ProcessConst {
 
-    int PROCESS_TYPE_SCENE = 1;
+    String TYPE_STRUCT = "struct";
 
-    int PROCESS_TYPE_TRIGGER = 2;
+    String TYPE_DICT = "dict";
 
-    int PROCESS_TYPE_OPERATE = 3;
+    String TYPE_LIST = "list";
+
+    String TYPE_ENUM = "enum";
 
     String PROCESS_BIZ_TYPE__SCENE = "scene";
 
     String PROCESS_BIZ_TYPE__TRIGGER = "trigger";
 
     String PROCESS_BIZ_TYPE__OPERATE = "operate";
-
-    String PROCESS_RESPONSE_VARIABLE_NAME = "resp";
 
     int PROCESS_DEPLOY_STATUS__UNDEPLOY = 0;
 

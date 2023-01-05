@@ -66,5 +66,5 @@ public class ProxyVo {
     /**
      * 24小时内的调用次数
      */
-    private Long callTimes24h;
+    private Integer callTimes24h;
 }

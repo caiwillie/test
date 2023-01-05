@@ -2,6 +2,7 @@ package com.brandnewdata.mop.poc.bff.service.proxy;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.lang.Opt;
 import com.brandnewdata.mop.poc.bff.converter.proxy.ProxyDtoConverter;
 import com.brandnewdata.mop.poc.bff.converter.proxy.ProxyEndpointDtoConverter;
 import com.brandnewdata.mop.poc.bff.converter.proxy.ProxyEndpointVoConverter;
@@ -11,10 +12,12 @@ import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.proxy.bo.ProxyEndpointFilter;
 import com.brandnewdata.mop.poc.proxy.bo.ProxyFilter;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
+import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointCallDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyGroupDto;
 import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyAService;
 import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyEndpointAService;
+import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyEndpointCallAService;
 import com.brandnewdata.mop.poc.proxy.service.combined.IProxyCService;
 import com.brandnewdata.mop.poc.proxy.service.combined.IProxyEndpointCService;
 import org.springframework.stereotype.Service;
@@ -30,16 +33,20 @@ public class ProxyBffService {
 
     private final IProxyEndpointAService proxyEndpointAService;
 
+    private final IProxyEndpointCallAService proxyEndpointCallService;
+
     private final IProxyCService proxyCService;
 
     private final IProxyAService proxyAService;
 
     public ProxyBffService(IProxyEndpointCService proxyEndpointCService,
                            IProxyEndpointAService proxyEndpointAService,
+                           IProxyEndpointCallAService proxyEndpointCallService,
                            IProxyCService proxyCService,
                            IProxyAService proxyAService) {
         this.proxyEndpointCService = proxyEndpointCService;
         this.proxyEndpointAService = proxyEndpointAService;
+        this.proxyEndpointCallService = proxyEndpointCallService;
         this.proxyCService = proxyCService;
         this.proxyAService = proxyAService;
     }
@@ -49,13 +56,46 @@ public class ProxyBffService {
         List<ProxyGroupDto> records = proxyGroupDtoPage.getRecords();
         if(CollUtil.isEmpty(records)) return Page.empty();
 
+        List<Long> proxyIdList = new ArrayList<>();
+
         List<ProxyGroupVo> voList = new ArrayList<>();
-        for (ProxyGroupDto record : records) {
+        for (ProxyGroupDto proxyGroupDto : records) {
             ProxyGroupVo proxyGroupVo = new ProxyGroupVo();
-            proxyGroupVo.setName(record.getName());
-            proxyGroupVo.setVersions(record.getProxyDtoList()
-                    .stream().map(ProxyVoConverter::createFrom).collect(Collectors.toList()));
+            proxyGroupVo.setName(proxyGroupDto.getName());
+            List<ProxyVo> versions = new ArrayList<>();
+            for (ProxyDto proxyDto : proxyGroupDto.getProxyDtoList()) {
+                versions.add(ProxyVoConverter.createFrom(proxyDto));
+                proxyIdList.add(proxyDto.getId());
+            }
+            proxyGroupVo.setVersions(versions);
             voList.add(proxyGroupVo);
+        }
+
+        // 查询24小时调用次数
+        // 根据proxyId 获取 endpointList
+        ProxyEndpointFilter proxyEndpointFilter = new ProxyEndpointFilter();
+        Map<Long, List<ProxyEndpointDto>> proxyEndpointDtoListMap =
+                proxyEndpointAService.fetchListByProxyIdAndFilter(proxyIdList, proxyEndpointFilter);
+        Map<Long, ProxyEndpointDto> proxyEndpointDtoMap = proxyEndpointDtoListMap.values().stream().flatMap(List::stream)
+                .collect(Collectors.toMap(ProxyEndpointDto::getId, Function.identity()));
+
+        Map<Long, List<ProxyEndpointCallDto>> proxyEndpointCallDtoListMap =
+                proxyEndpointCallService.fetchCacheListByEndpointId(ListUtil.toList(proxyEndpointDtoMap.keySet()));
+
+        Map<Long, Integer> countMap = new HashMap<>();
+        for (Map.Entry<Long, List<ProxyEndpointCallDto>> entry : proxyEndpointCallDtoListMap.entrySet()) {
+            Long endpointId = entry.getKey();
+            int count = CollUtil.count(entry.getValue(), null);
+            Long proxyId = Opt.ofNullable(proxyEndpointDtoMap.get(endpointId)).map(ProxyEndpointDto::getProxyId).orElse(null);
+            if(proxyId == null) continue;
+            countMap.put(proxyId, countMap.getOrDefault(proxyId, 0) + count);
+        }
+
+        for (ProxyGroupVo proxyGroupVo : voList) {
+            for (ProxyVo version : proxyGroupVo.getVersions()) {
+                Integer count = countMap.getOrDefault(version.getId(), 0);
+                version.setCallTimes24h(count);
+            }
         }
 
         return new Page<>(proxyGroupDtoPage.getTotal(), voList);
