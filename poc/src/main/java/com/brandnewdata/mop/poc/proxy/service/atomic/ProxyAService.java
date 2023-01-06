@@ -188,7 +188,7 @@ public class ProxyAService implements IProxyAService {
 
         QueryWrapper<ProxyPo> query = new QueryWrapper<>();
         if(name != null) {
-            query.eq(ProxyPo.NAME, name);
+            query.like(ProxyPo.NAME, name);
         }
         if(version != null) {
             query.eq(ProxyPo.VERSION, version);

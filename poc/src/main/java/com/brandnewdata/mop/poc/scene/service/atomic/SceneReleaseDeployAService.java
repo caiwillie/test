@@ -89,4 +89,16 @@ public class SceneReleaseDeployAService implements ISceneReleaseDeployAService {
         update.eq(SceneReleaseDeployPo.SCENE_ID, sceneId);
         sceneReleaseDeployDao.update(null, update);
     }
+
+    @Override
+    public void deleteByVersionIdAndExceptEnvId(Long versionId, List<Long> envIdList) {
+        Assert.notNull(versionId);
+        Assert.notEmpty(envIdList);
+        Assert.isFalse(CollUtil.hasNull(envIdList), "envIdList can not contain null");
+        UpdateWrapper<SceneReleaseDeployPo> update = new UpdateWrapper<>();
+        update.setSql(StrUtil.format("{}={}", SceneReleaseDeployPo.DELETE_FLAG, SceneReleaseDeployPo.ID));
+        update.eq(SceneReleaseDeployPo.VERSION_ID, versionId);
+        update.in(SceneReleaseDeployPo.ENV_ID, envIdList);
+        sceneReleaseDeployDao.update(null, update);
+    }
 }

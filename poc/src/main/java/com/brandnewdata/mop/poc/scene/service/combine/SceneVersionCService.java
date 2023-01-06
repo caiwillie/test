@@ -21,6 +21,7 @@ import com.brandnewdata.mop.poc.scene.converter.SceneVersionPoConverter;
 import com.brandnewdata.mop.poc.scene.converter.VersionProcessDtoConverter;
 import com.brandnewdata.mop.poc.scene.dao.SceneVersionDao;
 import com.brandnewdata.mop.poc.scene.dto.SceneReleaseDeployDto;
+import com.brandnewdata.mop.poc.scene.dto.SceneVersionDeployProgressDto;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
 import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
 import com.brandnewdata.mop.poc.scene.po.SceneVersionPo;
@@ -91,13 +92,18 @@ public class SceneVersionCService implements ISceneVersionCService {
             deployDto.setProcessId(versionProcessDto.getProcessId());
             deployDto.setProcessName(versionProcessDto.getProcessName());
             deployDto.setProcessXml(versionProcessDto.getProcessXml());
-            processDeployService.snapshotDeploy(deployDto, envId, ProcessConst.PROCESS_BIZ_TYPE__SCENE);
+            processDeployService.snapshotDeploy2(deployDto, envId, ProcessConst.PROCESS_BIZ_TYPE__SCENE);
         }
 
         // 修改状态
-        sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__DEBUGGING);
+        sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS_DEBUG_DEPLOYING);
         sceneVersionDao.updateById(SceneVersionPoConverter.createFrom(sceneVersionDto));
         return sceneVersionDto;
+    }
+
+    @Override
+    public SceneVersionDeployProgressDto fetchSnapshotDeployProgress(Long id) {
+        return null;
     }
 
     @Override
@@ -146,6 +152,7 @@ public class SceneVersionCService implements ISceneVersionCService {
     }
 
     @Override
+    @Transactional
     public SceneVersionDto deploy(Long id, String sceneName, List<Long> envIdList, String version) {
         // 配置中，和调试中均可以进行发布
         SceneVersionDto sceneVersionDto = sceneVersionAService.fetchOneByIdAndCheckStatus(id,
@@ -160,16 +167,31 @@ public class SceneVersionCService implements ISceneVersionCService {
                 versionProcessAService.fetchListByVersionId(ListUtil.of(id), false).get(id);
         Assert.isTrue(CollUtil.isNotEmpty(versionProcessDtoList), "该版本下至少需要配置一个流程");
 
-        // 发布到zeebe
+        // 发布流程
         for (VersionProcessDto versionProcessDto : versionProcessDtoList) {
-            BpmnXmlDto deployDto = new BpmnXmlDto();
-            deployDto.setProcessId(versionProcessDto.getProcessId());
-            deployDto.setProcessName(versionProcessDto.getProcessName());
-            deployDto.setProcessXml(versionProcessDto.getProcessXml());
-            processDeployService.releaseDeploy(deployDto, envIdList, ProcessConst.PROCESS_BIZ_TYPE__SCENE);
+            for (Long envId : envIdList) {
+                // release deploy
+                BpmnXmlDto deployDto = new BpmnXmlDto();
+                deployDto.setProcessId(versionProcessDto.getProcessId());
+                deployDto.setProcessName(versionProcessDto.getProcessName());
+                deployDto.setProcessXml(versionProcessDto.getProcessXml());
+                processDeployService.releaseDeploy2(deployDto, envId, ProcessConst.PROCESS_BIZ_TYPE__SCENE);
+
+                // 保存关系
+                SceneReleaseDeployDto sceneReleaseDeployDto = new SceneReleaseDeployDto();
+                SceneReleaseDeployDtoConverter.updateFrom(sceneReleaseDeployDto, versionProcessDto);
+                SceneReleaseDeployDtoConverter.updateFrom(sceneReleaseDeployDto, sceneVersionDto);
+                sceneReleaseDeployDto.setSceneName(sceneName);
+                sceneReleaseDeployDto.setEnvId(envId);
+                sceneReleaseDeployService.save(sceneReleaseDeployDto);
+            }
         }
 
+        // 删除之前在其他环境发布过的旧记录
+        sceneReleaseDeployService.deleteByVersionIdAndExceptEnvId(id, envIdList);
+
         // 保存到场景列表
+        /*
         for (VersionProcessDto versionProcessDto : versionProcessDtoList) {
             BpmnXmlDto deployDto = new BpmnXmlDto();
             deployDto.setProcessId(versionProcessDto.getProcessId());
@@ -179,27 +201,25 @@ public class SceneVersionCService implements ISceneVersionCService {
             ProcessDefinitionParseDto processDefinitionParseDto = processDefinitionService.parseSceneTrigger(deployDto);
 
             for (Long envId : envIdList) {
-                SceneReleaseDeployDto sceneReleaseDeployDto = new SceneReleaseDeployDto();
-                SceneReleaseDeployDtoConverter.updateFrom(sceneReleaseDeployDto, versionProcessDto);
-                SceneReleaseDeployDtoConverter.updateFrom(sceneReleaseDeployDto, sceneVersionDto);
-                sceneReleaseDeployDto.setSceneName(sceneName);
-                sceneReleaseDeployDto.setEnvId(envId);
-                sceneReleaseDeployDto = sceneReleaseDeployService.save(sceneReleaseDeployDto);
-
-                // todo caiwillie 上报
-                if(StrUtil.isNotBlank(processDefinitionParseDto.getTriggerFullId())) {
-                    // 有触发器时，才需要上报
-                    connectorManager.saveRequestParams(envId, processDefinitionParseDto.getTriggerFullId(),
-                            processDefinitionParseDto.getProtocol(), processDefinitionParseDto.getRequestParams(),
-                            sceneReleaseDeployDto);
-                }
+                          if(StrUtil.isNotBlank(processDefinitionParseDto.getTriggerFullId())) {
+                              // 有触发器时，才需要上报
+                              connectorManager.saveRequestParams(envId, processDefinitionParseDto.getTriggerFullId(),
+                                      processDefinitionParseDto.getProtocol(), processDefinitionParseDto.getRequestParams(),
+                                      sceneReleaseDeployDto);
+                          }
             }
         }
+        */
 
         // 更新状态
-        sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__RUNNING);
+        sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS_RUN_DEPLOYING);
         sceneVersionDao.updateById(SceneVersionPoConverter.createFrom(sceneVersionDto));
         return sceneVersionDto;
+    }
+
+    @Override
+    public SceneVersionDeployProgressDto fetchReleaseDeployProgress(Long id) {
+        return null;
     }
 
     @Override

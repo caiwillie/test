@@ -16,4 +16,6 @@ public interface ISceneReleaseDeployAService {
     void deleteByVersionId(Long versionId);
 
     void deleteBySceneId(Long sceneId);
+
+    void deleteByVersionIdAndExceptEnvId(Long versionId, List<Long> envIdList);
 }

@@ -16,15 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface IConnectorApi {
 
     /**
-     * 发布流程
-     *
-     * @param resource 连接器的资源
-     * @return the result
-     */
-    @RequestMapping("/api/connector/deploy")
-    Result deploy(@RequestBody ConnectorResource resource);
-
-    /**
      * 调试部署
      *
      * @param resource the resource
