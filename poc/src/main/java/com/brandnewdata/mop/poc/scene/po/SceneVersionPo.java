@@ -42,6 +42,8 @@ public class SceneVersionPo implements Serializable {
 
     private Long deleteFlag;
 
+    private Double deployProgressPercentage;
+
     private String exceptionMessage;
 
 
@@ -58,6 +60,8 @@ public class SceneVersionPo implements Serializable {
     public static final String STATUS = "status";
 
     public static final String DELETE_FLAG = "delete_flag";
+
+    public static final String DEPLOY_PROGRESS_PERCENTAGE = "deploy_progress_percentage";
 
     public static final String EXCEPTION_MESSAGE = "exception_message";
 

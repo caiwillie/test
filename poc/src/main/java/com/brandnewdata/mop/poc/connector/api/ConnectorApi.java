@@ -23,6 +23,8 @@ import com.brandnewdata.mop.poc.process.dto.DeployStatusDto;
 import com.brandnewdata.mop.poc.process.dto.ProcessSnapshotDeployDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
 import com.brandnewdata.mop.poc.process.util.ProcessUtil;
+import com.dxy.library.json.jackson.JacksonUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,6 +32,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 public class ConnectorApi implements IConnectorApi {
 
@@ -123,6 +126,7 @@ public class ConnectorApi implements IConnectorApi {
 
     @Override
     public Result<ConnectorDeployProgressDto> fetchSnapshotDeployProgress(ConnectorResource resource) {
+        log.debug("ConnectorApi.fetchSnapshotDeployProgress, resource: {}", JacksonUtil.to(resource));
         checkConnectorResource(resource);
         List<BPMNResource> triggerList = resource.getTriggers();
         List<BPMNResource> operateList = resource.getOperates();
@@ -137,6 +141,7 @@ public class ConnectorApi implements IConnectorApi {
 
     @Override
     public Result<ConnectorDeployProgressDto> fetchReleaseDeployProgress(ConnectorResource resource) {
+        log.debug("ConnectorApi.fetchReleaseDeployProgress, resource: {}", JacksonUtil.to(resource));
         checkConnectorResource(resource);
         List<BPMNResource> triggerList = resource.getTriggers();
         List<BPMNResource> operateList = resource.getOperates();
@@ -305,7 +310,8 @@ public class ConnectorApi implements IConnectorApi {
                 DeployStatusDto _deployStatusDto = entry.getValue();
                 String _modelKey = processIdModelKeyMap.get(processId);
                 ConnectorProcessDeployStatusDto connectorProcessDeployStatusDto =
-                        resourceDeployStatusMap.computeIfAbsent(_modelKey, key -> new ConnectorProcessDeployStatusDto(1, new HashMap<>()));
+                        resourceDeployStatusMap.computeIfAbsent(_modelKey,
+                                key -> new ConnectorProcessDeployStatusDto(ProcessConst.PROCESS_DEPLOY_STATUS__DEPLOYED, new HashMap<>()));
 
                 if(_deployStatusDto.getStatus() == ProcessConst.PROCESS_DEPLOY_STATUS__EXCEPTION) {
                     // 如果当前部署是失败，则不管之前是什么状态，都修改为失败
@@ -317,7 +323,7 @@ public class ConnectorApi implements IConnectorApi {
                             Opt.ofNullable(connectorProcessDeployStatusDto.getErrorMessageMap()).orElse(new LinkedHashMap<>());
                     messageMap.put(envDto.getName(), _deployStatusDto.getMessage());
                     connectorProcessDeployStatusDto.setErrorMessageMap(messageMap);
-                } else if (connectorProcessDeployStatusDto.getStatus() == 1) { // 默认赋值为 1
+                } else if (connectorProcessDeployStatusDto.getStatus() == ProcessConst.PROCESS_DEPLOY_STATUS__DEPLOYED) { // 默认赋值为 1
                     // 如果之前是成功部署的，则当前环境状态可以直接覆盖总状态
                     connectorProcessDeployStatusDto.setStatus(_deployStatusDto.getStatus());
                 }
