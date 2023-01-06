@@ -14,6 +14,7 @@ public class SceneVersionDtoConverter {
         dto.setVersion(po.getVersion());
         dto.setSceneId(po.getSceneId());
         dto.setStatus(po.getStatus());
+        dto.setExceptionMessage(po.getExceptionMessage());
         return dto;
     }
 }

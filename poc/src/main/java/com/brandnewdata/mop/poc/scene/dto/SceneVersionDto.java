@@ -20,5 +20,6 @@ public class SceneVersionDto {
 
     private Integer status;
 
+    private String exceptionMessage;
 
 }

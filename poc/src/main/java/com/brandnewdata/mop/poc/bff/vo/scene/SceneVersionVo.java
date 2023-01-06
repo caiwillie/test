@@ -51,4 +51,9 @@ public class SceneVersionVo {
      * 描述
      */
     private String description;
+
+    /**
+     * 异常信息
+     */
+    private String exceptionMessage;
 }

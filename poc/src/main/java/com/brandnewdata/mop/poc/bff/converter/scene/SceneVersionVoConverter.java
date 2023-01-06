@@ -32,6 +32,7 @@ public class SceneVersionVoConverter {
         vo.setVersion(dto.getVersion());
         vo.setSceneId(dto.getSceneId());
         vo.setStatus(dto.getStatus());
+        vo.setExceptionMessage(dto.getExceptionMessage());
 
         List<EnvVo> envVoList = Opt.ofNullable(envDtoList).orElse(ListUtil.empty()).stream()
                 .map(EnvVoConverter::createFrom).collect(Collectors.toList());
