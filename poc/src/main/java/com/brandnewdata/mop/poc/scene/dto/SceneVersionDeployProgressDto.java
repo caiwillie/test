@@ -13,7 +13,6 @@ public class SceneVersionDeployProgressDto {
      */
     private Map<String, ProcessDeployProgressDto> processDeployStatusMap;
 
-
     /**
      * 整体状态. 0 待部署，1 部署成功，2 部署异常
      */

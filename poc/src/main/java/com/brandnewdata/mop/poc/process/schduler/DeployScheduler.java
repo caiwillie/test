@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.process.manager;
+package com.brandnewdata.mop.poc.process.schduler;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
@@ -20,6 +20,7 @@ import com.brandnewdata.mop.poc.process.dao.ProcessDeployTaskDao;
 import com.brandnewdata.mop.poc.process.dao.ProcessReleaseDeployDao;
 import com.brandnewdata.mop.poc.process.dao.ProcessSnapshotDeployDao;
 import com.brandnewdata.mop.poc.process.lock.ProcessEnvLock;
+import com.brandnewdata.mop.poc.process.manager.ZeebeClientManager;
 import com.brandnewdata.mop.poc.process.po.ProcessDeployTaskPo;
 import com.brandnewdata.mop.poc.process.po.ProcessReleaseDeployPo;
 import com.brandnewdata.mop.poc.process.po.ProcessSnapshotDeployPo;
@@ -35,7 +36,7 @@ import java.util.List;
 
 @Slf4j
 @Component
-public class DeployManager {
+public class DeployScheduler {
 
     private final IEnvService envService;
 
@@ -54,9 +55,9 @@ public class DeployManager {
     @Resource
     private ProcessReleaseDeployDao processReleaseDeployDao;
 
-    public DeployManager(IEnvService envService, EnvLock envLock,
-                         ProcessEnvLock processEnvLock, ZeebeClientManager zeebeClientManager,
-                         @Value("${brandnewdata.deploy-schedule.enable}") boolean enable) {
+    public DeployScheduler(IEnvService envService, EnvLock envLock,
+                           ProcessEnvLock processEnvLock, ZeebeClientManager zeebeClientManager,
+                           @Value("${brandnewdata.deploy-schedule.enable}") boolean enable) {
         this.envService = envService;
         this.envLock = envLock;
         this.processEnvLock = processEnvLock;

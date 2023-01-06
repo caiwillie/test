@@ -288,22 +288,22 @@ public class ConnectorApi implements IConnectorApi {
 
     private Map<String, ConnectorProcessDeployStatusDto> getResourceDeployStatusMap(List<BPMNResource> resourceList, List<Long> envIdList) {
 
-        Map<String, String> triggerProcessIdMap = Opt.ofNullable(resourceList).orElse(ListUtil.empty()).stream()
+        Map<String, String> processIdModelKeyMap = Opt.ofNullable(resourceList).orElse(ListUtil.empty()).stream()
                 .map(BPMNResource::getModelKey).collect(Collectors.toMap(ProcessUtil::convertProcessId, Function.identity()));
 
-        if(CollUtil.isEmpty(triggerProcessIdMap)) return MapUtil.empty();
+        if(CollUtil.isEmpty(processIdModelKeyMap)) return MapUtil.empty();
 
         Map<String, ConnectorProcessDeployStatusDto> resourceDeployStatusMap = new HashMap<>();
 
         for (Long envId : Opt.ofNullable(envIdList).orElse(ListUtil.empty())) {
             Map<String, DeployStatusDto> deployStatusDtoMap =
-                    processDeployService.fetchDeployStatus(ListUtil.toList(triggerProcessIdMap.keySet()), envId);
+                    processDeployService.fetchDeployStatus(ListUtil.toList(processIdModelKeyMap.keySet()), envId);
             Assert.isTrue(deployStatusDtoMap.size() == resourceList.size(), "资源尚未部署，无法查询状态");
 
             for (Map.Entry<String, DeployStatusDto> entry : deployStatusDtoMap.entrySet()) {
                 String processId = entry.getKey();
                 DeployStatusDto _deployStatusDto = entry.getValue();
-                String _modelKey = triggerProcessIdMap.get(processId);
+                String _modelKey = processIdModelKeyMap.get(processId);
                 ConnectorProcessDeployStatusDto connectorProcessDeployStatusDto =
                         resourceDeployStatusMap.computeIfAbsent(_modelKey, key -> new ConnectorProcessDeployStatusDto(1, new HashMap<>()));
 

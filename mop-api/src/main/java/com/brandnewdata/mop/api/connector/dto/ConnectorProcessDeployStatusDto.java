@@ -15,7 +15,7 @@ public class ConnectorProcessDeployStatusDto {
     private int status;
 
     /**
-     *
+     * 异常信息
      */
     private Map<String, String> errorMessageMap;
 

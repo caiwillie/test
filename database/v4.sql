@@ -38,4 +38,6 @@ ALTER TABLE `mop`.`mop_scene` ADD COLUMN `delete_flag` bigint(20) NULL;
 
 ALTER TABLE `mop`.`mop_scene_release_deploy` ADD COLUMN `delete_flag` bigint(20) NULL;
 
+ALTER TABLE `mop`.`mop_scene_version` ADD COLUMN `deploy_progress_percentage` double NULL;
+
 ALTER TABLE `mop`.`mop_scene_version` ADD COLUMN `exception_message` text NULL;

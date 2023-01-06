@@ -14,7 +14,12 @@ public class ProcessDeployProgressDto {
     private int status;
 
     /**
-     *
+     * 异常信息
      */
     private Map<String, String> errorMessageMap;
+
+    public ProcessDeployProgressDto(int status, Map<String, String> errorMessageMap) {
+        this.status = status;
+        this.errorMessageMap = errorMessageMap;
+    }
 }
