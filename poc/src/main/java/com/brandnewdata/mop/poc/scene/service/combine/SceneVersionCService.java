@@ -97,6 +97,8 @@ public class SceneVersionCService implements ISceneVersionCService {
 
         // 修改状态
         sceneVersionDto.setDeployStatus(SceneConst.SCENE_DEPLOY_STATUS_SNAPSHOT_UNDEPLOY);
+        sceneVersionDto.setDeployProgressPercentage(0.0);
+        sceneVersionDto.setExceptionMessage(null);
         sceneVersionDao.updateById(SceneVersionPoConverter.createFrom(sceneVersionDto));
         return sceneVersionDto;
     }
@@ -192,6 +194,8 @@ public class SceneVersionCService implements ISceneVersionCService {
 
         // 更新状态
         sceneVersionDto.setDeployStatus(SceneConst.SCENE_DEPLOY_STATUS_RELEASE_UNDEPLOY);
+        sceneVersionDto.setDeployProgressPercentage(0.0);
+        sceneVersionDto.setExceptionMessage(null);
         sceneVersionDao.updateById(SceneVersionPoConverter.createFrom(sceneVersionDto));
         return sceneVersionDto;
     }
