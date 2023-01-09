@@ -9,6 +9,11 @@ import java.time.LocalDateTime;
 @Setter
 public class ProxyVo {
     /**
+     * 项目id
+     */
+    private String projectId;
+
+    /**
      * id
      */
     private Long id;

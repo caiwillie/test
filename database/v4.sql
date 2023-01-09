@@ -45,3 +45,5 @@ ALTER TABLE `mop`.`mop_scene_version` ADD COLUMN `exception_message` text NULL;
 ALTER TABLE `mop`.`mop_scene_version` ADD COLUMN `deploy_status` int(11) NULL;
 
 ALTER TABLE `mop`.`mop_scene` ADD COLUMN `project_id` bigint(20) NULL;
+
+ALTER TABLE `mop`.`mop_reverse_proxy` ADD COLUMN `project_id` bigint(20) NULL;
