@@ -46,6 +46,8 @@ public class SceneVersionPo implements Serializable {
 
     private String exceptionMessage;
 
+    private Integer deployStatus;
+
 
     public static final String ID = "id";
 
@@ -64,5 +66,7 @@ public class SceneVersionPo implements Serializable {
     public static final String DEPLOY_PROGRESS_PERCENTAGE = "deploy_progress_percentage";
 
     public static final String EXCEPTION_MESSAGE = "exception_message";
+
+    public static final String DEPLOY_STATUS = "deploy_status";
 
 }

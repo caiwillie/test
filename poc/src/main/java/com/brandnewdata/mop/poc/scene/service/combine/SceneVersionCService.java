@@ -11,7 +11,6 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.brandnewdata.mop.poc.constant.ProcessConst;
 import com.brandnewdata.mop.poc.constant.SceneConst;
 import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
-import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionParseDto;
 import com.brandnewdata.mop.poc.process.manager.ConnectorManager;
 import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
@@ -96,7 +95,7 @@ public class SceneVersionCService implements ISceneVersionCService {
         }
 
         // 修改状态
-        sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS_DEBUG_DEPLOYING);
+        sceneVersionDto.setDeployStatus(ProcessConst.PROCESS_DEPLOY_STATUS__UNDEPLOY);
         sceneVersionDao.updateById(SceneVersionPoConverter.createFrom(sceneVersionDto));
         return sceneVersionDto;
     }
@@ -190,29 +189,8 @@ public class SceneVersionCService implements ISceneVersionCService {
         // 删除之前在其他环境发布过的旧记录
         sceneReleaseDeployService.deleteByVersionIdAndExceptEnvId(id, envIdList);
 
-        // 保存到场景列表
-        /*
-        for (VersionProcessDto versionProcessDto : versionProcessDtoList) {
-            BpmnXmlDto deployDto = new BpmnXmlDto();
-            deployDto.setProcessId(versionProcessDto.getProcessId());
-            deployDto.setProcessName(versionProcessDto.getProcessName());
-            deployDto.setProcessXml(versionProcessDto.getProcessXml());
-
-            ProcessDefinitionParseDto processDefinitionParseDto = processDefinitionService.parseSceneTrigger(deployDto);
-
-            for (Long envId : envIdList) {
-                          if(StrUtil.isNotBlank(processDefinitionParseDto.getTriggerFullId())) {
-                              // 有触发器时，才需要上报
-                              connectorManager.saveRequestParams(envId, processDefinitionParseDto.getTriggerFullId(),
-                                      processDefinitionParseDto.getProtocol(), processDefinitionParseDto.getRequestParams(),
-                                      sceneReleaseDeployDto);
-                          }
-            }
-        }
-        */
-
         // 更新状态
-        sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS_RUN_DEPLOYING);
+        sceneVersionDto.setDeployStatus(ProcessConst.PROCESS_DEPLOY_STATUS__UNDEPLOY);
         sceneVersionDao.updateById(SceneVersionPoConverter.createFrom(sceneVersionDto));
         return sceneVersionDto;
     }

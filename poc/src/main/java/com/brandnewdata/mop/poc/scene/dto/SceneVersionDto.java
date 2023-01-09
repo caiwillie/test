@@ -20,8 +20,10 @@ public class SceneVersionDto {
 
     private Integer status;
 
-
+    private Double deployProgressPercentage;
 
     private String exceptionMessage;
+
+    private Integer deployStatus;
 
 }

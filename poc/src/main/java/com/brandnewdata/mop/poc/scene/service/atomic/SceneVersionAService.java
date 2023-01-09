@@ -110,9 +110,16 @@ public class SceneVersionAService implements ISceneVersionAService {
 
     @Override
     public SceneVersionDto save(SceneVersionDto sceneVersionDto) {
-        SceneVersionPo sceneVersionPo = SceneVersionPoConverter.createFrom(sceneVersionDto);
-        sceneVersionDao.insert(sceneVersionPo);
-        return SceneVersionDtoConverter.createFrom(sceneVersionPo);
+        Long id = sceneVersionDto.getId();
+        SceneVersionDto oldSceneVersionDto = fetchById(ListUtil.of(id)).get(id);
+        if(oldSceneVersionDto == null) {
+            SceneVersionPo sceneVersionPo = SceneVersionPoConverter.createFrom(sceneVersionDto);
+            sceneVersionDao.insert(sceneVersionPo);
+        } else {
+            SceneVersionPo sceneVersionPo = SceneVersionPoConverter.createFrom(sceneVersionDto);
+            sceneVersionDao.updateById(sceneVersionPo);
+        }
+        return sceneVersionDto;
     }
 
     @Override

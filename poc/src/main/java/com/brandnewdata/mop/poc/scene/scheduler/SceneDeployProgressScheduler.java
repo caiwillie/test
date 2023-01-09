@@ -8,23 +8,24 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.cron.Scheduler;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.brandnewdata.mop.poc.constant.ProcessConst;
 import com.brandnewdata.mop.poc.constant.SceneConst;
 import com.brandnewdata.mop.poc.env.dto.EnvDto;
 import com.brandnewdata.mop.poc.env.service.IEnvService;
+import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
 import com.brandnewdata.mop.poc.process.dto.DeployStatusDto;
+import com.brandnewdata.mop.poc.process.dto.ProcessDefinitionParseDto;
+import com.brandnewdata.mop.poc.process.manager.ConnectorManager;
+import com.brandnewdata.mop.poc.process.service.IProcessDefinitionService;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
-import com.brandnewdata.mop.poc.scene.dto.ProcessDeployProgressDto;
-import com.brandnewdata.mop.poc.scene.dto.SceneVersionDeployProgressDto;
-import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
-import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
+import com.brandnewdata.mop.poc.scene.dto.*;
 import com.brandnewdata.mop.poc.scene.service.atomic.ISceneReleaseDeployAService;
 import com.brandnewdata.mop.poc.scene.service.atomic.ISceneVersionAService;
 import com.brandnewdata.mop.poc.scene.service.atomic.IVersionProcessAService;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
@@ -40,17 +41,24 @@ public class SceneDeployProgressScheduler {
 
     private final IEnvService envService;
 
+    private final IProcessDefinitionService processDefinitionService;
+
+    private final ConnectorManager connectorManager;
 
     public SceneDeployProgressScheduler(ISceneReleaseDeployAService sceneReleaseDeployAService,
                                         ISceneVersionAService sceneVersionAService,
                                         IVersionProcessAService versionProcessAService,
                                         IProcessDeployService processDeployService,
-                                        IEnvService envService) {
+                                        IEnvService envService,
+                                        IProcessDefinitionService processDefinitionService,
+                                        ConnectorManager connectorManager) {
         this.sceneReleaseDeployAService = sceneReleaseDeployAService;
         this.sceneVersionAService = sceneVersionAService;
         this.versionProcessAService = versionProcessAService;
         this.processDeployService = processDeployService;
         this.envService = envService;
+        this.processDefinitionService = processDefinitionService;
+        this.connectorManager = connectorManager;
         Scheduler scheduler = new Scheduler();
         scheduler.setMatchSecond(true);
         scheduler.schedule("0/4 * * * * ?", (Runnable) this::scan);
@@ -62,9 +70,9 @@ public class SceneDeployProgressScheduler {
         for (SceneVersionDto sceneVersionDto : sceneVersionDtoList) {
             Integer status = sceneVersionDto.getStatus();
             if(NumberUtil.equals(SceneConst.SCENE_VERSION_STATUS_DEBUG_DEPLOYING, status)) {
-
+                snapshotDeployProgress(sceneVersionDto);
             } else if (NumberUtil.equals(SceneConst.SCENE_VERSION_STATUS_RUN_DEPLOYING, status)) {
-
+                releaseDeployProgress(sceneVersionDto);
             } else {
                 continue;
             }
@@ -81,13 +89,68 @@ public class SceneDeployProgressScheduler {
         // 查询版本的部署进度
         SceneVersionDeployProgressDto sceneVersionDeployProgressDto = getSceneVersionDeployProgressDto(processIdList, ListUtil.of(envDto.getId()));
 
-        if(NumberUtil.equals(sceneVersionDeployProgressDto.getStatus(), ProcessConst.PROCESS_DEPLOY_STATUS__UNDEPLOY)) {
+        int status = sceneVersionDeployProgressDto.getStatus();
+        double progressPercentage = sceneVersionDeployProgressDto.getProgressPercentage();
+        String errorMessage = sceneVersionDeployProgressDto.getErrorMessage();
 
+        if(NumberUtil.equals(status, ProcessConst.PROCESS_DEPLOY_STATUS__UNDEPLOY)) {
+            sceneVersionDto.setDeployStatus(ProcessConst.PROCESS_DEPLOY_STATUS__UNDEPLOY);
+            sceneVersionDto.setDeployProgressPercentage(progressPercentage);
+            sceneVersionAService.save(sceneVersionDto);
+            return;
+        }
+
+        if (NumberUtil.equals(status, ProcessConst.PROCESS_DEPLOY_STATUS__EXCEPTION)) {
+            sceneVersionDto.setDeployStatus(ProcessConst.PROCESS_DEPLOY_STATUS__EXCEPTION);
+            sceneVersionDto.setDeployProgressPercentage(progressPercentage);
+            sceneVersionDto.setExceptionMessage(errorMessage);
+            sceneVersionAService.save(sceneVersionDto);
+            return;
+        }
+
+        if (NumberUtil.equals(status, ProcessConst.PROCESS_DEPLOY_STATUS__DEPLOYED)) {
+            sceneVersionDto.setDeployStatus(ProcessConst.PROCESS_DEPLOY_STATUS__DEPLOYED);
+            sceneVersionDto.setDeployProgressPercentage(progressPercentage);
+            sceneVersionAService.save(sceneVersionDto);
         }
 
     }
 
-    private void releaseDeployProgress(Long versionId) {
+    private void releaseDeployProgress(SceneVersionDto sceneVersionDto) {
+        Long versionId = sceneVersionDto.getId();
+        List<SceneReleaseDeployDto> sceneReleaseDeployDtoList = sceneReleaseDeployAService.fetchListByVersionId(ListUtil.of(versionId)).get(versionId);
+        Map<Long, Map<String, SceneReleaseDeployDto>> envProcessMapMap = sceneReleaseDeployDtoList.stream()
+                .collect(Collectors.groupingBy(SceneReleaseDeployDto::getEnvId, Collectors.toMap(SceneReleaseDeployDto::getProcessId, Function.identity())));
+        List<Long> envList = ListUtil.toList(envProcessMapMap.keySet());
+        List<String> processIdList = envProcessMapMap.values().stream().flatMap(map -> map.keySet().stream()).distinct().collect(Collectors.toList());
+        SceneVersionDeployProgressDto sceneVersionDeployProgressDto = getSceneVersionDeployProgressDto(processIdList, envList);
+        int status = sceneVersionDeployProgressDto.getStatus();
+        double progressPercentage = sceneVersionDeployProgressDto.getProgressPercentage();
+        String errorMessage = sceneVersionDeployProgressDto.getErrorMessage();
+
+        if(NumberUtil.equals(status, ProcessConst.PROCESS_DEPLOY_STATUS__UNDEPLOY)) {
+            sceneVersionDto.setDeployStatus(ProcessConst.PROCESS_DEPLOY_STATUS__UNDEPLOY);
+            sceneVersionDto.setDeployProgressPercentage(progressPercentage);
+            sceneVersionAService.save(sceneVersionDto);
+            return;
+        }
+
+        if (NumberUtil.equals(status, ProcessConst.PROCESS_DEPLOY_STATUS__EXCEPTION)) {
+            sceneVersionDto.setDeployStatus(ProcessConst.PROCESS_DEPLOY_STATUS__EXCEPTION);
+            sceneVersionDto.setDeployProgressPercentage(progressPercentage);
+            sceneVersionDto.setExceptionMessage(errorMessage);
+            sceneVersionAService.save(sceneVersionDto);
+            return;
+        }
+
+        if (NumberUtil.equals(status, ProcessConst.PROCESS_DEPLOY_STATUS__DEPLOYED)) {
+            // 保存request params
+            saveRequestParams(processIdList, envList, envProcessMapMap);
+
+            sceneVersionDto.setDeployStatus(ProcessConst.PROCESS_DEPLOY_STATUS__DEPLOYED);
+            sceneVersionDto.setDeployProgressPercentage(progressPercentage);
+            sceneVersionAService.save(sceneVersionDto);
+        }
 
     }
 
@@ -162,5 +225,26 @@ public class SceneDeployProgressScheduler {
         return ret;
     }
 
+    private void saveRequestParams(List<String> processIdList, List<Long> envIdList, Map<Long, Map<String, SceneReleaseDeployDto>> envProcessMapMap) {
+        for (String processId : processIdList) {
+            VersionProcessDto versionProcessDto = versionProcessAService.fetchOneByProcessId(ListUtil.of(processId)).get(processId);
+            BpmnXmlDto deployDto = new BpmnXmlDto();
+            deployDto.setProcessId(versionProcessDto.getProcessId());
+            deployDto.setProcessName(versionProcessDto.getProcessName());
+            deployDto.setProcessXml(versionProcessDto.getProcessXml());
+
+            ProcessDefinitionParseDto processDefinitionParseDto = processDefinitionService.parseSceneTrigger(deployDto);
+
+            for (Long envId : envIdList) {
+                if(StrUtil.isNotBlank(processDefinitionParseDto.getTriggerFullId())) {
+                    SceneReleaseDeployDto sceneReleaseDeployDto = envProcessMapMap.get(envId).get(processId);
+                    // 有触发器时，才需要上报
+                    connectorManager.saveRequestParams(envId, processDefinitionParseDto.getTriggerFullId(),
+                            processDefinitionParseDto.getProtocol(), processDefinitionParseDto.getRequestParams(),
+                            sceneReleaseDeployDto);
+                }
+            }
+        }
+    }
 
 }

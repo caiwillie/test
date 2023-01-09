@@ -10,6 +10,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
+import com.brandnewdata.mop.poc.constant.ProcessConst;
 import com.brandnewdata.mop.poc.constant.SceneConst;
 import com.brandnewdata.mop.poc.scene.converter.SceneDtoConverter;
 import com.brandnewdata.mop.poc.scene.converter.ScenePoConverter;
@@ -79,6 +80,7 @@ public class SceneService implements ISceneService {
             sceneVersionDto.setSceneId(scenePo.getId());
             sceneVersionDto.setVersion(DateUtil.format(scenePo.getCreateTime(), DatePattern.PURE_DATETIME_PATTERN));
             sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__CONFIGURING);
+            sceneVersionDto.setDeployStatus(ProcessConst.PROCESS_DEPLOY_STATUS__DEPLOYED);
             sceneVersionAService.save(sceneVersionDto);
 
         } else {
