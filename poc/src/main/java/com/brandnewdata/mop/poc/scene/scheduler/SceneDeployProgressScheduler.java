@@ -112,7 +112,6 @@ public class SceneDeployProgressScheduler {
             sceneVersionDto.setDeployProgressPercentage(progressPercentage);
             sceneVersionAService.save(sceneVersionDto);
         }
-
     }
 
     private void releaseDeployProgress(SceneVersionDto sceneVersionDto) {
