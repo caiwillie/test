@@ -5,14 +5,15 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Opt;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.thread.ThreadUtil;
-import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.constant.ProcessConst;
 import com.brandnewdata.mop.poc.error.ErrorMessage;
 import com.brandnewdata.mop.poc.process.bo.ZeebeDeployBo;
-import com.brandnewdata.mop.poc.process.converter.*;
+import com.brandnewdata.mop.poc.process.converter.ProcessDeployTaskPoConverter;
+import com.brandnewdata.mop.poc.process.converter.ProcessReleaseDeployDtoConverter;
+import com.brandnewdata.mop.poc.process.converter.ProcessSnapshotDeployDtoConverter;
 import com.brandnewdata.mop.poc.process.dao.ProcessDeployTaskDao;
 import com.brandnewdata.mop.poc.process.dao.ProcessReleaseDeployDao;
 import com.brandnewdata.mop.poc.process.dao.ProcessSnapshotDeployDao;
@@ -27,7 +28,6 @@ import com.brandnewdata.mop.poc.process.parser.FeelUtil;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParseStep1;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParseStep2;
 import com.brandnewdata.mop.poc.process.parser.ProcessDefinitionParser;
-import com.brandnewdata.mop.poc.process.parser.dto.Step1Result;
 import com.brandnewdata.mop.poc.process.parser.dto.Step2Result;
 import com.brandnewdata.mop.poc.process.po.ProcessDeployTaskPo;
 import com.brandnewdata.mop.poc.process.po.ProcessReleaseDeployPo;
@@ -78,22 +78,6 @@ public class ProcessDeployService implements IProcessDeployService {
     }
 
     @Override
-    public void snapshotDeploy(BpmnXmlDto bpmnXmlDto, Long envId, String bizType) {
-        ZeebeDeployBo bo = zeebeDeploy(bpmnXmlDto, envId, bizType);
-        QueryWrapper<ProcessSnapshotDeployPo> query = new QueryWrapper<>();
-        query.eq(ProcessSnapshotDeployPo.ENV_ID, envId);
-        query.eq(ProcessSnapshotDeployPo.PROCESS_ZEEBE_KEY, bo.getZeebeKey());
-        ProcessSnapshotDeployPo po = snapshotDeployDao.selectOne(query);
-        if(po != null) {
-            // 说明没有更改任何东西，上个版本已经存在
-            return;
-        }
-        po = ProcessSnapshotDeployPoConverter.createFrom(bo);
-        ProcessSnapshotDeployPoConverter.updateFrom(po, envId, null, bpmnXmlDto.getProcessXml());
-        snapshotDeployDao.insert(po);
-    }
-
-    @Override
     @Transactional
     public void snapshotDeploy2(BpmnXmlDto bpmnXmlDto, Long envId, String bizType) {
         Assert.notNull(envId);
@@ -139,38 +123,6 @@ public class ProcessDeployService implements IProcessDeployService {
         } finally {
             if(version != null) {
                 processEnvLock.unlock(processId, envId, version);
-            }
-        }
-    }
-
-    @Override
-    public void releaseDeploy(BpmnXmlDto bpmnXmlDto, List<Long> envIdList, String bizType) {
-        if(CollUtil.isEmpty(envIdList)) return;
-        for (Long envId : envIdList) {
-            Step1Result step1Result = ProcessDefinitionParser.step1(bpmnXmlDto.getProcessId(),
-                    bpmnXmlDto.getProcessName(), bpmnXmlDto.getProcessXml()).step1Result();
-
-            QueryWrapper<ProcessReleaseDeployPo> query = new QueryWrapper<>();
-            query.eq(ProcessReleaseDeployPo.PROCESS_ID, step1Result.getProcessId());
-            query.eq(ProcessReleaseDeployPo.ENV_ID, envId);
-            ProcessReleaseDeployPo po = releaseDeployDao.selectOne(query);
-            ZeebeDeployBo bo;
-            if(po == null) {
-                bo = zeebeDeploy(bpmnXmlDto, envId, bizType);
-                po = ProcessReleaseDeployPoConverter.createFrom(bo);
-                po.setEnvId(envId);
-                releaseDeployDao.insert(po);
-            } else {
-                bo = zeebeDeploy(po.getProcessZeebeXml(), step1Result.getProcessId(), step1Result.getProcessName(), envId);
-                if(!StrUtil.equals(bo.getProcessId(), po.getProcessId())) {
-                    throw new RuntimeException("zeebe xml's process id is not equal to biz xml' process id");
-                }
-
-                if(!NumberUtil.equals(bo.getZeebeKey(), po.getProcessZeebeKey())) {
-                    log.warn("release deploy has been modified. process id: {}", bo.getProcessId());
-                    ProcessReleaseDeployPoConverter.updateFrom(bo, po);
-                    releaseDeployDao.updateById(po);
-                }
             }
         }
     }

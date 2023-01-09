@@ -10,11 +10,7 @@ import java.util.Map;
 
 public interface IProcessDeployService {
 
-    void snapshotDeploy(BpmnXmlDto bpmnXmlDto, Long envId, String bizType);
-
     void snapshotDeploy2(BpmnXmlDto bpmnXmlDto, Long envId, String bizType);
-
-    void releaseDeploy(BpmnXmlDto bpmnXmlDto, List<Long> envIdList, String bizType);
 
     void releaseDeploy2(BpmnXmlDto bpmnXmlDto, Long envId, String bizType);
 
