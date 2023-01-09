@@ -22,7 +22,7 @@ public class SceneVersionVoConverter {
         vo.setUpdateTime(dto.getUpdateTime());
         vo.setVersion(dto.getVersion());
         vo.setSceneId(dto.getSceneId());
-        // 根据deploy status 进行特殊处理
+        // 根据deploy status 进行特殊处理, 默认为部署完成
         Integer deployStatus = Opt.ofNullable(dto.getDeployStatus()).orElse(SceneConst.SCENE_DEPLOY_STATUS__DEPLOYED);
         if(NumberUtil.equals(deployStatus, SceneConst.SCENE_DEPLOY_STATUS_SNAPSHOT_UNDEPLOY)) {
             vo.setDeployStatus(0);

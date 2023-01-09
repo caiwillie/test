@@ -108,6 +108,7 @@ public class SceneDeployProgressScheduler {
 
         if (NumberUtil.equals(status, ProcessConst.PROCESS_DEPLOY_STATUS__DEPLOYED)) {
             sceneVersionDto.setDeployStatus(SceneConst.SCENE_DEPLOY_STATUS__DEPLOYED);
+            sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__DEBUGGING);
             sceneVersionDto.setDeployProgressPercentage(progressPercentage);
             sceneVersionAService.save(sceneVersionDto);
         }
@@ -145,6 +146,7 @@ public class SceneDeployProgressScheduler {
             // 保存request params
             saveRequestParams(processIdList, envList, envProcessMapMap);
 
+            sceneVersionDto.setStatus(SceneConst.SCENE_VERSION_STATUS__RUNNING);
             sceneVersionDto.setDeployStatus(SceneConst.SCENE_DEPLOY_STATUS__DEPLOYED);
             sceneVersionDto.setDeployProgressPercentage(progressPercentage);
             sceneVersionAService.save(sceneVersionDto);
