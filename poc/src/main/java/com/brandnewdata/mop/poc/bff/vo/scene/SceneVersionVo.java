@@ -53,7 +53,17 @@ public class SceneVersionVo {
     private String description;
 
     /**
-     * 异常信息
+     * 0 发布中；1 发布完成；2 发布异常
+     */
+    private Integer deployStatus;
+
+    /**
+     * 部署进度（当deployStatus = 0时用）
+     */
+    private Double deployProgressPercentage;
+
+    /**
+     * 异常信息（当deployStatus = 2时用）
      */
     private String exceptionMessage;
 }

@@ -157,6 +157,21 @@ public class SceneBffService {
                 .collect(Collectors.toList());
     }
 
+    public SceneVersionVo versionDetail(Long versionId) {
+        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchById(ListUtil.of(versionId)).get(versionId);
+
+        List<SceneReleaseDeployDto> sceneReleaseDeployDtoList =
+                sceneReleaseDeployService.fetchListByVersionId(ListUtil.of(versionId)).get(versionId);
+
+        List<EnvDto> envDtoList = sceneReleaseDeployDtoList.stream().map(sceneReleaseDeployDto -> {
+            EnvDto envDto = new EnvDto();
+            envDto.setId(sceneReleaseDeployDto.getEnvId());
+            return envDto;
+        }).collect(Collectors.toList());
+
+        return SceneVersionVoConverter.createFrom(sceneVersionDto, envDtoList);
+    }
+
     public List<VersionProcessVo> processList(Long versionId) {
         Assert.notNull(versionId, "版本id不能为空");
         List<VersionProcessDto> versionProcessDtoList =

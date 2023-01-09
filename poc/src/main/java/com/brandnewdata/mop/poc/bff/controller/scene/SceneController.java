@@ -137,6 +137,18 @@ public class SceneController {
     }
 
     /**
+     * 查询版本详情
+     *
+     * @param versionId 版本id
+     * @return the result
+     */
+    @GetMapping(value = "/rest/scene/version/detail")
+    public Result<SceneVersionVo> detailVersion(@RequestParam Long versionId) {
+        SceneVersionVo sceneVersionVo = sceneBffService.versionDetail(versionId);
+        return Result.OK(sceneVersionVo);
+    }
+
+    /**
      * 获取版本下的流程列表
      *
      * @param versionId 版本id
