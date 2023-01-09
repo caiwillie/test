@@ -54,7 +54,7 @@ public class SceneVersionAService implements ISceneVersionAService {
     @Override
     public Map<Long, SceneVersionDto> fetchById(List<Long> idList) {
         if (CollUtil.isEmpty(idList)) return MapUtil.empty();
-        Assert.isTrue(idList.stream().filter(Objects::isNull).count() == 0, "版本id不能为空");
+        Assert.isFalse(CollUtil.hasNull(idList), "版本id不能为空");
         QueryWrapper<SceneVersionPo> query = new QueryWrapper<>();
         query.isNull(SceneVersionPo.DELETE_FLAG);
         query.in(SceneVersionPo.ID, idList);
@@ -121,8 +121,7 @@ public class SceneVersionAService implements ISceneVersionAService {
     @Override
     public SceneVersionDto save(SceneVersionDto sceneVersionDto) {
         Long id = sceneVersionDto.getId();
-        SceneVersionDto oldSceneVersionDto = fetchById(ListUtil.of(id)).get(id);
-        if(oldSceneVersionDto == null) {
+        if(id == null) {
             SceneVersionPo sceneVersionPo = SceneVersionPoConverter.createFrom(sceneVersionDto);
             sceneVersionDao.insert(sceneVersionPo);
         } else {

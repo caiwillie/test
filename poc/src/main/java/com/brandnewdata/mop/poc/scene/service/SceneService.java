@@ -51,11 +51,12 @@ public class SceneService implements ISceneService {
     }
 
     @Override
-    public Page<SceneDto> page(int pageNum, int pageSize, String name) {
+    public Page<SceneDto> page(long projectId, int pageNum, int pageSize, String name) {
         com.baomidou.mybatisplus.extension.plugins.pagination.Page<ScenePo> page =
                 com.baomidou.mybatisplus.extension.plugins.pagination.Page.of(pageNum, pageSize);
         QueryWrapper<ScenePo> query = new QueryWrapper<>();
         query.isNull(ScenePo.DELETE_FLAG);
+        query.eq(ScenePo.PROJECT_ID, projectId);
         if(StrUtil.isNotBlank(name)) query.like(ScenePo.NAME, name); // 设置名称
         query.orderByDesc(ScenePo.UPDATE_TIME);
         page = sceneDao.selectPage(page, query);

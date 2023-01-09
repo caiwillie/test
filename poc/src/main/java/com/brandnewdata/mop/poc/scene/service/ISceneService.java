@@ -18,7 +18,7 @@ public interface ISceneService {
      * @param name
      * @return
      */
-    Page<SceneDto> page(int pageNum, int pageSize, String name);
+    Page<SceneDto> page(long projectId, int pageNum, int pageSize, String name);
 
     SceneDto save(SceneDto sceneDto);
 

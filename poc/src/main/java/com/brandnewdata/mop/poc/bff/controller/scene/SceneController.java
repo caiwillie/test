@@ -52,7 +52,7 @@ public class SceneController {
             @RequestParam Integer pageNum,
             @RequestParam Integer pageSize,
             @RequestParam(required = false) String name) {
-        Page<SceneVo> page = sceneBffService.page(pageNum, pageSize, name);
+        Page<SceneVo> page = sceneBffService.page(Long.valueOf(projectId), pageNum, pageSize, name);
         return Result.OK(page);
     }
 

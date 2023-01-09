@@ -100,7 +100,7 @@ public class SceneBffService {
         this.connectorManager = connectorManager;
     }
 
-    public Page<SceneVo> page(Integer pageNum, Integer pageSize, String name) {
+    public Page<SceneVo> page(Long projectId, Integer pageNum, Integer pageSize, String name) {
         Page<SceneDto> page = sceneService.page(pageNum, pageSize, name);
         List<SceneDto> records = page.getRecords();
 
