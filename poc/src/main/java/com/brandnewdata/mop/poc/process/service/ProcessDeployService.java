@@ -190,7 +190,7 @@ public class ProcessDeployService implements IProcessDeployService {
                 version = processEnvLock.lock(processId, envId);
                 // 一直等待到
                 ThreadUtil.sleep(400);
-            } while(version != null);
+            } while(version == null);
 
             QueryWrapper<ProcessReleaseDeployPo> query = new QueryWrapper<>();
             query.eq(ProcessReleaseDeployPo.PROCESS_ID, processId);
