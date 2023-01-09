@@ -26,10 +26,10 @@ public class SceneVersionVoConverter {
         Integer deployStatus = dto.getDeployStatus();
         if(NumberUtil.equals(deployStatus, SceneConst.SCENE_DEPLOY_STATUS_SNAPSHOT_UNDEPLOY)) {
             vo.setDeployStatus(0);
-            vo.setStatus(4);
+            vo.setStatus(5);
         } else if (NumberUtil.equals(deployStatus, SceneConst.SCENE_DEPLOY_STATUS_RELEASE_UNDEPLOY)) {
             vo.setDeployStatus(0);
-            vo.setStatus(5);
+            vo.setStatus(6);
         } else {
             vo.setDeployStatus(deployStatus);
             vo.setStatus(dto.getStatus());
