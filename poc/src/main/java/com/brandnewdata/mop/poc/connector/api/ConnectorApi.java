@@ -65,7 +65,7 @@ public class ConnectorApi implements IConnectorApi {
             for (Long envId : envIdList) {
                 try {
                     BpmnXmlDto bpmnXmlDto = getBpmnXmlDto(trigger, true);
-                    processDeployService.snapshotDeploy2(bpmnXmlDto, envId, ProcessConst.PROCESS_BIZ_TYPE__TRIGGER);
+                    processDeployService.snapshotDeploy(bpmnXmlDto, envId, ProcessConst.PROCESS_BIZ_TYPE__TRIGGER);
                 } catch (Exception e) {
                     throw new RuntimeException(StrUtil.format("【触发器】{} 部署异常: {}", trigger.getName(), e.getMessage()));
                 }
@@ -77,7 +77,7 @@ public class ConnectorApi implements IConnectorApi {
             for (Long envId : envIdList) {
                 try {
                     BpmnXmlDto bpmnXmlDto = getBpmnXmlDto(operate, false);
-                    processDeployService.snapshotDeploy2(bpmnXmlDto, envId, ProcessConst.PROCESS_BIZ_TYPE__OPERATE);
+                    processDeployService.snapshotDeploy(bpmnXmlDto, envId, ProcessConst.PROCESS_BIZ_TYPE__OPERATE);
                 } catch (Exception e) {
                     throw new RuntimeException(StrUtil.format("【操作】{} 部署异常: {}", operate.getName(), e.getMessage()));
                 }
@@ -102,7 +102,7 @@ public class ConnectorApi implements IConnectorApi {
             for (Long envId : envIdList) {
                 try {
                     BpmnXmlDto bpmnXmlDto = getBpmnXmlDto(trigger, true);
-                    processDeployService.releaseDeploy2(bpmnXmlDto, envId, ProcessConst.PROCESS_BIZ_TYPE__TRIGGER);
+                    processDeployService.releaseDeploy(bpmnXmlDto, envId, ProcessConst.PROCESS_BIZ_TYPE__TRIGGER);
                 } catch (Exception e) {
                     throw new RuntimeException(StrUtil.format("【触发器】{} 部署异常: {}", trigger.getName(), e.getMessage()));
                 }
@@ -114,7 +114,7 @@ public class ConnectorApi implements IConnectorApi {
             for (Long envId : envIdList) {
                 try {
                     BpmnXmlDto bpmnXmlDto = getBpmnXmlDto(operate, false);
-                    processDeployService.releaseDeploy2(bpmnXmlDto, envId, ProcessConst.PROCESS_BIZ_TYPE__OPERATE);
+                    processDeployService.releaseDeploy(bpmnXmlDto, envId, ProcessConst.PROCESS_BIZ_TYPE__OPERATE);
                 } catch (Exception e) {
                     throw new RuntimeException(StrUtil.format("【操作】{} 部署异常: {}", operate.getName(), e.getMessage()));
                 }

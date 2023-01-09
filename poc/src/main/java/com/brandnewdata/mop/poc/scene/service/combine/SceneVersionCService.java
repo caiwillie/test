@@ -19,7 +19,6 @@ import com.brandnewdata.mop.poc.scene.converter.SceneVersionPoConverter;
 import com.brandnewdata.mop.poc.scene.converter.VersionProcessDtoConverter;
 import com.brandnewdata.mop.poc.scene.dao.SceneVersionDao;
 import com.brandnewdata.mop.poc.scene.dto.SceneReleaseDeployDto;
-import com.brandnewdata.mop.poc.scene.dto.SceneVersionDeployProgressDto;
 import com.brandnewdata.mop.poc.scene.dto.SceneVersionDto;
 import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
 import com.brandnewdata.mop.poc.scene.po.SceneVersionPo;
@@ -57,7 +56,6 @@ public class SceneVersionCService implements ISceneVersionCService {
 
     private final ConnectorManager connectorManager;
 
-
     public SceneVersionCService(SceneVersionAService sceneVersionAService,
                                 IVersionProcessAService versionProcessAService,
                                 IVersionProcessCService versionProcessCService,
@@ -92,7 +90,7 @@ public class SceneVersionCService implements ISceneVersionCService {
             deployDto.setProcessId(versionProcessDto.getProcessId());
             deployDto.setProcessName(versionProcessDto.getProcessName());
             deployDto.setProcessXml(versionProcessDto.getProcessXml());
-            processDeployService.snapshotDeploy2(deployDto, envId, PROCESS_BIZ_TYPE__SCENE);
+            processDeployService.snapshotDeploy(deployDto, envId, PROCESS_BIZ_TYPE__SCENE);
         }
 
         // 修改状态
@@ -101,11 +99,6 @@ public class SceneVersionCService implements ISceneVersionCService {
         sceneVersionDto.setExceptionMessage(null);
         sceneVersionDao.updateById(SceneVersionPoConverter.createFrom(sceneVersionDto));
         return sceneVersionDto;
-    }
-
-    @Override
-    public SceneVersionDeployProgressDto fetchSnapshotDeployProgress(Long id) {
-        return null;
     }
 
     @Override
@@ -177,7 +170,7 @@ public class SceneVersionCService implements ISceneVersionCService {
                 deployDto.setProcessId(versionProcessDto.getProcessId());
                 deployDto.setProcessName(versionProcessDto.getProcessName());
                 deployDto.setProcessXml(versionProcessDto.getProcessXml());
-                processDeployService.releaseDeploy2(deployDto, envId, PROCESS_BIZ_TYPE__SCENE);
+                processDeployService.releaseDeploy(deployDto, envId, PROCESS_BIZ_TYPE__SCENE);
 
                 // 保存关系
                 SceneReleaseDeployDto sceneReleaseDeployDto = new SceneReleaseDeployDto();
@@ -198,11 +191,6 @@ public class SceneVersionCService implements ISceneVersionCService {
         sceneVersionDto.setExceptionMessage(null);
         sceneVersionDao.updateById(SceneVersionPoConverter.createFrom(sceneVersionDto));
         return sceneVersionDto;
-    }
-
-    @Override
-    public SceneVersionDeployProgressDto fetchReleaseDeployProgress(Long id) {
-        return null;
     }
 
     @Override

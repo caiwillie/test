@@ -79,7 +79,7 @@ public class ProcessDeployService implements IProcessDeployService {
 
     @Override
     @Transactional
-    public void snapshotDeploy2(BpmnXmlDto bpmnXmlDto, Long envId, String bizType) {
+    public void snapshotDeploy(BpmnXmlDto bpmnXmlDto, Long envId, String bizType) {
         Assert.notNull(envId);
         Step2Result step2Result = parseBpmnXmlDto(bpmnXmlDto, envId, bizType);
         String processXml = bpmnXmlDto.getProcessXml();
@@ -129,7 +129,7 @@ public class ProcessDeployService implements IProcessDeployService {
 
     @Override
     @Transactional
-    public void releaseDeploy2(BpmnXmlDto bpmnXmlDto, Long envId, String bizType) {
+    public void releaseDeploy(BpmnXmlDto bpmnXmlDto, Long envId, String bizType) {
         Assert.notNull(envId);
         Step2Result step2Result = parseBpmnXmlDto(bpmnXmlDto, envId, bizType);
         String processXml = bpmnXmlDto.getProcessXml();

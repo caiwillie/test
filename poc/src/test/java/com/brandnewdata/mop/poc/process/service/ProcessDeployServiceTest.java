@@ -43,7 +43,7 @@ class ProcessDeployServiceTest {
                 "    </bpmndi:BPMNPlane>\n" +
                 "  </bpmndi:BPMNDiagram>\n" +
                 "</bpmn2:definitions>\n");
-        processDeployService.snapshotDeploy2(bpmnXmlDto, 1L, ProcessConst.PROCESS_BIZ_TYPE__SCENE);
+        processDeployService.snapshotDeploy(bpmnXmlDto, 1L, ProcessConst.PROCESS_BIZ_TYPE__SCENE);
         return;
     }
 
