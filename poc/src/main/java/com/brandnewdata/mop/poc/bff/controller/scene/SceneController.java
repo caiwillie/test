@@ -48,7 +48,7 @@ public class SceneController {
      */
     @GetMapping(value = "/rest/scene/page")
     public Result<Page<SceneVo>> page(
-            @RequestParam(required = false) String projectId,
+            @RequestParam String projectId,
             @RequestParam Integer pageNum,
             @RequestParam Integer pageSize,
             @RequestParam(required = false) String name) {

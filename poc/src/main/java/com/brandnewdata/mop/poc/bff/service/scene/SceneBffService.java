@@ -101,7 +101,7 @@ public class SceneBffService {
     }
 
     public Page<SceneVo> page(Long projectId, Integer pageNum, Integer pageSize, String name) {
-        Page<SceneDto> page = sceneService.page(pageNum, pageSize, name);
+        Page<SceneDto> page = sceneService.page(projectId, pageNum, pageSize, name);
         List<SceneDto> records = page.getRecords();
 
         if(CollUtil.isEmpty(records)) return new Page<>(page.getTotal(), ListUtil.empty());
