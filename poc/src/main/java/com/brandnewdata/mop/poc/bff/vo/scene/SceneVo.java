@@ -32,6 +32,11 @@ public class SceneVo {
     private String name;
 
     /**
+     * 项目id
+     */
+    private String projectId;
+
+    /**
      * 图片URL
      */
     private String imgUrl;

@@ -19,6 +19,11 @@ public class SceneDto {
     private String name;
 
     /**
+     * 项目id
+     */
+    private Long projectId;
+
+    /**
      * 创建时间
      */
     private LocalDateTime createTime;

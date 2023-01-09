@@ -10,8 +10,7 @@ public class ScenePoConverter {
         ScenePo po = new ScenePo();
         po.setId(dto.getId());
         po.setName(dto.getName());
-        po.setCreateTime(Opt.ofNullable(dto.getCreateTime()).map(DateUtil::date).orElse(null));
-        po.setUpdateTime(Opt.ofNullable(dto.getUpdateTime()).map(DateUtil::date).orElse(null));
+        po.setProjectId(dto.getProjectId());
         return po;
     }
 
