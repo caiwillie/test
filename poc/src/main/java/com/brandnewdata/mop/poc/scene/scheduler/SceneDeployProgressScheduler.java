@@ -92,14 +92,14 @@ public class SceneDeployProgressScheduler {
         String errorMessage = sceneVersionDeployProgressDto.getErrorMessage();
 
         if(NumberUtil.equals(status, ProcessConst.PROCESS_DEPLOY_STATUS__UNDEPLOY)) {
-            sceneVersionDto.setDeployStatus(ProcessConst.PROCESS_DEPLOY_STATUS__UNDEPLOY);
+            sceneVersionDto.setDeployStatus(SceneConst.SCENE_DEPLOY_STATUS_SNAPSHOT_UNDEPLOY);
             sceneVersionDto.setDeployProgressPercentage(progressPercentage);
             sceneVersionAService.save(sceneVersionDto);
             return;
         }
 
         if (NumberUtil.equals(status, ProcessConst.PROCESS_DEPLOY_STATUS__EXCEPTION)) {
-            sceneVersionDto.setDeployStatus(ProcessConst.PROCESS_DEPLOY_STATUS__EXCEPTION);
+            sceneVersionDto.setDeployStatus(SceneConst.SCENE_DEPLOY_STATUS__EXCEPTION);
             sceneVersionDto.setDeployProgressPercentage(progressPercentage);
             sceneVersionDto.setExceptionMessage(errorMessage);
             sceneVersionAService.save(sceneVersionDto);
@@ -107,7 +107,7 @@ public class SceneDeployProgressScheduler {
         }
 
         if (NumberUtil.equals(status, ProcessConst.PROCESS_DEPLOY_STATUS__DEPLOYED)) {
-            sceneVersionDto.setDeployStatus(ProcessConst.PROCESS_DEPLOY_STATUS__DEPLOYED);
+            sceneVersionDto.setDeployStatus(SceneConst.SCENE_DEPLOY_STATUS__DEPLOYED);
             sceneVersionDto.setDeployProgressPercentage(progressPercentage);
             sceneVersionAService.save(sceneVersionDto);
         }
@@ -127,14 +127,14 @@ public class SceneDeployProgressScheduler {
         String errorMessage = sceneVersionDeployProgressDto.getErrorMessage();
 
         if(NumberUtil.equals(status, ProcessConst.PROCESS_DEPLOY_STATUS__UNDEPLOY)) {
-            sceneVersionDto.setDeployStatus(ProcessConst.PROCESS_DEPLOY_STATUS__UNDEPLOY);
+            sceneVersionDto.setDeployStatus(SceneConst.SCENE_DEPLOY_STATUS_RELEASE_UNDEPLOY);
             sceneVersionDto.setDeployProgressPercentage(progressPercentage);
             sceneVersionAService.save(sceneVersionDto);
             return;
         }
 
         if (NumberUtil.equals(status, ProcessConst.PROCESS_DEPLOY_STATUS__EXCEPTION)) {
-            sceneVersionDto.setDeployStatus(ProcessConst.PROCESS_DEPLOY_STATUS__EXCEPTION);
+            sceneVersionDto.setDeployStatus(SceneConst.SCENE_DEPLOY_STATUS__EXCEPTION);
             sceneVersionDto.setDeployProgressPercentage(progressPercentage);
             sceneVersionDto.setExceptionMessage(errorMessage);
             sceneVersionAService.save(sceneVersionDto);
@@ -145,7 +145,7 @@ public class SceneDeployProgressScheduler {
             // 保存request params
             saveRequestParams(processIdList, envList, envProcessMapMap);
 
-            sceneVersionDto.setDeployStatus(ProcessConst.PROCESS_DEPLOY_STATUS__DEPLOYED);
+            sceneVersionDto.setDeployStatus(SceneConst.SCENE_DEPLOY_STATUS__DEPLOYED);
             sceneVersionDto.setDeployProgressPercentage(progressPercentage);
             sceneVersionAService.save(sceneVersionDto);
         }

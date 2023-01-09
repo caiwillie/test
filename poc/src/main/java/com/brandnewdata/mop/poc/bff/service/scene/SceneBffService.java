@@ -161,7 +161,8 @@ public class SceneBffService {
         SceneVersionDto sceneVersionDto = sceneVersionAService.fetchById(ListUtil.of(versionId)).get(versionId);
 
         List<SceneReleaseDeployDto> sceneReleaseDeployDtoList =
-                sceneReleaseDeployService.fetchListByVersionId(ListUtil.of(versionId)).get(versionId);
+                Opt.ofNullable(sceneReleaseDeployService.fetchListByVersionId(ListUtil.of(versionId)).get(versionId))
+                        .orElse(ListUtil.empty());
 
         List<EnvDto> envDtoList = sceneReleaseDeployDtoList.stream().map(sceneReleaseDeployDto -> {
             EnvDto envDto = new EnvDto();
