@@ -66,15 +66,13 @@ public class SceneDeployProgressScheduler {
     }
 
     private void scan() {
-        List<SceneVersionDto> sceneVersionDtoList = sceneVersionAService.fetchAll();
+        List<SceneVersionDto> sceneVersionDtoList = sceneVersionAService.fetchAllUnDeployed();
         for (SceneVersionDto sceneVersionDto : sceneVersionDtoList) {
-            Integer status = sceneVersionDto.getStatus();
-            if(NumberUtil.equals(SceneConst.SCENE_VERSION_STATUS_DEBUG_DEPLOYING, status)) {
+            Integer deployStatus = sceneVersionDto.getDeployStatus();
+            if(NumberUtil.equals(SceneConst.SCENE_DEPLOY_STATUS_SNAPSHOT_UNDEPLOY, deployStatus)) {
                 snapshotDeployProgress(sceneVersionDto);
-            } else if (NumberUtil.equals(SceneConst.SCENE_VERSION_STATUS_RUN_DEPLOYING, status)) {
+            } else if (NumberUtil.equals(SceneConst.SCENE_DEPLOY_STATUS_RELEASE_UNDEPLOY, deployStatus)) {
                 releaseDeployProgress(sceneVersionDto);
-            } else {
-                continue;
             }
         }
     }

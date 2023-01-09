@@ -36,7 +36,7 @@ import java.util.List;
 
 @Slf4j
 @Component
-public class DeployScheduler {
+public class ProcessDeployScheduler {
 
     private final IEnvService envService;
 
@@ -55,9 +55,9 @@ public class DeployScheduler {
     @Resource
     private ProcessReleaseDeployDao processReleaseDeployDao;
 
-    public DeployScheduler(IEnvService envService, EnvLock envLock,
-                           ProcessEnvLock processEnvLock, ZeebeClientManager zeebeClientManager,
-                           @Value("${brandnewdata.deploy-schedule.enable}") boolean enable) {
+    public ProcessDeployScheduler(IEnvService envService, EnvLock envLock,
+                                  ProcessEnvLock processEnvLock, ZeebeClientManager zeebeClientManager,
+                                  @Value("${brandnewdata.deploy-schedule.enable}") boolean enable) {
         this.envService = envService;
         this.envLock = envLock;
         this.processEnvLock = processEnvLock;

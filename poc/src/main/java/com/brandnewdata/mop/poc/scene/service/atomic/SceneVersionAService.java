@@ -86,6 +86,16 @@ public class SceneVersionAService implements ISceneVersionAService {
     }
 
     @Override
+    public List<SceneVersionDto> fetchAllUnDeployed() {
+        QueryWrapper<SceneVersionPo> query = new QueryWrapper<>();
+        query.isNull(SceneVersionPo.DELETE_FLAG);
+        query.in(SceneVersionPo.DEPLOY_STATUS,
+                ListUtil.of(SceneConst.SCENE_DEPLOY_STATUS_SNAPSHOT_UNDEPLOY, SceneConst.SCENE_DEPLOY_STATUS_RELEASE_UNDEPLOY));
+        List<SceneVersionPo> sceneVersionPos = sceneVersionDao.selectList(query);
+        return sceneVersionPos.stream().map(SceneVersionDtoConverter::createFrom).collect(Collectors.toList());
+    }
+
+    @Override
     public Map<Long, SceneVersionDto> fetchLatestOneBySceneId(List<Long> sceneIdList, List<Integer> statusList) {
         if (CollUtil.isEmpty(sceneIdList)) return MapUtil.empty();
         Map<Long, List<SceneVersionDto>> sceneVersionListMap = fetchListBySceneId(sceneIdList);

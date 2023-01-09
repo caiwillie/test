@@ -23,13 +23,11 @@ public interface SceneConst {
      */
     int SCENE_VERSION_STATUS__DEBUGGING = 4;
 
-    /**
-     * 场景版本状态-调试部署中
-     */
-    int SCENE_VERSION_STATUS_DEBUG_DEPLOYING = 5;
+    int SCENE_DEPLOY_STATUS_SNAPSHOT_UNDEPLOY = 3;
 
-    /**
-     * 场景版本状态-发布部署中
-     */
-    int SCENE_VERSION_STATUS_RUN_DEPLOYING = 6;
+    int SCENE_DEPLOY_STATUS_RELEASE_UNDEPLOY = 4;
+
+    int SCENE_DEPLOY_STATUS__DEPLOYED = 1;
+
+    int SCENE_DEPLOY_STATUS__EXCEPTION = 2;
 }

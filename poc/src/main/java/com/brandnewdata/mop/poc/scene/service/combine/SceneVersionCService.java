@@ -8,7 +8,6 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.brandnewdata.mop.poc.constant.ProcessConst;
 import com.brandnewdata.mop.poc.constant.SceneConst;
 import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
 import com.brandnewdata.mop.poc.process.manager.ConnectorManager;
@@ -34,6 +33,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static com.brandnewdata.mop.poc.constant.ProcessConst.PROCESS_BIZ_TYPE__SCENE;
 
 @Slf4j
 @Service
@@ -91,11 +92,11 @@ public class SceneVersionCService implements ISceneVersionCService {
             deployDto.setProcessId(versionProcessDto.getProcessId());
             deployDto.setProcessName(versionProcessDto.getProcessName());
             deployDto.setProcessXml(versionProcessDto.getProcessXml());
-            processDeployService.snapshotDeploy2(deployDto, envId, ProcessConst.PROCESS_BIZ_TYPE__SCENE);
+            processDeployService.snapshotDeploy2(deployDto, envId, PROCESS_BIZ_TYPE__SCENE);
         }
 
         // 修改状态
-        sceneVersionDto.setDeployStatus(ProcessConst.PROCESS_DEPLOY_STATUS__UNDEPLOY);
+        sceneVersionDto.setDeployStatus(SceneConst.SCENE_DEPLOY_STATUS_SNAPSHOT_UNDEPLOY);
         sceneVersionDao.updateById(SceneVersionPoConverter.createFrom(sceneVersionDto));
         return sceneVersionDto;
     }
@@ -174,7 +175,7 @@ public class SceneVersionCService implements ISceneVersionCService {
                 deployDto.setProcessId(versionProcessDto.getProcessId());
                 deployDto.setProcessName(versionProcessDto.getProcessName());
                 deployDto.setProcessXml(versionProcessDto.getProcessXml());
-                processDeployService.releaseDeploy2(deployDto, envId, ProcessConst.PROCESS_BIZ_TYPE__SCENE);
+                processDeployService.releaseDeploy2(deployDto, envId, PROCESS_BIZ_TYPE__SCENE);
 
                 // 保存关系
                 SceneReleaseDeployDto sceneReleaseDeployDto = new SceneReleaseDeployDto();
@@ -190,7 +191,7 @@ public class SceneVersionCService implements ISceneVersionCService {
         sceneReleaseDeployService.deleteByVersionIdAndExceptEnvId(id, envIdList);
 
         // 更新状态
-        sceneVersionDto.setDeployStatus(ProcessConst.PROCESS_DEPLOY_STATUS__UNDEPLOY);
+        sceneVersionDto.setDeployStatus(SceneConst.SCENE_DEPLOY_STATUS_RELEASE_UNDEPLOY);
         sceneVersionDao.updateById(SceneVersionPoConverter.createFrom(sceneVersionDto));
         return sceneVersionDto;
     }

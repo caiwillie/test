@@ -114,7 +114,7 @@ public class ProcessDeployService implements IProcessDeployService {
             QueryWrapper<ProcessSnapshotDeployPo> query = new QueryWrapper<>();
             query.eq(ProcessSnapshotDeployPo.ENV_ID, envId);
             query.eq(ProcessSnapshotDeployPo.PROCESS_ID, processId);
-            query.orderByDesc(ProcessSnapshotDeployPo.PROCESS_ZEEBE_VERSION);
+            query.orderByDesc(ProcessSnapshotDeployPo.PROCESS_ZEEBE_VERSION, ProcessSnapshotDeployPo.CREATE_TIME);
             query.last("limit 1");
             ProcessSnapshotDeployPo latestProcessSnapshotDeployPo = snapshotDeployDao.selectOne(query);
 

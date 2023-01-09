@@ -17,6 +17,8 @@ public interface ISceneVersionAService {
 
     List<SceneVersionDto> fetchAll();
 
+    List<SceneVersionDto> fetchAllUnDeployed();
+
     SceneVersionDto save(SceneVersionDto sceneVersionDto);
 
     boolean checkNewReleaseVersion(Long sceneId, String version);

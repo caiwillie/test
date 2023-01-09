@@ -38,7 +38,7 @@ public class SceneVersionVo {
     private Long sceneId;
 
     /**
-     * 状态。1 配置中；2 运行中；3 已停止；4 调试中
+     * 状态。1 配置中；2 运行中；3 已停止；4 调试中, 5 调试部署中，6 发布部署中
      */
     private Integer status;
 
