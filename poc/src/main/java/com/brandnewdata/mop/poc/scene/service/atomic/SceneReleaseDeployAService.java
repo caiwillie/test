@@ -98,7 +98,7 @@ public class SceneReleaseDeployAService implements ISceneReleaseDeployAService {
         UpdateWrapper<SceneReleaseDeployPo> update = new UpdateWrapper<>();
         update.setSql(StrUtil.format("{}={}", SceneReleaseDeployPo.DELETE_FLAG, SceneReleaseDeployPo.ID));
         update.eq(SceneReleaseDeployPo.VERSION_ID, versionId);
-        update.in(SceneReleaseDeployPo.ENV_ID, envIdList);
+        update.notIn(SceneReleaseDeployPo.ENV_ID, envIdList);
         sceneReleaseDeployDao.update(null, update);
     }
 }
