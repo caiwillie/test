@@ -1,5 +1,6 @@
 package com.brandnewdata.mop.poc.bff.converter.proxy;
 
+import cn.hutool.core.lang.Opt;
 import com.brandnewdata.mop.poc.bff.vo.proxy.ProxyVo;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
 
@@ -14,6 +15,7 @@ public class ProxyDtoConverter {
         proxyDto.setDescription(proxyVo.getDescription());
         proxyDto.setTag(proxyVo.getTag());
         proxyDto.setState(proxyVo.getState());
+        proxyDto.setProjectId(Opt.ofNullable(proxyVo.getProjectId()).map(Long::valueOf).orElse(null));
         return proxyDto;
     }
 }

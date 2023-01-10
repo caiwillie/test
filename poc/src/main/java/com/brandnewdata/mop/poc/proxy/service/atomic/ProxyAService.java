@@ -101,6 +101,7 @@ public class ProxyAService implements IProxyAService {
     public ProxyDto save(ProxyDto proxyDto, boolean imported) {
         String name = proxyDto.getName();
         String version = proxyDto.getVersion();
+        Assert.notNull(proxyDto.getProjectId(), "project id can not be null");
         Assert.notNull(name, "API名称不能为空");
         Assert.notNull(version, "API版本不能为空");
 
@@ -215,8 +216,8 @@ public class ProxyAService implements IProxyAService {
     }
 
     private boolean existByDomainIdentifier(String domainIdentifier) {
+        // 全局唯一（包括已删除的接口）
         QueryWrapper<ProxyPo> query = new QueryWrapper<>();
-        query.isNull(ProxyPo.DELETE_FLAG);
         query.eq(ProxyPo.DOMAIN, domainIdentifier);
         return proxyDao.selectCount(query) > 0;
     }
