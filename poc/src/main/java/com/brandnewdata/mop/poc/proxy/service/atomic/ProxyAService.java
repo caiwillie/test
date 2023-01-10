@@ -93,7 +93,7 @@ public class ProxyAService implements IProxyAService {
             if (StrUtil.isNotBlank(name) && !StrUtil.equals(proxyDto.getName(), name)) return false;
             if (StrUtil.isNotBlank(version) && !StrUtil.equals(proxyDto.getVersion(), version)) return false;
             if(StrUtil.isNotBlank(tags) && !StrUtil.contains(tags, proxyDto.getTag())) return false;
-            if(projectId != null && projectId.equals(proxyDto.getProjectId())) return false;
+            if(projectId != null && !projectId.equals(proxyDto.getProjectId())) return false;
             return true;
         }).collect(Collectors.toList());
     }
