@@ -2,6 +2,7 @@ package com.brandnewdata.mop.poc.bff.service.proxy;
 
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.lang.Opt;
 import cn.hutool.core.lang.Pair;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
@@ -61,9 +62,11 @@ public class ProxyOperateBffService {
         String proxyName = filter.getProxyName();
         String version = filter.getVersion();
         String location = filter.getLocation();
+        Long projectId = Opt.ofNullable(filter.getProjectId()).map(Long::valueOf).orElse(null);
+
 
         // 查询proxy
-        ProxyFilter proxyFilter = new ProxyFilter().setName(proxyName).setVersion(version);
+        ProxyFilter proxyFilter = new ProxyFilter().setName(proxyName).setVersion(version).setProjectId(projectId);
         List<ProxyDto> proxyDtoList = proxyAtomicService.fetchCacheListByFilter(proxyFilter);
         Map<Long, ProxyDto> proxyDtoMap = proxyDtoList.stream().collect(Collectors.toMap(ProxyDto::getId, Function.identity()));
 
@@ -95,9 +98,10 @@ public class ProxyOperateBffService {
         String proxyName = filter.getProxyName();
         String version = filter.getVersion();
         String location = filter.getLocation();
+        Long projectId = Opt.ofNullable(filter.getProjectId()).map(Long::valueOf).orElse(null);
 
         // 查询proxy
-        ProxyFilter proxyFilter = new ProxyFilter().setName(proxyName).setVersion(version);
+        ProxyFilter proxyFilter = new ProxyFilter().setName(proxyName).setVersion(version).setProjectId(projectId);
         List<ProxyDto> proxyDtoList = proxyAtomicService.fetchCacheListByFilter(proxyFilter);
         Map<Long, ProxyDto> proxyDtoMap = proxyDtoList.stream().collect(Collectors.toMap(ProxyDto::getId, Function.identity()));
 

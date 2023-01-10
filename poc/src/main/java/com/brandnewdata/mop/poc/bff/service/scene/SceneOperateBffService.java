@@ -28,7 +28,6 @@ import com.brandnewdata.mop.poc.scene.service.ISceneService;
 import com.brandnewdata.mop.poc.scene.service.atomic.ISceneReleaseDeployAService;
 import com.brandnewdata.mop.poc.scene.service.atomic.IVersionProcessAService;
 import org.springframework.stereotype.Service;
-import org.springframework.util.NumberUtils;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -205,7 +204,7 @@ public class SceneOperateBffService {
 
         sceneReleaseDeployDtoList = sceneReleaseDeployDtoList.stream().filter(dto -> {
             SceneDto sceneDto = sceneDtoMap.get(dto.getSceneId());
-            if(projectId != null && !NumberUtil.equals(Opt.ofNullable(sceneDto.getProjectId()).orElse(-1L), projectId)) return false;
+            if(projectId != null && !projectId.equals(sceneDto.getProjectId())) return false;
             return true;
         }).collect(Collectors.toList());
 

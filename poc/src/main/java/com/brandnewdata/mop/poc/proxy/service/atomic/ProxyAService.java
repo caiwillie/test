@@ -86,15 +86,15 @@ public class ProxyAService implements IProxyAService {
         String name = filter.getName();
         String version = filter.getVersion();
         String tags = filter.getTags();
+        Long projectId = filter.getProjectId();
 
         // filter
         return proxyCache.asMap().values().stream().filter(proxyDto -> {
-            if (StrUtil.isBlank(name)) return true;
-            if (!StrUtil.equals(proxyDto.getName(), name)) return false;
-            if (StrUtil.isBlank(version)) return true;
-            if (!StrUtil.equals(proxyDto.getVersion(), version)) return false;
-            if (StrUtil.isBlank(tags)) return true;
-            return StrUtil.contains(tags, proxyDto.getTag());
+            if (StrUtil.isNotBlank(name) && !StrUtil.equals(proxyDto.getName(), name)) return false;
+            if (StrUtil.isNotBlank(version) && !StrUtil.equals(proxyDto.getVersion(), version)) return false;
+            if(StrUtil.isNotBlank(tags) && !StrUtil.contains(tags, proxyDto.getTag())) return false;
+            if(projectId != null && projectId.equals(proxyDto.getProjectId())) return false;
+            return true;
         }).collect(Collectors.toList());
     }
 
