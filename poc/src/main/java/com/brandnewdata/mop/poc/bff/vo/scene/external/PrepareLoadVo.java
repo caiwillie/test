@@ -15,6 +15,11 @@ public class PrepareLoadVo {
     private String id;
 
     /**
+     * 项目id
+     */
+    private String projectId;
+
+    /**
      * 新场景名称
      */
     private String sceneName;

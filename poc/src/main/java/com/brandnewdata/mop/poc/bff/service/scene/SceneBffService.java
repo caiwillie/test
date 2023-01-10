@@ -222,6 +222,7 @@ public class SceneBffService {
     public SceneVersionVo confirmLoad(PrepareLoadVo vo) {
         String id = vo.getId();
         String sceneName = vo.getSceneName();
+        String projectId = vo.getProjectId();
         Map<String, String> configMap = new HashMap<>();
         for (ConnectorConfigVo connectorConfigVo : Opt.ofNullable(vo.getConfigureList()).orElse(ListUtil.empty())) {
             String configureId = connectorConfigVo.getConfigureId();
