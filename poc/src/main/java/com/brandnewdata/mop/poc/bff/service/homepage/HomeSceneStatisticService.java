@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -74,6 +75,7 @@ public class HomeSceneStatisticService {
     public List<HomeSceneBo> sceneList() {
         List<SceneVersionDto> sceneVersionDtoList = sceneVersionAService.fetchAll();
         List<SceneVersionDto> filterSceneVersionList = sceneVersionDtoList.stream()
+                .sorted(Comparator.comparing(SceneVersionDto::getUpdateTime))
                 .filter(sceneVersionDto -> NumberUtil.equals(sceneVersionDto.getStatus(), SceneConst.SCENE_VERSION_STATUS__RUNNING))
                 .limit(10).collect(Collectors.toList());
         if(CollUtil.isEmpty(filterSceneVersionList)) return ListUtil.empty();
