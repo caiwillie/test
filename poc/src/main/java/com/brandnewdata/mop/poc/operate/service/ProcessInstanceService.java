@@ -9,15 +9,13 @@ import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermsQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
 import com.brandnewdata.mop.poc.common.dto.Page;
+import com.brandnewdata.mop.poc.operate.bo.StatisticCountBo;
 import com.brandnewdata.mop.poc.operate.cache.ProcessInstanceCache;
 import com.brandnewdata.mop.poc.operate.converter.SequenceFlowDtoConverter;
 import com.brandnewdata.mop.poc.operate.dao.FlowNodeInstanceDao;
 import com.brandnewdata.mop.poc.operate.dao.ListViewDao;
 import com.brandnewdata.mop.poc.operate.dao.SequenceFlowDao;
-import com.brandnewdata.mop.poc.operate.dto.FlowNodeInstanceTreeNodeDto;
-import com.brandnewdata.mop.poc.operate.dto.FlowNodeStateDto;
-import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
-import com.brandnewdata.mop.poc.operate.dto.SequenceFlowDto;
+import com.brandnewdata.mop.poc.operate.dto.*;
 import com.brandnewdata.mop.poc.operate.manager.DaoManager;
 import com.brandnewdata.mop.poc.operate.po.FlowNodeInstancePo;
 import com.brandnewdata.mop.poc.operate.po.SequenceFlowPo;
@@ -53,15 +51,17 @@ public class ProcessInstanceService implements IProcessInstanceService {
 
         List<ListViewProcessInstanceDto> processInstanceDtoList = listProcessInstanceByZeebeKey(envId, zeebeKeyList);
 
+        StatisticCountBo statisticCountBo = statisticCount(processInstanceDtoList);
+
         PageEnhancedUtil.setFirstPageNo(1);
         List<ListViewProcessInstanceDto> records = PageEnhancedUtil.slice(pageNum, pageSize, processInstanceDtoList);
 
         Page<ListViewProcessInstanceDto> page = new Page<>(processInstanceDtoList.size(), records);
         Map<String, Object> extraMap = new HashMap<>();
-        extraMap.put("successCount", 1);
-        extraMap.put("failCount", 1);
-        extraMap.put("activeCount", 1);
-        extraMap.put("cancleCount", 1);
+        extraMap.put("successCount", statisticCountBo.getCompletedCount());
+        extraMap.put("failCount", statisticCountBo.getIncidentCount());
+        extraMap.put("activeCount", statisticCountBo.getActiveCount());
+        extraMap.put("cancleCount", statisticCountBo.getCanceledCount());
         page.setExtraMap(extraMap);
         return page;
     }
@@ -197,4 +197,29 @@ public class ProcessInstanceService implements IProcessInstanceService {
         return ret;
     }
 
+    private StatisticCountBo statisticCount(List<ListViewProcessInstanceDto> processInstanceDtoList) {
+        StatisticCountBo ret = new StatisticCountBo();
+        int completedCount = 0;
+        int activeCount = 0;
+        int incidentCount = 0;
+        int canceledCount = 0;
+
+        for (ListViewProcessInstanceDto listViewProcessInstanceDto : processInstanceDtoList) {
+            ProcessInstanceStateDto state = listViewProcessInstanceDto.getState();
+            if(state == ProcessInstanceStateDto.COMPLETED) {
+                completedCount++;
+            } else if (state == ProcessInstanceStateDto.ACTIVE) {
+                activeCount++;
+            } else if (state == ProcessInstanceStateDto.INCIDENT) {
+                incidentCount++;
+            } else if (state == ProcessInstanceStateDto.CANCELED) {
+                canceledCount++;
+            }
+        }
+        ret.setCompletedCount(completedCount);
+        ret.setActiveCount(activeCount);
+        ret.setIncidentCount(incidentCount);
+        ret.setCanceledCount(canceledCount);
+        return ret;
+    }
 }
