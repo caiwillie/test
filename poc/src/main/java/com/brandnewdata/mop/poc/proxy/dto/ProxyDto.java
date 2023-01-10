@@ -28,4 +28,6 @@ public class ProxyDto {
     private String tag;
 
     private Integer state;
+
+    private Long projectId;
 }

@@ -160,8 +160,8 @@ public class ProxyAService implements IProxyAService {
         // 解析domain，获取正则表达式中的第一个括号中的内容
         String identity = ReUtil.getGroup1(domainRegEx, domain);
         QueryWrapper<ProxyPo> query = new QueryWrapper<>();
-        query.eq(ProxyPo.DOMAIN, identity);
         query.isNull(ProxyPo.DELETE_FLAG);
+        query.eq(ProxyPo.DOMAIN, identity);
         ProxyPo proxyPo = proxyDao.selectOne(query);
         return ProxyDtoConverter.createFrom(proxyPo, domainRegEx);
     }
@@ -207,6 +207,7 @@ public class ProxyAService implements IProxyAService {
 
     private boolean existByNameAndVersion(String name, String version) {
         QueryWrapper<ProxyPo> query = new QueryWrapper<>();
+        query.isNull(ProxyPo.DELETE_FLAG);
         query.eq(ProxyPo.NAME, name);
         query.eq(ProxyPo.VERSION, version);
 
@@ -215,6 +216,7 @@ public class ProxyAService implements IProxyAService {
 
     private boolean existByDomainIdentifier(String domainIdentifier) {
         QueryWrapper<ProxyPo> query = new QueryWrapper<>();
+        query.isNull(ProxyPo.DELETE_FLAG);
         query.eq(ProxyPo.DOMAIN, domainIdentifier);
         return proxyDao.selectCount(query) > 0;
     }

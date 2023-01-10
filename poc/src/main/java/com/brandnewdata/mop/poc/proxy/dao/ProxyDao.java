@@ -1,7 +1,7 @@
 package com.brandnewdata.mop.poc.proxy.dao;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.brandnewdata.mop.poc.proxy.po.ProxyPo;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * <p>
@@ -9,7 +9,7 @@ import com.brandnewdata.mop.poc.proxy.po.ProxyPo;
  * </p>
  *
  * @author caiwillie
- * @since 2022-12-27
+ * @since 2023-01-09
  */
 public interface ProxyDao extends BaseMapper<ProxyPo> {
 

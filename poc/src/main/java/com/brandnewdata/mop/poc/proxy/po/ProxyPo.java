@@ -1,11 +1,14 @@
 package com.brandnewdata.mop.poc.proxy.po;
 
-import com.baomidou.mybatisplus.annotation.*;
-import lombok.Getter;
-import lombok.Setter;
-
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * <p>
@@ -13,7 +16,7 @@ import java.util.Date;
  * </p>
  *
  * @author caiwillie
- * @since 2022-12-27
+ * @since 2023-01-09
  */
 @Getter
 @Setter
@@ -50,6 +53,8 @@ public class ProxyPo implements Serializable {
 
     private Long deleteFlag;
 
+    private Long projectId;
+
 
     public static final String ID = "id";
 
@@ -72,5 +77,7 @@ public class ProxyPo implements Serializable {
     public static final String TAG = "tag";
 
     public static final String DELETE_FLAG = "delete_flag";
+
+    public static final String PROJECT_ID = "project_id";
 
 }
