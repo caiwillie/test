@@ -81,6 +81,8 @@ public class SceneOperateBffService {
         Page<ListViewProcessInstanceDto> page = processInstanceService.pageProcessInstanceByZeebeKey(envId, zeebeKeyList,
                 filter.getPageNum(), filter.getPageSize(), new HashMap<>());
 
+        Map<String, Object> extraMap = page.getExtraMap();
+
         List<OperateProcessInstanceVo> vos = new ArrayList<>();
         for (ListViewProcessInstanceDto listViewProcessInstanceDto : page.getRecords()) {
             String _processId = listViewProcessInstanceDto.getBpmnProcessId();
@@ -94,7 +96,9 @@ public class SceneOperateBffService {
             vos.add(vo);
         }
 
-        return new Page<>(page.getTotal(), vos);
+        Page<OperateProcessInstanceVo> ret = new Page<>(page.getTotal(), vos);
+        ret.setExtraMap(extraMap);
+        return ret;
     }
 
     public ProcessDefinitionVo definitionProcessInstance(OperateProcessInstanceVo vo) {
