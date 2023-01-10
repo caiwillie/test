@@ -10,6 +10,7 @@ public class SceneDtoConverter {
         SceneDto dto = new SceneDto();
         dto.setId(po.getId());
         dto.setName(po.getName());
+        dto.setProjectId(po.getProjectId());
         dto.setCreateTime(LocalDateTimeUtil.of(po.getCreateTime()));
         dto.setUpdateTime(LocalDateTimeUtil.of(po.getUpdateTime()));
         return dto;
