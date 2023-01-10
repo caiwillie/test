@@ -16,6 +16,7 @@ public class ProxyPoConverter {
         po.setDomain(dto.getDomain());
         po.setTag(dto.getTag());
         po.setState(dto.getState());
+        po.setProjectId(dto.getProjectId());
         return po;
     }
 
