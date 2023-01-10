@@ -55,7 +55,7 @@ public class ProxyAService implements IProxyAService {
         Assert.notNull(pageNum > 0, "pageNum must be greater than 0");
         Assert.notNull(pageSize > 0, "pageSize must be greater than 0");
 
-        ProxyFilter proxyFilter = new ProxyFilter().setName(name).setTags(tags);
+        ProxyFilter proxyFilter = new ProxyFilter().setProjectId(projectId).setName(name).setTags(tags);
         List<ProxyDto> proxyDtoList = fetchListByFilter(proxyFilter);
 
         Map<String, List<ProxyDto>> proxyDtoListMap = new LinkedHashMap<>();
@@ -194,10 +194,10 @@ public class ProxyAService implements IProxyAService {
         if(projectId != null) {
             query.eq(ProxyPo.PROJECT_ID, projectId);
         }
-        if(name != null) {
+        if(StrUtil.isNotBlank(name)) {
             query.like(ProxyPo.NAME, name);
         }
-        if(version != null) {
+        if(StrUtil.isNotBlank(version)) {
             query.eq(ProxyPo.VERSION, version);
         }
         List<ProxyPo> proxyPoList = proxyDao.selectList(query);
