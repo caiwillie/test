@@ -10,7 +10,7 @@ import java.util.Map;
 
 public interface IProxyAService {
 
-    Page<ProxyGroupDto> fetchPageGroupByName(Integer pageNum, Integer pageSize, String name, String tags);
+    Page<ProxyGroupDto> fetchPageGroupByName(Long projectId, Integer pageNum, Integer pageSize, String name, String tags);
 
     List<ProxyDto> fetchCacheListByFilter(ProxyFilter filter);
 

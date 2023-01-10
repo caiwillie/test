@@ -49,8 +49,9 @@ public class ProxyAService implements IProxyAService {
     }
 
     @Override
-    public Page<ProxyGroupDto> fetchPageGroupByName(Integer pageNum, Integer pageSize,
+    public Page<ProxyGroupDto> fetchPageGroupByName(Long projectId, Integer pageNum, Integer pageSize,
                                                     String name, String tags) {
+        Assert.notNull(projectId, "projectId can not be null");
         Assert.notNull(pageNum > 0, "pageNum must be greater than 0");
         Assert.notNull(pageSize > 0, "pageSize must be greater than 0");
 
@@ -186,15 +187,19 @@ public class ProxyAService implements IProxyAService {
         String name = filter.getName();
         String version = filter.getVersion();
         String tags = filter.getTags();
+        Long projectId = filter.getProjectId();
 
         QueryWrapper<ProxyPo> query = new QueryWrapper<>();
+        query.isNull(ProxyPo.DELETE_FLAG);
+        if(projectId != null) {
+            query.eq(ProxyPo.PROJECT_ID, projectId);
+        }
         if(name != null) {
             query.like(ProxyPo.NAME, name);
         }
         if(version != null) {
             query.eq(ProxyPo.VERSION, version);
         }
-        query.isNull(ProxyPo.DELETE_FLAG);
         List<ProxyPo> proxyPoList = proxyDao.selectList(query);
 
         return proxyPoList.stream().filter(po -> {

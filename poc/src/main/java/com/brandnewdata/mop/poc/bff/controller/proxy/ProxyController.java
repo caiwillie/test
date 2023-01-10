@@ -75,11 +75,12 @@ public class ProxyController {
      * @return the result
      */
     @GetMapping("/rest/proxy/page")
-    public Result<Page<ProxyGroupVo>> pageProxy(@RequestParam int pageNum,
+    public Result<Page<ProxyGroupVo>> pageProxy(@RequestParam String projectId,
+                                                @RequestParam int pageNum,
                                                 @RequestParam int pageSize,
                                                 @RequestParam(required = false) String name,
                                                 @RequestParam(required = false) String tags) {
-        Page<ProxyGroupVo> ret = proxyBffService.pageProxy(pageNum, pageSize, name, tags);
+        Page<ProxyGroupVo> ret = proxyBffService.pageProxy(Long.valueOf(projectId), pageNum, pageSize, name, tags);
         return Result.OK(ret);
     }
 

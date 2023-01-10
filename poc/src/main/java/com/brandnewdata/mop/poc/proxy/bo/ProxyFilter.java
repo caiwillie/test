@@ -8,6 +8,7 @@ import lombok.experimental.Accessors;
 @Setter
 @Accessors(chain = true)
 public class ProxyFilter {
+    private Long projectId;
     private String name;
     private String version;
     private String tags;
