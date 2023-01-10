@@ -20,8 +20,22 @@ public interface ISceneService {
      */
     Page<SceneDto> page(long projectId, int pageNum, int pageSize, String name);
 
+
+
+    /**
+     * 保存场景
+     *
+     * @param sceneDto the scene dto
+     * @return the scene dto
+     */
     SceneDto save(SceneDto sceneDto);
 
+    /**
+     * Fetch by id map.
+     *
+     * @param idList the id list
+     * @return the map
+     */
     Map<Long, SceneDto> fetchById(List<Long> idList);
 
     void deleteById(Long id);

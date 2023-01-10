@@ -3,6 +3,7 @@ package com.brandnewdata.mop.poc.bff.service.scene;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.lang.Opt;
 import cn.hutool.core.lang.Pair;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
@@ -20,8 +21,10 @@ import com.brandnewdata.mop.poc.operate.dto.ProcessInstanceStateDto;
 import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService;
 import com.brandnewdata.mop.poc.process.dto.ProcessReleaseDeployDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
+import com.brandnewdata.mop.poc.scene.dto.SceneDto;
 import com.brandnewdata.mop.poc.scene.dto.SceneReleaseDeployDto;
 import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
+import com.brandnewdata.mop.poc.scene.service.ISceneService;
 import com.brandnewdata.mop.poc.scene.service.atomic.ISceneReleaseDeployAService;
 import com.brandnewdata.mop.poc.scene.service.atomic.IVersionProcessAService;
 import org.springframework.stereotype.Service;
@@ -45,14 +48,18 @@ public class SceneOperateBffService {
 
     private final IVersionProcessAService versionProcessAService;
 
+    private final ISceneService sceneService;
+
     public SceneOperateBffService(ISceneReleaseDeployAService sceneReleaseDeployService,
                                   IProcessDeployService processDeployService,
                                   IProcessInstanceService processInstanceService,
-                                  IVersionProcessAService versionProcessAService) {
+                                  IVersionProcessAService versionProcessAService,
+                                  ISceneService sceneService) {
         this.sceneReleaseDeployService = sceneReleaseDeployService;
         this.processDeployService = processDeployService;
         this.processInstanceService = processInstanceService;
         this.versionProcessAService = versionProcessAService;
+        this.sceneService = sceneService;
     }
 
     public Page<OperateProcessInstanceVo> pageProcessInstance(SceneDeployFilter filter) {
@@ -168,12 +175,13 @@ public class SceneOperateBffService {
     private List<SceneReleaseDeployDto> fetchSceneReleaseDeployDtoList(SceneDeployFilter filter) {
         Long envId = Assert.notNull(filter.getEnvId());
 
+        Long projectId = Opt.ofNullable(filter.getProjectId()).map(Long::valueOf).orElse(null);
         Long sceneId = filter.getSceneId();
         Long versionId = filter.getVersionId();
         String processId = filter.getProcessId();
 
         List<SceneReleaseDeployDto> sceneReleaseDeployDtoList = sceneReleaseDeployService.fetchByEnvId(envId);
-        return sceneReleaseDeployDtoList.stream().filter(dto -> {
+        sceneReleaseDeployDtoList = sceneReleaseDeployDtoList.stream().filter(dto -> {
             if (sceneId == null) return true;
             if (!NumberUtil.equals(sceneId, dto.getSceneId())) return false;
 
@@ -188,6 +196,19 @@ public class SceneOperateBffService {
             }
         }).collect(Collectors.toList());
 
+        List<Long> sceneIdList = sceneReleaseDeployDtoList.stream().map(SceneReleaseDeployDto::getSceneId)
+                .distinct().collect(Collectors.toList());
+
+        Map<Long, SceneDto> sceneDtoMap = sceneService.fetchById(sceneIdList);
+
+
+        sceneReleaseDeployDtoList = sceneReleaseDeployDtoList.stream().filter(dto -> {
+            SceneDto sceneDto = sceneDtoMap.get(dto.getSceneId());
+            if(projectId != null && !NumberUtil.equals(sceneDto.getProjectId(), projectId)) return false;
+            return true;
+        }).collect(Collectors.toList());
+
+        return sceneReleaseDeployDtoList;
     }
 
     private void assembleCount(SceneStatistic statistic, int executionCount, int successCount, int failCount) {
