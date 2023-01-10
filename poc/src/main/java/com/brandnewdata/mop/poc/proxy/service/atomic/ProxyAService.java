@@ -203,7 +203,7 @@ public class ProxyAService implements IProxyAService {
         List<ProxyPo> proxyPoList = proxyDao.selectList(query);
 
         return proxyPoList.stream().filter(po -> {
-            if (tags != null && !StrUtil.contains(tags, po.getTag())) {
+            if (StrUtil.isNotBlank(tags) && !StrUtil.contains(tags, po.getTag())) {
                 return false;
             }
             return true;
