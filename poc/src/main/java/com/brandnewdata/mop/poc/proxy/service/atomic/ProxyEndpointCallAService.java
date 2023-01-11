@@ -2,6 +2,7 @@ package com.brandnewdata.mop.poc.proxy.service.atomic;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.lang.Opt;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
@@ -38,13 +39,24 @@ public class ProxyEndpointCallAService implements IProxyEndpointCallAService {
 
     @Override
     public Page<ProxyEndpointCallDto> fetchPageByEndpointId(Integer pageNum, Integer pageSize,
-                                                            List<Long> endpointIdList) {
+                                                            List<Long> endpointIdList, ProxyEndpointCallFilter filter) {
         Assert.isTrue(pageNum > 0, "pageNum must be greater than 0");
         Assert.isTrue(pageSize > 0, "pageSize must be greater than 0");
         if(CollUtil.isEmpty(endpointIdList)) return Page.empty();
+        Assert.notNull(filter);
+        LocalDateTime minStartTime = filter.getMinStartTime();
+        LocalDateTime maxStartTime = filter.getMaxStartTime();
 
         QueryWrapper<ProxyEndpointCallPo> query = new QueryWrapper<>();
         query.in(ProxyEndpointCallPo.ENDPOINT_ID, endpointIdList);
+        if(minStartTime != null) {
+            query.ge(ProxyEndpointCallPo.CREATE_TIME, minStartTime);
+        }
+
+        if(maxStartTime != null) {
+            query.le(ProxyEndpointCallPo.CREATE_TIME, maxStartTime);
+        }
+
         query.orderByDesc(ProxyEndpointCallPo.CREATE_TIME);
         com.baomidou.mybatisplus.extension.plugins.pagination.Page<ProxyEndpointCallPo> page =
                 new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(pageNum, pageSize);
@@ -67,7 +79,6 @@ public class ProxyEndpointCallAService implements IProxyEndpointCallAService {
             } else {
                 countMap.put("failCount", countMap.getOrDefault(ProxyConst.CALL_EXECUTE_STATUS__FAIL, 0L) + num);
             }
-
         }
 
         List<ProxyEndpointCallPo> records = page.getRecords();

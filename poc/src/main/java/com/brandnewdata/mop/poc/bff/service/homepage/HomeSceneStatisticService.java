@@ -158,7 +158,8 @@ public class HomeSceneStatisticService {
         int processInstanceCount = Opt.of(bo.getProcessInstanceCount()).orElse(0);
         int processInstanceFailCount = Opt.of(bo.getProcessInstanceFailCount()).orElse(0);
         for (ListViewProcessInstanceDto listViewProcessInstanceDto : listViewProcessInstanceDtoList) {
-            if(listViewProcessInstanceDto.getStartDate().compareTo(startTime) > 0) continue;
+            // 超过7日的过滤
+            if(startTime.compareTo(listViewProcessInstanceDto.getStartDate()) > 0) continue;
             processInstanceCount++;
             if (listViewProcessInstanceDto.getState() == ProcessInstanceStateDto.INCIDENT) {
                 processInstanceFailCount++;

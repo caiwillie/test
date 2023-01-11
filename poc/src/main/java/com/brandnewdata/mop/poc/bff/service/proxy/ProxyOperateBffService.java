@@ -85,8 +85,10 @@ public class ProxyOperateBffService {
             ProxyEndpointDtoConverter.updateFrom(proxyEndpointDto, proxyDto);
         }
 
+        ProxyEndpointCallFilter proxyEndpointCallFilter = new ProxyEndpointCallFilter()
+                .setMinStartTime(minStartTime).setMaxStartTime(maxStartTime);
         Page<ProxyEndpointCallDto> page = proxyEndpointCallService
-                .fetchPageByEndpointId(pageNum, pageSize, ListUtil.toList(proxyEndpointDtoMap.keySet()));
+                .fetchPageByEndpointId(pageNum, pageSize, ListUtil.toList(proxyEndpointDtoMap.keySet()), proxyEndpointCallFilter);
 
         List<ProxyEndpointCallVo> voList = page.getRecords().stream()
                 .map(callDto -> ProxyEndpointCallVoConverter.createFrom(callDto, proxyEndpointDtoMap.get(callDto.getEndpointId())))
@@ -124,7 +126,7 @@ public class ProxyOperateBffService {
             ProxyEndpointDtoConverter.updateFrom(proxyEndpointDto, proxyDto);
         }
 
-        // todo caiwillie
+        // 查询所有api调用明细
         ProxyEndpointCallFilter proxyEndpointCallFilter = new ProxyEndpointCallFilter()
                 .setMinStartTime(minStartTime).setMaxStartTime(maxStartTime);
         Map<Long, List<ProxyEndpointCallDto>> proxyEndpointCallDtoListMap =

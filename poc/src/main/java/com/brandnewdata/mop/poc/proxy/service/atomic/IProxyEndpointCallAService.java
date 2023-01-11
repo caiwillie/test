@@ -9,7 +9,7 @@ import java.util.Map;
 
 public interface IProxyEndpointCallAService {
 
-    Page<ProxyEndpointCallDto> fetchPageByEndpointId(Integer pageNum, Integer pageSize, List<Long> endpointIdList);
+    Page<ProxyEndpointCallDto> fetchPageByEndpointId(Integer pageNum, Integer pageSize, List<Long> endpointIdList, ProxyEndpointCallFilter filter);
 
     ProxyEndpointCallDto save(ProxyEndpointCallDto dto);
 
