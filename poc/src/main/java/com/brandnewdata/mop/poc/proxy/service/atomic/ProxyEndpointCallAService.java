@@ -58,6 +58,7 @@ public class ProxyEndpointCallAService implements IProxyEndpointCallAService {
         for (Map<String, Object> map : countResultList) {
             String status = (String) map.get(ProxyEndpointCallPo.EXECUTE_STATUS);
             if(status == null) continue;
+            // todo caiwillie 魔法值优化
             Long num = (Long) map.get("num");
             if(StrUtil.equals(status, ProxyConst.CALL_EXECUTE_STATUS__SUCCESS)) {
                 countMap.put("successCount", num);
