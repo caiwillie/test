@@ -1,6 +1,7 @@
 package com.brandnewdata.mop.poc.bff.service.scene;
 
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Opt;
@@ -18,6 +19,7 @@ import com.brandnewdata.mop.poc.bff.vo.scene.operate.SceneStatistic;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.operate.dto.ProcessInstanceStateDto;
+import com.brandnewdata.mop.poc.operate.dto.filter.ProcessInstanceFilter;
 import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService;
 import com.brandnewdata.mop.poc.process.dto.ProcessReleaseDeployDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
@@ -30,6 +32,7 @@ import com.brandnewdata.mop.poc.scene.service.atomic.IVersionProcessAService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -114,6 +117,9 @@ public class SceneOperateBffService {
         SceneStatistic ret = new SceneStatistic();
         Long envId = Assert.notNull(filter.getEnvId());
 
+        LocalDateTime minStartTime = Opt.ofNullable(filter.getStartTime()).map(time -> DateUtil.parse(time).toLocalDateTime()).orElse(null);
+        LocalDateTime maxStartTime = Opt.ofNullable(filter.getEndTime()).map(time -> DateUtil.parse(time).toLocalDateTime()).orElse(null);
+
         // 获取符合过滤条件的流程id列表
         List<SceneReleaseDeployDto> sceneReleaseDeployDtoList = fetchSceneReleaseDeployDtoList(filter);
         Map<String, SceneReleaseDeployDto> sceneReleaseDeployDtoMap = sceneReleaseDeployDtoList.stream()
@@ -126,7 +132,10 @@ public class SceneOperateBffService {
         List<Long> zeebeKeyList = processReleaseDeployDtoMap.values().stream()
                 .map(ProcessReleaseDeployDto::getProcessZeebeKey).collect(Collectors.toList());
 
-        List<ListViewProcessInstanceDto> listViewProcessInstanceDtoList = processInstanceService.listProcessInstanceCacheByZeebeKey(envId, zeebeKeyList);
+        ProcessInstanceFilter processInstanceFilter = new ProcessInstanceFilter()
+                .setMinStartTime(minStartTime).setMaxStartTime(maxStartTime);
+        List<ListViewProcessInstanceDto> listViewProcessInstanceDtoList =
+                processInstanceService.listProcessInstanceCacheByZeebeKey(envId, zeebeKeyList, processInstanceFilter);
 
         int executionCount = 0;
         int successCount = 0;

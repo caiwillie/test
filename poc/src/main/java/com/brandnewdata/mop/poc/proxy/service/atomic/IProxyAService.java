@@ -1,7 +1,7 @@
 package com.brandnewdata.mop.poc.proxy.service.atomic;
 
 import com.brandnewdata.mop.poc.common.dto.Page;
-import com.brandnewdata.mop.poc.proxy.bo.ProxyFilter;
+import com.brandnewdata.mop.poc.proxy.dto.filter.ProxyFilter;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyGroupDto;
 

@@ -16,6 +16,7 @@ import com.brandnewdata.mop.poc.operate.dao.FlowNodeInstanceDao;
 import com.brandnewdata.mop.poc.operate.dao.ListViewDao;
 import com.brandnewdata.mop.poc.operate.dao.SequenceFlowDao;
 import com.brandnewdata.mop.poc.operate.dto.*;
+import com.brandnewdata.mop.poc.operate.dto.filter.ProcessInstanceFilter;
 import com.brandnewdata.mop.poc.operate.manager.DaoManager;
 import com.brandnewdata.mop.poc.operate.po.FlowNodeInstancePo;
 import com.brandnewdata.mop.poc.operate.po.SequenceFlowPo;
@@ -101,12 +102,24 @@ public class ProcessInstanceService implements IProcessInstanceService {
     }
 
     @Override
-    public List<ListViewProcessInstanceDto> listProcessInstanceCacheByZeebeKey(Long envId, List<Long> zeebeKeyList) {
+    public List<ListViewProcessInstanceDto> listProcessInstanceCacheByZeebeKey(Long envId, List<Long> zeebeKeyList, ProcessInstanceFilter filter) {
         Assert.notNull(envId, "envId is null");
         if(CollUtil.isEmpty(zeebeKeyList)) return ListUtil.empty();
         Assert.isFalse(CollUtil.hasNull(zeebeKeyList), "zeebeKeyList has null");
+        Assert.notNull(filter);
+
+        LocalDateTime minStartTime = filter.getMinStartTime();
+        LocalDateTime maxStartTime = filter.getMaxStartTime();
+
         Map<String, ListViewProcessInstanceDto> map = processInstanceCache.asMap(envId);
-        return map.values().stream().filter(dto -> zeebeKeyList.contains(dto.getProcessId())).collect(Collectors.toList());
+        return map.values().stream().filter(dto -> {
+            if(!zeebeKeyList.contains(dto.getProcessId())) return false;
+            LocalDateTime startDate = dto.getStartDate();
+            // 最小开始时间，最大开始时间
+            if(minStartTime != null && minStartTime.compareTo(startDate) > 0) return false;
+            if(maxStartTime != null && maxStartTime.compareTo(startDate) < 0) return false;
+            return true;
+        }).collect(Collectors.toList());
     }
 
     @Override

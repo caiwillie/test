@@ -11,7 +11,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.constant.ProxyConst;
-import com.brandnewdata.mop.poc.proxy.bo.ProxyFilter;
+import com.brandnewdata.mop.poc.proxy.dto.filter.ProxyFilter;
 import com.brandnewdata.mop.poc.proxy.cache.ProxyCache;
 import com.brandnewdata.mop.poc.proxy.converter.ProxyDtoConverter;
 import com.brandnewdata.mop.poc.proxy.converter.ProxyPoConverter;
@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -87,6 +88,8 @@ public class ProxyAService implements IProxyAService {
         String version = filter.getVersion();
         String tags = filter.getTags();
         Long projectId = filter.getProjectId();
+        LocalDateTime minStartTime = filter.getMinStartTime();
+        LocalDateTime maxStartTime = filter.getMaxStartTime();
 
         // filter
         return proxyCache.asMap().values().stream().filter(proxyDto -> {
@@ -94,6 +97,10 @@ public class ProxyAService implements IProxyAService {
             if (StrUtil.isNotBlank(version) && !StrUtil.equals(proxyDto.getVersion(), version)) return false;
             if(StrUtil.isNotBlank(tags) && !StrUtil.contains(tags, proxyDto.getTag())) return false;
             if(projectId != null && !projectId.equals(proxyDto.getProjectId())) return false;
+            // 最小开始时间，最大结束时间
+            LocalDateTime createTime = proxyDto.getCreateTime();
+            if(minStartTime != null && minStartTime.compareTo(createTime) > 0) return false;
+            if(maxStartTime != null && maxStartTime.compareTo(createTime) < 0) return false;
             return true;
         }).collect(Collectors.toList());
     }

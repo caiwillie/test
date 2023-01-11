@@ -13,6 +13,7 @@ import com.brandnewdata.mop.poc.env.dto.EnvDto;
 import com.brandnewdata.mop.poc.env.service.IEnvService;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.operate.dto.ProcessInstanceStateDto;
+import com.brandnewdata.mop.poc.operate.dto.filter.ProcessInstanceFilter;
 import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService;
 import com.brandnewdata.mop.poc.process.dto.ProcessReleaseDeployDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
@@ -148,8 +149,9 @@ public class HomeSceneStatisticService {
         List<Long> zeebeKeyList = processReleaseDeployDtoMap.values().stream()
                 .map(ProcessReleaseDeployDto::getProcessZeebeKey).collect(Collectors.toList());
 
+        ProcessInstanceFilter processInstanceFilter = new ProcessInstanceFilter();
         List<ListViewProcessInstanceDto> listViewProcessInstanceDtoList =
-                processInstanceService.listProcessInstanceCacheByZeebeKey(envId, zeebeKeyList);
+                processInstanceService.listProcessInstanceCacheByZeebeKey(envId, zeebeKeyList, processInstanceFilter);
 
 
         LocalDateTime startTime = LocalDateTime.now().minusDays(7);
@@ -181,8 +183,9 @@ public class HomeSceneStatisticService {
         List<Long> zeebeKeyList = processReleaseDeployDtoMap.values().stream()
                 .map(ProcessReleaseDeployDto::getProcessZeebeKey).collect(Collectors.toList());
 
+        ProcessInstanceFilter processInstanceFilter = new ProcessInstanceFilter();
         List<ListViewProcessInstanceDto> listViewProcessInstanceDtoList =
-                processInstanceService.listProcessInstanceCacheByZeebeKey(envId, zeebeKeyList);
+                processInstanceService.listProcessInstanceCacheByZeebeKey(envId, zeebeKeyList, processInstanceFilter);
 
         LocalDateTime startTime = LocalDateTime.now().minusDays(7);
         int processInstanceCount = 0;

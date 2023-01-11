@@ -13,10 +13,12 @@ import com.brandnewdata.mop.poc.proxy.converter.ProxyEndpointCallDtoConverter;
 import com.brandnewdata.mop.poc.proxy.converter.ProxyEndpointCallPoConverter;
 import com.brandnewdata.mop.poc.proxy.dao.ProxyEndpointCallDao;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointCallDto;
+import com.brandnewdata.mop.poc.proxy.dto.filter.ProxyEndpointCallFilter;
 import com.brandnewdata.mop.poc.proxy.po.ProxyEndpointCallPo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,9 +86,12 @@ public class ProxyEndpointCallAService implements IProxyEndpointCallAService {
     }
 
     @Override
-    public Map<Long, List<ProxyEndpointCallDto>> fetchCacheListByEndpointId(List<Long> endpointIdList) {
+    public Map<Long, List<ProxyEndpointCallDto>> fetchCacheListByEndpointId(List<Long> endpointIdList, ProxyEndpointCallFilter filter) {
         if(CollUtil.isEmpty(endpointIdList)) return MapUtil.empty();
         Assert.isFalse(CollUtil.hasNull(endpointIdList), "endpointIdList must not contain null");
+
+        LocalDateTime maxStartTime = filter.getMaxStartTime();
+        LocalDateTime minStartTime = filter.getMinStartTime();
 
         Map<Long, ProxyEndpointCallDto> proxyEndpointCallDtoMap = proxyEndpointCallCache.asMap();
 
@@ -94,6 +99,10 @@ public class ProxyEndpointCallAService implements IProxyEndpointCallAService {
         for (ProxyEndpointCallDto proxyEndpointCallDto : proxyEndpointCallDtoMap.values()) {
             Long endpointId = proxyEndpointCallDto.getEndpointId();
             if(!endpointIdList.contains(endpointId)) continue;
+            LocalDateTime startTime = proxyEndpointCallDto.getStartTime();
+            // 最小开始时间， 最大开始时间
+            if(minStartTime != null && minStartTime.compareTo(startTime) > 0) continue;
+            if(maxStartTime != null && maxStartTime.compareTo(startTime) < 0) continue;
 
             List<ProxyEndpointCallDto> proxyEndpointCallDtoList =
                     proxyEndpointCallDtoListMap.computeIfAbsent(endpointId, k -> CollUtil.newArrayList());

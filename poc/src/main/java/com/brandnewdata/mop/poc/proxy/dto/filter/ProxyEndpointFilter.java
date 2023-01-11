@@ -1,4 +1,4 @@
-package com.brandnewdata.mop.poc.proxy.bo;
+package com.brandnewdata.mop.poc.proxy.dto.filter;
 
 import lombok.Getter;
 import lombok.Setter;

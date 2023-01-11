@@ -4,6 +4,7 @@ import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.operate.dto.FlowNodeStateDto;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.operate.dto.SequenceFlowDto;
+import com.brandnewdata.mop.poc.operate.dto.filter.ProcessInstanceFilter;
 
 import java.util.List;
 import java.util.Map;
@@ -23,7 +24,8 @@ public interface IProcessInstanceService {
 
     List<ListViewProcessInstanceDto> listProcessInstanceCacheByZeebeKey(
             Long envId,
-            List<Long> zeebeKeyList);
+            List<Long> zeebeKeyList,
+            ProcessInstanceFilter filter);
 
     ListViewProcessInstanceDto detailProcessInstance(Long envId, Long processInstanceId);
 

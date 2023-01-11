@@ -8,7 +8,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
-import com.brandnewdata.mop.poc.proxy.bo.ProxyEndpointFilter;
+import com.brandnewdata.mop.poc.proxy.dto.filter.ProxyEndpointFilter;
 import com.brandnewdata.mop.poc.proxy.bo.ProxyEndpointServerBo;
 import com.brandnewdata.mop.poc.proxy.converter.ProxyEndpointDtoConverter;
 import com.brandnewdata.mop.poc.proxy.dao.ProxyEndpointDao;
@@ -79,10 +79,11 @@ public class ProxyEndpoingAService implements IProxyEndpointAService {
         if(CollUtil.isEmpty(proxyIdList)) return MapUtil.empty();
         Assert.isFalse(CollUtil.hasNull(proxyIdList), "proxyIdList can not contain null");
 
+        String location = filter.getLocation();
+
         QueryWrapper<ProxyEndpointPo> query = new QueryWrapper<>();
         query.in(ProxyEndpointPo.PROXY_ID, proxyIdList);
         query.isNull(ProxyEndpointPo.DELETE_FLAG);
-        String location = filter.getLocation();
         if(StrUtil.isNotBlank(location)) {
             query.eq(ProxyEndpointPo.LOCATION, location);
         }
