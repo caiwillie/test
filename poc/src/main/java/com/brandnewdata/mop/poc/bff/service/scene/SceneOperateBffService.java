@@ -81,7 +81,7 @@ public class SceneOperateBffService {
         Page<ListViewProcessInstanceDto> page = processInstanceService.pageProcessInstanceByZeebeKey(envId, zeebeKeyList,
                 filter.getPageNum(), filter.getPageSize(), new HashMap<>());
 
-        Map<String, Object> extraMap = page.getExtraMap();
+        Map<String, ?> extraMap = page.getExtraMap();
 
         List<OperateProcessInstanceVo> vos = new ArrayList<>();
         for (ListViewProcessInstanceDto listViewProcessInstanceDto : page.getRecords()) {
