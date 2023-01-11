@@ -20,7 +20,7 @@ public class Page<T> {
 
     private List<T> records;
 
-    private Map<String, Object> extraMap = new HashMap<>();
+    private Map<String, ?> extraMap = new HashMap<>();
 
     public Page() {
 

@@ -4,8 +4,10 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
+import com.brandnewdata.mop.poc.constant.ProxyConst;
 import com.brandnewdata.mop.poc.proxy.cache.ProxyEndpointCallCache;
 import com.brandnewdata.mop.poc.proxy.converter.ProxyEndpointCallDtoConverter;
 import com.brandnewdata.mop.poc.proxy.converter.ProxyEndpointCallPoConverter;
@@ -46,10 +48,31 @@ public class ProxyEndpointCallAService implements IProxyEndpointCallAService {
                 new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(pageNum, pageSize);
         page = proxyEndpointCallDao.selectPage(page, query);
 
+        // 统计成功数、失败数
+        Map<String, Long> countMap = new HashMap<>();
+        QueryWrapper<ProxyEndpointCallPo> query2 = new QueryWrapper<>();
+        query2.in(ProxyEndpointCallPo.ENDPOINT_ID, endpointIdList);
+        query2.groupBy(ProxyEndpointCallPo.EXECUTE_STATUS);
+        query2.select(ProxyEndpointCallPo.EXECUTE_STATUS, "count(*) as num");
+        List<Map<String, Object>> countResultList = proxyEndpointCallDao.selectMaps(query2);
+        for (Map<String, Object> map : countResultList) {
+            String status = (String) map.get(ProxyEndpointCallPo.EXECUTE_STATUS);
+            if(status == null) continue;
+            Long num = (Long) map.get("num");
+            if(StrUtil.equals(status, ProxyConst.CALL_EXECUTE_STATUS__SUCCESS)) {
+                countMap.put(ProxyConst.CALL_EXECUTE_STATUS__SUCCESS, num);
+            } else {
+                countMap.put(ProxyConst.CALL_EXECUTE_STATUS__FAIL, countMap.getOrDefault(ProxyConst.CALL_EXECUTE_STATUS__FAIL, 0L) + num);
+            }
+
+        }
+
         List<ProxyEndpointCallPo> records = page.getRecords();
         List<ProxyEndpointCallDto> dtoList = records.stream()
                 .map(ProxyEndpointCallDtoConverter::createFrom).collect(Collectors.toList());
-        return new Page<>(page.getTotal(), dtoList);
+        Page<ProxyEndpointCallDto> ret = new Page<>(page.getTotal(), dtoList);
+        ret.setExtraMap(countMap);
+        return ret;
     }
 
     @Override

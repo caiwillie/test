@@ -90,7 +90,9 @@ public class ProxyOperateBffService {
                 .map(callDto -> ProxyEndpointCallVoConverter.createFrom(callDto, proxyEndpointDtoMap.get(callDto.getEndpointId())))
                 .collect(Collectors.toList());
 
-        return new Page<>(page.getTotal(), voList);
+        Page<ProxyEndpointCallVo> ret = new Page<>(page.getTotal(), voList);
+        ret.setExtraMap(page.getExtraMap());
+        return ret;
     }
 
     public ProxyStatistic statistic(ProxyEndpointCallFilter filter) {
