@@ -234,7 +234,8 @@ public class SceneBffService {
         }
 
         ConfirmLoadDto confirmLoadDto = new ConfirmLoadDto();
-        confirmLoadDto.setId(Long.parseLong(id));
+        confirmLoadDto.setProjectId(Opt.ofNullable(projectId).map(Long::valueOf).orElse(null));
+        confirmLoadDto.setId(Opt.of(Long.parseLong(id)).map(Long::valueOf).orElse(null));
         confirmLoadDto.setNewSceneName(sceneName);
         confirmLoadDto.setConfigMap(configMap);
         SceneVersionDto sceneVersionDto = dataExternalService.confirmLoad(confirmLoadDto);
