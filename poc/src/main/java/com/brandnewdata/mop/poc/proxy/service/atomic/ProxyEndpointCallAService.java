@@ -60,9 +60,9 @@ public class ProxyEndpointCallAService implements IProxyEndpointCallAService {
             if(status == null) continue;
             Long num = (Long) map.get("num");
             if(StrUtil.equals(status, ProxyConst.CALL_EXECUTE_STATUS__SUCCESS)) {
-                countMap.put(ProxyConst.CALL_EXECUTE_STATUS__SUCCESS, num);
+                countMap.put("successCount", num);
             } else {
-                countMap.put(ProxyConst.CALL_EXECUTE_STATUS__FAIL, countMap.getOrDefault(ProxyConst.CALL_EXECUTE_STATUS__FAIL, 0L) + num);
+                countMap.put("failCount", countMap.getOrDefault(ProxyConst.CALL_EXECUTE_STATUS__FAIL, 0L) + num);
             }
 
         }
