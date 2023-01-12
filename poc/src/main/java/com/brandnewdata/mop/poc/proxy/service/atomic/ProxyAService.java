@@ -194,7 +194,7 @@ public class ProxyAService implements IProxyAService {
     public List<String> listTag() {
         List<String> ret = new ArrayList<>();
         QueryWrapper<ProxyPo> query = new QueryWrapper<>();
-        query.isNotNull(ProxyPo.DELETE_FLAG);
+        query.isNull(ProxyPo.DELETE_FLAG);
         query.isNotNull(ProxyPo.TAG);
         query.select(StrUtil.format("distinct {} as {}", ProxyPo.TAG, ProxyPo.TAG));
         List<Map<String, Object>> result = proxyDao.selectMaps(query);

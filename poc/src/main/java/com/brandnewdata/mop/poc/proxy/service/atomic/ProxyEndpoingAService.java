@@ -125,7 +125,7 @@ public class ProxyEndpoingAService implements IProxyEndpointAService {
         List<String> ret = new ArrayList<>();
         Assert.notNull(proxyId);
         QueryWrapper<ProxyEndpointPo> query = new QueryWrapper<>();
-        query.isNotNull(ProxyEndpointPo.DELETE_FLAG);
+        query.isNull(ProxyEndpointPo.DELETE_FLAG);
         query.isNotNull(ProxyEndpointPo.TAG);
         query.eq(ProxyEndpointPo.PROXY_ID, proxyId);
         query.select(StrUtil.format("distinct {} as {}", ProxyEndpointPo.TAG, ProxyEndpointPo.TAG));
