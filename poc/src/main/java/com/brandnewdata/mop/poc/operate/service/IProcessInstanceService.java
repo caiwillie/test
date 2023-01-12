@@ -16,11 +16,13 @@ public interface IProcessInstanceService {
             List<Long> zeebeKeyList,
             int pageNum,
             int pageSize,
+            ProcessInstanceFilter filter,
             Map<String, Object> extraMap);
 
     List<ListViewProcessInstanceDto> listProcessInstanceByZeebeKey(
             Long envId,
-            List<Long> zeebeKeyList);
+            List<Long> zeebeKeyList,
+            ProcessInstanceFilter filter);
 
     List<ListViewProcessInstanceDto> listProcessInstanceCacheByZeebeKey(
             Long envId,

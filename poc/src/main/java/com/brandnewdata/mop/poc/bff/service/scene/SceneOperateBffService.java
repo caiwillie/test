@@ -68,6 +68,10 @@ public class SceneOperateBffService {
     public Page<OperateProcessInstanceVo> pageProcessInstance(SceneDeployFilter filter) {
         Long envId = Assert.notNull(filter.getEnvId());
 
+        LocalDateTime minStartTime = Opt.ofNullable(filter.getStartTime()).map(time -> DateUtil.parse(time).toLocalDateTime()).orElse(null);
+        LocalDateTime maxStartTime = Opt.ofNullable(filter.getEndTime()).map(time -> DateUtil.parse(time).toLocalDateTime()).orElse(null);
+
+
         // 获取符合过滤条件的流程id列表
         List<SceneReleaseDeployDto> sceneReleaseDeployDtoList = fetchSceneReleaseDeployDtoList(filter);
         Map<String, SceneReleaseDeployDto> sceneReleaseDeployDtoMap = sceneReleaseDeployDtoList.stream()
@@ -81,8 +85,10 @@ public class SceneOperateBffService {
                 .map(ProcessReleaseDeployDto::getProcessZeebeKey).collect(Collectors.toList());
 
         // 查询流程实例
+        ProcessInstanceFilter processInstanceFilter = new ProcessInstanceFilter()
+                .setMinStartTime(minStartTime).setMaxStartTime(maxStartTime);
         Page<ListViewProcessInstanceDto> page = processInstanceService.pageProcessInstanceByZeebeKey(envId, zeebeKeyList,
-                filter.getPageNum(), filter.getPageSize(), new HashMap<>());
+                filter.getPageNum(), filter.getPageSize(), processInstanceFilter, new HashMap<>());
 
         Map<String, ?> extraMap = page.getExtraMap();
 
