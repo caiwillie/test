@@ -127,7 +127,8 @@ public class ProxyEndpoingAService implements IProxyEndpointAService {
         QueryWrapper<ProxyEndpointPo> query = new QueryWrapper<>();
         query.isNotNull(ProxyEndpointPo.DELETE_FLAG);
         query.isNotNull(ProxyEndpointPo.TAG);
-        query.select("distinct {} as {}", ProxyEndpointPo.TAG, ProxyEndpointPo.TAG);
+        query.eq(ProxyEndpointPo.PROXY_ID, proxyId);
+        query.select(StrUtil.format("distinct {} as {}", ProxyEndpointPo.TAG, ProxyEndpointPo.TAG));
         List<Map<String, Object>> result = proxyEndpointDao.selectMaps(query);
         for (Map<String, Object> map : result) {
             String tag = (String) map.get(ProxyEndpointPo.TAG);
