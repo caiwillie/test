@@ -65,6 +65,12 @@ public class ProxyEndpointCallAService implements IProxyEndpointCallAService {
         Map<String, Long> countMap = new HashMap<>();
         QueryWrapper<ProxyEndpointCallPo> query2 = new QueryWrapper<>();
         query2.in(ProxyEndpointCallPo.ENDPOINT_ID, endpointIdList);
+        if(minStartTime != null) {
+            query2.ge(ProxyEndpointCallPo.CREATE_TIME, minStartTime);
+        }
+        if(maxStartTime != null) {
+            query2.le(ProxyEndpointCallPo.CREATE_TIME, maxStartTime);
+        }
         query2.groupBy(ProxyEndpointCallPo.EXECUTE_STATUS);
         query2.select(ProxyEndpointCallPo.EXECUTE_STATUS, "count(*) as num");
         List<Map<String, Object>> countResultList = proxyEndpointCallDao.selectMaps(query2);
