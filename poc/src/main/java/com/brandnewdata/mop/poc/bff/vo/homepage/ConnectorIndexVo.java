@@ -24,4 +24,6 @@ public class ConnectorIndexVo {
 
     private String firm;
 
+    private Integer connectorType;
+
 }

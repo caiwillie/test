@@ -16,6 +16,7 @@ public class ConnectorIndexVoConverter {
         connectorIndexVo.setId(dto.getConnectorId());
         connectorIndexVo.setName(dto.getConnectorName());
         connectorIndexVo.setVersion(dto.getConnectorVersion());
+        connectorIndexVo.setConnectorType(dto.getConnectorType());
         return connectorIndexVo;
     }
 }

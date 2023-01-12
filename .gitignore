@@ -86,3 +86,9 @@ fabric.properties
 
 .idea
 logs
+/example/*.iml
+/example/worker-example/*.iml
+/*.iml
+/mop-api/*.iml
+/poc/*.iml
+/script-worker/*.iml
