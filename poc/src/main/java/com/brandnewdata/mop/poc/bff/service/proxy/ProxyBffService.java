@@ -123,6 +123,10 @@ public class ProxyBffService {
         return ProxyVoConverter.createFrom(proxyDto);
     }
 
+    public List<String> listProxyTag() {
+        return proxyAService.listTag();
+    }
+
     public ProxyEndpointVo saveEndpoint(ProxyEndpointVo vo) {
         ProxyEndpointDto dto = proxyEndpointCService.save(ProxyEndpointDtoConverter.createFrom(vo));
         return ProxyEndpointVoConverter.createFrom(dto);
@@ -135,6 +139,10 @@ public class ProxyBffService {
 
     public void deleteEndpoint(Long id) {
         proxyEndpointAService.deleteById(id);
+    }
+
+    public List<String> listEndpointTag(Long proxyId) {
+        return proxyEndpointAService.listTag(proxyId);
     }
 
     public Page<ProxyEndpointVo> pageEndpoint(Integer pageNum, Integer pageSize, Long proxyId) {

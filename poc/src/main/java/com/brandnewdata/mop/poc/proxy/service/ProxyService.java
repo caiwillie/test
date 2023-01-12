@@ -26,7 +26,6 @@ import org.yaml.snakeyaml.Yaml;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author caiwillie
@@ -51,20 +50,6 @@ public class ProxyService {
         ProxyPo entity = proxyDao.selectById(id);
         Assert.notNull(entity, "id 不存在");
         return toDTO(entity);
-    }
-
-    public List<String> listTags() {
-        // return proxyDao.listTags();
-        return null;
-    }
-
-    public List<String> listEndpointTags(Long proxyId) {
-        List<String> ret = new ArrayList<>();
-        getOne(proxyId);
-        List<Endpoint> endpoints = endpointService.listByProxyIdList(ListUtil.of(proxyId));
-        if(CollUtil.isEmpty(endpoints)) return ret;
-        ret.addAll(endpoints.stream().map(Endpoint::getTag).filter(StrUtil::isNotEmpty).distinct().collect(Collectors.toList()));
-        return ret;
     }
 
     public void importFromFile(ImportFromFileReq req) {

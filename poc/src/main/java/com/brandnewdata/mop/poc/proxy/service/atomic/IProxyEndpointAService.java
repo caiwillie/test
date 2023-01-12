@@ -23,4 +23,6 @@ public interface IProxyEndpointAService {
     void deleteByProxyId(Long proxyId);
 
     void deleteById(Long id);
+
+    List<String> listTag(Long proxyId);
 }

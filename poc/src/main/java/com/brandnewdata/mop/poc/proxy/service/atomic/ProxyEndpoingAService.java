@@ -18,6 +18,7 @@ import com.dxy.library.json.jackson.JacksonUtil;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -117,5 +118,21 @@ public class ProxyEndpoingAService implements IProxyEndpointAService {
         update.setSql(StrUtil.format("{} = {}", ProxyEndpointPo.DELETE_FLAG, ProxyEndpointPo.ID));
         update.eq(ProxyEndpointPo.ID, id);
         proxyEndpointDao.update(null, update);
+    }
+
+    @Override
+    public List<String> listTag(Long proxyId) {
+        List<String> ret = new ArrayList<>();
+        Assert.notNull(proxyId);
+        QueryWrapper<ProxyEndpointPo> query = new QueryWrapper<>();
+        query.isNotNull(ProxyEndpointPo.DELETE_FLAG);
+        query.isNotNull(ProxyEndpointPo.TAG);
+        query.select("distinct {} as {}", ProxyEndpointPo.TAG, ProxyEndpointPo.TAG);
+        List<Map<String, Object>> result = proxyEndpointDao.selectMaps(query);
+        for (Map<String, Object> map : result) {
+            String tag = (String) map.get(ProxyEndpointPo.TAG);
+            ret.add(tag);
+        }
+        return ret;
     }
 }

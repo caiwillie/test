@@ -39,6 +39,12 @@ public class ProxyController {
         return Result.OK(ret);
     }
 
+    /**
+     * API 详情
+     *
+     * @param id the id
+     * @return the result
+     */
     @GetMapping("/rest/reverseProxy/detail")
     public Result<ProxyVo> detail(@RequestParam long id) {
         ProxyVo proxyVo = proxyBffService.detailProxy(id);
@@ -58,6 +64,12 @@ public class ProxyController {
         return Result.OK();
     }
 
+    /**
+     * 修改API状态
+     *
+     * @param proxyVo the proxy vo
+     * @return the result
+     */
     @PostMapping("/rest/reverseProxy/changeState")
     public Result changeState(@RequestBody ProxyVo proxyVo) {
         ProxyDto dto = ProxyDtoConverter.createFrom(proxyVo);
@@ -81,6 +93,17 @@ public class ProxyController {
                                                 @RequestParam(required = false) String name,
                                                 @RequestParam(required = false) String tags) {
         Page<ProxyGroupVo> ret = proxyBffService.pageProxy(Long.valueOf(projectId), pageNum, pageSize, name, tags);
+        return Result.OK(ret);
+    }
+
+    /**
+     * API 标签列表（不分页）
+     *
+     * @return the result
+     */
+    @GetMapping("/rest/reverseProxy/listTags")
+    public Result<List<String>> listTags() {
+        List<String> ret = proxyBffService.listProxyTag();
         return Result.OK(ret);
     }
 
@@ -139,6 +162,18 @@ public class ProxyController {
         return Result.OK(ret);
     }
 
+
+    /**
+     * Endpoint标签列表（不分页）
+     *
+     * @param proxyId the proxy id
+     * @return the result
+     */
+    @GetMapping("/rest/reverseProxy/listEndpointTags")
+    public Result<List<String>> listEndpointTags(@RequestParam Long proxyId) {
+        List<String> ret = proxyBffService.listEndpointTag(proxyId);
+        return Result.OK(ret);
+    }
 
     /**
      * 获取所有 api-版本-路径

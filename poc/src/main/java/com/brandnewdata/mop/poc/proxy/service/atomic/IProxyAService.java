@@ -22,4 +22,5 @@ public interface IProxyAService {
 
     ProxyDto changeState(ProxyDto proxyDto);
 
+    List<String> listTag();
 }
