@@ -172,10 +172,9 @@ public class DataExternalCService implements IDataExternalCService {
 
     @Override
     public SceneVersionDto confirmLoad(ConfirmLoadDto confirmLoadDto) {
-        Long id = confirmLoadDto.getId();
-        String newSceneName = confirmLoadDto.getNewSceneName();
-        Assert.notNull(id);
-        Assert.notNull(newSceneName);
+        Long id = Assert.notNull(confirmLoadDto.getId());
+        String newSceneName = Assert.notNull(confirmLoadDto.getNewSceneName());
+        Long projectId = Assert.notNull(confirmLoadDto.getProjectId());
 
         // 保存场景下的流程
         SceneLoadPo sceneLoadPo = sceneLoadDao.selectById(id);
@@ -185,6 +184,7 @@ public class DataExternalCService implements IDataExternalCService {
         // 保存场景
         SceneDto sceneDto = new SceneDto();
         sceneDto.setName(newSceneName);
+        sceneDto.setProjectId(projectId);
         sceneDto = sceneService.save(sceneDto);
 
         // 获取最新的 scene version

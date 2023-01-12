@@ -51,11 +51,6 @@ public class EndpointService {
         return endpointDao.selectOne(query);
     }
 
-    public Endpoint getOne(long id) {
-        ProxyEndpointPo entity = endpointDao.selectById(id);
-        return Optional.ofNullable(entity).map(this::toDTO).orElse(null);
-    }
-
     public List<Endpoint> listByProxyIdList(List<Long> proxyIdList) {
         if(CollUtil.isEmpty(proxyIdList)) {
             return ListUtil.empty();

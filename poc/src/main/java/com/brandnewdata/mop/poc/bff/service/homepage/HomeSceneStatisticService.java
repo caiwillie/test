@@ -13,6 +13,7 @@ import com.brandnewdata.mop.poc.env.dto.EnvDto;
 import com.brandnewdata.mop.poc.env.service.IEnvService;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.operate.dto.ProcessInstanceStateDto;
+import com.brandnewdata.mop.poc.operate.dto.filter.ProcessInstanceFilter;
 import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService;
 import com.brandnewdata.mop.poc.process.dto.ProcessReleaseDeployDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
@@ -148,15 +149,17 @@ public class HomeSceneStatisticService {
         List<Long> zeebeKeyList = processReleaseDeployDtoMap.values().stream()
                 .map(ProcessReleaseDeployDto::getProcessZeebeKey).collect(Collectors.toList());
 
+        ProcessInstanceFilter processInstanceFilter = new ProcessInstanceFilter();
         List<ListViewProcessInstanceDto> listViewProcessInstanceDtoList =
-                processInstanceService.listProcessInstanceCacheByZeebeKey(envId, zeebeKeyList);
+                processInstanceService.listProcessInstanceCacheByZeebeKey(envId, zeebeKeyList, processInstanceFilter);
 
 
         LocalDateTime startTime = LocalDateTime.now().minusDays(7);
         int processInstanceCount = Opt.of(bo.getProcessInstanceCount()).orElse(0);
         int processInstanceFailCount = Opt.of(bo.getProcessInstanceFailCount()).orElse(0);
         for (ListViewProcessInstanceDto listViewProcessInstanceDto : listViewProcessInstanceDtoList) {
-            if(listViewProcessInstanceDto.getStartDate().compareTo(startTime) > 0) continue;
+            // 超过7日的过滤
+            if(startTime.compareTo(listViewProcessInstanceDto.getStartDate()) > 0) continue;
             processInstanceCount++;
             if (listViewProcessInstanceDto.getState() == ProcessInstanceStateDto.INCIDENT) {
                 processInstanceFailCount++;
@@ -181,8 +184,9 @@ public class HomeSceneStatisticService {
         List<Long> zeebeKeyList = processReleaseDeployDtoMap.values().stream()
                 .map(ProcessReleaseDeployDto::getProcessZeebeKey).collect(Collectors.toList());
 
+        ProcessInstanceFilter processInstanceFilter = new ProcessInstanceFilter();
         List<ListViewProcessInstanceDto> listViewProcessInstanceDtoList =
-                processInstanceService.listProcessInstanceCacheByZeebeKey(envId, zeebeKeyList);
+                processInstanceService.listProcessInstanceCacheByZeebeKey(envId, zeebeKeyList, processInstanceFilter);
 
         LocalDateTime startTime = LocalDateTime.now().minusDays(7);
         int processInstanceCount = 0;

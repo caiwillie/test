@@ -1,5 +1,7 @@
 package com.brandnewdata.mop.poc.process.parser;
 
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import com.dxy.library.json.jackson.JacksonUtil;
 import org.junit.jupiter.api.Test;
 
@@ -16,6 +18,12 @@ class FeelUtilTest {
         Object o = FeelUtil.evalExpression(expression, map);
         Map<String, Object> result = FeelUtil.convertMap(o);
         String to = JacksonUtil.to(result);
+        return;
+    }
+
+    @Test
+    void test2() {
+        DateTime date1 = DateUtil.parse("2023-01-11 00:00:00");
         return;
     }
 }

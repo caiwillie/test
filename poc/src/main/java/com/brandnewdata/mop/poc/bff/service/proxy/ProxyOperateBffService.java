@@ -1,7 +1,9 @@
 package com.brandnewdata.mop.poc.bff.service.proxy;
 
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.lang.Opt;
 import cn.hutool.core.lang.Pair;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
@@ -9,16 +11,16 @@ import com.brandnewdata.mop.poc.bff.converter.proxy.ProxyEndpointCallVoConverter
 import com.brandnewdata.mop.poc.bff.converter.proxy.ProxyEndpointDtoConverter;
 import com.brandnewdata.mop.poc.bff.vo.operate.charts.ChartOption;
 import com.brandnewdata.mop.poc.bff.vo.operate.charts.Series;
-import com.brandnewdata.mop.poc.bff.vo.proxy.operate.ProxyEndpointCallFilter;
 import com.brandnewdata.mop.poc.bff.vo.proxy.operate.ProxyEndpointCallVo;
 import com.brandnewdata.mop.poc.bff.vo.proxy.operate.ProxyStatistic;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.constant.ProxyConst;
-import com.brandnewdata.mop.poc.proxy.bo.ProxyEndpointFilter;
-import com.brandnewdata.mop.poc.proxy.bo.ProxyFilter;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointCallDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto;
+import com.brandnewdata.mop.poc.proxy.dto.filter.ProxyEndpointCallFilter;
+import com.brandnewdata.mop.poc.proxy.dto.filter.ProxyEndpointFilter;
+import com.brandnewdata.mop.poc.proxy.dto.filter.ProxyFilter;
 import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyAService;
 import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyEndpointAService;
 import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyEndpointCallAService;
@@ -54,16 +56,19 @@ public class ProxyOperateBffService {
         this.proxyEndpointCallService = proxyEndpointCallService;
     }
 
-    public Page<ProxyEndpointCallVo> page(ProxyEndpointCallFilter filter) {
+    public Page<ProxyEndpointCallVo> page(com.brandnewdata.mop.poc.bff.vo.proxy.operate.ProxyEndpointCallFilter filter) {
         Integer pageNum = filter.getPageNum();
         Integer pageSize = filter.getPageSize();
 
         String proxyName = filter.getProxyName();
         String version = filter.getVersion();
         String location = filter.getLocation();
+        Long projectId = Opt.ofNullable(filter.getProjectId()).map(Long::valueOf).orElse(null);
+        LocalDateTime minStartTime = Opt.ofNullable(filter.getStartTime()).map(date -> DateUtil.parse(date).toLocalDateTime()).orElse(null);
+        LocalDateTime maxStartTime = Opt.ofNullable(filter.getEndTime()).map(date -> DateUtil.parse(date).toLocalDateTime()).orElse(null);
 
         // 查询proxy
-        ProxyFilter proxyFilter = new ProxyFilter().setName(proxyName).setVersion(version);
+        ProxyFilter proxyFilter = new ProxyFilter().setName(proxyName).setVersion(version).setProjectId(projectId);
         List<ProxyDto> proxyDtoList = proxyAtomicService.fetchCacheListByFilter(proxyFilter);
         Map<Long, ProxyDto> proxyDtoMap = proxyDtoList.stream().collect(Collectors.toMap(ProxyDto::getId, Function.identity()));
 
@@ -80,24 +85,31 @@ public class ProxyOperateBffService {
             ProxyEndpointDtoConverter.updateFrom(proxyEndpointDto, proxyDto);
         }
 
+        ProxyEndpointCallFilter proxyEndpointCallFilter = new ProxyEndpointCallFilter()
+                .setMinStartTime(minStartTime).setMaxStartTime(maxStartTime);
         Page<ProxyEndpointCallDto> page = proxyEndpointCallService
-                .fetchPageByEndpointId(pageNum, pageSize, ListUtil.toList(proxyEndpointDtoMap.keySet()));
+                .fetchPageByEndpointId(pageNum, pageSize, ListUtil.toList(proxyEndpointDtoMap.keySet()), proxyEndpointCallFilter);
 
         List<ProxyEndpointCallVo> voList = page.getRecords().stream()
                 .map(callDto -> ProxyEndpointCallVoConverter.createFrom(callDto, proxyEndpointDtoMap.get(callDto.getEndpointId())))
                 .collect(Collectors.toList());
 
-        return new Page<>(page.getTotal(), voList);
+        Page<ProxyEndpointCallVo> ret = new Page<>(page.getTotal(), voList);
+        ret.setExtraMap(page.getExtraMap());
+        return ret;
     }
 
-    public ProxyStatistic statistic(ProxyEndpointCallFilter filter) {
+    public ProxyStatistic statistic(com.brandnewdata.mop.poc.bff.vo.proxy.operate.ProxyEndpointCallFilter filter) {
         ProxyStatistic statistic = new ProxyStatistic();
         String proxyName = filter.getProxyName();
         String version = filter.getVersion();
         String location = filter.getLocation();
+        Long projectId = Opt.ofNullable(filter.getProjectId()).map(Long::valueOf).orElse(null);
+        LocalDateTime minStartTime = Opt.ofNullable(filter.getStartTime()).map(date -> DateUtil.parse(date).toLocalDateTime()).orElse(null);
+        LocalDateTime maxStartTime = Opt.ofNullable(filter.getEndTime()).map(date -> DateUtil.parse(date).toLocalDateTime()).orElse(null);
 
         // 查询proxy
-        ProxyFilter proxyFilter = new ProxyFilter().setName(proxyName).setVersion(version);
+        ProxyFilter proxyFilter = new ProxyFilter().setName(proxyName).setVersion(version).setProjectId(projectId);
         List<ProxyDto> proxyDtoList = proxyAtomicService.fetchCacheListByFilter(proxyFilter);
         Map<Long, ProxyDto> proxyDtoMap = proxyDtoList.stream().collect(Collectors.toMap(ProxyDto::getId, Function.identity()));
 
@@ -114,9 +126,11 @@ public class ProxyOperateBffService {
             ProxyEndpointDtoConverter.updateFrom(proxyEndpointDto, proxyDto);
         }
 
-
+        // 查询所有api调用明细
+        ProxyEndpointCallFilter proxyEndpointCallFilter = new ProxyEndpointCallFilter()
+                .setMinStartTime(minStartTime).setMaxStartTime(maxStartTime);
         Map<Long, List<ProxyEndpointCallDto>> proxyEndpointCallDtoListMap =
-                proxyEndpointCallService.fetchCacheListByEndpointId(ListUtil.toList(proxyEndpointDtoMap.keySet()));
+                proxyEndpointCallService.fetchCacheListByEndpointId(ListUtil.toList(proxyEndpointDtoMap.keySet()), proxyEndpointCallFilter);
 
         AtomicInteger totalCount = new AtomicInteger();
         AtomicInteger successCount = new AtomicInteger();

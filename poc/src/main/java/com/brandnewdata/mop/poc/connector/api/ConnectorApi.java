@@ -17,6 +17,7 @@ import com.brandnewdata.mop.poc.constant.ProcessConst;
 import com.brandnewdata.mop.poc.env.dto.EnvDto;
 import com.brandnewdata.mop.poc.env.service.IEnvService;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
+import com.brandnewdata.mop.poc.operate.dto.filter.ProcessInstanceFilter;
 import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService;
 import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
 import com.brandnewdata.mop.poc.process.dto.DeployStatusDto;
@@ -176,9 +177,10 @@ public class ConnectorApi implements IConnectorApi {
                 .flatMap(Collection::stream).collect(Collectors.toMap(ProcessSnapshotDeployDto::getProcessZeebeKey, Function.identity()));
 
         // 根据流程定义去查询流程实例
+        ProcessInstanceFilter processInstanceFilter = new ProcessInstanceFilter();
         Page<ListViewProcessInstanceDto> page =
                 processInstanceService.pageProcessInstanceByZeebeKey(
-                        envId, ListUtil.toList(processSnapshotDeployDtoMap.keySet()), pageNum, pageSize, new HashMap<>());
+                        envId, ListUtil.toList(processSnapshotDeployDtoMap.keySet()), pageNum, pageSize, processInstanceFilter, new HashMap<>());
 
         List<ProcessInstanceDto> dtoList = new ArrayList<>();
         for (ListViewProcessInstanceDto listViewProcessInstanceDto : page.getRecords()) {

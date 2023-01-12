@@ -25,6 +25,7 @@ import com.brandnewdata.mop.poc.constant.SceneConst;
 import com.brandnewdata.mop.poc.env.dto.EnvDto;
 import com.brandnewdata.mop.poc.env.service.IEnvService;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
+import com.brandnewdata.mop.poc.operate.dto.filter.ProcessInstanceFilter;
 import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService;
 import com.brandnewdata.mop.poc.process.dto.ProcessSnapshotDeployDto;
 import com.brandnewdata.mop.poc.process.manager.ConnectorManager;
@@ -222,6 +223,7 @@ public class SceneBffService {
     public SceneVersionVo confirmLoad(PrepareLoadVo vo) {
         String id = vo.getId();
         String sceneName = vo.getSceneName();
+        String projectId = vo.getProjectId();
         Map<String, String> configMap = new HashMap<>();
         for (ConnectorConfigVo connectorConfigVo : Opt.ofNullable(vo.getConfigureList()).orElse(ListUtil.empty())) {
             String configureId = connectorConfigVo.getConfigureId();
@@ -233,7 +235,8 @@ public class SceneBffService {
         }
 
         ConfirmLoadDto confirmLoadDto = new ConfirmLoadDto();
-        confirmLoadDto.setId(Long.parseLong(id));
+        confirmLoadDto.setProjectId(Opt.ofNullable(projectId).map(Long::valueOf).orElse(null));
+        confirmLoadDto.setId(Opt.of(Long.parseLong(id)).map(Long::valueOf).orElse(null));
         confirmLoadDto.setNewSceneName(sceneName);
         confirmLoadDto.setConfigMap(configMap);
         SceneVersionDto sceneVersionDto = dataExternalService.confirmLoad(confirmLoadDto);
@@ -324,9 +327,9 @@ public class SceneBffService {
                 .flatMap(Collection::stream).collect(Collectors.toMap(ProcessSnapshotDeployDto::getProcessZeebeKey, Function.identity()));
 
         // 根据流程定义去查询流程实例
-        Page<ListViewProcessInstanceDto> page =
-                processInstanceService.pageProcessInstanceByZeebeKey(
-                        envId, ListUtil.toList(processSnapshotDeployDtoMap.keySet()), pageNum, pageSize, new HashMap<>());
+        ProcessInstanceFilter processInstanceFilter = new ProcessInstanceFilter();
+        Page<ListViewProcessInstanceDto> page = processInstanceService.pageProcessInstanceByZeebeKey(
+                envId, ListUtil.toList(processSnapshotDeployDtoMap.keySet()), pageNum, pageSize, processInstanceFilter, new HashMap<>());
 
         List<DebugProcessInstanceVo> vos = new ArrayList<>();
         for (ListViewProcessInstanceDto listViewProcessInstanceDto : page.getRecords()) {

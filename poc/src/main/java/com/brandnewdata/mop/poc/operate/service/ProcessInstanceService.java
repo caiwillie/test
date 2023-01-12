@@ -3,21 +3,19 @@ package com.brandnewdata.mop.poc.operate.service;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.lang.Opt;
 import co.elastic.clients.elasticsearch._types.FieldValue;
-import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import co.elastic.clients.elasticsearch._types.query_dsl.TermsQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
+import co.elastic.clients.elasticsearch._types.query_dsl.*;
+import co.elastic.clients.json.JsonData;
 import com.brandnewdata.mop.poc.common.dto.Page;
+import com.brandnewdata.mop.poc.operate.bo.StatisticCountBo;
 import com.brandnewdata.mop.poc.operate.cache.ProcessInstanceCache;
 import com.brandnewdata.mop.poc.operate.converter.SequenceFlowDtoConverter;
 import com.brandnewdata.mop.poc.operate.dao.FlowNodeInstanceDao;
 import com.brandnewdata.mop.poc.operate.dao.ListViewDao;
 import com.brandnewdata.mop.poc.operate.dao.SequenceFlowDao;
-import com.brandnewdata.mop.poc.operate.dto.FlowNodeInstanceTreeNodeDto;
-import com.brandnewdata.mop.poc.operate.dto.FlowNodeStateDto;
-import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
-import com.brandnewdata.mop.poc.operate.dto.SequenceFlowDto;
+import com.brandnewdata.mop.poc.operate.dto.*;
+import com.brandnewdata.mop.poc.operate.dto.filter.ProcessInstanceFilter;
 import com.brandnewdata.mop.poc.operate.manager.DaoManager;
 import com.brandnewdata.mop.poc.operate.po.FlowNodeInstancePo;
 import com.brandnewdata.mop.poc.operate.po.SequenceFlowPo;
@@ -31,6 +29,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -41,6 +41,8 @@ public class ProcessInstanceService implements IProcessInstanceService {
 
     private final ProcessInstanceCache processInstanceCache;
 
+    private static final ZoneOffset DEFAULT_ZONE_OFFSET = OffsetDateTime.now().getOffset();
+
     public ProcessInstanceService(DaoManager daoManager, ProcessInstanceCache processInstanceCache) {
         this.daoManager = daoManager;
         this.processInstanceCache = processInstanceCache;
@@ -48,41 +50,69 @@ public class ProcessInstanceService implements IProcessInstanceService {
 
     @Override
     public Page<ListViewProcessInstanceDto> pageProcessInstanceByZeebeKey(Long envId,
-                                                                          List<Long> zeebeKeyList, int pageNum, int pageSize, Map<String, Object> extra) {
+                                                                          List<Long> zeebeKeyList,
+                                                                          int pageNum,
+                                                                          int pageSize,
+                                                                          ProcessInstanceFilter filter,
+                                                                          Map<String, Object> extra) {
         if(CollUtil.isEmpty(zeebeKeyList)) return new Page<>(0, ListUtil.empty());
 
-        List<ListViewProcessInstanceDto> processInstanceDtoList = listProcessInstanceByZeebeKey(envId, zeebeKeyList);
+        List<ListViewProcessInstanceDto> processInstanceDtoList = listProcessInstanceByZeebeKey(envId, zeebeKeyList, filter);
+
+        StatisticCountBo statisticCountBo = statisticCount(processInstanceDtoList);
 
         PageEnhancedUtil.setFirstPageNo(1);
         List<ListViewProcessInstanceDto> records = PageEnhancedUtil.slice(pageNum, pageSize, processInstanceDtoList);
 
         Page<ListViewProcessInstanceDto> page = new Page<>(processInstanceDtoList.size(), records);
         Map<String, Object> extraMap = new HashMap<>();
-        extraMap.put("successCount", 1);
-        extraMap.put("failCount", 1);
-        extraMap.put("activeCount", 1);
-        extraMap.put("cancleCount", 1);
+        extraMap.put("successCount", statisticCountBo.getCompletedCount());
+        extraMap.put("failCount", statisticCountBo.getIncidentCount());
+        extraMap.put("activeCount", statisticCountBo.getActiveCount());
+        extraMap.put("cancleCount", statisticCountBo.getCanceledCount());
         page.setExtraMap(extraMap);
         return page;
     }
 
     @Override
-    public List<ListViewProcessInstanceDto> listProcessInstanceByZeebeKey(Long envId, List<Long> zeebeKeyList) {
+    public List<ListViewProcessInstanceDto> listProcessInstanceByZeebeKey(Long envId, List<Long> zeebeKeyList, ProcessInstanceFilter filter) {
         if(CollUtil.isEmpty(zeebeKeyList)) return ListUtil.empty();
 
-        List<FieldValue> values = zeebeKeyList.stream().map(key -> new FieldValue.Builder().longValue(key).build())
+        Assert.notNull(filter);
+
+        Long minStartTime = Opt.ofNullable(filter.getMinStartTime())
+                .map(time -> time.toInstant(DEFAULT_ZONE_OFFSET).toEpochMilli()).orElse(null);
+        Long maxStartTime = Opt.ofNullable(filter.getMaxStartTime())
+                .map(time -> time.toInstant(DEFAULT_ZONE_OFFSET).toEpochMilli()).orElse(null);
+
+        List<FieldValue> zeebeKeyFieldValueList = zeebeKeyList.stream().map(key -> new FieldValue.Builder().longValue(key).build())
                 .collect(Collectors.toList());
+
+        List<Query> mustQueryList = new ArrayList<>();
+        mustQueryList.add(new Query.Builder()
+                .term(t -> t.field(ListViewTemplate.JOIN_RELATION).value("processInstance"))
+                .build());
+        mustQueryList.add(new Query.Builder()
+                .terms(new TermsQuery.Builder()
+                        .field(ListViewTemplate.PROCESS_KEY)
+                        .terms(new TermsQueryField.Builder().value(zeebeKeyFieldValueList).build()).build())
+                .build());
+
+        if(minStartTime != null) {
+            mustQueryList.add(new Query.Builder()
+                    .range(new RangeQuery.Builder().field(ListViewTemplate.START_DATE).gte(JsonData.of(minStartTime)).build())
+                    .build());
+        }
+
+        if(maxStartTime != null) {
+            mustQueryList.add(new Query.Builder()
+                    .range(new RangeQuery.Builder().field(ListViewTemplate.START_DATE).lte(JsonData.of(maxStartTime)).build())
+                    .build());
+        }
 
         Query query = new Query.Builder()
                 .bool(new BoolQuery.Builder()
-                        .must(new Query.Builder()
-                                .term(t -> t.field(ListViewTemplate.JOIN_RELATION).value("processInstance"))
-                                .build(), new Query.Builder()
-                                .terms(new TermsQuery.Builder()
-                                        .field(ListViewTemplate.PROCESS_KEY)
-                                        .terms(new TermsQueryField.Builder().value(values).build())
-                                        .build())
-                                .build())
+                        .must(mustQueryList)
                         .build())
                 .build();
 
@@ -101,12 +131,24 @@ public class ProcessInstanceService implements IProcessInstanceService {
     }
 
     @Override
-    public List<ListViewProcessInstanceDto> listProcessInstanceCacheByZeebeKey(Long envId, List<Long> zeebeKeyList) {
+    public List<ListViewProcessInstanceDto> listProcessInstanceCacheByZeebeKey(Long envId, List<Long> zeebeKeyList, ProcessInstanceFilter filter) {
         Assert.notNull(envId, "envId is null");
         if(CollUtil.isEmpty(zeebeKeyList)) return ListUtil.empty();
         Assert.isFalse(CollUtil.hasNull(zeebeKeyList), "zeebeKeyList has null");
+        Assert.notNull(filter);
+
+        LocalDateTime minStartTime = filter.getMinStartTime();
+        LocalDateTime maxStartTime = filter.getMaxStartTime();
+
         Map<String, ListViewProcessInstanceDto> map = processInstanceCache.asMap(envId);
-        return map.values().stream().filter(dto -> zeebeKeyList.contains(dto.getProcessId())).collect(Collectors.toList());
+        return map.values().stream().filter(dto -> {
+            if(!zeebeKeyList.contains(dto.getProcessId())) return false;
+            LocalDateTime startDate = dto.getStartDate();
+            // 最小开始时间，最大开始时间
+            if(minStartTime != null && minStartTime.compareTo(startDate) > 0) return false;
+            if(maxStartTime != null && maxStartTime.compareTo(startDate) < 0) return false;
+            return true;
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -197,4 +239,29 @@ public class ProcessInstanceService implements IProcessInstanceService {
         return ret;
     }
 
+    private StatisticCountBo statisticCount(List<ListViewProcessInstanceDto> processInstanceDtoList) {
+        StatisticCountBo ret = new StatisticCountBo();
+        int completedCount = 0;
+        int activeCount = 0;
+        int incidentCount = 0;
+        int canceledCount = 0;
+
+        for (ListViewProcessInstanceDto listViewProcessInstanceDto : processInstanceDtoList) {
+            ProcessInstanceStateDto state = listViewProcessInstanceDto.getState();
+            if(state == ProcessInstanceStateDto.COMPLETED) {
+                completedCount++;
+            } else if (state == ProcessInstanceStateDto.ACTIVE) {
+                activeCount++;
+            } else if (state == ProcessInstanceStateDto.INCIDENT) {
+                incidentCount++;
+            } else if (state == ProcessInstanceStateDto.CANCELED) {
+                canceledCount++;
+            }
+        }
+        ret.setCompletedCount(completedCount);
+        ret.setActiveCount(activeCount);
+        ret.setIncidentCount(incidentCount);
+        ret.setCanceledCount(canceledCount);
+        return ret;
+    }
 }

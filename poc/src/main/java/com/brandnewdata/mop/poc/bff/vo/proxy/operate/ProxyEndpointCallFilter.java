@@ -7,6 +7,11 @@ import lombok.Setter;
 @Setter
 public class ProxyEndpointCallFilter {
     /**
+     * 项目id
+     */
+    private String projectId;
+
+    /**
      * pageNum
      */
     private Integer pageNum;

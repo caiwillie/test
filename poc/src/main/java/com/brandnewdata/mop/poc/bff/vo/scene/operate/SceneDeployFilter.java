@@ -8,6 +8,11 @@ import lombok.Setter;
 public class SceneDeployFilter {
 
     /**
+     * 项目id
+     */
+    private String projectId;
+
+    /**
      * 分页页码
      */
     private Integer pageNum;

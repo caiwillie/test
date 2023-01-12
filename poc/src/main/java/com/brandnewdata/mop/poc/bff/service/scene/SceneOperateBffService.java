@@ -1,8 +1,10 @@
 package com.brandnewdata.mop.poc.bff.service.scene;
 
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.lang.Opt;
 import cn.hutool.core.lang.Pair;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
@@ -17,16 +19,20 @@ import com.brandnewdata.mop.poc.bff.vo.scene.operate.SceneStatistic;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.operate.dto.ProcessInstanceStateDto;
+import com.brandnewdata.mop.poc.operate.dto.filter.ProcessInstanceFilter;
 import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService;
 import com.brandnewdata.mop.poc.process.dto.ProcessReleaseDeployDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
+import com.brandnewdata.mop.poc.scene.dto.SceneDto;
 import com.brandnewdata.mop.poc.scene.dto.SceneReleaseDeployDto;
 import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
+import com.brandnewdata.mop.poc.scene.service.ISceneService;
 import com.brandnewdata.mop.poc.scene.service.atomic.ISceneReleaseDeployAService;
 import com.brandnewdata.mop.poc.scene.service.atomic.IVersionProcessAService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,18 +51,26 @@ public class SceneOperateBffService {
 
     private final IVersionProcessAService versionProcessAService;
 
+    private final ISceneService sceneService;
+
     public SceneOperateBffService(ISceneReleaseDeployAService sceneReleaseDeployService,
                                   IProcessDeployService processDeployService,
                                   IProcessInstanceService processInstanceService,
-                                  IVersionProcessAService versionProcessAService) {
+                                  IVersionProcessAService versionProcessAService,
+                                  ISceneService sceneService) {
         this.sceneReleaseDeployService = sceneReleaseDeployService;
         this.processDeployService = processDeployService;
         this.processInstanceService = processInstanceService;
         this.versionProcessAService = versionProcessAService;
+        this.sceneService = sceneService;
     }
 
     public Page<OperateProcessInstanceVo> pageProcessInstance(SceneDeployFilter filter) {
         Long envId = Assert.notNull(filter.getEnvId());
+
+        LocalDateTime minStartTime = Opt.ofNullable(filter.getStartTime()).map(time -> DateUtil.parse(time).toLocalDateTime()).orElse(null);
+        LocalDateTime maxStartTime = Opt.ofNullable(filter.getEndTime()).map(time -> DateUtil.parse(time).toLocalDateTime()).orElse(null);
+
 
         // 获取符合过滤条件的流程id列表
         List<SceneReleaseDeployDto> sceneReleaseDeployDtoList = fetchSceneReleaseDeployDtoList(filter);
@@ -71,8 +85,12 @@ public class SceneOperateBffService {
                 .map(ProcessReleaseDeployDto::getProcessZeebeKey).collect(Collectors.toList());
 
         // 查询流程实例
+        ProcessInstanceFilter processInstanceFilter = new ProcessInstanceFilter()
+                .setMinStartTime(minStartTime).setMaxStartTime(maxStartTime);
         Page<ListViewProcessInstanceDto> page = processInstanceService.pageProcessInstanceByZeebeKey(envId, zeebeKeyList,
-                filter.getPageNum(), filter.getPageSize(), new HashMap<>());
+                filter.getPageNum(), filter.getPageSize(), processInstanceFilter, new HashMap<>());
+
+        Map<String, ?> extraMap = page.getExtraMap();
 
         List<OperateProcessInstanceVo> vos = new ArrayList<>();
         for (ListViewProcessInstanceDto listViewProcessInstanceDto : page.getRecords()) {
@@ -87,7 +105,9 @@ public class SceneOperateBffService {
             vos.add(vo);
         }
 
-        return new Page<>(page.getTotal(), vos);
+        Page<OperateProcessInstanceVo> ret = new Page<>(page.getTotal(), vos);
+        ret.setExtraMap(extraMap);
+        return ret;
     }
 
     public ProcessDefinitionVo definitionProcessInstance(OperateProcessInstanceVo vo) {
@@ -103,6 +123,9 @@ public class SceneOperateBffService {
         SceneStatistic ret = new SceneStatistic();
         Long envId = Assert.notNull(filter.getEnvId());
 
+        LocalDateTime minStartTime = Opt.ofNullable(filter.getStartTime()).map(time -> DateUtil.parse(time).toLocalDateTime()).orElse(null);
+        LocalDateTime maxStartTime = Opt.ofNullable(filter.getEndTime()).map(time -> DateUtil.parse(time).toLocalDateTime()).orElse(null);
+
         // 获取符合过滤条件的流程id列表
         List<SceneReleaseDeployDto> sceneReleaseDeployDtoList = fetchSceneReleaseDeployDtoList(filter);
         Map<String, SceneReleaseDeployDto> sceneReleaseDeployDtoMap = sceneReleaseDeployDtoList.stream()
@@ -115,7 +138,10 @@ public class SceneOperateBffService {
         List<Long> zeebeKeyList = processReleaseDeployDtoMap.values().stream()
                 .map(ProcessReleaseDeployDto::getProcessZeebeKey).collect(Collectors.toList());
 
-        List<ListViewProcessInstanceDto> listViewProcessInstanceDtoList = processInstanceService.listProcessInstanceCacheByZeebeKey(envId, zeebeKeyList);
+        ProcessInstanceFilter processInstanceFilter = new ProcessInstanceFilter()
+                .setMinStartTime(minStartTime).setMaxStartTime(maxStartTime);
+        List<ListViewProcessInstanceDto> listViewProcessInstanceDtoList =
+                processInstanceService.listProcessInstanceCacheByZeebeKey(envId, zeebeKeyList, processInstanceFilter);
 
         int executionCount = 0;
         int successCount = 0;
@@ -168,12 +194,13 @@ public class SceneOperateBffService {
     private List<SceneReleaseDeployDto> fetchSceneReleaseDeployDtoList(SceneDeployFilter filter) {
         Long envId = Assert.notNull(filter.getEnvId());
 
+        Long projectId = Opt.ofNullable(filter.getProjectId()).map(Long::valueOf).orElse(null);
         Long sceneId = filter.getSceneId();
         Long versionId = filter.getVersionId();
         String processId = filter.getProcessId();
 
         List<SceneReleaseDeployDto> sceneReleaseDeployDtoList = sceneReleaseDeployService.fetchByEnvId(envId);
-        return sceneReleaseDeployDtoList.stream().filter(dto -> {
+        sceneReleaseDeployDtoList = sceneReleaseDeployDtoList.stream().filter(dto -> {
             if (sceneId == null) return true;
             if (!NumberUtil.equals(sceneId, dto.getSceneId())) return false;
 
@@ -188,6 +215,19 @@ public class SceneOperateBffService {
             }
         }).collect(Collectors.toList());
 
+        List<Long> sceneIdList = sceneReleaseDeployDtoList.stream().map(SceneReleaseDeployDto::getSceneId)
+                .distinct().collect(Collectors.toList());
+
+        Map<Long, SceneDto> sceneDtoMap = sceneService.fetchById(sceneIdList);
+
+
+        sceneReleaseDeployDtoList = sceneReleaseDeployDtoList.stream().filter(dto -> {
+            SceneDto sceneDto = sceneDtoMap.get(dto.getSceneId());
+            if(projectId != null && !projectId.equals(sceneDto.getProjectId())) return false;
+            return true;
+        }).collect(Collectors.toList());
+
+        return sceneReleaseDeployDtoList;
     }
 
     private void assembleCount(SceneStatistic statistic, int executionCount, int successCount, int failCount) {

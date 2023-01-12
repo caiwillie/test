@@ -12,5 +12,7 @@ public class ConfirmLoadDto {
 
     private String newSceneName;
 
+    private Long projectId;
+
     private Map<String, String> configMap;
 }

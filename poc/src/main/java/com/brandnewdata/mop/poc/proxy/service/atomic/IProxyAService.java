@@ -1,9 +1,9 @@
 package com.brandnewdata.mop.poc.proxy.service.atomic;
 
 import com.brandnewdata.mop.poc.common.dto.Page;
-import com.brandnewdata.mop.poc.proxy.bo.ProxyFilter;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyGroupDto;
+import com.brandnewdata.mop.poc.proxy.dto.filter.ProxyFilter;
 
 import java.util.List;
 import java.util.Map;
@@ -22,4 +22,5 @@ public interface IProxyAService {
 
     ProxyDto changeState(ProxyDto proxyDto);
 
+    List<String> listTag();
 }

@@ -9,12 +9,13 @@ import com.brandnewdata.mop.poc.bff.converter.proxy.ProxyEndpointVoConverter;
 import com.brandnewdata.mop.poc.bff.converter.proxy.ProxyVoConverter;
 import com.brandnewdata.mop.poc.bff.vo.proxy.*;
 import com.brandnewdata.mop.poc.common.dto.Page;
-import com.brandnewdata.mop.poc.proxy.bo.ProxyEndpointFilter;
-import com.brandnewdata.mop.poc.proxy.bo.ProxyFilter;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointCallDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyGroupDto;
+import com.brandnewdata.mop.poc.proxy.dto.filter.ProxyEndpointCallFilter;
+import com.brandnewdata.mop.poc.proxy.dto.filter.ProxyEndpointFilter;
+import com.brandnewdata.mop.poc.proxy.dto.filter.ProxyFilter;
 import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyAService;
 import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyEndpointAService;
 import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyEndpointCallAService;
@@ -79,8 +80,10 @@ public class ProxyBffService {
         Map<Long, ProxyEndpointDto> proxyEndpointDtoMap = proxyEndpointDtoListMap.values().stream().flatMap(List::stream)
                 .collect(Collectors.toMap(ProxyEndpointDto::getId, Function.identity()));
 
+        // todo caiwillie
+        ProxyEndpointCallFilter proxyEndpointCallFilter = new ProxyEndpointCallFilter();
         Map<Long, List<ProxyEndpointCallDto>> proxyEndpointCallDtoListMap =
-                proxyEndpointCallService.fetchCacheListByEndpointId(ListUtil.toList(proxyEndpointDtoMap.keySet()));
+                proxyEndpointCallService.fetchCacheListByEndpointId(ListUtil.toList(proxyEndpointDtoMap.keySet()), proxyEndpointCallFilter);
 
         Map<Long, Integer> countMap = new HashMap<>();
         for (Map.Entry<Long, List<ProxyEndpointCallDto>> entry : proxyEndpointCallDtoListMap.entrySet()) {
@@ -120,6 +123,10 @@ public class ProxyBffService {
         return ProxyVoConverter.createFrom(proxyDto);
     }
 
+    public List<String> listProxyTag() {
+        return proxyAService.listTag();
+    }
+
     public ProxyEndpointVo saveEndpoint(ProxyEndpointVo vo) {
         ProxyEndpointDto dto = proxyEndpointCService.save(ProxyEndpointDtoConverter.createFrom(vo));
         return ProxyEndpointVoConverter.createFrom(dto);
@@ -132,6 +139,10 @@ public class ProxyBffService {
 
     public void deleteEndpoint(Long id) {
         proxyEndpointAService.deleteById(id);
+    }
+
+    public List<String> listEndpointTag(Long proxyId) {
+        return proxyEndpointAService.listTag(proxyId);
     }
 
     public Page<ProxyEndpointVo> pageEndpoint(Integer pageNum, Integer pageSize, Long proxyId) {

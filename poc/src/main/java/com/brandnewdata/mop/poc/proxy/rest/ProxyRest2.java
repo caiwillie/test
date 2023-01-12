@@ -25,28 +25,7 @@ public class ProxyRest2 {
     @Resource
     private EndpointService endpointService;
 
-    /**
-     * 标签列表（不分页）
-     *
-     * @return the result
-     */
-    @GetMapping("/rest/reverseProxy/listTags")
-    public Result<List<String>> listTags() {
-        List<String> tags = proxyService.listTags();
-        return Result.OK(tags);
-    }
 
-    /**
-     * Endpoint标签列表（不分页）
-     *
-     * @param proxyId the proxy id
-     * @return the result
-     */
-    @GetMapping("/rest/reverseProxy/listEndpointTags")
-    public Result<List<String>> listEndpointTags(@RequestParam Long proxyId) {
-        List<String> resp = proxyService.listEndpointTags(proxyId);
-        return Result.ok(resp);
-    }
 
 
     /**

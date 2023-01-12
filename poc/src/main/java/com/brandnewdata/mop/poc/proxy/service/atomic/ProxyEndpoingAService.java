@@ -8,16 +8,17 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.brandnewdata.mop.poc.common.dto.Page;
-import com.brandnewdata.mop.poc.proxy.bo.ProxyEndpointFilter;
 import com.brandnewdata.mop.poc.proxy.bo.ProxyEndpointServerBo;
 import com.brandnewdata.mop.poc.proxy.converter.ProxyEndpointDtoConverter;
 import com.brandnewdata.mop.poc.proxy.dao.ProxyEndpointDao;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto;
+import com.brandnewdata.mop.poc.proxy.dto.filter.ProxyEndpointFilter;
 import com.brandnewdata.mop.poc.proxy.po.ProxyEndpointPo;
 import com.dxy.library.json.jackson.JacksonUtil;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -79,10 +80,11 @@ public class ProxyEndpoingAService implements IProxyEndpointAService {
         if(CollUtil.isEmpty(proxyIdList)) return MapUtil.empty();
         Assert.isFalse(CollUtil.hasNull(proxyIdList), "proxyIdList can not contain null");
 
+        String location = filter.getLocation();
+
         QueryWrapper<ProxyEndpointPo> query = new QueryWrapper<>();
         query.in(ProxyEndpointPo.PROXY_ID, proxyIdList);
         query.isNull(ProxyEndpointPo.DELETE_FLAG);
-        String location = filter.getLocation();
         if(StrUtil.isNotBlank(location)) {
             query.eq(ProxyEndpointPo.LOCATION, location);
         }
@@ -116,5 +118,22 @@ public class ProxyEndpoingAService implements IProxyEndpointAService {
         update.setSql(StrUtil.format("{} = {}", ProxyEndpointPo.DELETE_FLAG, ProxyEndpointPo.ID));
         update.eq(ProxyEndpointPo.ID, id);
         proxyEndpointDao.update(null, update);
+    }
+
+    @Override
+    public List<String> listTag(Long proxyId) {
+        List<String> ret = new ArrayList<>();
+        Assert.notNull(proxyId);
+        QueryWrapper<ProxyEndpointPo> query = new QueryWrapper<>();
+        query.isNull(ProxyEndpointPo.DELETE_FLAG);
+        query.isNotNull(ProxyEndpointPo.TAG);
+        query.eq(ProxyEndpointPo.PROXY_ID, proxyId);
+        query.select(StrUtil.format("distinct {} as {}", ProxyEndpointPo.TAG, ProxyEndpointPo.TAG));
+        List<Map<String, Object>> result = proxyEndpointDao.selectMaps(query);
+        for (Map<String, Object> map : result) {
+            String tag = (String) map.get(ProxyEndpointPo.TAG);
+            ret.add(tag);
+        }
+        return ret;
     }
 }

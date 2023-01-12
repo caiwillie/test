@@ -60,6 +60,7 @@ public class ProxyCache {
         dto.setDescription(entity.getStr(ProxyPo.DESCRIPTION));
         dto.setTag(entity.getStr(ProxyPo.TAG));
         dto.setState(entity.getInt(ProxyPo.STATE));
+        dto.setProjectId(entity.getLong(ProxyPo.PROJECT_ID));
         return dto;
     }
 

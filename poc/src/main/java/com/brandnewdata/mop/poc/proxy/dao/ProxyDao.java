@@ -1,7 +1,7 @@
 package com.brandnewdata.mop.poc.proxy.dao;
 
-import com.brandnewdata.mop.poc.proxy.po.ProxyPo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.brandnewdata.mop.poc.proxy.po.ProxyPo;
 
 /**
  * <p>

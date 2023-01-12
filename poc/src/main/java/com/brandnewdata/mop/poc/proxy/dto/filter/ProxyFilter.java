@@ -1,8 +1,10 @@
-package com.brandnewdata.mop.poc.proxy.bo;
+package com.brandnewdata.mop.poc.proxy.dto.filter;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -12,4 +14,6 @@ public class ProxyFilter {
     private String name;
     private String version;
     private String tags;
+    private LocalDateTime minStartTime;
+    private LocalDateTime maxStartTime;
 }
