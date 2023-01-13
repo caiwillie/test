@@ -14,7 +14,6 @@ public class ProxyEndpointVoConverter {
         vo.setBackendType(dto.getBackendType());
         vo.setBackendConfig(dto.getBackendConfig());
         vo.setDescription(dto.getDescription());
-
         vo.setTag(StringPool.EMPTY.equals(dto.getTag()) ? null : dto.getTag());
         vo.setUpdateTime(dto.getUpdateTime());
         return vo;
