@@ -2,6 +2,7 @@ package com.brandnewdata.mop.poc.bff.converter.proxy;
 
 import cn.hutool.core.lang.Opt;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.brandnewdata.mop.poc.bff.vo.proxy.ProxyEndpointVo;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto;
@@ -16,7 +17,7 @@ public class ProxyEndpointDtoConverter {
         dto.setBackendType(vo.getBackendType());
         dto.setBackendConfig(vo.getBackendConfig());
         dto.setDescription(StrUtil.trim(vo.getDescription()));
-        dto.setTag(StrUtil.trim(vo.getTag()));
+        dto.setTag(Opt.ofNullable(vo.getTag()).orElse(StringPool.EMPTY));
         return dto;
     }
 

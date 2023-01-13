@@ -2,6 +2,7 @@ package com.brandnewdata.mop.poc.bff.converter.proxy;
 
 import cn.hutool.core.lang.Opt;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.brandnewdata.mop.poc.bff.vo.proxy.ProxyVo;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
 
@@ -14,7 +15,8 @@ public class ProxyDtoConverter {
         proxyDto.setVersion(proxyVo.getVersion());
         proxyDto.setProtocol(proxyVo.getProtocol());
         proxyDto.setDescription(proxyVo.getDescription());
-        proxyDto.setTag(StrUtil.trim(proxyVo.getTag()));
+        // null 转换为 ""
+        proxyDto.setTag(Opt.ofNullable(proxyVo.getTag()).orElse(StringPool.EMPTY));
         proxyDto.setState(proxyVo.getState());
         proxyDto.setProjectId(Opt.ofNullable(proxyVo.getProjectId()).map(Long::valueOf).orElse(null));
         return proxyDto;
