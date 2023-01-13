@@ -7,6 +7,7 @@ import cn.hutool.core.lang.Opt;
 import cn.hutool.core.map.MapUtil;
 import com.brandnewdata.common.webresult.Result;
 import com.brandnewdata.mop.api.scene.ISceneApi;
+import com.brandnewdata.mop.api.scene.dto.SceneDto;
 import com.brandnewdata.mop.api.scene.dto.SceneQuery;
 import com.brandnewdata.mop.api.scene.dto.VersionProcessStartDto;
 import com.brandnewdata.mop.poc.constant.ProcessConst;
@@ -35,7 +36,7 @@ public class SceneApi implements ISceneApi {
     }
 
     @Override
-    public Result<List<com.brandnewdata.mop.api.scene.dto.SceneDto>> listByIds(SceneQuery req) {
+    public Result<List<SceneDto>> listByIds(SceneQuery req) {
         return null;
     }
 

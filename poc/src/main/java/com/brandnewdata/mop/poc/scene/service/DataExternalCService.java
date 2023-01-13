@@ -10,7 +10,6 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
-import com.brandnewdata.mop.poc.constant.SceneConst;
 import com.brandnewdata.mop.poc.process.dto.BpmnXmlDto;
 import com.brandnewdata.mop.poc.process.manager.ConnectorManager;
 import com.brandnewdata.mop.poc.process.manager.dto.ConfigInfo;
@@ -94,8 +93,8 @@ public class DataExternalCService implements IDataExternalCService {
 
     @Override
     public SceneVersionExportDto export(Long versionId, List<String> processIdList) {
-        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchOneByIdAndCheckStatus(versionId, new int[]{SceneConst.SCENE_VERSION_STATUS__RUNNING,
-                SceneConst.SCENE_VERSION_STATUS__STOPPED});
+        SceneVersionDto sceneVersionDto = sceneVersionAService.fetchById(ListUtil.of(versionId)).get(versionId);
+        Assert.notNull(sceneVersionDto, "场景版本不存在");
 
         Long sceneId = sceneVersionDto.getSceneId();
         SceneDto sceneDto = sceneService.fetchById(ListUtil.of(sceneId)).get(sceneId);
