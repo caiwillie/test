@@ -23,6 +23,7 @@ import com.brandnewdata.mop.poc.proxy.service.combined.IProxyCService;
 import com.brandnewdata.mop.poc.proxy.service.combined.IProxyEndpointCService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -81,7 +82,10 @@ public class ProxyBffService {
                 .collect(Collectors.toMap(ProxyEndpointDto::getId, Function.identity()));
 
         // todo caiwillie
-        ProxyEndpointCallFilter proxyEndpointCallFilter = new ProxyEndpointCallFilter();
+        LocalDateTime endTime = LocalDateTime.now();
+        LocalDateTime beginTime = endTime.minusDays(1);
+        ProxyEndpointCallFilter proxyEndpointCallFilter = new ProxyEndpointCallFilter()
+                .setMinStartTime(beginTime).setMaxStartTime(endTime);
         Map<Long, List<ProxyEndpointCallDto>> proxyEndpointCallDtoListMap =
                 proxyEndpointCallService.fetchCacheListByEndpointId(ListUtil.toList(proxyEndpointDtoMap.keySet()), proxyEndpointCallFilter);
 
