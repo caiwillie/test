@@ -26,4 +26,9 @@ public class ConnectorIndexVo {
 
     private Integer connectorType;
 
+    /**
+     * 连接器类别 1:应用 2:数据 3: 组件 4:设备 5:算法
+     */
+    private Integer connectorCategory;
+
 }
