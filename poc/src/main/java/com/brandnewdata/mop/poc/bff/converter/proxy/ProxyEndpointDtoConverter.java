@@ -16,7 +16,7 @@ public class ProxyEndpointDtoConverter {
         dto.setLocation(vo.getLocation());
         dto.setBackendType(vo.getBackendType());
         dto.setBackendConfig(vo.getBackendConfig());
-        dto.setDescription(StrUtil.trim(vo.getDescription()));
+        dto.setDescription(vo.getDescription());
         dto.setTag(Opt.ofNullable(vo.getTag()).orElse(StringPool.EMPTY));
         return dto;
     }

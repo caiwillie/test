@@ -11,7 +11,7 @@ public class ProxyDtoConverter {
     public static ProxyDto createFrom(ProxyVo proxyVo) {
         ProxyDto proxyDto = new ProxyDto();
         proxyDto.setId(proxyVo.getId());
-        proxyDto.setName(StrUtil.trim(proxyVo.getName()));
+        proxyDto.setName(proxyVo.getName());
         proxyDto.setVersion(proxyVo.getVersion());
         proxyDto.setProtocol(proxyVo.getProtocol());
         proxyDto.setDescription(proxyVo.getDescription());
