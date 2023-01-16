@@ -179,6 +179,8 @@ public class FlowNodeInstanceService implements IFlowNodeInstanceService {
         if (metaData.getFlowNodeType().equals(FlowNodeType.CALL_ACTIVITY)) {
             ListViewDao listViewDao = daoManager.getListViewDaoByEnvId(envId);
             ProcessInstanceForListViewPo entity = listViewDao.getOneByParentFlowNodeInstanceId(metaData.getFlowNodeInstanceId());
+            // 如果未找到parent，就直接返回
+            if(entity == null) return;
             String calledProcessInstanceId = entity.getId();
             String processName = entity.getProcessName();
             if (processName == null) {
