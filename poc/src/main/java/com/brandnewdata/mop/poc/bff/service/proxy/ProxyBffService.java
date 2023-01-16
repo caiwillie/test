@@ -81,7 +81,7 @@ public class ProxyBffService {
         Map<Long, ProxyEndpointDto> proxyEndpointDtoMap = proxyEndpointDtoListMap.values().stream().flatMap(List::stream)
                 .collect(Collectors.toMap(ProxyEndpointDto::getId, Function.identity()));
 
-        // todo caiwillie
+        // 获取调用次数
         LocalDateTime endTime = LocalDateTime.now();
         LocalDateTime beginTime = endTime.minusDays(1);
         ProxyEndpointCallFilter proxyEndpointCallFilter = new ProxyEndpointCallFilter()
@@ -98,12 +98,20 @@ public class ProxyBffService {
             countMap.put(proxyId, countMap.getOrDefault(proxyId, 0) + count);
         }
 
+        // 获取endpoint总数
+        Map<Long, Integer> endpointCountMap = proxyEndpointAService.countByProxyId(proxyIdList);
+
+        // 组装数据
         for (ProxyGroupVo proxyGroupVo : voList) {
             for (ProxyVo version : proxyGroupVo.getVersions()) {
-                Integer count = countMap.getOrDefault(version.getId(), 0);
-                version.setCallTimes24h(count);
+                Integer callTimesCount = countMap.getOrDefault(version.getId(), 0);
+                Integer endpointCount = endpointCountMap.getOrDefault(version.getId(), 0);
+                version.setCallTimes24h(callTimesCount);
+                version.setEndpointTotal(endpointCount);
             }
         }
+
+
 
         return new Page<>(proxyGroupDtoPage.getTotal(), voList);
     }

@@ -9,6 +9,7 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.constant.ProxyConst;
 import com.brandnewdata.mop.poc.proxy.cache.ProxyCache;
@@ -196,6 +197,7 @@ public class ProxyAService implements IProxyAService {
         QueryWrapper<ProxyPo> query = new QueryWrapper<>();
         query.isNull(ProxyPo.DELETE_FLAG);
         query.isNotNull(ProxyPo.TAG);
+        query.ne(ProxyPo.TAG, StringPool.EMPTY);
         query.select(StrUtil.format("distinct {} as {}", ProxyPo.TAG, ProxyPo.TAG));
         List<Map<String, Object>> result = proxyDao.selectMaps(query);
         for (Map<String, Object> map : result) {

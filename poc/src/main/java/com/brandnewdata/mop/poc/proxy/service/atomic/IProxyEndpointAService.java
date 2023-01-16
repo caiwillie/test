@@ -25,4 +25,6 @@ public interface IProxyEndpointAService {
     void deleteById(Long id);
 
     List<String> listTag(Long proxyId);
+
+    Map<Long, Integer> countByProxyId(List<Long> proxyIdList);
 }
