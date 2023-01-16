@@ -20,10 +20,10 @@ public class ProxyEndpointDtoConverter {
         dto.setTag(Opt.ofNullable(vo.getTag()).orElse(StringPool.EMPTY));
         return dto;
     }
-
     public static void updateFrom(ProxyEndpointDto target, ProxyDto dto) {
         if(dto == null) return;
         target.setProxyName(dto.getName());
         target.setProxyVersion(dto.getVersion());
     }
+
 }
