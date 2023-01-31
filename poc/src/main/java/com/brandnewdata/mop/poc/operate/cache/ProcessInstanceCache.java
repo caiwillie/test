@@ -76,6 +76,7 @@ public class ProcessInstanceCache {
     }
 
     public Map<String, ListViewProcessInstanceDto> asMap(Long envId) {
+        log.debug("process instance cache as map: env {}", envId);
         return Opt.ofNullable(cacheMap.get(envId)).map(ScheduleScanEsCache::asMap).orElse(MapUtil.empty());
     }
 
