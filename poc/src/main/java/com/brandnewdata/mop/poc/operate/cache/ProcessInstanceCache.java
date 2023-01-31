@@ -71,7 +71,6 @@ public class ProcessInstanceCache {
         });
         scheduler.setThreadExecutor(Executors.newSingleThreadExecutor());
         scheduler.start();
-
     }
 
     public Map<String, ListViewProcessInstanceDto> asMap(Long envId) {
