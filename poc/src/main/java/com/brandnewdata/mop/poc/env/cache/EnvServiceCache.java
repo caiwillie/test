@@ -6,6 +6,7 @@ import com.brandnewdata.mop.poc.env.dto.EnvServiceDto;
 import com.brandnewdata.mop.poc.env.po.EnvServicePo;
 import com.caiwillie.util.cache.ScheduleUpdateCache;
 import com.google.common.cache.Cache;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
@@ -18,9 +19,10 @@ public class EnvServiceCache {
 
     private final ScheduleUpdateCache<Long, EnvServiceDto> scheduleCache;
 
-    public EnvServiceCache(DataSource dataSource) {
+    public EnvServiceCache(DataSource dataSource,
+                           @Value("${brandnewdata.database-schedule.maxRowSize}") int maxRowSize) {
         scheduleCache = new ScheduleUpdateCache<>("mop_env_service", "id", "update_time", dataSource,
-                "0/4 * * * * ?", 10, getConsume());
+                "0/4 * * * * ?", maxRowSize, getConsume());
     }
 
     private BiConsumer<List<Entity>, Cache<Long, EnvServiceDto>> getConsume() {

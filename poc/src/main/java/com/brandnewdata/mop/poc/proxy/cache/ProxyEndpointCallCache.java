@@ -6,6 +6,7 @@ import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointCallDto;
 import com.brandnewdata.mop.poc.proxy.po.ProxyEndpointCallPo;
 import com.caiwillie.util.cache.ScheduleUpdateCache;
 import com.google.common.cache.Cache;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
@@ -23,9 +24,10 @@ public class ProxyEndpointCallCache {
         return Collections.unmodifiableMap(scheduleCache.asMap());
     }
 
-    public ProxyEndpointCallCache(DataSource dataSource) {
+    public ProxyEndpointCallCache(DataSource dataSource,
+                                  @Value("${brandnewdata.database-schedule.maxRowSize}") int maxRowSize) {
         scheduleCache = new ScheduleUpdateCache<>("mop_proxy_endpoint_call", "id", "update_time", dataSource,
-                "0/4 * * * * ?", 10, getConsume());
+                "0/4 * * * * ?", maxRowSize, getConsume());
     }
 
     private BiConsumer<List<Entity>, Cache<Long, ProxyEndpointCallDto>> getConsume() {

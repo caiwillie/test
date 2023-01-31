@@ -24,10 +24,11 @@ public class ProxyCache {
     private ScheduleUpdateCache<Long, ProxyDto> scheduleCache;
 
     public ProxyCache(DataSource dataSource,
-                      @Value("${brandnewdata.api.domainPattern}") String domainPattern) {
+                      @Value("${brandnewdata.api.domainPattern}") String domainPattern,
+                      @Value("${brandnewdata.database-schedule.maxRowSize}") int maxRowSize) {
         this.domainPattern = domainPattern;
         scheduleCache = new ScheduleUpdateCache<>("mop_reverse_proxy", "id", "update_time", dataSource,
-                "0/4 * * * * ?", 10, getConsume());
+                "0/4 * * * * ?", maxRowSize, getConsume());
     }
 
     public Map<Long, ProxyDto> asMap() {
