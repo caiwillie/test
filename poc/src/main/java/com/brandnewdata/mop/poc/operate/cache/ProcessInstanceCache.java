@@ -1,6 +1,9 @@
 package com.brandnewdata.mop.poc.operate.cache;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.lang.Opt;
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.cron.Scheduler;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
@@ -47,6 +50,8 @@ public class ProcessInstanceCache {
         scheduler.schedule("0/10 * * * * ?", (Runnable) () -> {
             List<EnvDto> envDtoList = envService.fetchEnvList();
             for (EnvDto envDto : envDtoList) {
+                // 如果是调试环境，就跳过
+                if(NumberUtil.equals(envDto.getType(), 1)) continue;
                 Long id = envDto.getId();
                 // 存在就放过
                 if(cacheMap.containsKey(id)) continue;
@@ -70,7 +75,7 @@ public class ProcessInstanceCache {
     }
 
     public Map<String, ListViewProcessInstanceDto> asMap(Long envId) {
-        return cacheMap.get(envId).asMap();
+        return Opt.ofNullable(cacheMap.get(envId)).map(ScheduleScanEsCache::asMap).orElse(MapUtil.empty());
     }
 
     private BiConsumer<List<ObjectNode>, Cache<String, ListViewProcessInstanceDto>> getConsume() {
