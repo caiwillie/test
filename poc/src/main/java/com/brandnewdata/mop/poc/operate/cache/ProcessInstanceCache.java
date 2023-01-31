@@ -17,6 +17,7 @@ import com.caiwillie.util.cache.ScheduleScanEsCache;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.cache.Cache;
 import io.camunda.operate.dto.ProcessInstanceState;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +27,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
 
+@Slf4j
 @Component
 public class ProcessInstanceCache {
 
@@ -65,7 +67,7 @@ public class ProcessInstanceCache {
                 ScheduleScanEsCache<String, ListViewProcessInstanceDto> cache = new ScheduleScanEsCache<>(
                         "operate-list-view-1.3.0_alias", "id",
                         "startDate", client, "0/4 * * * * ?", filter, maxRowSize, getConsume());
-
+                log.info("process instance cache add env {}", envDto.getId());
                 cacheMap.put(id, cache);
             }
         });
