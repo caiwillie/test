@@ -1,6 +1,7 @@
 package com.brandnewdata.mop.poc.proxy.cache;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.db.Entity;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointCallDto;
 import com.brandnewdata.mop.poc.proxy.po.ProxyEndpointCallPo;
@@ -34,6 +35,7 @@ public class ProxyEndpointCallCache {
         return (entities, cache) -> {
             for (Entity entity : entities) {
                 ProxyEndpointCallDto dto = toDto(entity);
+                ThreadUtil.sleep(20);
                 cache.put(dto.getId(), dto);
             }
         };
