@@ -25,6 +25,7 @@ import com.brandnewdata.mop.poc.scene.service.atomic.IVersionProcessAService;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -62,6 +63,7 @@ public class SceneDeployProgressScheduler {
         Scheduler scheduler = new Scheduler();
         scheduler.setMatchSecond(true);
         scheduler.schedule("0/4 * * * * ?", (Runnable) this::scan);
+        scheduler.setThreadExecutor(Executors.newSingleThreadExecutor());
         scheduler.start();
     }
 

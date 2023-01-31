@@ -33,6 +33,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 @Slf4j
 @Component
@@ -66,6 +67,7 @@ public class ProcessDeployScheduler {
         Scheduler scheduler = new Scheduler();
         scheduler.setMatchSecond(true);
         scheduler.schedule("0/2 * * * * ?", (Runnable) this::scan);
+        scheduler.setThreadExecutor(Executors.newSingleThreadExecutor());
         scheduler.start();
     }
 

@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
 
 @Component
@@ -57,6 +58,7 @@ public class ProcessInstanceCache {
                 cacheMap.put(id, cache);
             }
         });
+        scheduler.setThreadExecutor(Executors.newSingleThreadExecutor());
         scheduler.start();
 
     }
