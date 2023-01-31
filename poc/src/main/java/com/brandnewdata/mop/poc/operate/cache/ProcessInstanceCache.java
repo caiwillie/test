@@ -14,6 +14,7 @@ import com.caiwillie.util.cache.ScheduleScanEsCache;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.cache.Cache;
 import io.camunda.operate.dto.ProcessInstanceState;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -29,9 +30,14 @@ public class ProcessInstanceCache {
     private final ElasticsearchManager elasticsearchManager;
     private final IEnvService envService;
 
-    public ProcessInstanceCache(ElasticsearchManager elasticsearchManager, IEnvService envService) {
+    private final int maxRowSize;
+
+    public ProcessInstanceCache(ElasticsearchManager elasticsearchManager,
+                                IEnvService envService,
+                                @Value("${brandnewdata.elasticsearch-schedule.maxRowSize}") int maxRowSize) {
         this.elasticsearchManager = elasticsearchManager;
         this.envService = envService;
+        this.maxRowSize = maxRowSize;
         init();
     }
 
@@ -53,7 +59,7 @@ public class ProcessInstanceCache {
 
                 ScheduleScanEsCache<String, ListViewProcessInstanceDto> cache = new ScheduleScanEsCache<>(
                         "operate-list-view-1.3.0_alias", "id",
-                        "startDate", client, "0/4 * * * * ?", filter, getConsume());
+                        "startDate", client, "0/4 * * * * ?", filter, maxRowSize, getConsume());
 
                 cacheMap.put(id, cache);
             }

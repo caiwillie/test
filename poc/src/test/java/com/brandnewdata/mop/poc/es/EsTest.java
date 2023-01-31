@@ -85,7 +85,7 @@ public class EsTest {
                 .must(new Query.Builder().term(t -> t.field("joinRelation").value("processInstance")).build())
                 .build();
         ScheduleScanEsCache<String, ListViewProcessInstanceDto> cache = new ScheduleScanEsCache<>("operate-list-view-1.3.0_alias", "id",
-                "startDate", client, "0/4 * * * * ?", filter, (objectNodes, stringListViewProcessInstanceDtoCache) -> {
+                "startDate", client, "0/4 * * * * ?", filter, 10, (objectNodes, stringListViewProcessInstanceDtoCache) -> {
 
                 });
         ThreadUtil.sleep(1000000);
