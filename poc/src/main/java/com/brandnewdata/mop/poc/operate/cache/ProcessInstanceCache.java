@@ -38,7 +38,7 @@ public class ProcessInstanceCache {
         this.elasticsearchManager = elasticsearchManager;
         this.envService = envService;
         this.maxRowSize = maxRowSize;
-        init();
+        // init();
     }
 
     private void init() {
