@@ -35,7 +35,6 @@ public class ProxyEndpointCallCache {
         return (entities, cache) -> {
             for (Entity entity : entities) {
                 ProxyEndpointCallDto dto = toDto(entity);
-                ThreadUtil.sleep(20);
                 cache.put(dto.getId(), dto);
             }
         };
