@@ -2,6 +2,7 @@ package com.brandnewdata.mop.poc.operate.service;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Opt;
 import cn.hutool.core.map.MapUtil;
@@ -159,8 +160,7 @@ public class ProcessInstanceService implements IProcessInstanceService {
 
             Long processDefinitionKey = keyMap.get("processDefinitionKey").to(Long.class);
             Long startDateMillis = keyMap.get("startDate").to(Long.class);
-            LocalDate startDate = LocalDate.from(Instant.ofEpochMilli(startDateMillis));
-
+            LocalDate startDate = LocalDateTimeUtil.of(Instant.ofEpochMilli(startDateMillis)).toLocalDate();
             String state = keyMap.get("state").toString();
             Boolean incident = keyMap.get("incident").to(Boolean.class);
             processInstanceAgg.setProcessInstanceKey(processDefinitionKey);
