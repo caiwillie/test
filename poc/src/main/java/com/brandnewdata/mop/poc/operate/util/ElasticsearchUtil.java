@@ -97,6 +97,15 @@ public class ElasticsearchUtil {
     }
 
     @SneakyThrows
+    public static <T> List<T> searchList(ElasticsearchClient client,
+                                         SearchRequest searchRequest,
+                                         Class<T> clazz) {
+        SearchResponse<T> response = client.search(searchRequest, clazz);
+        List<Hit<T>> hits = response.hits().hits();
+        return hits.stream().map(Hit::source).collect(Collectors.toList());
+    }
+
+    @SneakyThrows
     public static <T> T getOne(ElasticsearchClient client, GetRequest getRequest, Class<T> clazz) {
         GetResponse<T> response = client.get(getRequest, clazz);
         if(response == null) {

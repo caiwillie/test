@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.aggregations.*;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
@@ -66,16 +67,19 @@ public class ListViewDao {
     }
 
     @SneakyThrows
-    public SearchResponse<ProcessInstanceForListViewPo> search(Query query, Integer from, Integer size, ElasticsearchUtil.QueryType queryType) {
-        SearchRequest request = new SearchRequest.Builder()
-                .index(ElasticsearchUtil.whereToSearch(TEMPLATE, queryType))
+    public List<ProcessInstanceForListViewPo> searchList(Query query, Integer from, Integer size,
+                                                         List<SortOptions> sortOptions, ElasticsearchUtil.QueryType queryType) {
+        SearchRequest.Builder builder = new SearchRequest.Builder();
+        builder.index(ElasticsearchUtil.whereToSearch(TEMPLATE, queryType))
                 .query(query)
                 .from(from)
-                .size(size)
-                .build();
+                .size(size);
 
-        SearchResponse<ProcessInstanceForListViewPo> response = client.search(request, ProcessInstanceForListViewPo.class);
-        return response;
+        if(CollUtil.isNotEmpty(sortOptions)) builder.sort(sortOptions);
+
+        SearchRequest request = builder.build();
+
+        return ElasticsearchUtil.searchList(client, request, ProcessInstanceForListViewPo.class);
     }
 
     @SneakyThrows
@@ -90,7 +94,7 @@ public class ListViewDao {
         do {
             CompositeAggregation.Builder compositeAggregationBuilder = new CompositeAggregation.Builder();
             compositeAggregationBuilder.sources(sourceList).size(10);
-            if(CollUtil.isNotEmpty(afterMap)) {
+            if (CollUtil.isNotEmpty(afterMap)) {
                 compositeAggregationBuilder.after(afterMap);
             }
 
@@ -110,21 +114,21 @@ public class ListViewDao {
 
             tempBuckets = myAgg.buckets().array();
 
-            if(CollUtil.isNotEmpty(tempBuckets) && CollUtil.isNotEmpty(afterMap)) {
+            if (CollUtil.isNotEmpty(tempBuckets) && CollUtil.isNotEmpty(afterMap)) {
                 tempBuckets.remove(0);
             }
 
             Map<String, JsonData> afterKeyMap = myAgg.afterKey();
-            if(CollUtil.isNotEmpty(afterKeyMap)) {
+            if (CollUtil.isNotEmpty(afterKeyMap)) {
                 afterKeyMap.forEach((s, jsonData) -> {
                     afterMap.put(s, jsonData.toString());
                 });
             }
 
-            if(CollUtil.isNotEmpty(tempBuckets)) {
+            if (CollUtil.isNotEmpty(tempBuckets)) {
                 buckets.addAll(tempBuckets);
             }
-        } while(CollUtil.isNotEmpty(tempBuckets));
+        } while (CollUtil.isNotEmpty(tempBuckets));
 
         return buckets;
     }

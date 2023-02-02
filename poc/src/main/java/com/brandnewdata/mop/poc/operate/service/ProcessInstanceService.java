@@ -6,9 +6,14 @@ import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Opt;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.StrUtil;
+import co.elastic.clients.elasticsearch._types.FieldSort;
 import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.SortOptions;
+import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.aggregations.*;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.json.JsonData;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.operate.bo.StatisticCountBo;
@@ -30,6 +35,7 @@ import com.brandnewdata.mop.poc.operate.schema.template.ListViewTemplate;
 import com.brandnewdata.mop.poc.operate.schema.template.SequenceFlowTemplate;
 import com.brandnewdata.mop.poc.operate.util.ElasticsearchUtil;
 import com.brandnewdata.mop.poc.util.PageEnhancedUtil;
+import io.camunda.operate.dto.ProcessInstanceState;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -58,21 +64,50 @@ public class ProcessInstanceService implements IProcessInstanceService {
                                                                           int pageSize,
                                                                           ProcessInstanceFilter filter,
                                                                           Map<String, Object> extra) {
+        Assert.notNull(envId, "envId is null");
         if(CollUtil.isEmpty(zeebeKeyList)) return new Page<>(0, ListUtil.empty());
+        Assert.isFalse(CollUtil.hasNull(zeebeKeyList), "zeebeKeyList has null");
+        Query query = assembleQuery(zeebeKeyList, filter);
 
-        List<ListViewProcessInstanceDto> processInstanceDtoList = listProcessInstanceByZeebeKey(envId, zeebeKeyList, filter);
+        int from = (pageNum - 1) * pageSize;
+        int size = pageSize;
 
-        StatisticCountBo statisticCountBo = statisticCount(processInstanceDtoList);
 
-        PageEnhancedUtil.setFirstPageNo(1);
-        List<ListViewProcessInstanceDto> records = PageEnhancedUtil.slice(pageNum, pageSize, processInstanceDtoList);
+        ListViewDao listViewDao = daoManager.getListViewDaoByEnvId(envId);
 
-        Page<ListViewProcessInstanceDto> page = new Page<>(processInstanceDtoList.size(), records);
+        SortOptions sortOption = new SortOptions.Builder()
+                .field(new FieldSort.Builder().field(ListViewTemplate.START_DATE).order(SortOrder.Desc).build())
+                .build();
+        List<ProcessInstanceForListViewPo> listViewPoList =
+                listViewDao.searchList(query, from, size, ListUtil.of(sortOption), ElasticsearchUtil.QueryType.ALL);
+
+        List<ListViewProcessInstanceDto> records = listViewPoList.stream().map(entity -> {
+            ListViewProcessInstanceDto dto = new ListViewProcessInstanceDto();
+            dto.from(entity);
+            return dto;
+        }).collect(Collectors.toList());
+
+        List<ProcessInstanceStateAgg> processInstanceStateAggs = aggProcessInstanceState(envId, zeebeKeyList, filter);
+
         Map<String, Object> extraMap = new HashMap<>();
-        extraMap.put("successCount", statisticCountBo.getCompletedCount());
-        extraMap.put("failCount", statisticCountBo.getIncidentCount());
-        extraMap.put("activeCount", statisticCountBo.getActiveCount());
-        extraMap.put("cancleCount", statisticCountBo.getCanceledCount());
+        int total = 0;
+        for (ProcessInstanceStateAgg agg : processInstanceStateAggs) {
+            String state = agg.getState();
+            Boolean incident = agg.getIncident();
+            Integer docCount = agg.getDocCount();
+            total += docCount;
+            if(StrUtil.equals(state, ProcessInstanceState.COMPLETED.name())) {
+                extraMap.put("successCount", docCount);
+            } else if (StrUtil.equals(state, ProcessInstanceState.CANCELED.name())) {
+                extraMap.put("cancleCount", docCount);
+            } else if (StrUtil.equals(state, ProcessInstanceState.ACTIVE.name()) && incident) {
+                extraMap.put("failCount", docCount);
+            } else if (StrUtil.equals(state, ProcessInstanceState.ACTIVE.name()) && !incident) {
+                extraMap.put("activeCount", docCount);
+            }
+        }
+
+        Page<ListViewProcessInstanceDto> page = new Page<>(total, records);
         page.setExtraMap(extraMap);
         return page;
     }
@@ -129,25 +164,25 @@ public class ProcessInstanceService implements IProcessInstanceService {
         List<Map<String, CompositeAggregationSource>> sourceList = new ArrayList<>();
 
         CompositeAggregationSource processDefinitionKeySource = new CompositeAggregationSource.Builder()
-                .terms(new TermsAggregation.Builder().field("processDefinitionKey").build())
+                .terms(new TermsAggregation.Builder().field(ListViewTemplate.PROCESS_KEY).build())
                 .build();
-        sourceList.add(MapUtil.of("processDefinitionKey", processDefinitionKeySource));
+        sourceList.add(MapUtil.of(ListViewTemplate.PROCESS_KEY, processDefinitionKeySource));
 
         CompositeAggregationSource startDateSource = new CompositeAggregationSource.Builder()
-                .dateHistogram(new DateHistogramAggregation.Builder().field("startDate")
+                .dateHistogram(new DateHistogramAggregation.Builder().field(ListViewTemplate.START_DATE)
                         .calendarInterval(CalendarInterval.Day).build())
                 .build();
-        sourceList.add(MapUtil.of("startDate", startDateSource));
+        sourceList.add(MapUtil.of(ListViewTemplate.START_DATE, startDateSource));
 
         CompositeAggregationSource stateSource = new CompositeAggregationSource.Builder()
-                .terms(new TermsAggregation.Builder().field("state").build())
+                .terms(new TermsAggregation.Builder().field(ListViewTemplate.STATE).build())
                 .build();
-        sourceList.add(MapUtil.of("state", stateSource));
+        sourceList.add(MapUtil.of(ListViewTemplate.STATE, stateSource));
 
         CompositeAggregationSource incidentSource = new CompositeAggregationSource.Builder()
-                .terms(new TermsAggregation.Builder().field("incident").build())
+                .terms(new TermsAggregation.Builder().field(ListViewTemplate.INCIDENT).build())
                 .build();
-        sourceList.add(MapUtil.of("incident", incidentSource));
+        sourceList.add(MapUtil.of(ListViewTemplate.INCIDENT, incidentSource));
 
         ListViewDao listViewDao = daoManager.getListViewDaoByEnvId(envId);
         List<CompositeBucket> bucketList = listViewDao.aggregation(query, sourceList, ElasticsearchUtil.QueryType.ALL);
@@ -158,11 +193,11 @@ public class ProcessInstanceService implements IProcessInstanceService {
             long docCount = bucket.docCount();
             Map<String, JsonData> keyMap = bucket.key();
 
-            Long processDefinitionKey = keyMap.get("processDefinitionKey").to(Long.class);
-            Long startDateMillis = keyMap.get("startDate").to(Long.class);
+            Long processDefinitionKey = keyMap.get(ListViewTemplate.PROCESS_KEY).to(Long.class);
+            Long startDateMillis = keyMap.get(ListViewTemplate.START_DATE).to(Long.class);
             LocalDate startDate = LocalDateTimeUtil.of(Instant.ofEpochMilli(startDateMillis)).toLocalDate();
-            String state = keyMap.get("state").to(String.class);
-            Boolean incident = keyMap.get("incident").to(Boolean.class);
+            String state = keyMap.get(ListViewTemplate.STATE).to(String.class);
+            Boolean incident = keyMap.get(ListViewTemplate.INCIDENT).to(Boolean.class);
             processInstanceKeyAgg.setProcessInstanceKey(processDefinitionKey);
             processInstanceKeyAgg.setStartDate(startDate);
             processInstanceKeyAgg.setState(state);
@@ -184,14 +219,14 @@ public class ProcessInstanceService implements IProcessInstanceService {
 
         List<Map<String, CompositeAggregationSource>> sourceList = new ArrayList<>();
         CompositeAggregationSource stateSource = new CompositeAggregationSource.Builder()
-                .terms(new TermsAggregation.Builder().field("state").build())
+                .terms(new TermsAggregation.Builder().field(ListViewTemplate.STATE).build())
                 .build();
-        sourceList.add(MapUtil.of("state", stateSource));
+        sourceList.add(MapUtil.of(ListViewTemplate.STATE, stateSource));
 
         CompositeAggregationSource incidentSource = new CompositeAggregationSource.Builder()
-                .terms(new TermsAggregation.Builder().field("incident").build())
+                .terms(new TermsAggregation.Builder().field(ListViewTemplate.INCIDENT).build())
                 .build();
-        sourceList.add(MapUtil.of("incident", incidentSource));
+        sourceList.add(MapUtil.of(ListViewTemplate.INCIDENT, incidentSource));
 
         ListViewDao listViewDao = daoManager.getListViewDaoByEnvId(envId);
         List<CompositeBucket> bucketList = listViewDao.aggregation(query, sourceList, ElasticsearchUtil.QueryType.ALL);
@@ -202,8 +237,8 @@ public class ProcessInstanceService implements IProcessInstanceService {
             long docCount = bucket.docCount();
             Map<String, JsonData> keyMap = bucket.key();
 
-            String state = keyMap.get("state").to(String.class);
-            Boolean incident = keyMap.get("incident").to(Boolean.class);
+            String state = keyMap.get(ListViewTemplate.STATE).to(String.class);
+            Boolean incident = keyMap.get(ListViewTemplate.INCIDENT).to(Boolean.class);
             processInstanceStateAgg.setState(state);
             processInstanceStateAgg.setIncident(incident);
             processInstanceStateAgg.setDocCount((int) docCount);
