@@ -161,7 +161,7 @@ public class ProcessInstanceService implements IProcessInstanceService {
             Long processDefinitionKey = keyMap.get("processDefinitionKey").to(Long.class);
             Long startDateMillis = keyMap.get("startDate").to(Long.class);
             LocalDate startDate = LocalDateTimeUtil.of(Instant.ofEpochMilli(startDateMillis)).toLocalDate();
-            String state = keyMap.get("state").toString();
+            String state = keyMap.get("state").to(String.class);
             Boolean incident = keyMap.get("incident").to(Boolean.class);
             processInstanceAgg.setProcessInstanceKey(processDefinitionKey);
             processInstanceAgg.setStartDate(startDate);

@@ -168,7 +168,7 @@ public class SceneOperateBffService {
                 _state = ProcessInstanceStateDto.INCIDENT;
             }
 
-            executionCount++;
+            executionCount += docCount;
             if(_state == ProcessInstanceStateDto.COMPLETED) {
                 successCount += docCount;
             } else if (_state == ProcessInstanceStateDto.INCIDENT) {
