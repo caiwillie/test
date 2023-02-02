@@ -5,7 +5,8 @@ import com.brandnewdata.mop.poc.operate.dto.FlowNodeStateDto;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.operate.dto.SequenceFlowDto;
 import com.brandnewdata.mop.poc.operate.dto.filter.ProcessInstanceFilter;
-import com.brandnewdata.mop.poc.operate.dto.statistic.ProcessInstanceAgg;
+import com.brandnewdata.mop.poc.operate.dto.statistic.ProcessInstanceKeyAgg;
+import com.brandnewdata.mop.poc.operate.dto.statistic.ProcessInstanceStateAgg;
 
 import java.util.List;
 import java.util.Map;
@@ -30,9 +31,13 @@ public interface IProcessInstanceService {
             List<Long> zeebeKeyList,
             ProcessInstanceFilter filter);
 
-    List<ProcessInstanceAgg> aggProcessInstance(Long envId,
-                                                List<Long> zeebeKeyList,
-                                                ProcessInstanceFilter filter);
+    List<ProcessInstanceKeyAgg> aggProcessInstanceKey(Long envId,
+                                                      List<Long> zeebeKeyList,
+                                                      ProcessInstanceFilter filter);
+
+    List<ProcessInstanceStateAgg> aggProcessInstanceState(Long envId,
+                                                          List<Long> zeebeKeyList,
+                                                          ProcessInstanceFilter filter);
 
     ListViewProcessInstanceDto detailProcessInstance(Long envId, Long processInstanceId);
 

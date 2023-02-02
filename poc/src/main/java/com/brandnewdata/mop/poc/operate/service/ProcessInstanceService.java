@@ -19,7 +19,8 @@ import com.brandnewdata.mop.poc.operate.dao.ListViewDao;
 import com.brandnewdata.mop.poc.operate.dao.SequenceFlowDao;
 import com.brandnewdata.mop.poc.operate.dto.*;
 import com.brandnewdata.mop.poc.operate.dto.filter.ProcessInstanceFilter;
-import com.brandnewdata.mop.poc.operate.dto.statistic.ProcessInstanceAgg;
+import com.brandnewdata.mop.poc.operate.dto.statistic.ProcessInstanceKeyAgg;
+import com.brandnewdata.mop.poc.operate.dto.statistic.ProcessInstanceStateAgg;
 import com.brandnewdata.mop.poc.operate.manager.DaoManager;
 import com.brandnewdata.mop.poc.operate.po.FlowNodeInstancePo;
 import com.brandnewdata.mop.poc.operate.po.SequenceFlowPo;
@@ -118,8 +119,8 @@ public class ProcessInstanceService implements IProcessInstanceService {
     }
 
     @Override
-    public List<ProcessInstanceAgg> aggProcessInstance(Long envId, List<Long> zeebeKeyList, ProcessInstanceFilter filter) {
-        List<ProcessInstanceAgg> ret = new ArrayList<>();
+    public List<ProcessInstanceKeyAgg> aggProcessInstanceKey(Long envId, List<Long> zeebeKeyList, ProcessInstanceFilter filter) {
+        List<ProcessInstanceKeyAgg> ret = new ArrayList<>();
         Assert.notNull(envId, "envId is null");
         if(CollUtil.isEmpty(zeebeKeyList)) return ListUtil.empty();
         Assert.isFalse(CollUtil.hasNull(zeebeKeyList), "zeebeKeyList has null");
@@ -153,22 +154,60 @@ public class ProcessInstanceService implements IProcessInstanceService {
         if(CollUtil.isEmpty(bucketList)) return ret;
 
         for (CompositeBucket bucket : bucketList) {
-            ProcessInstanceAgg processInstanceAgg = new ProcessInstanceAgg();
+            ProcessInstanceKeyAgg processInstanceKeyAgg = new ProcessInstanceKeyAgg();
             long docCount = bucket.docCount();
             Map<String, JsonData> keyMap = bucket.key();
-
 
             Long processDefinitionKey = keyMap.get("processDefinitionKey").to(Long.class);
             Long startDateMillis = keyMap.get("startDate").to(Long.class);
             LocalDate startDate = LocalDateTimeUtil.of(Instant.ofEpochMilli(startDateMillis)).toLocalDate();
             String state = keyMap.get("state").to(String.class);
             Boolean incident = keyMap.get("incident").to(Boolean.class);
-            processInstanceAgg.setProcessInstanceKey(processDefinitionKey);
-            processInstanceAgg.setStartDate(startDate);
-            processInstanceAgg.setState(state);
-            processInstanceAgg.setIncident(incident);
-            processInstanceAgg.setDocCount((int) docCount);
-            ret.add(processInstanceAgg);
+            processInstanceKeyAgg.setProcessInstanceKey(processDefinitionKey);
+            processInstanceKeyAgg.setStartDate(startDate);
+            processInstanceKeyAgg.setState(state);
+            processInstanceKeyAgg.setIncident(incident);
+            processInstanceKeyAgg.setDocCount((int) docCount);
+            ret.add(processInstanceKeyAgg);
+        }
+
+        return ret;
+    }
+
+    @Override
+    public List<ProcessInstanceStateAgg> aggProcessInstanceState(Long envId, List<Long> zeebeKeyList, ProcessInstanceFilter filter) {
+        List<ProcessInstanceStateAgg> ret = new ArrayList<>();
+        Assert.notNull(envId, "envId is null");
+        if(CollUtil.isEmpty(zeebeKeyList)) return ListUtil.empty();
+        Assert.isFalse(CollUtil.hasNull(zeebeKeyList), "zeebeKeyList has null");
+        Query query = assembleQuery(zeebeKeyList, filter);
+
+        List<Map<String, CompositeAggregationSource>> sourceList = new ArrayList<>();
+        CompositeAggregationSource stateSource = new CompositeAggregationSource.Builder()
+                .terms(new TermsAggregation.Builder().field("state").build())
+                .build();
+        sourceList.add(MapUtil.of("state", stateSource));
+
+        CompositeAggregationSource incidentSource = new CompositeAggregationSource.Builder()
+                .terms(new TermsAggregation.Builder().field("incident").build())
+                .build();
+        sourceList.add(MapUtil.of("incident", incidentSource));
+
+        ListViewDao listViewDao = daoManager.getListViewDaoByEnvId(envId);
+        List<CompositeBucket> bucketList = listViewDao.aggregation(query, sourceList, ElasticsearchUtil.QueryType.ALL);
+        if(CollUtil.isEmpty(bucketList)) return ret;
+
+        for (CompositeBucket bucket : bucketList) {
+            ProcessInstanceStateAgg processInstanceStateAgg = new ProcessInstanceStateAgg();
+            long docCount = bucket.docCount();
+            Map<String, JsonData> keyMap = bucket.key();
+
+            String state = keyMap.get("state").to(String.class);
+            Boolean incident = keyMap.get("incident").to(Boolean.class);
+            processInstanceStateAgg.setState(state);
+            processInstanceStateAgg.setIncident(incident);
+            processInstanceStateAgg.setDocCount((int) docCount);
+            ret.add(processInstanceStateAgg);
         }
 
         return ret;

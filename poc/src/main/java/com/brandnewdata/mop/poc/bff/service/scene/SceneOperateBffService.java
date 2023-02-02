@@ -20,7 +20,7 @@ import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.operate.dto.ListViewProcessInstanceDto;
 import com.brandnewdata.mop.poc.operate.dto.ProcessInstanceStateDto;
 import com.brandnewdata.mop.poc.operate.dto.filter.ProcessInstanceFilter;
-import com.brandnewdata.mop.poc.operate.dto.statistic.ProcessInstanceAgg;
+import com.brandnewdata.mop.poc.operate.dto.statistic.ProcessInstanceKeyAgg;
 import com.brandnewdata.mop.poc.operate.service.IProcessInstanceService;
 import com.brandnewdata.mop.poc.process.dto.ProcessReleaseDeployDto;
 import com.brandnewdata.mop.poc.process.service.IProcessDeployService;
@@ -143,8 +143,8 @@ public class SceneOperateBffService {
         ProcessInstanceFilter processInstanceFilter = new ProcessInstanceFilter()
                 .setMinStartTime(minStartTime).setMaxStartTime(maxStartTime);
 
-        List<ProcessInstanceAgg> processInstanceAggList = processInstanceService
-                .aggProcessInstance(envId, ListUtil.toList(zeebeKeyMap.keySet()), processInstanceFilter);
+        List<ProcessInstanceKeyAgg> processInstanceKeyAggList = processInstanceService
+                .aggProcessInstanceKey(envId, ListUtil.toList(zeebeKeyMap.keySet()), processInstanceFilter);
 
         int executionCount = 0;
         int successCount = 0;
@@ -155,7 +155,7 @@ public class SceneOperateBffService {
         Map<LocalDate, Integer> executionSceneTendencyMap = new HashMap<>();
         Map<LocalDate, Integer> executionSceneTendencySuccessMap = new HashMap<>();
         Map<LocalDate, Integer> executionSceneTendencyFailMap = new HashMap<>();
-        for (ProcessInstanceAgg agg : processInstanceAggList) {
+        for (ProcessInstanceKeyAgg agg : processInstanceKeyAggList) {
             Integer docCount = agg.getDocCount();
             String state = agg.getState();
             Boolean incident = agg.getIncident();
