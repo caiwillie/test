@@ -167,7 +167,7 @@ public class ProcessInstanceService implements IProcessInstanceService {
             processInstanceAgg.setStartDate(startDate);
             processInstanceAgg.setState(state);
             processInstanceAgg.setIncident(incident);
-            processInstanceAgg.setDocCount(docCount);
+            processInstanceAgg.setDocCount((int) docCount);
             ret.add(processInstanceAgg);
         }
 

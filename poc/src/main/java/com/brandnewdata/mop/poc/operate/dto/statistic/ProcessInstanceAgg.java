@@ -16,5 +16,5 @@ public class ProcessInstanceAgg {
 
     private Boolean incident;
 
-    private Long docCount;
+    private Integer docCount;
 }

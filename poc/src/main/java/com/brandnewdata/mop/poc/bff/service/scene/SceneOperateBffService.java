@@ -30,6 +30,7 @@ import com.brandnewdata.mop.poc.scene.dto.VersionProcessDto;
 import com.brandnewdata.mop.poc.scene.service.ISceneService;
 import com.brandnewdata.mop.poc.scene.service.atomic.ISceneReleaseDeployAService;
 import com.brandnewdata.mop.poc.scene.service.atomic.IVersionProcessAService;
+import io.camunda.operate.dto.ProcessInstanceState;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -141,7 +142,7 @@ public class SceneOperateBffService {
 
         ProcessInstanceFilter processInstanceFilter = new ProcessInstanceFilter()
                 .setMinStartTime(minStartTime).setMaxStartTime(maxStartTime);
-        // List<ListViewProcessInstanceDto> listViewProcessInstanceDtoList
+
         List<ProcessInstanceAgg> processInstanceAggList = processInstanceService
                 .aggProcessInstance(envId, ListUtil.toList(zeebeKeyMap.keySet()), processInstanceFilter);
 
@@ -154,36 +155,45 @@ public class SceneOperateBffService {
         Map<LocalDate, Integer> executionSceneTendencyMap = new HashMap<>();
         Map<LocalDate, Integer> executionSceneTendencySuccessMap = new HashMap<>();
         Map<LocalDate, Integer> executionSceneTendencyFailMap = new HashMap<>();
-        for (ListViewProcessInstanceDto dto : listViewProcessInstanceDtoList) {
-            ProcessInstanceStateDto state = dto.getState();
+        for (ProcessInstanceAgg agg : processInstanceAggList) {
+            Integer docCount = agg.getDocCount();
+            String state = agg.getState();
+            Boolean incident = agg.getIncident();
+            Long zeebeKey = agg.getProcessInstanceKey();
+            LocalDate startDate = agg.getStartDate();
+            ProcessInstanceStateDto _state = null;
+            if(StrUtil.equals(state, ProcessInstanceState.COMPLETED.name())) {
+                _state = ProcessInstanceStateDto.COMPLETED;
+            } else if (StrUtil.equals(state, ProcessInstanceState.ACTIVE.name()) && incident) {
+                _state = ProcessInstanceStateDto.INCIDENT;
+            }
+
             executionCount++;
-            if(state == ProcessInstanceStateDto.COMPLETED) {
-                successCount++;
-            } else if (state == ProcessInstanceStateDto.INCIDENT) {
-                failCount++;
+            if(_state == ProcessInstanceStateDto.COMPLETED) {
+                successCount += docCount;
+            } else if (_state == ProcessInstanceStateDto.INCIDENT) {
+                failCount += docCount;
             }
 
-            if(state == ProcessInstanceStateDto.COMPLETED || state == ProcessInstanceStateDto.INCIDENT) {
-                SceneReleaseDeployDto sceneReleaseDeployDto = sceneReleaseDeployDtoMap.get(dto.getBpmnProcessId());
+            if(_state == ProcessInstanceStateDto.COMPLETED || _state == ProcessInstanceStateDto.INCIDENT) {
+                String processId = zeebeKeyMap.get(zeebeKey).getProcessId();
+                SceneReleaseDeployDto sceneReleaseDeployDto = sceneReleaseDeployDtoMap.get(processId);
                 String sceneName = sceneReleaseDeployDto.getSceneName();
-                executionSceneRankingMap.put(sceneName, executionSceneRankingMap.getOrDefault(sceneName, 0) + 1);
+                executionSceneRankingMap.put(sceneName, executionSceneRankingMap.getOrDefault(sceneName, 0) + docCount);
 
-                if(state == ProcessInstanceStateDto.COMPLETED) {
-                    executionSceneRankingSuccessMap.put(sceneName, executionSceneRankingSuccessMap.getOrDefault(sceneName, 0) + 1);
+                if(_state == ProcessInstanceStateDto.COMPLETED) {
+                    executionSceneRankingSuccessMap.put(sceneName, executionSceneRankingSuccessMap.getOrDefault(sceneName, 0) + docCount);
                 } else {
-                    executionSceneRankingFailMap.put(sceneName, executionSceneRankingFailMap.getOrDefault(sceneName, 0) + 1);
+                    executionSceneRankingFailMap.put(sceneName, executionSceneRankingFailMap.getOrDefault(sceneName, 0) + docCount);
                 }
 
-                LocalDate localDate = dto.getStartDate().toLocalDate();
-                executionSceneTendencyMap.put(localDate, executionSceneTendencyMap.getOrDefault(localDate, 0) + 1);
-                if(state == ProcessInstanceStateDto.COMPLETED) {
-                    executionSceneTendencySuccessMap.put(localDate, executionSceneTendencySuccessMap.getOrDefault(localDate, 0) + 1);
+                executionSceneTendencyMap.put(startDate, executionSceneTendencyMap.getOrDefault(startDate, 0) + docCount);
+                if(_state == ProcessInstanceStateDto.COMPLETED) {
+                    executionSceneTendencySuccessMap.put(startDate, executionSceneTendencySuccessMap.getOrDefault(startDate, 0) + 1);
                 } else {
-                    executionSceneTendencyFailMap.put(localDate, executionSceneTendencyFailMap.getOrDefault(localDate, 0) + 1);
+                    executionSceneTendencyFailMap.put(startDate, executionSceneTendencyFailMap.getOrDefault(startDate, 0) + 1);
                 }
-
             }
-
         }
 
         // assemble result
