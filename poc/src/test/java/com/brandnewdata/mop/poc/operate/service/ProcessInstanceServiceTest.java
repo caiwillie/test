@@ -22,7 +22,8 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.when;
 
 class ProcessInstanceServiceTest {
     @Mock
