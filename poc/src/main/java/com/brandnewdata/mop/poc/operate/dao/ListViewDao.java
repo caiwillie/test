@@ -93,7 +93,7 @@ public class ListViewDao {
 
         do {
             CompositeAggregation.Builder compositeAggregationBuilder = new CompositeAggregation.Builder();
-            compositeAggregationBuilder.sources(sourceList).size(100);
+            compositeAggregationBuilder.sources(sourceList).size(400);
             if (CollUtil.isNotEmpty(afterMap)) {
                 compositeAggregationBuilder.after(afterMap);
             }
