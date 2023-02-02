@@ -4,7 +4,9 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Opt;
+import cn.hutool.core.map.MapUtil;
 import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.aggregations.*;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.json.JsonData;
 import com.brandnewdata.mop.poc.common.dto.Page;
@@ -16,6 +18,7 @@ import com.brandnewdata.mop.poc.operate.dao.ListViewDao;
 import com.brandnewdata.mop.poc.operate.dao.SequenceFlowDao;
 import com.brandnewdata.mop.poc.operate.dto.*;
 import com.brandnewdata.mop.poc.operate.dto.filter.ProcessInstanceFilter;
+import com.brandnewdata.mop.poc.operate.dto.statistic.ProcessInstanceAgg;
 import com.brandnewdata.mop.poc.operate.manager.DaoManager;
 import com.brandnewdata.mop.poc.operate.po.FlowNodeInstancePo;
 import com.brandnewdata.mop.poc.operate.po.SequenceFlowPo;
@@ -28,9 +31,7 @@ import com.brandnewdata.mop.poc.util.PageEnhancedUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -78,43 +79,7 @@ public class ProcessInstanceService implements IProcessInstanceService {
     public List<ListViewProcessInstanceDto> listProcessInstanceByZeebeKey(Long envId, List<Long> zeebeKeyList, ProcessInstanceFilter filter) {
         if(CollUtil.isEmpty(zeebeKeyList)) return ListUtil.empty();
 
-        Assert.notNull(filter);
-
-        Long minStartTime = Opt.ofNullable(filter.getMinStartTime())
-                .map(time -> time.toInstant(DEFAULT_ZONE_OFFSET).toEpochMilli()).orElse(null);
-        Long maxStartTime = Opt.ofNullable(filter.getMaxStartTime())
-                .map(time -> time.toInstant(DEFAULT_ZONE_OFFSET).toEpochMilli()).orElse(null);
-
-        List<FieldValue> zeebeKeyFieldValueList = zeebeKeyList.stream().map(key -> new FieldValue.Builder().longValue(key).build())
-                .collect(Collectors.toList());
-
-        List<Query> mustQueryList = new ArrayList<>();
-        mustQueryList.add(new Query.Builder()
-                .term(t -> t.field(ListViewTemplate.JOIN_RELATION).value("processInstance"))
-                .build());
-        mustQueryList.add(new Query.Builder()
-                .terms(new TermsQuery.Builder()
-                        .field(ListViewTemplate.PROCESS_KEY)
-                        .terms(new TermsQueryField.Builder().value(zeebeKeyFieldValueList).build()).build())
-                .build());
-
-        if(minStartTime != null) {
-            mustQueryList.add(new Query.Builder()
-                    .range(new RangeQuery.Builder().field(ListViewTemplate.START_DATE).gte(JsonData.of(minStartTime)).build())
-                    .build());
-        }
-
-        if(maxStartTime != null) {
-            mustQueryList.add(new Query.Builder()
-                    .range(new RangeQuery.Builder().field(ListViewTemplate.START_DATE).lte(JsonData.of(maxStartTime)).build())
-                    .build());
-        }
-
-        Query query = new Query.Builder()
-                .bool(new BoolQuery.Builder()
-                        .must(mustQueryList)
-                        .build())
-                .build();
+        Query query = assembleQuery(zeebeKeyList, filter);
 
         ListViewDao listViewDao = daoManager.getListViewDaoByEnvId(envId);
         List<ProcessInstanceForListViewPo> processInstanceForListViewEntities = listViewDao.scrollAll(query, ElasticsearchUtil.QueryType.ALL);
@@ -149,6 +114,64 @@ public class ProcessInstanceService implements IProcessInstanceService {
             if(maxStartTime != null && maxStartTime.compareTo(startDate) < 0) return false;
             return true;
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProcessInstanceAgg> aggProcessInstance(Long envId, List<Long> zeebeKeyList, ProcessInstanceFilter filter) {
+        List<ProcessInstanceAgg> ret = new ArrayList<>();
+        Assert.notNull(envId, "envId is null");
+        if(CollUtil.isEmpty(zeebeKeyList)) return ListUtil.empty();
+        Assert.isFalse(CollUtil.hasNull(zeebeKeyList), "zeebeKeyList has null");
+        Query query = assembleQuery(zeebeKeyList, filter);
+
+        List<Map<String, CompositeAggregationSource>> sourceList = new ArrayList<>();
+
+        CompositeAggregationSource processDefinitionKeySource = new CompositeAggregationSource.Builder()
+                .terms(new TermsAggregation.Builder().field("processDefinitionKey").build())
+                .build();
+        sourceList.add(MapUtil.of("processDefinitionKey", processDefinitionKeySource));
+
+        CompositeAggregationSource startDateSource = new CompositeAggregationSource.Builder()
+                .dateHistogram(new DateHistogramAggregation.Builder().field("startDate")
+                        .calendarInterval(CalendarInterval.Day).build())
+                .build();
+        sourceList.add(MapUtil.of("startDate", startDateSource));
+
+        CompositeAggregationSource stateSource = new CompositeAggregationSource.Builder()
+                .terms(new TermsAggregation.Builder().field("state").build())
+                .build();
+        sourceList.add(MapUtil.of("state", stateSource));
+
+        CompositeAggregationSource incidentSource = new CompositeAggregationSource.Builder()
+                .terms(new TermsAggregation.Builder().field("incident").build())
+                .build();
+        sourceList.add(MapUtil.of("incident", incidentSource));
+
+        ListViewDao listViewDao = daoManager.getListViewDaoByEnvId(envId);
+        List<CompositeBucket> bucketList = listViewDao.aggregation(query, sourceList, ElasticsearchUtil.QueryType.ALL);
+        if(CollUtil.isEmpty(bucketList)) return ret;
+
+        for (CompositeBucket bucket : bucketList) {
+            ProcessInstanceAgg processInstanceAgg = new ProcessInstanceAgg();
+            long docCount = bucket.docCount();
+            Map<String, JsonData> keyMap = bucket.key();
+
+
+            Long processDefinitionKey = keyMap.get("processDefinitionKey").to(Long.class);
+            Long startDateMillis = keyMap.get("startDate").to(Long.class);
+            LocalDate startDate = LocalDate.from(Instant.ofEpochMilli(startDateMillis));
+
+            String state = keyMap.get("state").toString();
+            Boolean incident = keyMap.get("incident").to(Boolean.class);
+            processInstanceAgg.setProcessInstanceKey(processDefinitionKey);
+            processInstanceAgg.setStartDate(startDate);
+            processInstanceAgg.setState(state);
+            processInstanceAgg.setIncident(incident);
+            processInstanceAgg.setDocCount(docCount);
+            ret.add(processInstanceAgg);
+        }
+
+        return ret;
     }
 
     @Override
@@ -237,6 +260,46 @@ public class ProcessInstanceService implements IProcessInstanceService {
         }
 
         return ret;
+    }
+
+    private Query assembleQuery(List<Long> zeebeKeyList, ProcessInstanceFilter filter) {
+        Assert.notNull(filter);
+
+        Long minStartTime = Opt.ofNullable(filter.getMinStartTime())
+                .map(time -> time.toInstant(DEFAULT_ZONE_OFFSET).toEpochMilli()).orElse(null);
+        Long maxStartTime = Opt.ofNullable(filter.getMaxStartTime())
+                .map(time -> time.toInstant(DEFAULT_ZONE_OFFSET).toEpochMilli()).orElse(null);
+
+        List<FieldValue> zeebeKeyFieldValueList = zeebeKeyList.stream().map(key -> new FieldValue.Builder().longValue(key).build())
+                .collect(Collectors.toList());
+
+        List<Query> mustQueryList = new ArrayList<>();
+        mustQueryList.add(new Query.Builder()
+                .term(t -> t.field(ListViewTemplate.JOIN_RELATION).value("processInstance"))
+                .build());
+        mustQueryList.add(new Query.Builder()
+                .terms(new TermsQuery.Builder()
+                        .field(ListViewTemplate.PROCESS_KEY)
+                        .terms(new TermsQueryField.Builder().value(zeebeKeyFieldValueList).build()).build())
+                .build());
+
+        if(minStartTime != null) {
+            mustQueryList.add(new Query.Builder()
+                    .range(new RangeQuery.Builder().field(ListViewTemplate.START_DATE).gte(JsonData.of(minStartTime)).build())
+                    .build());
+        }
+
+        if(maxStartTime != null) {
+            mustQueryList.add(new Query.Builder()
+                    .range(new RangeQuery.Builder().field(ListViewTemplate.START_DATE).lte(JsonData.of(maxStartTime)).build())
+                    .build());
+        }
+
+        return new Query.Builder()
+                .bool(new BoolQuery.Builder()
+                        .must(mustQueryList)
+                        .build())
+                .build();
     }
 
     private StatisticCountBo statisticCount(List<ListViewProcessInstanceDto> processInstanceDtoList) {
