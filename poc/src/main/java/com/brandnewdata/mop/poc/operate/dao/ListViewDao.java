@@ -114,14 +114,10 @@ public class ListViewDao {
 
             tempBuckets = myAgg.buckets().array();
 
-            if (CollUtil.isNotEmpty(tempBuckets) && CollUtil.isNotEmpty(afterMap)) {
-                tempBuckets.remove(0);
-            }
-
             Map<String, JsonData> afterKeyMap = myAgg.afterKey();
             if (CollUtil.isNotEmpty(afterKeyMap)) {
                 afterKeyMap.forEach((s, jsonData) -> {
-                    afterMap.put(s, jsonData.toString());
+                    afterMap.put(s, jsonData.to(String.class));
                 });
             }
 

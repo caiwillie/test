@@ -70,8 +70,6 @@ public class ProcessInstanceService implements IProcessInstanceService {
         Query query = assembleQuery(zeebeKeyList, filter);
 
         int from = (pageNum - 1) * pageSize;
-        int size = pageSize;
-
 
         ListViewDao listViewDao = daoManager.getListViewDaoByEnvId(envId);
 
@@ -79,7 +77,7 @@ public class ProcessInstanceService implements IProcessInstanceService {
                 .field(new FieldSort.Builder().field(ListViewTemplate.START_DATE).order(SortOrder.Desc).build())
                 .build();
         List<ProcessInstanceForListViewPo> listViewPoList =
-                listViewDao.searchList(query, from, size, ListUtil.of(sortOption), ElasticsearchUtil.QueryType.ALL);
+                listViewDao.searchList(query, from, pageSize, ListUtil.of(sortOption), ElasticsearchUtil.QueryType.ALL);
 
         List<ListViewProcessInstanceDto> records = listViewPoList.stream().map(entity -> {
             ListViewProcessInstanceDto dto = new ListViewProcessInstanceDto();

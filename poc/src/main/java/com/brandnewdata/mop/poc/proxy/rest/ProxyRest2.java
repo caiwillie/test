@@ -24,9 +24,6 @@ public class ProxyRest2 {
     @Resource
     private EndpointService endpointService;
 
-
-
-
     /**
      * 创建自配置文件
      *

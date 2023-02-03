@@ -2,6 +2,7 @@ package com.brandnewdata.mop.poc.proxy.service.atomic;
 
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointCallDto;
+import com.brandnewdata.mop.poc.proxy.dto.agg.ProxyEndpointCallAgg;
 import com.brandnewdata.mop.poc.proxy.dto.filter.ProxyEndpointCallFilter;
 
 import java.util.List;
@@ -14,5 +15,7 @@ public interface IProxyEndpointCallAService {
     ProxyEndpointCallDto save(ProxyEndpointCallDto dto);
 
     Map<Long, List<ProxyEndpointCallDto>> fetchCacheListByEndpointId(List<Long> endpointIdList, ProxyEndpointCallFilter filter);
+
+    List<ProxyEndpointCallAgg> aggProxyEndpointCallByEndpointId(List<Long> endpointIdList, ProxyEndpointCallFilter filter);
 
 }

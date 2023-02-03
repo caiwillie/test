@@ -1,6 +1,7 @@
 package com.brandnewdata.mop.poc.proxy.service.atomic;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
@@ -13,6 +14,7 @@ import com.brandnewdata.mop.poc.proxy.converter.ProxyEndpointCallDtoConverter;
 import com.brandnewdata.mop.poc.proxy.converter.ProxyEndpointCallPoConverter;
 import com.brandnewdata.mop.poc.proxy.dao.ProxyEndpointCallDao;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointCallDto;
+import com.brandnewdata.mop.poc.proxy.dto.agg.ProxyEndpointCallAgg;
 import com.brandnewdata.mop.poc.proxy.dto.filter.ProxyEndpointCallFilter;
 import com.brandnewdata.mop.poc.proxy.po.ProxyEndpointCallPo;
 import org.springframework.stereotype.Service;
@@ -126,6 +128,44 @@ public class ProxyEndpointCallAService implements IProxyEndpointCallAService {
         }
 
         return proxyEndpointCallDtoListMap;
+    }
+
+    @Override
+    public List<ProxyEndpointCallAgg> aggProxyEndpointCallByEndpointId(List<Long> endpointIdList, ProxyEndpointCallFilter filter) {
+        if(CollUtil.isEmpty(endpointIdList)) return ListUtil.empty();
+        Assert.isFalse(CollUtil.hasNull(endpointIdList), "endpointIdList must not contain null");
+
+        LocalDateTime minStartTime = filter.getMinStartTime();
+        LocalDateTime maxStartTime = filter.getMaxStartTime();
+
+        QueryWrapper<ProxyEndpointCallPo> query = new QueryWrapper<>();
+        query.in(ProxyEndpointCallPo.ENDPOINT_ID, endpointIdList);
+        if(minStartTime != null) {
+            query.ge(ProxyEndpointCallPo.CREATE_TIME, minStartTime);
+        }
+
+        if(maxStartTime != null) {
+            query.le(ProxyEndpointCallPo.CREATE_TIME, maxStartTime);
+        }
+        return null;
+    }
+
+
+    private QueryWrapper<ProxyEndpointCallPo> assembleQuery(List<Long> endpointIdList, ProxyEndpointCallFilter filter) {
+        Assert.notEmpty(endpointIdList);
+        LocalDateTime minStartTime = filter.getMinStartTime();
+        LocalDateTime maxStartTime = filter.getMaxStartTime();
+
+        QueryWrapper<ProxyEndpointCallPo> query = new QueryWrapper<>();
+        query.in(ProxyEndpointCallPo.ENDPOINT_ID, endpointIdList);
+        if(minStartTime != null) {
+            query.ge(ProxyEndpointCallPo.CREATE_TIME, minStartTime);
+        }
+
+        if(maxStartTime != null) {
+            query.le(ProxyEndpointCallPo.CREATE_TIME, maxStartTime);
+        }
+        return query;
     }
 
 }
