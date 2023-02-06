@@ -3,6 +3,7 @@ package com.brandnewdata.mop.poc.proxy.service.atomic;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.lang.Opt;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
@@ -19,8 +20,10 @@ import com.brandnewdata.mop.poc.proxy.dto.filter.ProxyEndpointCallFilter;
 import com.brandnewdata.mop.poc.proxy.po.ProxyEndpointCallPo;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,12 +32,13 @@ import java.util.stream.Collectors;
 @Service
 public class ProxyEndpointCallAService implements IProxyEndpointCallAService {
 
-    @Resource
-    private ProxyEndpointCallDao proxyEndpointCallDao;
+    private final ProxyEndpointCallDao proxyEndpointCallDao;
 
     private final ProxyEndpointCallCache proxyEndpointCallCache;
 
-    public ProxyEndpointCallAService(ProxyEndpointCallCache proxyEndpointCallCache) {
+    public ProxyEndpointCallAService(ProxyEndpointCallDao proxyEndpointCallDao,
+                                     ProxyEndpointCallCache proxyEndpointCallCache) {
+        this.proxyEndpointCallDao = proxyEndpointCallDao;
         this.proxyEndpointCallCache = proxyEndpointCallCache;
     }
 
@@ -44,19 +48,8 @@ public class ProxyEndpointCallAService implements IProxyEndpointCallAService {
         Assert.isTrue(pageNum > 0, "pageNum must be greater than 0");
         Assert.isTrue(pageSize > 0, "pageSize must be greater than 0");
         if(CollUtil.isEmpty(endpointIdList)) return Page.empty();
-        Assert.notNull(filter);
-        LocalDateTime minStartTime = filter.getMinStartTime();
-        LocalDateTime maxStartTime = filter.getMaxStartTime();
 
-        QueryWrapper<ProxyEndpointCallPo> query = new QueryWrapper<>();
-        query.in(ProxyEndpointCallPo.ENDPOINT_ID, endpointIdList);
-        if(minStartTime != null) {
-            query.ge(ProxyEndpointCallPo.CREATE_TIME, minStartTime);
-        }
-
-        if(maxStartTime != null) {
-            query.le(ProxyEndpointCallPo.CREATE_TIME, maxStartTime);
-        }
+        QueryWrapper<ProxyEndpointCallPo> query = assembleQuery(endpointIdList, filter);
 
         query.orderByDesc(ProxyEndpointCallPo.CREATE_TIME);
         com.baomidou.mybatisplus.extension.plugins.pagination.Page<ProxyEndpointCallPo> page =
@@ -65,14 +58,7 @@ public class ProxyEndpointCallAService implements IProxyEndpointCallAService {
 
         // 统计成功数、失败数
         Map<String, Long> countMap = new HashMap<>();
-        QueryWrapper<ProxyEndpointCallPo> query2 = new QueryWrapper<>();
-        query2.in(ProxyEndpointCallPo.ENDPOINT_ID, endpointIdList);
-        if(minStartTime != null) {
-            query2.ge(ProxyEndpointCallPo.CREATE_TIME, minStartTime);
-        }
-        if(maxStartTime != null) {
-            query2.le(ProxyEndpointCallPo.CREATE_TIME, maxStartTime);
-        }
+        QueryWrapper<ProxyEndpointCallPo> query2 = assembleQuery(endpointIdList, filter);
         query2.groupBy(ProxyEndpointCallPo.EXECUTE_STATUS);
         query2.select(ProxyEndpointCallPo.EXECUTE_STATUS, "count(*) as num");
         List<Map<String, Object>> countResultList = proxyEndpointCallDao.selectMaps(query2);
@@ -132,22 +118,36 @@ public class ProxyEndpointCallAService implements IProxyEndpointCallAService {
 
     @Override
     public List<ProxyEndpointCallAgg> aggProxyEndpointCallByEndpointId(List<Long> endpointIdList, ProxyEndpointCallFilter filter) {
+        List<ProxyEndpointCallAgg> ret = new ArrayList<>();
         if(CollUtil.isEmpty(endpointIdList)) return ListUtil.empty();
         Assert.isFalse(CollUtil.hasNull(endpointIdList), "endpointIdList must not contain null");
 
-        LocalDateTime minStartTime = filter.getMinStartTime();
-        LocalDateTime maxStartTime = filter.getMaxStartTime();
+        QueryWrapper<ProxyEndpointCallPo> query = assembleQuery(endpointIdList, filter);
+        String createDateAgg = StrUtil.format("DATE({})", ProxyEndpointCallPo.CREATE_TIME);
+        query.groupBy(ProxyEndpointCallPo.ENDPOINT_ID, createDateAgg, ProxyEndpointCallPo.EXECUTE_STATUS);
+        query.select(ProxyEndpointCallPo.ENDPOINT_ID,
+                StrUtil.format("{} as create_date", createDateAgg),
+                ProxyEndpointCallPo.EXECUTE_STATUS,
+                StrUtil.format("COUNT(*) as row_count"),
+                StrUtil.format("SUM({}) as time_consume_sum", ProxyEndpointCallPo.TIME_CONSUMING));
+        List<Map<String, Object>> records = proxyEndpointCallDao.selectMaps(query);
+        if(CollUtil.isEmpty(records)) return ret;
 
-        QueryWrapper<ProxyEndpointCallPo> query = new QueryWrapper<>();
-        query.in(ProxyEndpointCallPo.ENDPOINT_ID, endpointIdList);
-        if(minStartTime != null) {
-            query.ge(ProxyEndpointCallPo.CREATE_TIME, minStartTime);
+        for (Map<String, Object> record : records) {
+            ProxyEndpointCallAgg agg = new ProxyEndpointCallAgg();
+            Long endpointId = (Long) record.get(ProxyEndpointCallPo.ENDPOINT_ID);
+            LocalDate createDate = Opt.ofNullable((Date) record.get("create_date")).map(Date::toLocalDate).orElse(null);
+            String executeStatus = (String) record.get(ProxyEndpointCallPo.EXECUTE_STATUS);
+            Long rowCount = (Long) record.get("row_count");
+            Long timeConsumeSum = (Long) record.get("time_consume_sum");
+            agg.setEndpointId(endpointId);
+            agg.setCreateDate(createDate);
+            agg.setExecuteStatus(executeStatus);
+            agg.setRowCount(rowCount);
+            agg.setTimeConsumeSum(timeConsumeSum);
+            ret.add(agg);
         }
-
-        if(maxStartTime != null) {
-            query.le(ProxyEndpointCallPo.CREATE_TIME, maxStartTime);
-        }
-        return null;
+        return ret;
     }
 
 

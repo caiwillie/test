@@ -1,20 +1,20 @@
-package com.brandnewdata.mop.poc.config;
+package datasource;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.db.ds.simple.SimpleDataSource;
+import com.baomidou.mybatisplus.core.MybatisConfiguration;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
+import com.brandnewdata.mop.poc.proxy.dao.ProxyEndpointCallDao;
+import lombok.SneakyThrows;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.mybatis.spring.mapper.MapperScannerConfigurer;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.support.ResourcePatternResolver;
 
 import javax.sql.DataSource;
 import java.util.Arrays;
@@ -22,39 +22,29 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-/**
- * @author caiwillie
- */
-@Configuration("modelMybatisPlusConfiguration")
-public class MybatisPlusConfiguration {
-    // private static final String LOCATION_PATTERN = "classpath*:com/shinemo/suc/core/mappers/DataDao.xml";
+public class MybatisPlusMapperUtil {
 
-    @Bean("modelMainMapperScannerConfigurer")
-    public static MapperScannerConfigurer mapperScannerConfigurer() {
-        MapperScannerConfigurer ret = new MapperScannerConfigurer();
-        ret.setSqlSessionFactoryBeanName("coreMainSqlSessionFactoryBean");
-        ret.setBasePackage(String.join(",",
-                "com.brandnewdata.mop.poc.dao",
-                "com.brandnewdata.mop.poc.scene.dao",
-                "com.brandnewdata.mop.poc.process.dao",
-                "com.brandnewdata.mop.poc.proxy.dao"));
-        return ret;
+    private static final DataSource dataSource;
+
+    static {
+        dataSource = new SimpleDataSource(DataSourceEnum.POC.getJdbcUrl(),
+                DataSourceEnum.POC.getUser(), DataSourceEnum.POC.getPassword());
     }
 
-    @Bean("coreMainSqlSessionFactoryBean")
-    public static SqlSessionFactory sqlSessionFactoryBean(
-            DataSource dataSource,
-            ResourcePatternResolver resourcePatResolver,
-            @Value("${brandnewdata.datasource.schema}") String schema) throws Exception {
+    @SneakyThrows
+    public static <T> T get(Class<T> clazz) {
         MybatisSqlSessionFactoryBean factory = new MybatisSqlSessionFactoryBean();
+        MybatisConfiguration configuration = new MybatisConfiguration();
+        configuration.addMapper(clazz);
+        factory.setConfiguration(configuration);
         factory.setDataSource(dataSource);
-
-        // factory.setConfiguration(null); 原生mybatis相关配置
-        factory.setGlobalConfig(globalConfig(schema)); // mybatis plus新增的相关配置
+        factory.setGlobalConfig(globalConfig("mop")); // mybatis plus新增的相关配置
         factory.setPlugins(mybatisPlusInterceptor()); // mybatis plus插件相关配置
-        // factory.setMapperLocations(resourcePatResolver.getResources(LOCATION_PATTERN));
-        SqlSessionFactory sqlSessionFactory = factory.getObject();
-        return sqlSessionFactory;
+        try {
+            return factory.getObject().openSession().getMapper(clazz);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static GlobalConfig globalConfig(String schema) {
@@ -108,4 +98,9 @@ public class MybatisPlusConfiguration {
         return ret;
     }
 
+    public static void main(String[] args) {
+        ProxyEndpointCallDao proxyEndpointCallDao = MybatisPlusMapperUtil.get(ProxyEndpointCallDao.class);
+        Long count = proxyEndpointCallDao.selectCount(new QueryWrapper<>());
+        return;
+    }
 }

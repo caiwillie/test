@@ -119,10 +119,10 @@
             </dependency>
 
             <!-- ================= Mybatis ===================== -->
-            <!-- Mybatis-plus-extension 包含了所有集成 Spring 的扩展功能以及自身核心框架   -->
+            <!-- mybatis-plus 包含了所有集成 Spring 的扩展功能以及自身核心框架   -->
             <dependency>
                 <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-extension</artifactId>
+                <artifactId>mybatis-plus</artifactId>
                 <version>${mybatis.plus.version}</version>
             </dependency>
 
