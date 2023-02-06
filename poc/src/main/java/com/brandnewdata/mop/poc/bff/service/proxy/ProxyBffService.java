@@ -13,6 +13,7 @@ import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointCallDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyGroupDto;
+import com.brandnewdata.mop.poc.proxy.dto.agg.ProxyEndpointCallAgg;
 import com.brandnewdata.mop.poc.proxy.dto.filter.ProxyEndpointCallFilter;
 import com.brandnewdata.mop.poc.proxy.dto.filter.ProxyEndpointFilter;
 import com.brandnewdata.mop.poc.proxy.dto.filter.ProxyFilter;
@@ -86,26 +87,27 @@ public class ProxyBffService {
         LocalDateTime beginTime = endTime.minusDays(1);
         ProxyEndpointCallFilter proxyEndpointCallFilter = new ProxyEndpointCallFilter()
                 .setMinStartTime(beginTime).setMaxStartTime(endTime);
-        Map<Long, List<ProxyEndpointCallDto>> proxyEndpointCallDtoListMap =
-                proxyEndpointCallService.fetchCacheListByEndpointId(ListUtil.toList(proxyEndpointDtoMap.keySet()), proxyEndpointCallFilter);
 
-        Map<Long, Integer> countMap = new HashMap<>();
-        for (Map.Entry<Long, List<ProxyEndpointCallDto>> entry : proxyEndpointCallDtoListMap.entrySet()) {
-            Long endpointId = entry.getKey();
-            int count = CollUtil.count(entry.getValue(), null);
+        List<ProxyEndpointCallAgg> proxyEndpointCallAggList =
+                proxyEndpointCallService.aggProxyEndpointCallByEndpointId(ListUtil.toList(proxyEndpointDtoMap.keySet()), proxyEndpointCallFilter);
+
+        Map<Long, Long> countMap = new HashMap<>();
+        for (ProxyEndpointCallAgg agg : proxyEndpointCallAggList) {
+            Long endpointId = agg.getEndpointId();
+            Long rowCount = agg.getRowCount();
             Long proxyId = Opt.ofNullable(proxyEndpointDtoMap.get(endpointId)).map(ProxyEndpointDto::getProxyId).orElse(null);
             if(proxyId == null) continue;
-            countMap.put(proxyId, countMap.getOrDefault(proxyId, 0) + count);
+            countMap.put(proxyId, countMap.getOrDefault(proxyId, 0L) + rowCount);
         }
 
         // 获取endpoint总数
-        Map<Long, Integer> endpointCountMap = proxyEndpointAService.countByProxyId(proxyIdList);
+        Map<Long, Long> endpointCountMap = proxyEndpointAService.countByProxyId(proxyIdList);
 
         // 组装数据
         for (ProxyGroupVo proxyGroupVo : voList) {
             for (ProxyVo version : proxyGroupVo.getVersions()) {
-                Integer callTimesCount = countMap.getOrDefault(version.getId(), 0);
-                Integer endpointCount = endpointCountMap.getOrDefault(version.getId(), 0);
+                Long callTimesCount = countMap.getOrDefault(version.getId(), 0L);
+                Long endpointCount = endpointCountMap.getOrDefault(version.getId(), 0L);
                 version.setCallTimes24h(callTimesCount);
                 version.setEndpointTotal(endpointCount);
             }

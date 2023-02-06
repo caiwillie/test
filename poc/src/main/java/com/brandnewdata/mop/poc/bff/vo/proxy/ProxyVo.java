@@ -66,10 +66,10 @@ public class ProxyVo {
     /**
      * endpoint总数
      */
-    private Integer endpointTotal;
+    private Long endpointTotal;
 
     /**
      * 24小时内的调用次数
      */
-    private Integer callTimes24h;
+    private Long callTimes24h;
 }
