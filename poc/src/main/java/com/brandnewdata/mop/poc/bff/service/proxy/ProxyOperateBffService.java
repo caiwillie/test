@@ -126,16 +126,11 @@ public class ProxyOperateBffService {
             ProxyEndpointDtoConverter.updateFrom(proxyEndpointDto, proxyDto);
         }
 
-        // 查询所有api调用明细
+        // 聚合所有api调用明细
         ProxyEndpointCallFilter proxyEndpointCallFilter = new ProxyEndpointCallFilter()
                 .setMinStartTime(minStartTime).setMaxStartTime(maxStartTime);
         List<ProxyEndpointCallAgg> proxyEndpointCallAggList = proxyEndpointCallService
                 .aggProxyEndpointCallByEndpointId(ListUtil.toList(proxyEndpointDtoMap.keySet()), proxyEndpointCallFilter);
-
-/*
-        Map<Long, List<ProxyEndpointCallDto>> proxyEndpointCallDtoListMap =
-                proxyEndpointCallService.fetchCacheListByEndpointId(ListUtil.toList(proxyEndpointDtoMap.keySet()), proxyEndpointCallFilter);
-*/
 
         Long totalCount = 0L;
         Long successCount = 0L;
