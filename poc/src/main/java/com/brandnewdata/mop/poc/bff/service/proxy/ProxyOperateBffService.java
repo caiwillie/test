@@ -18,6 +18,7 @@ import com.brandnewdata.mop.poc.constant.ProxyConst;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointCallDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto;
+import com.brandnewdata.mop.poc.proxy.dto.agg.ProxyEndpointCallAgg;
 import com.brandnewdata.mop.poc.proxy.dto.filter.ProxyEndpointCallFilter;
 import com.brandnewdata.mop.poc.proxy.dto.filter.ProxyEndpointFilter;
 import com.brandnewdata.mop.poc.proxy.dto.filter.ProxyFilter;
@@ -33,7 +34,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -129,82 +129,93 @@ public class ProxyOperateBffService {
         // 查询所有api调用明细
         ProxyEndpointCallFilter proxyEndpointCallFilter = new ProxyEndpointCallFilter()
                 .setMinStartTime(minStartTime).setMaxStartTime(maxStartTime);
+        List<ProxyEndpointCallAgg> proxyEndpointCallAggList = proxyEndpointCallService
+                .aggProxyEndpointCallByEndpointId(ListUtil.toList(proxyEndpointDtoMap.keySet()), proxyEndpointCallFilter);
+
+/*
         Map<Long, List<ProxyEndpointCallDto>> proxyEndpointCallDtoListMap =
                 proxyEndpointCallService.fetchCacheListByEndpointId(ListUtil.toList(proxyEndpointDtoMap.keySet()), proxyEndpointCallFilter);
+*/
 
-        AtomicInteger totalCount = new AtomicInteger();
-        AtomicInteger successCount = new AtomicInteger();
-        AtomicInteger falseCount = new AtomicInteger();
-        AtomicInteger totalTimeConsuming = new AtomicInteger();
-        Map<String, Integer> callCountProxyRankingMap = new HashMap<>();
-        Map<String, Integer> callCountProxyRankingSuccessMap = new HashMap<>();
-        Map<String, Integer> callCountProxyRankingFalseMap = new HashMap<>();
+        Long totalCount = 0L;
+        Long successCount = 0L;
+        Long falseCount = 0L;
+        Long totalTimeConsuming = 0L;
+        Map<String, Long> callCountProxyRankingMap = new HashMap<>();
+        Map<String, Long> callCountProxyRankingSuccessMap = new HashMap<>();
+        Map<String, Long> callCountProxyRankingFalseMap = new HashMap<>();
         Map<String, Double> timeConsumingProxyRankingMap = new HashMap<>();
-        Map<ProxyEndpointDto, Integer> callCountEndpointRankingMap = new HashMap<>();
-        Map<ProxyEndpointDto, Integer> callCountEndpointRankingSuccessMap = new HashMap<>();
-        Map<ProxyEndpointDto, Integer> callCountEndpointRankingFalseMap = new HashMap<>();
+        Map<ProxyEndpointDto, Long> callCountEndpointRankingMap = new HashMap<>();
+        Map<ProxyEndpointDto, Long> callCountEndpointRankingSuccessMap = new HashMap<>();
+        Map<ProxyEndpointDto, Long> callCountEndpointRankingFalseMap = new HashMap<>();
         Map<ProxyEndpointDto, Double> timeConsumingEndpointRankingMap = new HashMap<>();
-        Map<LocalDate, Integer> callCountTendencyMap = new HashMap<>();
-        Map<LocalDate, Integer> callCountTendencySuccessMap = new HashMap<>();
-        Map<LocalDate, Integer> callCountTendencyFalseMap = new HashMap<>();
+        Map<LocalDate, Long> callCountTendencyMap = new HashMap<>();
+        Map<LocalDate, Long> callCountTendencySuccessMap = new HashMap<>();
+        Map<LocalDate, Long> callCountTendencyFalseMap = new HashMap<>();
         Map<LocalDate, Double> timeConsumingTendencyMap = new HashMap<>();
 
-        proxyEndpointCallDtoListMap.values().stream().flatMap(List::stream).forEach(callDto -> {
-            totalCount.getAndIncrement();
-            if (StrUtil.equals(ProxyConst.CALL_EXECUTE_STATUS__SUCCESS, callDto.getExecuteStatus())) {
-                successCount.getAndIncrement();
+        for (ProxyEndpointCallAgg agg : proxyEndpointCallAggList) {
+            Long endpointId = agg.getEndpointId();
+            Long rowCount = agg.getRowCount();
+            String executeStatus = agg.getExecuteStatus();
+            Long timeConsumeSum = agg.getTimeConsumeSum();
+            LocalDate createDate = agg.getCreateDate();
+            totalCount += rowCount;
+            totalTimeConsuming += timeConsumeSum;
+            if (StrUtil.equals(ProxyConst.CALL_EXECUTE_STATUS__SUCCESS,executeStatus)) {
+                successCount += rowCount;
             } else {
-                falseCount.getAndIncrement();
+                falseCount += rowCount;
             }
-            totalTimeConsuming.addAndGet(callDto.getTimeConsuming());
-            ProxyEndpointDto proxyEndpointDto = proxyEndpointDtoMap.get(callDto.getEndpointId());
-            if(proxyEndpointDto == null) return;
+
+            ProxyEndpointDto proxyEndpointDto = proxyEndpointDtoMap.get(endpointId);
+            if(proxyEndpointDto == null) continue;
             ProxyDto proxyDto = proxyDtoMap.get(proxyEndpointDto.getProxyId());
-            if(proxyDto == null) return;
+            if(proxyDto == null) continue;
 
             String name = proxyDto.getName();
             if(StrUtil.isNotBlank(name)) {
-                callCountProxyRankingMap.put(name, callCountProxyRankingMap.getOrDefault(name, 0) + 1);
-                if(StrUtil.equals(ProxyConst.CALL_EXECUTE_STATUS__SUCCESS, callDto.getExecuteStatus())) {
+                callCountProxyRankingMap.put(name, callCountProxyRankingMap.getOrDefault(name, 0L) + rowCount);
+                if(StrUtil.equals(ProxyConst.CALL_EXECUTE_STATUS__SUCCESS, executeStatus)) {
                     callCountProxyRankingSuccessMap.put(name,
-                            callCountProxyRankingSuccessMap.getOrDefault(name, 0) + 1);
+                            callCountProxyRankingSuccessMap.getOrDefault(name, 0L) + rowCount);
                 } else {
                     callCountProxyRankingFalseMap.put(name,
-                            callCountProxyRankingFalseMap.getOrDefault(name, 0) + 1);
+                            callCountProxyRankingFalseMap.getOrDefault(name, 0L) + rowCount);
                 }
 
                 timeConsumingProxyRankingMap.put(name,
-                        timeConsumingProxyRankingMap.getOrDefault(name, 0.0) + callDto.getTimeConsuming());
+                        timeConsumingProxyRankingMap.getOrDefault(name, 0.0) + timeConsumeSum);
             }
 
             callCountEndpointRankingMap.put(proxyEndpointDto,
-                    callCountEndpointRankingMap.getOrDefault(proxyEndpointDto, 0) + 1);
-            if (StrUtil.equals(ProxyConst.CALL_EXECUTE_STATUS__SUCCESS, callDto.getExecuteStatus())) {
+                    callCountEndpointRankingMap.getOrDefault(proxyEndpointDto, 0L) + rowCount);
+            if (StrUtil.equals(ProxyConst.CALL_EXECUTE_STATUS__SUCCESS, executeStatus)) {
                 callCountEndpointRankingSuccessMap.put(proxyEndpointDto,
-                        callCountEndpointRankingSuccessMap.getOrDefault(proxyEndpointDto, 0) + 1);
+                        callCountEndpointRankingSuccessMap.getOrDefault(proxyEndpointDto, 0L) + rowCount);
             } else {
                 callCountEndpointRankingFalseMap.put(proxyEndpointDto,
-                        callCountEndpointRankingFalseMap.getOrDefault(proxyEndpointDto, 0) + 1);
+                        callCountEndpointRankingFalseMap.getOrDefault(proxyEndpointDto, 0L) + rowCount);
             }
             timeConsumingEndpointRankingMap.put(proxyEndpointDto,
-                    timeConsumingEndpointRankingMap.getOrDefault(proxyEndpointDto, 0.0) + callDto.getTimeConsuming());
+                    timeConsumingEndpointRankingMap.getOrDefault(proxyEndpointDto, 0.0) + timeConsumeSum);
 
-            LocalDateTime startTime = callDto.getStartTime();
-            if(startTime != null) {
-                LocalDate date = startTime.toLocalDate();
-                callCountTendencyMap.put(date, callCountTendencyMap.getOrDefault(date, 0) + 1);
-                if(StrUtil.equals(ProxyConst.CALL_EXECUTE_STATUS__SUCCESS, callDto.getExecuteStatus())) {
-                    callCountTendencySuccessMap.put(date, callCountTendencySuccessMap.getOrDefault(date, 0) + 1);
+            if(createDate != null) {
+                callCountTendencyMap.put(createDate, callCountTendencyMap.getOrDefault(createDate, 0L) + rowCount);
+                if(StrUtil.equals(ProxyConst.CALL_EXECUTE_STATUS__SUCCESS, executeStatus)) {
+                    callCountTendencySuccessMap.put(createDate, callCountTendencySuccessMap.getOrDefault(createDate, 0L) + rowCount);
                 } else {
-                    callCountTendencyFalseMap.put(date, callCountTendencyFalseMap.getOrDefault(date, 0) + 1);
+                    callCountTendencyFalseMap.put(createDate, callCountTendencyFalseMap.getOrDefault(createDate, 0L) + rowCount);
                 }
-                timeConsumingTendencyMap.put(date,
-                        timeConsumingTendencyMap.getOrDefault(date, 0.0) + callDto.getTimeConsuming());
+                timeConsumingTendencyMap.put(createDate,
+                        timeConsumingTendencyMap.getOrDefault(createDate, 0.0) + timeConsumeSum);
             }
-        });
+
+        }
+
 
         // 组装数据
-        assembleCount(statistic, totalCount.get(), successCount.get(), falseCount.get(), totalTimeConsuming.get());
+        assembleCount(statistic, totalCount, successCount, falseCount, totalTimeConsuming);
         assembleCallCountProxyRanking(statistic, callCountProxyRankingMap, callCountProxyRankingSuccessMap, callCountProxyRankingFalseMap);
         assembleTimeConsumingProxyRanking(statistic, timeConsumingProxyRankingMap, callCountProxyRankingMap);
         assembleCallCountEndpointRanking(statistic, callCountEndpointRankingMap, callCountEndpointRankingSuccessMap, callCountEndpointRankingFalseMap);
@@ -214,7 +225,7 @@ public class ProxyOperateBffService {
         return statistic;
     }
 
-    private void assembleCount(ProxyStatistic statistic, int totalCount, int successCount, int failCount, int totalTimeConsuming) {
+    private void assembleCount(ProxyStatistic statistic, long totalCount, long successCount, long failCount, long totalTimeConsuming) {
         statistic.setTotalCount(totalCount);
         statistic.setSuccessCount(successCount);
         statistic.setFailCount(failCount);
@@ -227,23 +238,23 @@ public class ProxyOperateBffService {
     }
 
     private void assembleCallCountProxyRanking(ProxyStatistic statistic,
-                                               Map<String, Integer> callCountProxyRankingMap,
-                                               Map<String, Integer> callCountProxyRankingSuccessMap,
-                                               Map<String, Integer> callCountProxyRankingFalseMap) {
+                                               Map<String, Long> callCountProxyRankingMap,
+                                               Map<String, Long> callCountProxyRankingSuccessMap,
+                                               Map<String, Long> callCountProxyRankingFalseMap) {
         ChartOption chart = new ChartOption();
-        List<Pair<String, Integer>> callCountProxyRankingList = callCountProxyRankingMap.entrySet().stream()
+        List<Pair<String, Long>> callCountProxyRankingList = callCountProxyRankingMap.entrySet().stream()
                 .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
                 .sorted((o1, o2) -> NumberUtil.compare(o2.getValue(), o1.getValue()))
                 .collect(Collectors.toList());
         List<String> categoryList = new ArrayList<>();
-        List<Integer> successDataList = new ArrayList<>();
-        List<Integer> falseDataList = new ArrayList<>();
+        List<Long> successDataList = new ArrayList<>();
+        List<Long> falseDataList = new ArrayList<>();
 
         for (int i = 0; i < callCountProxyRankingList.size() && i < MAX_SIZE; i++) {
-            Pair<String, Integer> pair = callCountProxyRankingList.get(i);
+            Pair<String, Long> pair = callCountProxyRankingList.get(i);
             String name = pair.getKey();
-            Integer successCount = callCountProxyRankingSuccessMap.getOrDefault(name, 0);
-            Integer falseCount = callCountProxyRankingFalseMap.getOrDefault(name, 0);
+            Long successCount = callCountProxyRankingSuccessMap.getOrDefault(name, 0L);
+            Long falseCount = callCountProxyRankingFalseMap.getOrDefault(name, 0L);
             categoryList.add(name);
             successDataList.add(successCount);
             falseDataList.add(falseCount);
@@ -259,13 +270,13 @@ public class ProxyOperateBffService {
 
     private void assembleTimeConsumingProxyRanking(ProxyStatistic statistic,
                                                    Map<String, Double> timeConsumingProxyRankingMap,
-                                                   Map<String, Integer> callCountProxyRankingMap) {
+                                                   Map<String, Long> callCountProxyRankingMap) {
         ChartOption chart = new ChartOption();
         List<Pair<String, Double>> timeConsumingProxyRankingList = timeConsumingProxyRankingMap.entrySet().stream()
                 .map(entry -> {
                     String name = entry.getKey();
                     Double _totalTime = entry.getValue();
-                    Integer _totalCount = callCountProxyRankingMap.get(name);
+                    Long _totalCount = callCountProxyRankingMap.get(name);
                     BigDecimal averageTime1 = NumberUtil.div(_totalTime, _totalCount, 2);
                     return Pair.of(name, averageTime1.doubleValue());
                 })
@@ -288,23 +299,23 @@ public class ProxyOperateBffService {
     }
 
     private void assembleCallCountEndpointRanking(ProxyStatistic statistic,
-                                                  Map<ProxyEndpointDto, Integer> callCountEndpointRankingMap,
-                                                  Map<ProxyEndpointDto, Integer> callCountEndpointRankingSuccessMap,
-                                                  Map<ProxyEndpointDto, Integer> callCountEndpointRankingFalseMap) {
+                                                  Map<ProxyEndpointDto, Long> callCountEndpointRankingMap,
+                                                  Map<ProxyEndpointDto, Long> callCountEndpointRankingSuccessMap,
+                                                  Map<ProxyEndpointDto, Long> callCountEndpointRankingFalseMap) {
         ChartOption chart = new ChartOption();
-        List<Pair<ProxyEndpointDto, Integer>> callCountProxyRankingList = callCountEndpointRankingMap.entrySet().stream()
+        List<Pair<ProxyEndpointDto, Long>> callCountProxyRankingList = callCountEndpointRankingMap.entrySet().stream()
                 .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
                 .sorted((o1, o2) -> NumberUtil.compare(o2.getValue(), o1.getValue()))
                 .collect(Collectors.toList());
         List<String> categoryList = new ArrayList<>();
-        List<Integer> successDataList = new ArrayList<>();
-        List<Integer> falseDataList = new ArrayList<>();
+        List<Long> successDataList = new ArrayList<>();
+        List<Long> falseDataList = new ArrayList<>();
 
         for (int i = 0; i < callCountProxyRankingList.size() && i < MAX_SIZE; i++) {
-            Pair<ProxyEndpointDto, Integer> pair = callCountProxyRankingList.get(i);
+            Pair<ProxyEndpointDto, Long> pair = callCountProxyRankingList.get(i);
             ProxyEndpointDto endpointDto = pair.getKey();
-            Integer successCount = callCountEndpointRankingSuccessMap.getOrDefault(endpointDto, 0);
-            Integer falseCount = callCountEndpointRankingFalseMap.getOrDefault(endpointDto, 0);
+            Long successCount = callCountEndpointRankingSuccessMap.getOrDefault(endpointDto, 0L);
+            Long falseCount = callCountEndpointRankingFalseMap.getOrDefault(endpointDto, 0L);
             categoryList.add(StrUtil.format("{}\n{}({})", endpointDto.getLocation(),
                     endpointDto.getProxyName(), endpointDto.getProxyVersion()));
             successDataList.add(successCount);
@@ -321,13 +332,13 @@ public class ProxyOperateBffService {
 
     private void assembleTimeConsumingEndpointRanking(ProxyStatistic statistic,
                                                       Map<ProxyEndpointDto, Double> timeConsumingEndpointRankingMap,
-                                                      Map<ProxyEndpointDto, Integer> callCountEndpointRankingMap) {
+                                                      Map<ProxyEndpointDto, Long> callCountEndpointRankingMap) {
         ChartOption chart = new ChartOption();
         List<Pair<ProxyEndpointDto, Double>> timeConsumingEndpointRankingList = timeConsumingEndpointRankingMap.entrySet().stream()
                 .map(entry -> {
                     ProxyEndpointDto endpointDto = entry.getKey();
                     Double _totalTime = entry.getValue();
-                    Integer _totalCount = callCountEndpointRankingMap.get(endpointDto);
+                    Long _totalCount = callCountEndpointRankingMap.get(endpointDto);
                     BigDecimal averageTime1 = NumberUtil.div(_totalTime, _totalCount, 2);
                     return Pair.of(endpointDto, averageTime1.doubleValue());
                 })
@@ -350,23 +361,23 @@ public class ProxyOperateBffService {
     }
 
     private void assembleCallCountTendency(ProxyStatistic statistic,
-                                           Map<LocalDate, Integer> callCountTendencyMap,
-                                           Map<LocalDate, Integer> callCountTendencySuccessMap,
-                                           Map<LocalDate, Integer> callCountTendencyFalseMap) {
+                                           Map<LocalDate, Long> callCountTendencyMap,
+                                           Map<LocalDate, Long> callCountTendencySuccessMap,
+                                           Map<LocalDate, Long> callCountTendencyFalseMap) {
         ChartOption chart = new ChartOption();
-        List<Pair<LocalDate, Integer>> callCountTendencyList = callCountTendencyMap.entrySet().stream()
+        List<Pair<LocalDate, Long>> callCountTendencyList = callCountTendencyMap.entrySet().stream()
                 .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
                 .sorted((o1, o2) -> o2.getKey().compareTo(o1.getKey())).collect(Collectors.toList());
 
         List<String> categoryList = new ArrayList<>();
-        List<Integer> successDataList = new ArrayList<>();
-        List<Integer> falseDataList = new ArrayList<>();
+        List<Long> successDataList = new ArrayList<>();
+        List<Long> falseDataList = new ArrayList<>();
         for (int i = 0; i < callCountTendencyList.size(); i++) {
-            Pair<LocalDate, Integer> pair = callCountTendencyList.get(i);
+            Pair<LocalDate, Long> pair = callCountTendencyList.get(i);
             LocalDate date = pair.getKey();
             categoryList.add(LocalDateTimeUtil.formatNormal(date));
-            Integer successCount = callCountTendencySuccessMap.getOrDefault(date, 0);
-            Integer falseCount = callCountTendencyFalseMap.getOrDefault(date, 0);
+            Long successCount = callCountTendencySuccessMap.getOrDefault(date, 0L);
+            Long falseCount = callCountTendencyFalseMap.getOrDefault(date, 0L);
             successDataList.add(successCount);
             falseDataList.add(falseCount);
         }
@@ -381,13 +392,13 @@ public class ProxyOperateBffService {
 
     private void assembleTimeConsumingTendency(ProxyStatistic statistic,
                                                   Map<LocalDate, Double> timeConsumingTendencyMap,
-                                                  Map<LocalDate, Integer> callCountTendencyMap) {
+                                                  Map<LocalDate, Long> callCountTendencyMap) {
         ChartOption chart = new ChartOption();
         List<Pair<LocalDate, Double>> timeConsumingTendencyList = timeConsumingTendencyMap.entrySet().stream()
                 .map(entry -> {
                     LocalDate date = entry.getKey();
                     Double _totalTime = entry.getValue();
-                    Integer _totalCount = callCountTendencyMap.get(date);
+                    Long _totalCount = callCountTendencyMap.get(date);
                     BigDecimal averageTime1 = NumberUtil.div(_totalTime, _totalCount, 2);
                     return Pair.of(date, averageTime1.doubleValue());
                 })
