@@ -27,6 +27,7 @@ import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyEndpointCallAService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -66,6 +67,11 @@ public class ProxyOperateBffService {
         Long projectId = Opt.ofNullable(filter.getProjectId()).map(Long::valueOf).orElse(null);
         LocalDateTime minStartTime = Opt.ofNullable(filter.getStartTime()).map(date -> DateUtil.parse(date).toLocalDateTime()).orElse(null);
         LocalDateTime maxStartTime = Opt.ofNullable(filter.getEndTime()).map(date -> DateUtil.parse(date).toLocalDateTime()).orElse(null);
+
+        //添加校验, 时间间隔一个月内
+        if(!checkTimeInterval(minStartTime,maxStartTime)){
+            throw new RuntimeException("起止日期最大间隔请小于30天");
+        }
 
         // 查询proxy
         ProxyFilter proxyFilter = new ProxyFilter().setName(proxyName).setVersion(version).setProjectId(projectId);
@@ -107,6 +113,11 @@ public class ProxyOperateBffService {
         Long projectId = Opt.ofNullable(filter.getProjectId()).map(Long::valueOf).orElse(null);
         LocalDateTime minStartTime = Opt.ofNullable(filter.getStartTime()).map(date -> DateUtil.parse(date).toLocalDateTime()).orElse(null);
         LocalDateTime maxStartTime = Opt.ofNullable(filter.getEndTime()).map(date -> DateUtil.parse(date).toLocalDateTime()).orElse(null);
+
+        //添加校验, 时间间隔一个月内
+        if(!checkTimeInterval(minStartTime,maxStartTime)){
+            throw new RuntimeException("起止日期最大间隔请小于30天");
+        }
 
         // 查询proxy
         ProxyFilter proxyFilter = new ProxyFilter().setName(proxyName).setVersion(version).setProjectId(projectId);
@@ -406,5 +417,15 @@ public class ProxyOperateBffService {
         Series series = new Series("平均请求耗时", dataList.toArray());
         chart.setSeries(new Series[]{series});
         statistic.setTimeConsumingTendency(chart);
+    }
+
+    private boolean checkTimeInterval(LocalDateTime time1, LocalDateTime time2){
+        Duration duration = Duration.between(time1,time2);
+        Long monthMillis = 2592000000L;
+        Long dMillis = duration.toMillis();
+        if(Math.abs(dMillis)>monthMillis){
+            return false;
+        }
+        return true;
     }
 }

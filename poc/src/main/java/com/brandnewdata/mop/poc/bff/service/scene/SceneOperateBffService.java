@@ -33,6 +33,7 @@ import com.brandnewdata.mop.poc.scene.service.atomic.IVersionProcessAService;
 import io.camunda.operate.dto.ProcessInstanceState;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -72,8 +73,10 @@ public class SceneOperateBffService {
 
         LocalDateTime minStartTime = Opt.ofNullable(filter.getStartTime()).map(time -> DateUtil.parse(time).toLocalDateTime()).orElse(null);
         LocalDateTime maxStartTime = Opt.ofNullable(filter.getEndTime()).map(time -> DateUtil.parse(time).toLocalDateTime()).orElse(null);
-
-
+        //添加校验, 时间间隔一个月内
+        if(!checkTimeInterval(minStartTime,maxStartTime)){
+            throw new RuntimeException("起止日期最大间隔请小于30天");
+        }
         // 获取符合过滤条件的流程id列表
         List<SceneReleaseDeployDto> sceneReleaseDeployDtoList = fetchSceneReleaseDeployDtoList(filter);
         Map<String, SceneReleaseDeployDto> sceneReleaseDeployDtoMap = sceneReleaseDeployDtoList.stream()
@@ -127,6 +130,10 @@ public class SceneOperateBffService {
 
         LocalDateTime minStartTime = Opt.ofNullable(filter.getStartTime()).map(time -> DateUtil.parse(time).toLocalDateTime()).orElse(null);
         LocalDateTime maxStartTime = Opt.ofNullable(filter.getEndTime()).map(time -> DateUtil.parse(time).toLocalDateTime()).orElse(null);
+        //添加校验, 时间间隔一个月内
+        if(!checkTimeInterval(minStartTime,maxStartTime)){
+            throw new RuntimeException("起止日期最大间隔请小于30天");
+        }
 
         // 获取符合过滤条件的流程id列表
         List<SceneReleaseDeployDto> sceneReleaseDeployDtoList = fetchSceneReleaseDeployDtoList(filter);
@@ -308,6 +315,16 @@ public class SceneOperateBffService {
         chart.setSeries(new Series[]{seriesSuccess, seriesFalse});
 
         statistic.setExecutionSceneTendency(chart);
+    }
+
+    private boolean checkTimeInterval(LocalDateTime time1, LocalDateTime time2){
+        Duration duration = Duration.between(time1,time2);
+        Long monthMillis = 2592000000L;
+        Long dMillis = duration.toMillis();
+        if(Math.abs(dMillis)>monthMillis){
+            return false;
+        }
+        return true;
     }
 
 }
