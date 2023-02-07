@@ -71,12 +71,9 @@ public class SceneOperateBffService {
     public Page<OperateProcessInstanceVo> pageProcessInstance(SceneDeployFilter filter) {
         Long envId = Assert.notNull(filter.getEnvId());
 
-        LocalDateTime minStartTime = Opt.ofNullable(filter.getStartTime()).map(time -> DateUtil.parse(time).toLocalDateTime()).orElse(null);
-        LocalDateTime maxStartTime = Opt.ofNullable(filter.getEndTime()).map(time -> DateUtil.parse(time).toLocalDateTime()).orElse(null);
-        //添加校验, 时间间隔一个月内
-        if(!checkTimeInterval(minStartTime,maxStartTime)){
-            throw new RuntimeException("起止日期最大间隔请小于30天");
-        }
+        LocalDateTime minStartTime = Opt.ofNullable(filter.getStartTime()).map(time -> DateUtil.parse(time).toLocalDateTime()).orElse(LocalDateTime.now().minusDays(1));
+        LocalDateTime maxStartTime = Opt.ofNullable(filter.getEndTime()).map(time -> DateUtil.parse(time).toLocalDateTime()).orElse(LocalDateTime.now());
+
         // 获取符合过滤条件的流程id列表
         List<SceneReleaseDeployDto> sceneReleaseDeployDtoList = fetchSceneReleaseDeployDtoList(filter);
         Map<String, SceneReleaseDeployDto> sceneReleaseDeployDtoMap = sceneReleaseDeployDtoList.stream()
@@ -127,13 +124,11 @@ public class SceneOperateBffService {
     public SceneStatistic statistic(SceneDeployFilter filter) {
         SceneStatistic ret = new SceneStatistic();
         Long envId = Assert.notNull(filter.getEnvId());
+        //没填时间默认一天内
 
-        LocalDateTime minStartTime = Opt.ofNullable(filter.getStartTime()).map(time -> DateUtil.parse(time).toLocalDateTime()).orElse(null);
-        LocalDateTime maxStartTime = Opt.ofNullable(filter.getEndTime()).map(time -> DateUtil.parse(time).toLocalDateTime()).orElse(null);
-        //添加校验, 时间间隔一个月内
-        if(!checkTimeInterval(minStartTime,maxStartTime)){
-            throw new RuntimeException("起止日期最大间隔请小于30天");
-        }
+        LocalDateTime minStartTime = Opt.ofNullable(filter.getStartTime()).map(time -> DateUtil.parse(time).toLocalDateTime()).orElse(LocalDateTime.now().minusDays(1));
+        LocalDateTime maxStartTime = Opt.ofNullable(filter.getEndTime()).map(time -> DateUtil.parse(time).toLocalDateTime()).orElse(LocalDateTime.now());
+
 
         // 获取符合过滤条件的流程id列表
         List<SceneReleaseDeployDto> sceneReleaseDeployDtoList = fetchSceneReleaseDeployDtoList(filter);
@@ -317,14 +312,14 @@ public class SceneOperateBffService {
         statistic.setExecutionSceneTendency(chart);
     }
 
-    private boolean checkTimeInterval(LocalDateTime time1, LocalDateTime time2){
-        Duration duration = Duration.between(time1,time2);
-        Long monthMillis = 2592000000L;
-        Long dMillis = duration.toMillis();
-        if(Math.abs(dMillis)>monthMillis){
-            return false;
-        }
-        return true;
-    }
+//    private boolean checkTimeInterval(LocalDateTime time1, LocalDateTime time2){
+//        Duration duration = Duration.between(time1,time2);
+//        Long monthMillis = 2592000000L;
+//        Long dMillis = duration.toMillis();
+//        if(Math.abs(dMillis)>monthMillis){
+//            return false;
+//        }
+//        return true;
+//    }
 
 }
