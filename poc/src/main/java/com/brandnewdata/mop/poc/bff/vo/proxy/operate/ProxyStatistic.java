@@ -10,17 +10,17 @@ public class ProxyStatistic {
     /**
      * 请求次数
      */
-    private int totalCount;
+    private long totalCount;
 
     /**
      * 成功次数
      */
-    private int successCount;
+    private long successCount;
 
     /**
      * 失败次数
      */
-    private int failCount;
+    private long failCount;
 
     /**
      * 平均耗时

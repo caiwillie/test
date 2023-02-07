@@ -137,9 +137,9 @@ public class ProxyEndpoingAService implements IProxyEndpointAService {
     }
 
     @Override
-    public Map<Long, Integer> countByProxyId(List<Long> proxyIdList) {
+    public Map<Long, Long> countByProxyId(List<Long> proxyIdList) {
         if(CollUtil.isEmpty(proxyIdList)) return MapUtil.empty();
-        Map<Long, Integer> ret = new HashMap<>();
+        Map<Long, Long> ret = new HashMap<>();
         QueryWrapper<ProxyEndpointPo> query = new QueryWrapper<>();
         query.isNull(ProxyEndpointPo.DELETE_FLAG);
         query.in(ProxyEndpointPo.PROXY_ID, proxyIdList);
@@ -150,9 +150,8 @@ public class ProxyEndpoingAService implements IProxyEndpointAService {
         for (Map<String, Object> record : records) {
             Long proxyId = (Long) record.get(ProxyEndpointPo.PROXY_ID);
             Long num = (Long) record.get("num");
-            ret.put(proxyId, num.intValue());
+            ret.put(proxyId, num);
         }
-
         return ret;
     }
 }

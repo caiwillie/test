@@ -20,10 +20,12 @@ import com.google.common.cache.LoadingCache;
 import lombok.SneakyThrows;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class ElasticsearchManager {
@@ -70,11 +72,17 @@ public class ElasticsearchManager {
                 HttpHost httpHost = HttpHostUtil.createHttpHost(StrUtil.format("{}:{}", serviceDomain, port));
 
                 // Create the low-level client
-                RestClient restClient = RestClient.builder(new HttpHost[]{httpHost}).build();
+                RestClientBuilder restClientBuilder = RestClient.builder(new HttpHost[]{httpHost});
+                restClientBuilder.setHttpClientConfigCallback(
+                        requestConfig -> requestConfig.setKeepAliveStrategy((response, context) -> TimeUnit.MINUTES.toMinutes(5)));
+
+                restClientBuilder.setRequestConfigCallback(requestConfigBuilder ->
+                        requestConfigBuilder.setConnectTimeout(30000).setSocketTimeout(300 * 1000));
+
 
                 // Create the transport with a Jackson mapper
                 ElasticsearchTransport transport = new RestClientTransport(
-                        restClient, new JacksonJsonpMapper(JacksonUtil.getObjectMapper()));
+                        restClientBuilder.build(), new JacksonJsonpMapper(JacksonUtil.getObjectMapper()));
 
                 // And create the API client
                 return new ElasticsearchClient(transport);

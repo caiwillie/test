@@ -20,6 +20,7 @@ import com.brandnewdata.mop.poc.proxy.dto.filter.ProxyEndpointCallFilter;
 import com.brandnewdata.mop.poc.proxy.po.ProxyEndpointCallPo;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -139,7 +140,7 @@ public class ProxyEndpointCallAService implements IProxyEndpointCallAService {
             LocalDate createDate = Opt.ofNullable((Date) record.get("create_date")).map(Date::toLocalDate).orElse(null);
             String executeStatus = (String) record.get(ProxyEndpointCallPo.EXECUTE_STATUS);
             Long rowCount = (Long) record.get("row_count");
-            Long timeConsumeSum = (Long) record.get("time_consume_sum");
+            Long timeConsumeSum = ((BigDecimal) record.get("time_consume_sum")).longValue();
             agg.setEndpointId(endpointId);
             agg.setCreateDate(createDate);
             agg.setExecuteStatus(executeStatus);

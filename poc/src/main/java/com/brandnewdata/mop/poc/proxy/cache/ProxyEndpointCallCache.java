@@ -26,8 +26,8 @@ public class ProxyEndpointCallCache {
 
     public ProxyEndpointCallCache(DataSource dataSource,
                                   @Value("${brandnewdata.database-schedule.maxRowSize}") int maxRowSize) {
-        scheduleCache = new ScheduleUpdateCache<>("mop_proxy_endpoint_call", "id", "update_time", dataSource,
-                "0/4 * * * * ?", maxRowSize, getConsume());
+        /*scheduleCache = new ScheduleUpdateCache<>("mop_proxy_endpoint_call", "id", "update_time", dataSource,
+                "0/4 * * * * ?", maxRowSize, getConsume());*/
     }
 
     private BiConsumer<List<Entity>, Cache<Long, ProxyEndpointCallDto>> getConsume() {

@@ -26,5 +26,5 @@ public interface IProxyEndpointAService {
 
     List<String> listTag(Long proxyId);
 
-    Map<Long, Integer> countByProxyId(List<Long> proxyIdList);
+    Map<Long, Long> countByProxyId(List<Long> proxyIdList);
 }

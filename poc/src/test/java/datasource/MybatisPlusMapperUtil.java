@@ -14,7 +14,6 @@ import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import com.brandnewdata.mop.poc.proxy.dao.ProxyEndpointCallDao;
 import lombok.SneakyThrows;
 import org.apache.ibatis.reflection.MetaObject;
-import org.apache.ibatis.session.SqlSessionFactory;
 
 import javax.sql.DataSource;
 import java.util.Arrays;

@@ -174,7 +174,7 @@ public class ConnectorApi implements IConnectorApi {
         Map<String, List<ProcessSnapshotDeployDto>> snapshotDeployMap =
                 processDeployService.listSnapshotByEnvIdAndProcessId(envId, ListUtil.toList(processIdMap.keySet()));
         Map<Long, ProcessSnapshotDeployDto> processSnapshotDeployDtoMap = snapshotDeployMap.values().stream()
-                .flatMap(Collection::stream).collect(Collectors.toMap(ProcessSnapshotDeployDto::getProcessZeebeKey, Function.identity()));
+                .flatMap(Collection::stream).collect(Collectors.toMap(ProcessSnapshotDeployDto::getProcessZeebeKey, Function.identity(), (a, b) -> b));
 
         // 根据流程定义去查询流程实例
         ProcessInstanceFilter processInstanceFilter = new ProcessInstanceFilter();
