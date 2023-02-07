@@ -8,6 +8,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.brandnewdata.mop.poc.constant.ProxyConst;
 import com.brandnewdata.mop.poc.proxy.dao.ProxyDao;
+import com.brandnewdata.mop.poc.proxy.dto.ImportDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto;
 import com.brandnewdata.mop.poc.proxy.dto.filter.ProxyEndpointFilter;
@@ -15,6 +16,7 @@ import com.brandnewdata.mop.poc.proxy.dto.openapi.OpenAPI;
 import com.brandnewdata.mop.poc.proxy.po.ProxyPo;
 import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyAService;
 import com.brandnewdata.mop.poc.proxy.service.atomic.IProxyEndpointAService;
+import com.brandnewdata.mop.poc.proxy.util.SwaggerUtil2;
 import com.dxy.library.json.jackson.JacksonUtil;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
@@ -79,6 +81,19 @@ public class ProxyCService implements IProxyCService {
         }
 
         return ret;
+    }
+
+    @Override
+    public void importProxy(String content, String format) {
+        ImportDto importDto = SwaggerUtil2.parse(content);
+        ProxyDto proxyDto = importDto.getProxy();
+        List<ProxyEndpointDto> endpointList = importDto.getEndpointList();
+
+        proxyDto = proxyAService.save(proxyDto, true);
+        for (ProxyEndpointDto proxyEndpointDto : endpointList) {
+
+        }
+
     }
 
     private OpenAPI getOpenAPI(Long proxyId) {

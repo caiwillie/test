@@ -184,6 +184,13 @@ public class ProxyController {
     }
 
 
+    /**
+     * 查看描述文件
+     *
+     * @param proxyId the proxy id
+     * @param format  the format
+     * @return the result
+     */
     @GetMapping("/rest/reverseProxy/inspect")
     public Result<InspectVo> inspect(@RequestParam Long proxyId, @RequestParam String format) {
         InspectVo ret = new InspectVo();
@@ -191,5 +198,16 @@ public class ProxyController {
         ret.setFormat(format);
         ret.setContent(content);
         return Result.OK(ret);
+    }
+
+    /**
+     * 创建自配置文件
+     *
+     * @return the result
+     */
+    @PostMapping("/rest/reverseProxy/importFromFile")
+    public Result importFromFile (@RequestBody ImportVo vo) {
+
+        return Result.OK();
     }
 }

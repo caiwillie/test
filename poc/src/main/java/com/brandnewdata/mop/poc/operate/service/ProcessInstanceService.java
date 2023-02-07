@@ -13,7 +13,6 @@ import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.aggregations.*;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
-import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.json.JsonData;
 import com.brandnewdata.mop.poc.common.dto.Page;
 import com.brandnewdata.mop.poc.operate.bo.StatisticCountBo;
@@ -34,7 +33,6 @@ import com.brandnewdata.mop.poc.operate.schema.template.FlowNodeInstanceTemplate
 import com.brandnewdata.mop.poc.operate.schema.template.ListViewTemplate;
 import com.brandnewdata.mop.poc.operate.schema.template.SequenceFlowTemplate;
 import com.brandnewdata.mop.poc.operate.util.ElasticsearchUtil;
-import com.brandnewdata.mop.poc.util.PageEnhancedUtil;
 import io.camunda.operate.dto.ProcessInstanceState;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;

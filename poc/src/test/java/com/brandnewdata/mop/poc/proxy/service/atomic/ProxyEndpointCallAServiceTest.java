@@ -1,25 +1,17 @@
 package com.brandnewdata.mop.poc.proxy.service.atomic;
 
 import cn.hutool.core.collection.ListUtil;
-import cn.hutool.db.ds.simple.SimpleDataSource;
-import cn.hutool.db.sql.SqlUtil;
-import com.brandnewdata.mop.poc.operate.service.ProcessInstanceService;
 import com.brandnewdata.mop.poc.proxy.cache.ProxyEndpointCallCache;
 import com.brandnewdata.mop.poc.proxy.dao.ProxyEndpointCallDao;
 import com.brandnewdata.mop.poc.proxy.dto.agg.ProxyEndpointCallAgg;
 import com.brandnewdata.mop.poc.proxy.dto.filter.ProxyEndpointCallFilter;
-import com.brandnewdata.mop.poc.proxy.service.atomic.ProxyEndpointCallAService;
-import datasource.DataSourceEnum;
 import datasource.MybatisPlusMapperUtil;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import javax.sql.DataSource;
-import java.util.Arrays;
 import java.util.List;
 
 public class ProxyEndpointCallAServiceTest {
