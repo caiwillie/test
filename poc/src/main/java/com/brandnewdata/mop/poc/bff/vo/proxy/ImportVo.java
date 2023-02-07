@@ -8,6 +8,11 @@ import lombok.Setter;
 public class ImportVo {
 
     /**
+     * 项目id
+     */
+    private String projectId;
+
+    /**
      * 文件类型：JSON, YAML
      */
     private String fileType;
