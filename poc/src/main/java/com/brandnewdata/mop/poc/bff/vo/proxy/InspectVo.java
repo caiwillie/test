@@ -1,9 +1,9 @@
-package com.brandnewdata.mop.poc.proxy.resp;
+package com.brandnewdata.mop.poc.bff.vo.proxy;
 
 import lombok.Data;
 
 @Data
-public class InspectResp {
+public class InspectVo {
 
     /**
      * 描述文件格式：YAML

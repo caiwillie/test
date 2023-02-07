@@ -233,4 +233,8 @@ public class ProxyBffService {
         return ListUtil.toList(proxyMap.values());
     }
 
+    public String inspect(Long proxyId, String format) {
+        return proxyCService.inspect(proxyId, format);
+    }
+
 }

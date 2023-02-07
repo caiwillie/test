@@ -1,8 +1,6 @@
 package com.brandnewdata.mop.poc.proxy.service;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.brandnewdata.mop.poc.proxy.dao.ProxyEndpointDao;
@@ -11,8 +9,6 @@ import com.brandnewdata.mop.poc.proxy.po.ProxyEndpointPo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author caiwillie
@@ -50,16 +46,7 @@ public class EndpointService {
         return endpointDao.selectOne(query);
     }
 
-    public List<Endpoint> listByProxyIdList(List<Long> proxyIdList) {
-        if(CollUtil.isEmpty(proxyIdList)) {
-            return ListUtil.empty();
-        }
-        QueryWrapper<ProxyEndpointPo> queryWrapper = new QueryWrapper<>();
-        queryWrapper.in(ProxyEndpointPo.PROXY_ID, proxyIdList);
-        List<ProxyEndpointPo> list = endpointDao.selectList(queryWrapper);
-        List<Endpoint> ret = list.stream().map(this::toDTO).collect(Collectors.toList());
-        return ret;
-    }
+
 
     private ProxyEndpointPo toEntity(Endpoint dto) {
         Assert.notNull(dto);
@@ -73,20 +60,5 @@ public class EndpointService {
         entity.setTag(dto.getTag());
         return entity;
     }
-
-    private Endpoint toDTO(ProxyEndpointPo entity) {
-        Assert.notNull(entity);
-        Endpoint dto = new Endpoint();
-        dto.setId(String.valueOf(entity.getId()));
-        dto.setProxyId(entity.getProxyId());
-        dto.setLocation(entity.getLocation());
-        dto.setDescription(entity.getDescription());
-        dto.setBackendType(entity.getBackendType());
-        dto.setBackendConfig(entity.getBackendConfig());
-        dto.setTag(entity.getTag());
-        return dto;
-    }
-
-
 
 }
