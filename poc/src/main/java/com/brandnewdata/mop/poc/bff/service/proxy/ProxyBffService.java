@@ -236,4 +236,8 @@ public class ProxyBffService {
         return proxyCService.inspect(proxyId, format);
     }
 
+    public void importProxy(String content, String format) {
+        proxyCService.importProxy(content, format);
+    }
+
 }

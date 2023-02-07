@@ -207,7 +207,7 @@ public class ProxyController {
      */
     @PostMapping("/rest/reverseProxy/importFromFile")
     public Result importFromFile (@RequestBody ImportVo vo) {
-
+        proxyBffService.importProxy(vo.getFileContent(), vo.getFileType());
         return Result.OK();
     }
 }

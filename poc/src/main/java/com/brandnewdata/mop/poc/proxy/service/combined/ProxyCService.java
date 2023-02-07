@@ -3,11 +3,14 @@ package com.brandnewdata.mop.poc.proxy.service.combined;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.brandnewdata.mop.poc.constant.ProxyConst;
+import com.brandnewdata.mop.poc.proxy.converter.ProxyEndpointPoConverter;
 import com.brandnewdata.mop.poc.proxy.dao.ProxyDao;
+import com.brandnewdata.mop.poc.proxy.dao.ProxyEndpointDao;
 import com.brandnewdata.mop.poc.proxy.dto.ImportDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyDto;
 import com.brandnewdata.mop.poc.proxy.dto.ProxyEndpointDto;
@@ -40,9 +43,14 @@ public class ProxyCService implements IProxyCService {
 
     private final IProxyAService proxyAService;
 
-    public ProxyCService(IProxyEndpointAService proxyEndpointAService, IProxyAService proxyAService) {
+    private final ProxyEndpointDao proxyEndpointDao;
+
+    public ProxyCService(IProxyEndpointAService proxyEndpointAService,
+                         IProxyAService proxyAService,
+                         ProxyEndpointDao proxyEndpointDao) {
         this.proxyEndpointAService = proxyEndpointAService;
         this.proxyAService = proxyAService;
+        this.proxyEndpointDao = proxyEndpointDao;
     }
 
 
@@ -84,16 +92,23 @@ public class ProxyCService implements IProxyCService {
     }
 
     @Override
+    @Transactional
     public void importProxy(String content, String format) {
         ImportDto importDto = SwaggerUtil2.parse(content);
         ProxyDto proxyDto = importDto.getProxy();
         List<ProxyEndpointDto> endpointList = importDto.getEndpointList();
 
         proxyDto = proxyAService.save(proxyDto, true);
+        Long proxyId = proxyDto.getId();
         for (ProxyEndpointDto proxyEndpointDto : endpointList) {
+            String location = proxyEndpointDto.getLocation();
+            // endpoint 的唯一性校验
+            ProxyEndpointDto exist = proxyEndpointAService.fetchByProxyIdAndLocation(proxyId, location);
+            Assert.isNull(exist, "路径 {} 已存在", location);
 
+            proxyEndpointDto.setId(IdUtil.getSnowflakeNextId());
+            proxyEndpointDao.insert(ProxyEndpointPoConverter.createFrom(proxyEndpointDto));
         }
-
     }
 
     private OpenAPI getOpenAPI(Long proxyId) {
