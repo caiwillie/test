@@ -59,7 +59,6 @@ public class ElasticsearchManager {
                 Optional<EnvServiceDto> serviceOpt = envService.fetchEnvService(key).stream()
                         .filter(envServiceDto -> StrUtil.equals(envServiceDto.getName(), "elasticsearch-master"))
                         .findFirst();
-
                 if(!serviceOpt.isPresent()) {
                     throw new RuntimeException("环境信息配置有误");
                 }
