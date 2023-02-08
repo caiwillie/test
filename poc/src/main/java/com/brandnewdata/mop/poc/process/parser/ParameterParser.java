@@ -83,14 +83,14 @@ public class ParameterParser {
     }
 
     private Object parseStruct(Element root) {
+        if(root == null ) {
+            return null;
+        }
         String expression = root.attributeValue(expressionAttribute);
         if(StrUtil.isNotBlank(expression)) {
             return new RawValue(expression);
         }
         ObjectNode ret = OM.createObjectNode();
-        if(root == null ) {
-            return null;
-        }
 
         List<Element> elements = root.elements();
         for (Element element : elements) {
@@ -108,14 +108,14 @@ public class ParameterParser {
     }
 
     private Object parseList(Element root) {
+        if(root == null) {
+            return null;
+        }
         String expression = root.attributeValue(expressionAttribute);
         if(StrUtil.isNotBlank(expression)) {
             return new RawValue(expression);
         }
         ArrayNode ret = OM.createArrayNode();
-        if(root == null) {
-            return null;
-        }
 
         List<Element> elements = root.elements();
         for (Element element : elements) {
