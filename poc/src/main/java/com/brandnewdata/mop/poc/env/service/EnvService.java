@@ -47,7 +47,10 @@ public class EnvService implements IEnvService {
         // 获取调试环境
         Optional<EnvDto> debugEnvOpt = fetchEnvList().stream()
                 .filter(envDto -> NumberUtil.equals(envDto.getType(), EnvConst.ENV_TYPE__SANDBOX)).findFirst();
-        Assert.isTrue(debugEnvOpt.isPresent(), "调试环境不存在");
-        return debugEnvOpt.get();
+        if(debugEnvOpt.isPresent()) {
+            return debugEnvOpt.get();
+        } else {
+            throw new RuntimeException("调试环境不存在");
+        }
     }
 }
