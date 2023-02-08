@@ -275,8 +275,6 @@ public class FlowNodeInstanceService implements IFlowNodeInstanceService {
             incidentDto.setRootCauseInstance(rootCauseInstance);
         }
 
-        if (rootCauseDecision != null) incidentDto.setRootCauseDecision(rootCauseDecision);
-
         ret.setIncidentDTO(incidentDto);
         return ret;
     }
