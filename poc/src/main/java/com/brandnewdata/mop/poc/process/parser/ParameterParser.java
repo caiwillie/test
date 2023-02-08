@@ -29,7 +29,7 @@ public class ParameterParser {
 
     private static final ObjectMapper OM = new ObjectMapper();
 
-    public String qName;
+    private final String qName;
 
     private final String nameAttribute;
 
